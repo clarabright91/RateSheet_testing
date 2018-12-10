@@ -5,7 +5,6 @@ class ImportFilesController < ApplicationController
     xlsx = Roo::Spreadsheet.open("/home/richa/richa/Kevin-Project/Pure-Loan/OB_New_Penn_Financial_Wholesale5806.xls")
     begin
       xlsx.sheets.each do |sheet|
-        debugger
         if (sheet == "Cover Zone 1")
           headers = ["Phone", "General Contacts", "Mortgagee Clause (Wholesale)"]
           xlsx.sheet(sheet).each_with_index do |row, index|
