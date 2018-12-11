@@ -2,6 +2,7 @@ class CreatePrograms < ActiveRecord::Migration[5.2]
   def change
     create_table :programs do |t|
       t.integer :bank_id
+      t.string :title
       t.integer :loan_type
       t.integer :term
       t.integer :interest_type
@@ -17,8 +18,8 @@ class CreatePrograms < ActiveRecord::Migration[5.2]
       t.boolean :usda
       t.boolean :streamline
       t.boolean :full_doc
-      t.integer :text
-      t.integer :text
+      t.text :interest_points
+      t.text :adjustments
       t.timestamps
     end
   end

@@ -31,6 +31,7 @@ ActiveRecord::Schema.define(version: 2018_12_06_095711) do
 
   create_table "programs", force: :cascade do |t|
     t.integer "bank_id"
+    t.string "title"
     t.integer "loan_type"
     t.integer "term"
     t.integer "interest_type"
@@ -46,7 +47,8 @@ ActiveRecord::Schema.define(version: 2018_12_06_095711) do
     t.boolean "usda"
     t.boolean "streamline"
     t.boolean "full_doc"
-    t.integer "text"
+    t.text "interest_points"
+    t.text "adjustments"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
