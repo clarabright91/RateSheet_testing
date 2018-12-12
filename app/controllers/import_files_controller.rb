@@ -1,7 +1,10 @@
 class ImportFilesController < ApplicationController
+  before_action :get_bank, only: [:import_government_sheet, :programs]
+
+  require 'roo'
+  require 'roo-xls'
+
   def index
-    require 'roo'
-    require 'roo-xls'
     xlsx = Roo::Spreadsheet.open("/home/richa/richa/Kevin-Project/Pure-Loan/OB_New_Penn_Financial_Wholesale5806.xls")
     begin
       xlsx.sheets.each do |sheet|
@@ -31,67 +34,78 @@ class ImportFilesController < ApplicationController
           @bank = Bank.find_or_create_by(name: @name)
           @bank.update(phone: @phone, address1: @address_a.join, state_code: @state_code, zip: @zip)
         end
-        if (sheet == "Government")
-          sheet_data = xlsx.sheet(sheet)
-
-          (1..95).each do |r|
-            row = sheet_data.row(r)
-
-            if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet"))
-              # (0..row.compact.count).each do |header_col|
-              #   term = row.compact[header_col]
-              #   debugger
-              # end
-              # r == 7 / 35 / 55
-              rr = r + 1 # (r == 8) / (r == 36) / (r == 56)
-
-              max_column_section = row.compact.count - 1
-              (0..max_column_section).each do |max_column|
-                cc = 3 + max_column*6 # (3 / 9 / 15) 3/8/13
-
-                @title = sheet_data.cell(r,cc)
-                program_heading = @title.split
-                @term = program_heading[1]
-                @interest_type = program_heading[3]
-
-                @program = @bank.programs.find_or_create_by(title: @title)
-                @program.update(term: @term,interest_type: @interest_type,loan_type: 0)
-                (0..50).each do |max_row|
-                  @data = []
-                  (0..4).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    # i_hash["interest"] = value
-                    @data << value
-                  end
-
-                  i_hash = Hash.new
-                  i_hash[@data[0]] = ["15 Day", "30 Day", "45 Day", "60 Day"].zip(@data.drop(1)).to_h
-                  debugger
-                  # hash = {}
-                  # @data.each { |i| hash[i] = 'free' }
-
-                  if @data.compact.length == 0
-                    # terminate the loop
-                    break
-                  end
-                end
-              end
-            end
-          end
-        end
       end
     rescue
       # the required headers are not all present
     end
   end
 
-  def new
+
+  def import_government_sheet
+    xlsx = Roo::Spreadsheet.open("/home/richa/richa/Kevin-Project/Pure-Loan/OB_New_Penn_Financial_Wholesale5806.xls")
+    xlsx.sheets.each do |sheet|
+      if (sheet == "Government")
+        sheet_data = xlsx.sheet(sheet)
+
+        (1..95).each do |r|
+          row = sheet_data.row(r)
+
+          if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet"))
+            # r == 7 / 35 / 55
+            rr = r + 1 # (r == 8) / (r == 36) / (r == 56)
+            max_column_section = row.compact.count - 1
+            (0..max_column_section).each do |max_column|
+              cc = 3 + max_column*6 # (3 / 9 / 15)
+
+              @title = sheet_data.cell(r,cc)
+              program_heading = @title.split
+              @term = program_heading[1]
+              @interest_type = program_heading[3]
+
+              @program = @bank.programs.find_or_create_by(title: @title)
+              @program.update(term: @term,interest_type: @interest_type,loan_type: 0)
+              @block_hash = {}
+              key = ''
+              (0..50).each do |max_row|
+                @data = []
+                (0..4).each_with_index do |index, c_i|
+                  rrr = rr + max_row
+                  ccc = cc + c_i
+                  value = sheet_data.cell(rrr,ccc)
+                  if (c_i == 0)
+                    key = value
+                    @block_hash[key] = {}
+                  else
+                    # first_row[c_i]
+                    @block_hash[key][15*c_i] = value
+                  end
+                  @data << value
+                end
+
+                if @data.compact.length == 0
+                  break # terminate the loop
+                end
+              end
+              @program.update(interest_points: @block_hash)
+            end
+          end
+        end
+      end
+    end
+    redirect_to programs_import_file_path(@bank)
   end
 
-  def create
+  def programs
+    @programs = @bank.programs
   end
+
+  private
+
+  def get_bank
+    @bank = Bank.find(params[:id])
+  end
+
+
 end
 
 

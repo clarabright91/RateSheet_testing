@@ -1,0 +1,29 @@
+<div class="container">
+  <h2>Programs</h2>
+  <table class="table table-dark table-striped">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Loan Type</th>
+        <th>Term</th>
+        <th>Interest Type</th>
+        <th>FHA</th>
+        <th>Interest Points</th>
+        <th>Adjustment</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @programs.each do |program|%>
+        <tr>
+          <td><%= program.title %></td>
+          <td><%= program.loan_type %></td>
+          <td><%= program.term %></td>
+          <td><%= program.interest_type %></td>
+          <td><%= program.fha %></td>
+          <td><%= program.interest_points %></td>
+          <td>Adjustment are in process</td>
+        </tr>
+      <%end%>
+    </tbody>
+  </table>
+</div>
