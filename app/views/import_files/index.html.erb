@@ -1,5 +1,9 @@
 <div class="container">
   <%= link_to "Import Government Sheet", import_government_sheet_import_file_path(@bank), class: "btn btn-primary" %>
+  <%= link_to "Import HomeReady Sheet", import_homereddy_sheet_import_file_path(@bank), class: "btn btn-primary" %>
+  <%= link_to "Import Home balance extra Sheet", import_home_balance_extra_import_file_path(@bank), class: "btn btn-primary" %>
+
+
   <%= link_to "Import Conforming Fixed Rate",nil,  class: "btn btn-primary" %>
   <%= link_to "Import Freddie Fixed Rate", nil,class: "btn btn-primary" %>
 
