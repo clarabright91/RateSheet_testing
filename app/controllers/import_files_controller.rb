@@ -46,7 +46,6 @@ class ImportFilesController < ApplicationController
     xlsx.sheets.each do |sheet|
       if (sheet == "Government")
         sheet_data = xlsx.sheet(sheet)
-
         (1..95).each do |r|
           row = sheet_data.row(r)
 
@@ -81,12 +80,60 @@ class ImportFilesController < ApplicationController
                   end
                   @data << value
                 end
-
-                if @data.compact.length == 0
+                if @data.compact.reject { |c| c.blank? }.length == 0
                   break # terminate the loop
                 end
               end
+
               @program.update(interest_points: @block_hash)
+            end
+          end
+        end
+
+        xlsx.sheet(sheet).each_with_index do |sheet_row, index|
+          index = index+ 1
+          if sheet_row.include?("Loan Level Price Adjustments")
+            (index..xlsx.sheet(sheet).last_row).drop(1).each do |row_no|
+              adj_row = xlsx.sheet(sheet).row(row_no)
+              if xlsx.sheet(sheet).row(row_no).compact.length > 0
+                rr = row_no # (r == 8) / (r == 36) / (r == 56)
+                max_column_section = adj_row.compact.count - 1
+                (0..max_column_section).each do |max_column|
+                  cc = 3 + max_column*8 # (3 / 9 / 15)
+                  @block_hash = {}
+                  key = ''
+                  (0..50).each do |max_row|
+                    @data = []
+                    (0..7).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = xlsx.sheet(sheet).cell(rrr,ccc)
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      elsif (index == 2)
+                        @block_hash[key][value.split[0]] = {}
+                        # first_row[c_i]
+                        # {"Credit Score"=> {0 => 4.0, 580 => 2.00, 600 => 1.250},
+
+                        # {"Credit Score"=>{15=>nil, 30=>"< 580", 45=>nil, 60=>nil, 75=>nil, 90=>4.0, 105=>nil}}
+                        # debugger
+
+                        debugger
+                        # @block_hash[key][(value.include?("<") ? value.split[0] : nil ] = value if !(value.include?("<"))
+                      elsif (index == 6)
+                        @block_hash[key][value.split[0]] = value
+                      end
+                      @data << value
+                    end
+
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
+                    end
+                  end
+                  @program.update(interest_points: @block_hash)
+                end
+              end
             end
           end
         end
@@ -419,8 +466,4 @@ class ImportFilesController < ApplicationController
   def get_bank
     @bank = Bank.find(params[:id])
   end
-
-
 end
-
-
