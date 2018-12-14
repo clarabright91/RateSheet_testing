@@ -17,6 +17,7 @@ Rails.application.routes.draw do
       get :dream_big
       get :high_balance_extra
       get :freddie_arms
+      get :import_jumbo_sheet
     end
   end
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

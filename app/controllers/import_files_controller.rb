@@ -1,11 +1,13 @@
 class ImportFilesController < ApplicationController
-  before_action :get_bank, only: [:import_government_sheet, :programs, :import_freddie_fixed_rate, :import_conforming_fixed_rate, :home_possible, :conforming_arms, :lp_open_acces_arms, :lp_open_access_105, :lp_open_access, :du_refi_plus_arms, :du_refi_plus_fixed_rate_105, :du_refi_plus_fixed_rate, :dream_big, :high_balance_extra, :freddie_arms]
+  before_action :get_bank, only: [:import_government_sheet, :programs, :import_freddie_fixed_rate, :import_conforming_fixed_rate, :home_possible, :conforming_arms, :lp_open_acces_arms, :lp_open_access_105, :lp_open_access, :du_refi_plus_arms, :du_refi_plus_fixed_rate_105, :du_refi_plus_fixed_rate, :dream_big, :high_balance_extra, :freddie_arms, :import_jumbo_sheet]
 
   require 'roo'
   require 'roo-xls'
 
   def index
-    xlsx = Roo::Spreadsheet.open("/home/yuva/Desktop/Projects/Pure-Loan_last/RateSheetExtractor/OB_New_Penn_Financial_Wholesale5806.xls")
+    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    xlsx = Roo::Spreadsheet.open(file)
+    # xlsx = Roo::Spreadsheet.open("/home/yuva/Desktop/pureloan/RateSheetExtractor/OB_New_Penn_Financial_Wholesale5806.xls")
     begin
       xlsx.sheets.each do |sheet|
         if (sheet == "Cover Zone 1")
@@ -42,7 +44,8 @@ class ImportFilesController < ApplicationController
 
 
   def import_government_sheet
-    xlsx = Roo::Spreadsheet.open("/home/yuva/Desktop/Projects/Pure-Loan_last/RateSheetExtractor/OB_New_Penn_Financial_Wholesale5806.xls")
+    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Government")
         sheet_data = xlsx.sheet(sheet)
@@ -62,7 +65,7 @@ class ImportFilesController < ApplicationController
               @interest_type = program_heading[3]
 
               @program = @bank.programs.find_or_create_by(title: @title)
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0)
+              @program.update(term: @term,interest_type: 0,loan_type: 0)
               @block_hash = {}
               key = ''
               (0..50).each do |max_row|
@@ -140,6 +143,82 @@ class ImportFilesController < ApplicationController
       end
     end
     redirect_to programs_import_file_path(@bank)
+  end
+
+  def import_jumbo_sheet
+    titles = get_titles
+    rows_entities = get_rows_entities
+    columns_entities = get_columns_entities
+    m_key  = nil
+    mm_key = nil
+
+    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    xlsx = Roo::Spreadsheet.open(file)
+    xlsx.sheets.each do |sheet|
+      if (sheet == "Jumbo Series_D")
+        sheet_data = xlsx.sheet(sheet)
+        (41..72).each do |r|
+          row = sheet_data.row(r)
+          if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet"))
+             # r == 43 / 53 / 63
+            rr = r + 1 # (r == 44) / (r == 54) / (r == 64)
+            max_column_section = row.compact.count - 1
+            (0..max_column_section).each do |max_column|
+              cc = 2 + max_column*9 # (2 / 11)
+              @title = sheet_data.cell(r,cc)
+              if(titles.include?(@title))
+                program_heading = @title.split
+                @term = program_heading[1]
+                @interest_type = program_heading[3]
+
+                @program = @bank.programs.find_or_create_by(title: @title)
+                @program.update(term: @term,interest_type: 0,loan_type: 0)
+                @block_hash = {}
+                key = ''
+
+                unless(["State Adjustments", "Feature Adjustments", "Max Price"].include?(@title))
+                  (0..50).each do |max_row|
+                    @data = []
+                    (0..7).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      main_key = rows_entities[:main_pair][value]
+                      sub_key = rows_entities[:heading_pair][c_i]
+
+                      if (max_row == 0 && c_i == 0)
+                        key = sheet_data.cell(rrr + 1,ccc) + "/" + value.split("%")[0]
+                        m_key = key
+                        # "FICO/Liv" = {}
+                        @block_hash[m_key] = {}
+                      end
+
+                      if ccc == 3 && main_key.present? && !@block_hash[m_key].keys.include?(main_key)
+                        # "FICO/Liv"["800"] = {}
+                        mm_key = main_key
+                        @block_hash[m_key][main_key] = {}
+                      end
+
+                      if columns_entities[:numbers].include?(ccc)
+                        valume_key = columns_entities[ccc]
+                        if valume_key.present? && mm_key.present? && !@block_hash[m_key][mm_key].keys.include?(valume_key)
+                          @block_hash[m_key][mm_key][valume_key] = value
+                        end
+
+                        if mm_key == "680" && valume_key == "75"
+                          @program.update(adjustments: @block_hash.to_json)
+                        end
+                      end
+                    end
+                  end
+                else
+                end
+              end
+            end
+          end
+        end
+      end
+    end
   end
 
   def import_freddie_fixed_rate
@@ -1409,5 +1488,45 @@ class ImportFilesController < ApplicationController
 
   def get_bank
     @bank = Bank.find(params[:id])
+  end
+
+  def get_titles
+    return ["FICO/LTV Adjustments - Loan Amount ≤ $1MM", "State Adjustments", "FICO/LTV Adjustments - Loan Amount > $1MM", "Feature Adjustments", "Max Price"]
+  end
+
+  def get_rows_entities
+    rows_entities = {
+      main_pair: {
+        ">= 800" => "800",
+        "780 - 799" => "780",
+        "760 - 779" => "760",
+        "740 - 759" => "740",
+        "720 - 739" => "720",
+        "700 - 719" => "700",
+        "680 - 699" => "680"
+      },
+      heading_pair: {
+        30 => "0",
+        45 => "60",
+        60 => "65",
+        75 => "70",
+        90 => "75"
+      }
+    }
+
+    return rows_entities
+  end
+
+  def get_columns_entities
+    columns_entities = {
+      4=>"0",
+      5=>"60",
+      6=>"65",
+      7=>"70",
+      9=>"75",
+      numbers: [4,5,6,7,9]
+    }
+
+    return columns_entities
   end
 end
