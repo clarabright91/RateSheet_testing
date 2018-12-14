@@ -137,60 +137,6 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        # (121..178).each do |r|
-        #   row = sheet_data.row(r)
-        #   if row.compact.count > 1
-        #     rr = r+1
-        #     max_column_section = row.count-1
-        #     (0..max_column_section).each do |max_column|
-        #       cc = max_column
-        #       @block_adjustment_hash = {}
-        #       # (0..50).each do |max_row|
-        #         @adjustment_data = []
-        #         (0..19).each_with_index do |index, c_i|
-        #           rrr = rr
-        #           ccc = cc + c_i
-        #           value = sheet_data.cell(rrr,ccc)
-
-        #           if (c_i == 0)
-        #             key = value
-        #             @block_adjustment_hash[key] = {}
-        #           else
-        #             @block_adjustment_hash["key"] = "All Fixed Conforming\n(does not apply to terms <=15yrs)"
-        #             debugger
-        #             if row.compact.include?("< 620")
-        #               @adjustment_headers = row.compact
-        #             end
-        #             @block_adjustment_hash[key][@adjustment_headers[0]] = value
-        #           end
-        #           # debugger
-        #           @adjustment_data << value
-        #         end
-        #       # end
-        #     end
-        #   end
-        # end
-        # (123..178).each do |r|
-        #   row = sheet_data.row(r)
-        #   if row.compact.count > 1
-        #     max_column_section = row.count-1
-        #     @block_adjustment_hash = {}
-        #     @adjustment_data = []
-        #     (0..max_column_section).each_with_index do |max_column|
-        #       value = sheet_data.cell(r,max_column)
-
-        #       if (value == "All Fixed Conforming\n(does not apply to terms <=15yrs)")
-        #         key = value
-        #         @block_adjustment_hash[key] = {}
-        #       elsif value.present?
-        #         debugger
-        #         @block_adjustment_hash[key][max_column] = value
-        #       end
-        #       @adjustment_data << value
-        #       debugger
-        #     end
-        #   end
-        # end
         (122..178).each do |r|
           row = sheet_data.row(r)
           if r == 122
