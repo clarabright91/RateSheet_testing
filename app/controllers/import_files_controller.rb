@@ -166,33 +166,94 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        (120..178).each do |r|
-          row = sheet_data.row(r)
-          if row.compact.count > 1
-            rr = r+1
-            max_column_section = row.count-1
-            (0..max_column_section).each do |max_column|
-              cc = max_column
-              @block_adjustment_hash = {}
-              (0..50).each do |max_row|
-                @adjustment_data = []
-                (0..19).each_with_index do |index, c_i|
-                  rrr = r + max_row
-                  ccc = cc + c_i
-                  value = sheet_data.cell(rrr,ccc)
+        # (121..178).each do |r|
+        #   row = sheet_data.row(r)
+        #   if row.compact.count > 1
+        #     rr = r+1
+        #     max_column_section = row.count-1
+        #     (0..max_column_section).each do |max_column|
+        #       cc = max_column
+        #       @block_adjustment_hash = {}
+        #       # (0..50).each do |max_row|
+        #         @adjustment_data = []
+        #         (0..19).each_with_index do |index, c_i|
+        #           rrr = rr
+        #           ccc = cc + c_i
+        #           value = sheet_data.cell(rrr,ccc)
 
-                  if (c_i == 0)
-                    key = value
-                    @block_adjustment_hash[key] = {}
-                  else
-                    if row.compact.include?("< 620")
-                      @adjustment_headers = row.compact
-                    end
-                    @block_adjustment_hash[key][@adjustment_headers[0]] = value
+        #           if (c_i == 0)
+        #             key = value
+        #             @block_adjustment_hash[key] = {}
+        #           else
+        #             @block_adjustment_hash["key"] = "All Fixed Conforming\n(does not apply to terms <=15yrs)"
+        #             debugger
+        #             if row.compact.include?("< 620")
+        #               @adjustment_headers = row.compact
+        #             end
+        #             @block_adjustment_hash[key][@adjustment_headers[0]] = value
+        #           end
+        #           # debugger
+        #           @adjustment_data << value
+        #         end
+        #       # end
+        #     end
+        #   end
+        # end
+        # (123..178).each do |r|
+        #   row = sheet_data.row(r)
+        #   if row.compact.count > 1
+        #     max_column_section = row.count-1
+        #     @block_adjustment_hash = {}
+        #     @adjustment_data = []
+        #     (0..max_column_section).each_with_index do |max_column|
+        #       value = sheet_data.cell(r,max_column)
+
+        #       if (value == "All Fixed Conforming\n(does not apply to terms <=15yrs)")
+        #         key = value
+        #         @block_adjustment_hash[key] = {}
+        #       elsif value.present?
+        #         debugger
+        #         @block_adjustment_hash[key][max_column] = value
+        #       end
+        #       @adjustment_data << value
+        #       debugger
+        #     end
+        #   end
+        # end
+        (122..178).each do |r|
+          row = sheet_data.row(r)
+          if r == 122
+            @adjustment_headers = row.compact
+          end
+          if row.compact.count > 1
+            max_column_section = row.count-1
+            @block_adjustment_hash = {}
+            @adjustment_data = []
+            key = ''
+            first_column = ''
+            column = 3
+            (0..max_column_section).each_with_index do |index, max_column|
+              cc = column + max_column
+              value = sheet_data.cell(r,cc)
+              # debugger if max_column == 7
+              if value.present? && value != "LTV"
+                if (value == "All Fixed Conforming\n(does not apply to terms <=15yrs)")
+                  key = value
+                  @block_adjustment_hash[key] = {}
+                elsif (value.class ==String) && (value.include?("<="))
+                  first_column = ((value.include?("<=") || value.include?("<")) ? "0" : value.split.first)
+                  @block_adjustment_hash[key][first_column] = first_column
+                elsif value.is_a?(Numeric)
+                  @adjustment_headers.each do |header|
+                    @i_hash = {}
+                    new_val = {header => value}
+                    @i_hash.merge!(new_val)
+                    @block_adjustment_hash[key][first_column] = {} #{header => value}
+                    debugger
                   end
-                  debugger
-                  @adjustment_data << value
+                  @block_adjustment_hash[key][first_column].merge!(@i_hash)
                 end
+                @adjustment_data << value
               end
             end
           end
