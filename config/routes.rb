@@ -8,6 +8,8 @@ Rails.application.routes.draw do
       get :import_conforming_fixed_rate
       get :home_possible
       get :conforming_arms
+      get :lp_open_acces_arms
+      get :lp_open_access_105
     end
   end
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
