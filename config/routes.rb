@@ -20,6 +20,7 @@ Rails.application.routes.draw do
       get :import_jumbo_sheet
       get :jumbo_series_d
       get :jumbo_series_f
+      get :jumbo_series_h
     end
   end
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
