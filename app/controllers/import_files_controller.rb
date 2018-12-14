@@ -1,5 +1,5 @@
 class ImportFilesController < ApplicationController
-  before_action :get_bank, only: [:import_government_sheet, :programs, :import_freddie_fixed_rate, :import_conforming_fixed_rate, :home_possible, :conforming_arms]
+  before_action :get_bank, only: [:import_government_sheet, :programs, :import_freddie_fixed_rate, :import_conforming_fixed_rate, :home_possible, :conforming_arms, :lp_open_acces_arms, :lp_open_access_105]
 
   require 'roo'
   require 'roo-xls'
@@ -331,6 +331,202 @@ class ImportFilesController < ApplicationController
               
               @program = @bank.programs.find_or_create_by(title: @title)
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae)
+              @block_hash = {}
+              key = ''
+              (0..50).each do |max_row|
+                @data = []
+                (0..4).each_with_index do |index, c_i|
+                  rrr = rr + max_row
+                  ccc = cc + c_i
+                  value = sheet_data.cell(rrr,ccc)
+                  if (c_i == 0)
+                    key = value
+                    @block_hash[key] = {}
+                  else
+                    # first_row[c_i]
+                    if value.class == Float
+                      @block_hash[key][15*c_i] = value.round(3)  
+                    else
+                      @block_hash[key][15*c_i] = value
+                    end
+                  end
+                  @data << value
+                end
+
+                if @data.compact.length == 0
+                  break # terminate the loop
+                end
+              end
+              @program.update(interest_points: @block_hash)
+            end
+          end
+        end
+      end
+    end
+    redirect_to programs_import_file_path(@bank)
+  end
+
+  def lp_open_acces_arms
+    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    xlsx = Roo::Spreadsheet.open(file)
+    xlsx.sheets.each do |sheet|
+      if (sheet == "LP Open Acces ARMs")
+        sheet_data = xlsx.sheet(sheet)
+        
+        (1..35).each do |r|
+          row = sheet_data.row(r)
+          if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet"))
+            rr = r + 1 # (r == 8) / (r == 36) / (r == 56)
+            max_column_section = row.compact.count - 1
+            (0..max_column_section).each do |max_column|
+              cc = 3 + max_column*6 # (3 / 9 / 15)
+              # title
+              @title = sheet_data.cell(r,cc)
+
+              # term
+              program_heading = @title.split
+              if @title.scan(/\d+/)[0] == "10"
+                @term = @title.scan(/\d+/)[0]
+              elsif @title.scan(/\d+/)[0] == "15"
+                @term = @title.scan(/\d+/)[0]
+              elsif @title.scan(/\d+/)[0] == "20"
+                @term = @title.scan(/\d+/)[0]
+              elsif @title.scan(/\d+/)[0] == "25"
+                @term = @title.scan(/\d+/)[0]
+              elsif @title.scan(/\d+/)[0] == "30"
+                @term = @title.scan(/\d+/)[0]
+              end
+              if (@term.nil? && @title.include?("ARM"))
+                @term = 0
+              end
+
+              # interest type
+              if @title.include?("Fixed")
+                @interest_type = 0
+              elsif @title.include?("ARM")
+                @interest_type = 2
+              end
+
+              # interest sub type
+              if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
+                @interest_subtype = @title.scan(/\d+/)[0].to_i              
+              end
+
+              # conforming
+              if @title.include?("Freddie Mac") || @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Possible") || @title.include?("Freddie Mac Home Ready")
+                @conforming = true
+              end
+
+              # freddie_mac
+              if @title.include?("Freddie Mac")
+                @freddie_mac = true
+              end
+
+              # fannie_mae
+              if @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Ready")
+                @fannie_mae = true
+              end
+        
+              @program = @bank.programs.find_or_create_by(title: @title)
+              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
+              @block_hash = {}
+              key = ''
+              (0..50).each do |max_row|
+                @data = []
+                (0..4).each_with_index do |index, c_i|
+                  rrr = rr + max_row
+                  ccc = cc + c_i
+                  value = sheet_data.cell(rrr,ccc)
+                  if (c_i == 0)
+                    key = value
+                    @block_hash[key] = {}
+                  else
+                    # first_row[c_i]
+                    if value.class == Float
+                      @block_hash[key][15*c_i] = value.round(3)  
+                    else
+                      @block_hash[key][15*c_i] = value
+                    end
+                  end
+                  @data << value
+                end
+
+                if @data.compact.length == 0
+                  break # terminate the loop
+                end
+              end
+              @program.update(interest_points: @block_hash)
+            end
+          end
+        end
+      end
+    end
+    redirect_to programs_import_file_path(@bank)
+  end
+
+  def lp_open_access_105
+    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    xlsx = Roo::Spreadsheet.open(file)
+    xlsx.sheets.each do |sheet|
+      if (sheet == "LP Open Access_105")
+        sheet_data = xlsx.sheet(sheet)
+        
+        (1..61).each do |r|
+          row = sheet_data.row(r)
+          if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet")) || (row.include?("LP Open Access 10yr Fixed >125 LTV"))
+            rr = r + 1 # (r == 8) / (r == 36) / (r == 56)
+            max_column_section = row.compact.count - 1
+            (0..max_column_section).each do |max_column|
+              cc = 3 + max_column*6 # (3 / 9 / 15)
+              # title
+              @title = sheet_data.cell(r,cc)
+              
+              # term
+              program_heading = @title.split
+              if @title.scan(/\d+/)[0] == "10"
+                @term = @title.scan(/\d+/)[0]
+              elsif @title.scan(/\d+/)[0] == "15"
+                @term = @title.scan(/\d+/)[0]
+              elsif @title.scan(/\d+/)[0] == "20"
+                @term = @title.scan(/\d+/)[0]
+              elsif @title.scan(/\d+/)[0] == "25"
+                @term = @title.scan(/\d+/)[0]
+              elsif @title.scan(/\d+/)[0] == "30"
+                @term = @title.scan(/\d+/)[0]
+              end
+              if (@term.nil? && @title.include?("ARM"))
+                @term = 0
+              end
+
+              # interest type
+              if @title.include?("Fixed")
+                @interest_type = 0
+              elsif @title.include?("ARM")
+                @interest_type = 2
+              end
+
+              # interest sub type
+              if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
+                @interest_subtype = @title.scan(/\d+/)[0].to_i              
+              end
+
+              # conforming
+              if @title.include?("Freddie Mac") || @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Possible") || @title.include?("Freddie Mac Home Ready")
+                @conforming = true
+              end
+
+              # freddie_mac
+              if @title.include?("Freddie Mac")
+                @freddie_mac = true
+              end
+
+              # fannie_mae
+              if @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Ready")
+                @fannie_mae = true
+              end
+              
+              @program = @bank.programs.find_or_create_by(title: @title)
+              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
               @block_hash = {}
               key = ''
               (0..50).each do |max_row|
