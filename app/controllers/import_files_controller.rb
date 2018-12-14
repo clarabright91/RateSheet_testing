@@ -1,6 +1,6 @@
 class ImportFilesController < ApplicationController
-  before_action :get_bank, only: [:import_government_sheet, :programs, :import_freddie_fixed_rate, :import_conforming_fixed_rate, :home_possible, :conforming_arms, :lp_open_acces_arms, :lp_open_access_105, :lp_open_access, :du_refi_plus_arms, :du_refi_plus_fixed_rate_105, :du_refi_plus_fixed_rate, :dream_big, :high_balance_extra, :freddie_arms, :import_jumbo_sheet]
 
+  before_action :get_bank, only: [:import_government_sheet, :programs, :import_freddie_fixed_rate, :import_conforming_fixed_rate, :home_possible, :conforming_arms, :lp_open_acces_arms, :lp_open_access_105, :lp_open_access, :du_refi_plus_arms, :du_refi_plus_fixed_rate_105, :du_refi_plus_fixed_rate, :dream_big, :high_balance_extra, :freddie_arms, :import_jumbo_sheet, :jumbo_series_d]
 
   require 'roo'
   require 'roo-xls'
@@ -8,7 +8,6 @@ class ImportFilesController < ApplicationController
   def index
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
-    # xlsx = Roo::Spreadsheet.open("/home/yuva/Desktop/pureloan/RateSheetExtractor/OB_New_Penn_Financial_Wholesale5806.xls")
     begin
       xlsx.sheets.each do |sheet|
         if (sheet == "Cover Zone 1")
@@ -119,11 +118,7 @@ class ImportFilesController < ApplicationController
                         @block_hash[key][value.split[0]] = {}
                         # first_row[c_i]
                         # {"Credit Score"=> {0 => 4.0, 580 => 2.00, 600 => 1.250},
-
                         # {"Credit Score"=>{15=>nil, 30=>"< 580", 45=>nil, 60=>nil, 75=>nil, 90=>4.0, 105=>nil}}
-                        # debugger
-
-                        debugger
                         # @block_hash[key][(value.include?("<") ? value.split[0] : nil ] = value if !(value.include?("<"))
                       elsif (index == 6)
                         @block_hash[key][value.split[0]] = value
@@ -710,6 +705,56 @@ class ImportFilesController < ApplicationController
                     else
                       @block_hash[key][15*c_i] = value
                     end
+                  end
+                  @data << value
+                end
+
+                if @data.compact.length == 0
+                  break # terminate the loop
+                end
+              end
+              @program.update(interest_points: @block_hash)
+            end
+          end
+        end
+      end
+    end
+    redirect_to programs_import_file_path(@bank)
+  end
+
+  def jumbo_series_d
+    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    xlsx = Roo::Spreadsheet.open(file)
+    xlsx.sheets.each do |sheet|
+      if (sheet == "Jumbo Series_D")
+        sheet_data = xlsx.sheet(sheet)
+        (1..22).each do |r|
+          row = sheet_data.row(r)
+          if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet"))
+            rr = r + 1 # (r == 8)
+            max_column_section = row.compact.count - 1
+            (0..max_column_section).each do |max_column|
+              cc = 2 + max_column*6 # (2 / 8 / 14)
+              @title = sheet_data.cell(r,cc)
+                program_heading = @title.split
+                @term =  program_heading[3]
+                @interest_type = program_heading[5]
+                @program = @bank.programs.find_or_create_by(title: @title)
+                @program.update(term: @term,interest_type: @interest_type,loan_type: 0)
+              @block_hash = {}
+              key = ''
+              (0..50).each do |max_row|
+                @data = []
+                (0..4).each_with_index do |index, c_i|
+                  rrr = rr + max_row
+                  ccc = cc + c_i
+                  value = sheet_data.cell(rrr,ccc)
+                  if (c_i == 0)
+                    key = value
+                    @block_hash[key] = {}
+                  else
+                    # first_row[c_i]
+                    @block_hash[key][15*c_i] = value
                   end
                   @data << value
                 end
