@@ -22,6 +22,7 @@ Rails.application.routes.draw do
       get :jumbo_series_f
       get :jumbo_series_h
       get :jumbo_series_i
+      get :jumbo_series_jqm
     end
   end
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

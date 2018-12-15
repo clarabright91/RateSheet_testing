@@ -1,6 +1,6 @@
 class ImportFilesController < ApplicationController
 
-  before_action :get_bank, only: [:import_government_sheet, :programs, :import_freddie_fixed_rate, :import_conforming_fixed_rate, :home_possible, :conforming_arms, :lp_open_acces_arms, :lp_open_access_105, :lp_open_access, :du_refi_plus_arms, :du_refi_plus_fixed_rate_105, :du_refi_plus_fixed_rate, :dream_big, :high_balance_extra, :freddie_arms, :import_jumbo_sheet, :jumbo_series_d,:jumbo_series_f, :jumbo_series_h, :jumbo_series_i]
+  before_action :get_bank, only: [:import_government_sheet, :programs, :import_freddie_fixed_rate, :import_conforming_fixed_rate, :home_possible, :conforming_arms, :lp_open_acces_arms, :lp_open_access_105, :lp_open_access, :du_refi_plus_arms, :du_refi_plus_fixed_rate_105, :du_refi_plus_fixed_rate, :dream_big, :high_balance_extra, :freddie_arms, :import_jumbo_sheet, :jumbo_series_d,:jumbo_series_f, :jumbo_series_h, :jumbo_series_i, :jumbo_series_jqm]
 
   require 'roo'
   require 'roo-xls'
@@ -1270,6 +1270,74 @@ class ImportFilesController < ApplicationController
                 end
               end
               @program.update(interest_points: @block_hash)
+            end
+          end
+        end
+      end
+    end
+    redirect_to programs_import_file_path(@bank)
+  end
+
+  def jumbo_series_jqm
+    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    xlsx = Roo::Spreadsheet.open(file)
+    xlsx.sheets.each do |sheet|
+      if (sheet == "Jumbo Series_JQM")
+        sheet_data = xlsx.sheet(sheet)
+        (2..60).each do |r|
+          row = sheet_data.row(r)
+          if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet"))
+            # r == 7 / 35 / 55
+            rr = r + 1 # (r == 8)/ (r == 21)
+            max_column_section = row.compact.count - 1
+            (0..max_column_section).each do |max_column|
+              cc = 6 + max_column*6 # (6 / 12 / 18)
+              @title = sheet_data.cell(r,cc)
+              if @title.present?
+                program_heading = @title.split
+                if @title.scan(/\w+/).include?("Fixed")
+                  @interest_type = 0
+                  # @term =  program_heading[3]
+                elsif @title.scan(/\w+/).include?("ARM")
+                  @term = 0
+                  @interest_type = 2
+                  if @title.scan(/\d+/)[0] == "5"
+                    @interest_subtype = @title.scan(/\d+/)[0]
+                  elsif @title.scan(/\d+/)[0] == "7"
+                    @interest_subtype = @title.scan(/\d+/)[0]
+                  elsif @title.scan(/\d+/)[0] == "10"
+                    @interest_subtype = @title.scan(/\d+/)[0]
+                  end
+                end
+                @program = @bank.programs.find_or_create_by(title: @title)
+                if @interest_subtype.present?
+                  @program.update(term: @term,interest_type: @interest_type,loan_type: 0 ,interest_subtype: @interest_subtype )
+                else
+                  @program.update(term: @term,interest_type: @interest_type,loan_type: 0)
+                end
+                @block_hash = {}
+                key = ''
+                (0..50).each do |max_row|
+                  @data = []
+                  (0..4).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if (c_i == 0)
+                      key = value
+                      @block_hash[key] = {}
+                    else
+                      @block_hash[key][15*c_i] = value
+                    end
+                    @data << value
+                  end
+
+                  if @data.compact.length == 0
+                    break #terminate the loop
+                  end
+                end
+                @program.update(interest_points: @block_hash)
+              end
             end
           end
         end
