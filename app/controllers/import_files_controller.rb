@@ -145,82 +145,6 @@ class ImportFilesController < ApplicationController
     redirect_to programs_import_file_path(@bank)
   end
 
-  def import_jumbo_sheet
-    titles = get_titles
-    rows_entities = get_rows_entities
-    columns_entities = get_columns_entities
-    m_key  = nil
-    mm_key = nil
-
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
-      if (sheet == "Jumbo Series_D")
-        sheet_data = xlsx.sheet(sheet)
-        (41..72).each do |r|
-          row = sheet_data.row(r)
-          if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet"))
-             # r == 43 / 53 / 63
-            rr = r + 1 # (r == 44) / (r == 54) / (r == 64)
-            max_column_section = row.compact.count - 1
-            (0..max_column_section).each do |max_column|
-              cc = 2 + max_column*9 # (2 / 11)
-              @title = sheet_data.cell(r,cc)
-              if(titles.include?(@title))
-                program_heading = @title.split
-                @term = program_heading[1]
-                @interest_type = program_heading[3]
-
-                @program = @bank.programs.find_or_create_by(title: @title)
-                @program.update(term: @term,interest_type: 0,loan_type: 0)
-                @block_hash = {}
-                key = ''
-
-                unless(["State Adjustments", "Feature Adjustments", "Max Price"].include?(@title))
-                  (0..50).each do |max_row|
-                    @data = []
-                    (0..7).each_with_index do |index, c_i|
-                      rrr = rr + max_row
-                      ccc = cc + c_i
-                      value = sheet_data.cell(rrr,ccc)
-                      main_key = rows_entities[:main_pair][value]
-                      sub_key = rows_entities[:heading_pair][c_i]
-
-                      if (max_row == 0 && c_i == 0)
-                        key = sheet_data.cell(rrr + 1,ccc) + "/" + value.split("%")[0]
-                        m_key = key
-                        # "FICO/Liv" = {}
-                        @block_hash[m_key] = {}
-                      end
-
-                      if ccc == 3 && main_key.present? && !@block_hash[m_key].keys.include?(main_key)
-                        # "FICO/Liv"["800"] = {}
-                        mm_key = main_key
-                        @block_hash[m_key][main_key] = {}
-                      end
-
-                      if columns_entities[:numbers].include?(ccc)
-                        valume_key = columns_entities[ccc]
-                        if valume_key.present? && mm_key.present? && !@block_hash[m_key][mm_key].keys.include?(valume_key)
-                          @block_hash[m_key][mm_key][valume_key] = value
-                        end
-
-                        if mm_key == "680" && valume_key == "75"
-                          @program.update(adjustments: @block_hash.to_json)
-                        end
-                      end
-                    end
-                  end
-                else
-                end
-              end
-            end
-          end
-        end
-      end
-    end
-  end
-
   def import_freddie_fixed_rate
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -1484,6 +1408,132 @@ class ImportFilesController < ApplicationController
     @programs = @bank.programs
   end
 
+  def import_jumbo_sheet
+    titles = get_titles
+    rows_entities = nil
+    columns_entities = get_columns_entities
+    state_ad_columns = {}
+    columns = {
+      data: {},
+      indexs: [12,13,15,16,17]
+    }
+    m_key  = nil
+    mm_key = nil
+    previous_key = nil
+
+    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    xlsx = Roo::Spreadsheet.open(file)
+    xlsx.sheets.each do |sheet|
+      if (sheet.eql?("Jumbo Series_D"))
+        sheet_data = xlsx.sheet(sheet)
+        (41..72).each do |r|
+          row    = sheet_data.row(r)
+          status = row.compact.count <= 3 || row.compact.include?("FICO/LTV Adjustments - Loan Amount > $1MM")
+
+          if ((row.compact.count > 1) && status) && (!row.compact.include?("California Wholesale Rate Sheet"))
+             # r == 43 / 53 / 63
+            rr = r + 1 # (r == 44) / (r == 54) / (r == 64)
+            max_column_section = row.compact.count - 1
+            (0..max_column_section).each do |max_column|
+              cc = 2 + max_column*9 # (2 / 11)
+              @title = sheet_data.cell(r,cc)
+              if(titles.include?(@title))
+                program_heading = @title.split
+                @term = program_heading[1]
+                @interest_type = program_heading[3]
+
+                @program = @bank.programs.find_or_create_by(title: @title)
+                @program.update(term: @term,interest_type: 0,loan_type: 0)
+                @block_hash = {}
+                key = ''
+                unless(["State Adjustments", "Max Price"].include?(@title))
+                  (0..50).each do |max_row|
+                    @data = []
+                    (0..7).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      rows_entities = @title.eql?("Feature Adjustments") ? get_adjustment_columns : get_rows_entities
+                      main_key = rows_entities[:main_pair][value]
+                      sub_key = rows_entities[:heading_pair][c_i]
+
+                      if (max_row.eql?(0) && c_i.eql?(0))
+                        key = !@title.eql?("Feature Adjustments") ? sheet_data.cell(rrr + 1,ccc) + "/" + value.split("%")[0] : sheet_data.cell(rrr,ccc)
+                        m_key = key
+                        # "FICO/Liv" = {}
+                        @block_hash[m_key] = {}
+                      end
+
+                      if ccc.eql?(3) && main_key.present? && !@block_hash[m_key].has_key?(main_key)
+                        # "FICO/Liv"["800"] = {}
+                        mm_key = main_key
+                        @block_hash[m_key][main_key] = {}
+                      elsif @title.eql?("Feature Adjustments") && ccc.eql?(2) && main_key.present? && !@block_hash[m_key].has_key?(main_key)
+                        # "FICO/Liv"["800"] = {}
+                        mm_key = main_key
+                        @block_hash[m_key][main_key] = {}
+                      end
+
+                      if columns_entities[:numbers].include?(ccc)
+                        valume_key = columns_entities[ccc]
+                        begin
+                          if valume_key.present? && mm_key.present? && @block_hash[m_key].keys.any? && !@block_hash[m_key][mm_key].has_key?(valume_key)
+                            @block_hash[m_key][mm_key][valume_key] = value
+                          end
+                        rescue Exception => e
+                          puts e
+                        end
+
+                        if mm_key.eql?("680") && valume_key.eql?("75")
+                          @program.update(adjustments: @block_hash.to_json)
+                        elsif mm_key.eql?("Escrow Waiver - except CA") && valume_key.eql?("75")
+                          @program.update(adjustments: @block_hash.to_json)
+                        end
+                      end
+                    end
+                  end
+                else
+                  (0..50).each do |max_row|
+                    @data = []
+                    (0..6).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      state_ad_columns[value] = value if ccc.eql?(11)
+                      if columns[:data].values.include?(value)
+                        columns[:data][ccc] =  value + (columns[:data].values.count + 1).to_s if rrr.eql?(44) && value.present?
+                      else
+                        columns[:data][ccc] = value if rrr.eql?(44) && value.present?
+                      end
+                      if (c_i == 0)
+                        key = @block_hash.empty? ? value : state_ad_columns[value]
+                        previous_key = key if @block_hash.empty?
+                        @block_hash[key] = {} if @block_hash.empty?
+                        @block_hash[previous_key][key] = {} if previous_key.present? && key.present? && previous_key != key
+                        state_ad_columns[:current_element] = key if previous_key.present? && key.present? && previous_key != key
+                      else
+                        if rrr < 62 && ccc != 14 && value.present? && !columns[:data].has_value?(value)
+                          # if key present like "LLPA"
+                          @block_hash[previous_key][state_ad_columns[:current_element]][columns[:data][ccc]] = value
+                        end
+                      end
+                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
+                    end
+                  end
+
+                  @program.update(interest_points: @block_hash)
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+
   private
 
   def get_bank
@@ -1528,5 +1578,28 @@ class ImportFilesController < ApplicationController
     }
 
     return columns_entities
+  end
+
+  def get_adjustment_columns
+    rows_entities = {
+      main_pair: {
+        "Condo" => "condo",
+        "2nd Home" => "2nd home",
+        "Investment" => "investment",
+        "Cashout" => "cashout",
+        "2-Unit" => "2-unit",
+        "3-4 Unit" => "3-4 unit",
+        "Escrow Waiver - except CA" => "Escrow Waiver - except CA"
+      },
+      heading_pair: {
+        30 => "0",
+        45 => "60",
+        60 => "65",
+        75 => "70",
+        90 => "75"
+      }
+    }
+
+    return rows_entities
   end
 end
