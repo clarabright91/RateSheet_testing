@@ -1,6 +1,7 @@
 class ImportFilesController < ApplicationController
   before_action :get_bank, only: [:import_government_sheet, :programs, :import_freddie_fixed_rate, :import_conforming_fixed_rate, :home_possible, :conforming_arms, :lp_open_acces_arms, :lp_open_access_105, :lp_open_access, :du_refi_plus_arms, :du_refi_plus_fixed_rate_105, :du_refi_plus_fixed_rate, :dream_big, :high_balance_extra, :freddie_arms, :import_jumbo_sheet]
 
+
   require 'roo'
   require 'roo-xls'
 
