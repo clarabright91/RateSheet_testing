@@ -163,6 +163,7 @@ class ImportFilesController < ApplicationController
               @title = sheet_data.cell(r,cc)
 
               #term
+              @term = nil
               program_heading = @title.split
               if @title.include?("10yr") || @title.include?("10 Yr")
                 @term = @title.scan(/\d+/)[0]
@@ -255,6 +256,7 @@ class ImportFilesController < ApplicationController
               @title = sheet_data.cell(r,cc)
 
               #term
+              @term = nil
               program_heading = @title.split
               if @title.include?("10yr") || @title.include?("10 Yr")
                 @term = @title.scan(/\d+/)[0]
@@ -346,6 +348,7 @@ class ImportFilesController < ApplicationController
               @title = sheet_data.cell(r,cc)
 
               #term
+              @term = nil
               program_heading = @title.split
               if @title.include?("10yr") || @title.include?("10 Yr")
                 @term = @title.scan(/\d+/)[0]
@@ -441,6 +444,7 @@ class ImportFilesController < ApplicationController
               @title = sheet_data.cell(r,cc)
 
               # term
+              @term = nil
               program_heading = @title.split
               if @title.include?("10yr") || @title.include?("10 Yr")
                 @term = @title.scan(/\d+/)[0]
@@ -539,6 +543,7 @@ class ImportFilesController < ApplicationController
               @title = sheet_data.cell(r,cc)
               
               # term
+              @term = nil
               program_heading = @title.split
               if @title.include?("10yr") || @title.include?("10 Yr")
                 @term = @title.scan(/\d+/)[0]
@@ -637,6 +642,7 @@ class ImportFilesController < ApplicationController
               @title = sheet_data.cell(r,cc)
               
               # term
+              @term = nil
               program_heading = @title.split
               if @title.include?("10yr") || @title.include?("10 Yr")
                 @term = @title.scan(/\d+/)[0]
@@ -735,6 +741,7 @@ class ImportFilesController < ApplicationController
               @title = sheet_data.cell(r,cc)
               
               # term
+              @term = nil
               program_heading = @title.split
               if @title.include?("10yr") || @title.include?("10 Yr")
                 @term = @title.scan(/\d+/)[0]
@@ -833,6 +840,7 @@ class ImportFilesController < ApplicationController
               @title = sheet_data.cell(r,cc)
               
               # term
+              @term = nil
               program_heading = @title.split
               if @title.include?("10yr") || @title.include?("10 Yr")
                 @term = @title.scan(/\d+/)[0]
@@ -931,6 +939,7 @@ class ImportFilesController < ApplicationController
               @title = sheet_data.cell(r,cc)
               
               # term
+              @term = nil
               program_heading = @title.split
               if @title.include?("10yr") || @title.include?("10 Yr")
                 @term = @title.scan(/\d+/)[0]
@@ -1127,6 +1136,7 @@ class ImportFilesController < ApplicationController
               @title = sheet_data.cell(r,cc)
               
               # term
+              @term = nil
               program_heading = @title.split
               if @title.include?("10yr") || @title.include?("10 Yr")
                 @term = @title.scan(/\d+/)[0]
@@ -1225,6 +1235,7 @@ class ImportFilesController < ApplicationController
               @title = sheet_data.cell(r,cc)
               
               # term
+              @term = nil
               program_heading = @title.split
               if @title.include?("10yr") || @title.include?("10 Yr")
                 @term = @title.scan(/\d+/)[0]
@@ -1322,6 +1333,7 @@ class ImportFilesController < ApplicationController
               cc = 3 + max_column*6 # (3 / 9 / 15)
 
               @title = sheet_data.cell(r,cc)
+              @term = nil
               program_heading = @title.split
               if @title.include?("10yr") || @title.include?("10 Yr")
                 @term = @title.scan(/\d+/)[0]
