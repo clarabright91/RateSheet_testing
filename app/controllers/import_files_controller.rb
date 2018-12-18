@@ -1921,8 +1921,7 @@ class ImportFilesController < ApplicationController
       end
     end
 
-    @bank.programs.update(adjustments: @allAdjustments)
-
+    @bank.programs.update(adjustments: @allAdjustments.to_json)
     redirect_to programs_import_file_path(@bank)
   end
 
