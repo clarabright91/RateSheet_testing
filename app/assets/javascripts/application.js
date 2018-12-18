@@ -14,6 +14,15 @@
 //= require rails-ujs
 //= require activestorage
 //= require turbolinks
+//= require datatables
 //= require popper
 //= require bootstrap
 //= require_tree .
+
+$(document).ready(function() {
+  $("#dttb").dataTable({
+    "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+      $(nRow).css('background', 'black')
+    }
+  });
+});
