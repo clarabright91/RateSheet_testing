@@ -1135,10 +1135,7 @@ class ImportFilesController < ApplicationController
             end
             
             if value.present?
-              if adjustment_row.include?("LTV Based Adjustments for 20/25/30 Yr Fixed Jumbo Products") || adjustment_row.include?("LTV Based Adjustments for 15 Yr Fixed and All ARM Jumbo Products")
-                @key = value 
-                @adjustment_hash[@key] = {}
-              elsif cc == 3
+              if cc == 3
                 @key = value 
                 @adjustment_hash[@key] = {}
               elsif cc > 3 && cc <= 14
