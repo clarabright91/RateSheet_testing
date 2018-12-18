@@ -1410,7 +1410,7 @@ class ImportFilesController < ApplicationController
   end
 
   def import_jumbo_sheet
-    @all_data = {}
+    @allAdjustments = {}
     titles = get_titles
     table_names = ["State Adjustments", "Max Price"]
     rows_entities = {}
@@ -1507,9 +1507,11 @@ class ImportFilesController < ApplicationController
                           end
 
                           if mm_key.eql?("680") && valume_key.eql?("75")
-                            @program.update(adjustments: @block_hash.to_json)
+                            # @program.update(adjustments: @block_hash.to_json)
+                            @allAdjustments[@program.title] = @block_hash
                           else
-                            @program.update(adjustments: @block_hash.to_json)
+                            # @program.update(adjustments: @block_hash.to_json)
+                            @allAdjustments[@program.title] = @block_hash
                           end
                         end
                       end
@@ -1552,7 +1554,8 @@ class ImportFilesController < ApplicationController
                       end
                     end
                   end
-                  @program.update(adjustments: @block_hash.to_json)
+                  @allAdjustments[@program.title] = @block_hash
+                  # @program.update(adjustments: @block_hash.to_json)
                 end
               end
             end
@@ -1560,6 +1563,8 @@ class ImportFilesController < ApplicationController
         end
       end
     end
+
+    @bank.programs.update(adjustments: @allAdjustments.to_json)
 
     redirect_to programs_import_file_path(@bank)
   end
