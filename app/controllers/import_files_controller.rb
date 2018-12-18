@@ -1118,6 +1118,44 @@ class ImportFilesController < ApplicationController
             end
           end
         end
+
+        @adjustment_hash = {}
+        @adj_data = []
+        (38..62).each do |max_row|
+          adjustment_row = sheet_data.row(max_row)
+          @adjustment_data = []
+          cc = 2
+          (0..13).each do |adj_column|
+            rr = max_row + 1
+            cc = adj_column + 2
+            value = sheet_data.cell(rr,cc)
+
+            if adjustment_row.include?("Higher of LTV/CLTV --->")
+              @adj_data = adjustment_row
+            end
+            
+            if value.present?
+              if adjustment_row.include?("LTV Based Adjustments for 20/25/30 Yr Fixed Jumbo Products") || adjustment_row.include?("LTV Based Adjustments for 15 Yr Fixed and All ARM Jumbo Products")
+                @key = value 
+                @adjustment_hash[@key] = {}
+              elsif cc == 3
+                @key = value 
+                @adjustment_hash[@key] = {}
+              elsif cc > 3 && cc <= 14
+                @adjustment_hash[@key][@adj_data[adj_column]] = value
+              elsif cc == 2 && !adjustment_row.include?("FICO")
+                @key = value 
+                @adjustment_hash[@key] = {}
+              end
+            end
+            @adjustment_data << value
+          end
+
+          if @adjustment_data.compact.length == 0
+            break # terminate the loop
+          end
+        end
+        @program.update(adjustments: @adjustment_hash)
       end
     end
     redirect_to programs_import_file_path(@bank)
