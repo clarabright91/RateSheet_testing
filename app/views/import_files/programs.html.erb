@@ -18,6 +18,10 @@
       </tr>
     </thead>
     <tbody>
+      <% all_arjustments = {} %>
+      <% @programs.each do |program|%>
+        <% all_arjustments[program.title] = program.adjustments if program.adjustments.present? %>
+      <% end %>
       <% @programs.each do |program|%>
         <tr>
           <td><%= program.title %></td>
@@ -31,7 +35,7 @@
           <td><%= program.fannie_mae %></td>
           <td><%= program.freddie_mac %></td>
           <td><%= program.interest_points %></td>
-          <td>Adjustment are in process</td>
+          <td><%= all_arjustments.to_json %></td>
         </tr>
       <%end%>
     </tbody>
