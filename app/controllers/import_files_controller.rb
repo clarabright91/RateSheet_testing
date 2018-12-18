@@ -1448,14 +1448,22 @@ class ImportFilesController < ApplicationController
   end
 
   def import_jumbo_sheet
+    @allAdjustments = {}
     titles = get_titles
-    rows_entities = nil
-    columns_entities = get_columns_entities
-    state_ad_columns = {}
+    table_names = ["State Adjustments", "Max Price"]
+    rows_entities = {}
+    changed_columns_fields = [">= 800", "< =60"]
+    columns_entities = {}#get_columns_entities
+    state_ad_columns = {
+      heading_pair: {}
+    }
     columns = {
       data: {},
       indexs: [12,13,15,16,17]
     }
+    row_numbers = [44, 54, 64]
+    columns_numbers = [2, 3]
+    unwanted_data = "LTV% -->"
     m_key  = nil
     mm_key = nil
     previous_key = nil
@@ -1480,53 +1488,69 @@ class ImportFilesController < ApplicationController
                 program_heading = @title.split
                 @term = program_heading[1]
                 @interest_type = program_heading[3]
-
                 @program = @bank.programs.find_or_create_by(title: @title)
                 @program.update(term: @term,interest_type: 0,loan_type: 0)
                 @block_hash = {}
                 key = ''
-                unless(["State Adjustments", "Max Price"].include?(@title))
+                unless(table_names.include?(@title))
                   (0..50).each do |max_row|
                     @data = []
                     (0..7).each_with_index do |index, c_i|
                       rrr = rr + max_row
-                      ccc = cc + c_i
-                      value = sheet_data.cell(rrr,ccc)
-                      rows_entities = @title.eql?("Feature Adjustments") ? get_adjustment_columns : get_rows_entities
-                      main_key = rows_entities[:main_pair][value]
-                      sub_key = rows_entities[:heading_pair][c_i]
-
-                      if (max_row.eql?(0) && c_i.eql?(0))
-                        key = !@title.eql?("Feature Adjustments") ? sheet_data.cell(rrr + 1,ccc) + "/" + value.split("%")[0] : sheet_data.cell(rrr,ccc)
-                        m_key = key
-                        # "FICO/Liv" = {}
-                        @block_hash[m_key] = {}
-                      end
-
-                      if ccc.eql?(3) && main_key.present? && !@block_hash[m_key].has_key?(main_key)
-                        # "FICO/Liv"["800"] = {}
-                        mm_key = main_key
-                        @block_hash[m_key][main_key] = {}
-                      elsif @title.eql?("Feature Adjustments") && ccc.eql?(2) && main_key.present? && !@block_hash[m_key].has_key?(main_key)
-                        # "FICO/Liv"["800"] = {}
-                        mm_key = main_key
-                        @block_hash[m_key][main_key] = {}
-                      end
-
-                      if columns_entities[:numbers].include?(ccc)
-                        valume_key = columns_entities[ccc]
-                        begin
-                          if valume_key.present? && mm_key.present? && @block_hash[m_key].keys.any? && !@block_hash[m_key][mm_key].has_key?(valume_key)
-                            @block_hash[m_key][mm_key][valume_key] = value
-                          end
-                        rescue Exception => e
-                          puts e
+                      if rrr <= 71
+                        ccc = cc + c_i
+                        value = sheet_data.cell(rrr,ccc)
+                        # get all verticle columns in columns data
+                        if row_numbers.include?(rr) && value.present? && !value.eql?("n/a") && value.is_a?(String)
+                          columns[:data][ccc] = changed_columns_fields.include?(value) ? value.tr("^0-9", '') : value.split("-").last.split(".").first
+                          columns_entities = columns[:data]
+                          columns_entities[:indexs]  = [12, 13, 15, 16, 17]
+                          columns_entities[:numbers] = [4,5,6,7,9]
+                        end
+                        # get all horizontal columns in state_ad_columns
+                        if columns_numbers.include?(ccc) && value.present? && value.is_a?(String)
+                          state_ad_columns[value] = changed_columns_fields.include?(value) ? value.tr("^0-9", '') : value.split(" -").first
                         end
 
-                        if mm_key.eql?("680") && valume_key.eql?("75")
-                          @program.update(adjustments: @block_hash.to_json)
-                        elsif mm_key.eql?("Escrow Waiver - except CA") && valume_key.eql?("75")
-                          @program.update(adjustments: @block_hash.to_json)
+                        if (max_row.eql?(0) && c_i.eql?(0))
+                          key = !@title.eql?("Feature Adjustments") ? sheet_data.cell(rrr + 1,ccc) + "/" + value.split("%")[0] : sheet_data.cell(rrr,ccc)
+                          m_key = key
+                          # prepare first level hash
+                          @block_hash[m_key] = {}
+                        end
+
+                        rows_entities[:main_pair] = state_ad_columns
+                        main_key = rows_entities[:main_pair][value]
+
+                        if ccc.eql?(3) && main_key.present? && !@block_hash[m_key].has_key?(main_key)
+                          # prepare second level hash
+                          mm_key = main_key
+                          @block_hash[m_key][main_key] = {}
+                        elsif @title.eql?("Feature Adjustments") && ccc.eql?(2) && main_key.present? && !@block_hash[m_key].has_key?(main_key)
+                          # prepare second level hash
+                          mm_key = main_key
+                          @block_hash[m_key][main_key] = {}
+                        end
+
+                        if columns_entities[:numbers].include?(ccc)
+                          valume_key = columns_entities[ccc]
+                          # find third level hash key
+                          begin
+                            if valume_key.present? && mm_key.present? && @block_hash[m_key].keys.any? && !@block_hash[m_key][mm_key].has_key?(valume_key)
+                              # assign third level key value
+                              @block_hash[m_key][mm_key][valume_key] = value
+                            end
+                          rescue Exception => e
+                            puts e
+                          end
+
+                          if mm_key.eql?("680") && valume_key.eql?("75")
+                            # @program.update(adjustments: @block_hash.to_json)
+                            @allAdjustments[@program.title] = @block_hash
+                          else
+                            # @program.update(adjustments: @block_hash.to_json)
+                            @allAdjustments[@program.title] = @block_hash
+                          end
                         end
                       end
                     end
@@ -1560,10 +1584,16 @@ class ImportFilesController < ApplicationController
                     end
                     if @data.compact.reject { |c| c.blank? }.length == 0
                       break # terminate the loop
+                    elsif @title.eql?("Max Price")
+                      begin
+                        @hash1 = Hash[*@data.compact] if @data.compact.include?("20/30 Yr Fixed")
+                        @block_hash = @hash1.merge(Hash[*@data.compact]) if @data.compact.include?("15 Yr Fixed")
+                      rescue Exception => e
+                      end
                     end
                   end
-
-                  @program.update(interest_points: @block_hash)
+                  @allAdjustments[@program.title] = @block_hash
+                  # @program.update(adjustments: @block_hash.to_json)
                 end
               end
             end
@@ -1571,6 +1601,10 @@ class ImportFilesController < ApplicationController
         end
       end
     end
+
+    @bank.programs.update(adjustments: @allAdjustments.to_json)
+
+    redirect_to programs_import_file_path(@bank)
   end
 
   private
