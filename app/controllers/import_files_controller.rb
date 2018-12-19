@@ -212,11 +212,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
+                    @block_hash[key][15*c_i] = value
                   end
                   @data << value
                 end
@@ -225,7 +221,7 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              @program.update(interest_points: @block_hash)
+              @program.update(interest_points: @block_hash.to_json)
             end
           end
         end
@@ -305,11 +301,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)  
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
+                    @block_hash[key][15*c_i] = value
                   end
                   @data << value
                 end
@@ -318,7 +310,7 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              @program.update(interest_points: @block_hash)
+              @program.update(interest_points: @block_hash.to_json)
             end
           end
         end
@@ -402,11 +394,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)  
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
+                    @block_hash[key][15*c_i] = value
                   end
                   @data << value
                 end
@@ -415,7 +403,7 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              @program.update(interest_points: @block_hash)
+              @program.update(interest_points: @block_hash.to_json)
             end
           end
         end
@@ -501,11 +489,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)  
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
+                    @block_hash[key][15*c_i] = value
                   end
                   @data << value
                 end
@@ -514,7 +498,7 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              @program.update(interest_points: @block_hash)
+              @program.update(interest_points: @block_hash.to_json)
             end
           end
         end
@@ -600,11 +584,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)  
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
+                    @block_hash[key][15*c_i] = value
                   end
                   @data << value
                 end
@@ -613,7 +593,7 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              @program.update(interest_points: @block_hash)
+              @program.update(interest_points: @block_hash.to_json)
             end
           end
         end
@@ -749,11 +729,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)  
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
+                    @block_hash[key][15*c_i] = value
                   end
                   @data << value
                 end
@@ -762,7 +738,7 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              @program.update(interest_points: @block_hash)
+              @program.update(interest_points: @block_hash.to_json)
             end
           end
         end
@@ -913,11 +889,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)  
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
+                    @block_hash[key][15*c_i] = value
                   end
                   @data << value
                 end
@@ -926,7 +898,7 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              @program.update(interest_points: @block_hash)
+              @program.update(interest_points: @block_hash.to_json)
             end
           end
         end
@@ -1088,11 +1060,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)  
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
+                    @block_hash[key][15*c_i] = value
                   end
                   @data << value
                 end
@@ -1101,7 +1069,7 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              @program.update(interest_points: @block_hash)
+              @program.update(interest_points: @block_hash.to_json)
             end
           end
         end
@@ -1256,11 +1224,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)  
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
+                    @block_hash[key][15*c_i] = value
                   end
                   @data << value
                 end
@@ -1269,7 +1233,7 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              @program.update(interest_points: @block_hash)
+              @program.update(interest_points: @block_hash.to_json)
             end
           end
         end
@@ -1423,11 +1387,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)  
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
+                    @block_hash[key][15*c_i] = value
                   end
                   @data << value
                 end
@@ -1436,45 +1396,71 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              @program.update(interest_points: @block_hash)
+              @program.update(interest_points: @block_hash.to_json)
             end
           end
         end
 
-        @adjustment_hash = {}
-        @adj_data = []
-        (38..62).each do |max_row|
-          adjustment_row = sheet_data.row(max_row)
-          @adjustment_data = []
-          cc = 2
-          (0..13).each do |adj_column|
-            rr = max_row + 1
-            cc = adj_column + 2
-            value = sheet_data.cell(rr,cc)
+        # @adjustment_hash = {}
+        # @rate_adjustment = {}
+        # @title_adjustment = {}
+        # @adj_data = []
+        # (37..62).each do |max_row|
+        #   adjustment_row = sheet_data.row(max_row)
+        #   @adjustment_data = []
+        #   cc = 2
+        #   max_column = adjustment_row.count-1
+        #   (0..max_column).each do |adj_column|
+        #     rr = max_row + 1
+        #     cc = adj_column + 2
+        #     value = sheet_data.cell(rr,cc)
 
-            if adjustment_row.include?("Higher of LTV/CLTV --->")
-              @adj_data = adjustment_row
-            end
-            
-            if value.present?
-              if cc == 3
-                @key = value 
-                @adjustment_hash[@key] = {}
-              elsif cc > 3 && cc <= 14
-                @adjustment_hash[@key][@adj_data[adj_column]] = value
-              elsif cc == 2 && !adjustment_row.include?("FICO")
-                @key = value 
-                @adjustment_hash[@key] = {}
-              end
-            end
-            @adjustment_data << value
-          end
+        #     if adjustment_row.include?("Higher of LTV/CLTV --->")
+        #       @adj_data = adjustment_row
+        #     end
+  
+        #     if value.present?
+        #       debugger
+        #       if value == "LTV Based Adjustments for 20/25/30 Yr Fixed Jumbo Products" || "Rate Adjustments (Increase to rate)" || "Max Price" || "LTV Based Adjustments for 15 Yr Fixed and All ARM Jumbo Products" || "Rate Fall-Out Pricing Special" || "ARM Info"
+        #         @main_key = value
+        #         @adjustment_hash[@main_key] = {}
+        #       elsif cc == 3
+        #         @key = value 
+        #         @adjustment_hash[@key] = {}
+        #       elsif cc > 3 && cc <= 14
+        #         @adjustment_hash[@key][@adj_data[adj_column]] = value
+        #       elsif cc == 2 && !adjustment_row.include?("FICO")
+        #         @key = value 
+        #         @adjustment_hash[@key] = {}
+        #       end
+        #     end
+        #     @adjustment_data << value
+        #   end
 
-          if @adjustment_data.compact.length == 0
-            break # terminate the loop
-          end
-        end
-        @program.update(adjustments: @adjustment_hash)
+          
+        #   # (16..18).each do |adj|
+        #   #   rr = max_row 
+        #   #   value = sheet_data.cell(rr,adj)
+        #   #   if value.present?
+        #   #     if adj == 16
+        #   #       @new_key = value
+        #   #       @rate_adjustment[@new_key] = {}
+        #   #     elsif adj > 16 && adj <= 18 
+        #   #       @rate_adjustment[@new_key] = value
+        #   #     end
+        #   #   end
+        #     # if value == "20/25/30 Yr Fixed Only"
+        #     #   main_key = value
+        #     #   @title_adjustment[main_key] = {}
+        #     #   debugger
+        #     # end
+        #   # end
+        #   # if @adjustment_data.compact.length == 0
+        #   #   break # terminate the loop
+        #   # end
+        # end
+        # debugger
+        # @program.update(adjustments: @adjustment_hash)
       end
     end
     redirect_to programs_import_file_path(@bank)
@@ -1556,11 +1542,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)  
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
+                    @block_hash[key][15*c_i] = value
                   end
                   @data << value
                 end
@@ -1569,7 +1551,7 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              @program.update(interest_points: @block_hash)
+              @program.update(interest_points: @block_hash.to_json)
             end
           end
         end
@@ -1655,11 +1637,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)  
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
+                    @block_hash[key][15*c_i] = value
                   end
                   @data << value
                 end
@@ -1668,7 +1646,7 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              @program.update(interest_points: @block_hash)
+              @program.update(interest_points: @block_hash.to_json)
             end
           end
         end
@@ -1740,11 +1718,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)  
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
+                    @block_hash[key][15*c_i] = value
                   end
                   @data << value
                 end
@@ -1753,7 +1727,7 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              @program.update(interest_points: @block_hash)
+              @program.update(interest_points: @block_hash.to_json)
             end
           end
         end
