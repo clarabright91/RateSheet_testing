@@ -1782,7 +1782,7 @@ class ImportFilesController < ApplicationController
                 @term = program_heading[1]
                 @interest_type = program_heading[3]
                 @program = @bank.programs.find_or_create_by(title: @title)
-                @program.update(term: @term,interest_type: 0,loan_type: 0)
+                @program.update(term: @term,interest_type: 0,loan_type: 0, sheet_name: sheet)
                 @block_hash = {}
                 key = ''
                 unless(table_names.include?(@title))
@@ -1840,9 +1840,11 @@ class ImportFilesController < ApplicationController
                           if mm_key.eql?("680") && valume_key.eql?("75")
                             # @program.update(adjustments: @block_hash.to_json)
                             @allAdjustments[@program.title] = @block_hash
+                            make_adjust(@block_hash, @program.title, sheet, @program.id)
                           else
                             # @program.update(adjustments: @block_hash.to_json)
                             @allAdjustments[@program.title] = @block_hash
+                            make_adjust(@block_hash, @program.title, sheet, @program.id)
                           end
                         end
                       end
@@ -1886,7 +1888,7 @@ class ImportFilesController < ApplicationController
                     end
                   end
                   @allAdjustments[@program.title] = @block_hash
-                  # @program.update(adjustments: @block_hash.to_json)
+                  make_adjust(@block_hash, @program.title, sheet, @program.id)
                 end
               end
             end
@@ -1966,5 +1968,14 @@ class ImportFilesController < ApplicationController
     }
 
     return rows_entities
+  end
+
+  def make_adjust(block_hash, title, sheet_name, program_id)
+    adjustment = Adjustment.find_or_create_by(program_title: title)
+    adjustment.data = block_hash
+    adjustment.program_title = title
+    adjustment.sheet_name = sheet_name
+    adjustment.program_ids << program_id unless adjustment.program_ids.include?(program_id)
+    adjustment.save
   end
 end
