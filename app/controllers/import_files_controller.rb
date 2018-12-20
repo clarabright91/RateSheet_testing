@@ -1878,7 +1878,7 @@ class ImportFilesController < ApplicationController
                               @all_data[@program.title] = @block_hash
                             else
                               # @program.update(adjustments: @block_hash.to_json)
-                              make_adjust(@block_hash, @allAdjustments.keys.first, sheet, @program.id)
+                              make_adjust(@block_hash, @program.title, sheet, @program.id)
                               @all_data[@program.title] = @block_hash
                             end
                           else
