@@ -297,15 +297,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
-=======
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
->>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -399,15 +391,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
-=======
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
->>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -503,15 +487,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
-=======
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
->>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -669,15 +645,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
-=======
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
->>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -1007,15 +975,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
-=======
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
->>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -1177,15 +1137,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
-=======
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
->>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -1358,15 +1310,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
-=======
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
->>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -1532,15 +1476,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
-=======
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
->>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -1705,15 +1641,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
-=======
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
->>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -1728,7 +1656,6 @@ class ImportFilesController < ApplicationController
           end
         end
 
-<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
         # @adjustment_hash = {}
         # @rate_adjustment = {}
         # @title_adjustment = {}
@@ -1789,42 +1716,6 @@ class ImportFilesController < ApplicationController
         # end
         # debugger
         # @program.update(adjustments: @adjustment_hash)
-=======
-        @adjustment_hash = {}
-        @adj_data = []
-        (38..62).each do |max_row|
-          adjustment_row = sheet_data.row(max_row)
-          @adjustment_data = []
-          cc = 2
-          (0..13).each do |adj_column|
-            rr = max_row + 1
-            cc = adj_column + 2
-            value = sheet_data.cell(rr,cc)
-
-            if adjustment_row.include?("Higher of LTV/CLTV --->")
-              @adj_data = adjustment_row
-            end
-
-            if value.present?
-              if cc == 3
-                @key = value
-                @adjustment_hash[@key] = {}
-              elsif cc > 3 && cc <= 14
-                @adjustment_hash[@key][@adj_data[adj_column]] = value
-              elsif cc == 2 && !adjustment_row.include?("FICO")
-                @key = value
-                @adjustment_hash[@key] = {}
-              end
-            end
-            @adjustment_data << value
-          end
-
-          if @adjustment_data.compact.length == 0
-            break # terminate the loop
-          end
-        end
-        @program.update(adjustments: @adjustment_hash)
->>>>>>> update in government sheet
       end
     end
     redirect_to programs_import_file_path(@bank)
@@ -1906,15 +1797,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
-=======
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
->>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -2010,15 +1893,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
-=======
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
->>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -2100,15 +1975,7 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
-<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
-=======
-                    if value.class == Float
-                      @block_hash[key][15*c_i] = value.round(3)
-                    else
-                      @block_hash[key][15*c_i] = value
-                    end
->>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -2131,170 +1998,6 @@ class ImportFilesController < ApplicationController
     @programs = @bank.programs
   end
 
-<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
-=======
-  def import_jumbo_sheet
-    @allAdjustments = {}
-    titles = get_titles
-    table_names = ["State Adjustments", "Max Price"]
-    rows_entities = {}
-    changed_columns_fields = [">= 800", "< =60"]
-    columns_entities = {}#get_columns_entities
-    state_ad_columns = {
-      heading_pair: {}
-    }
-    columns = {
-      data: {},
-      indexs: [12,13,15,16,17]
-    }
-    row_numbers = [44, 54, 64]
-    columns_numbers = [2, 3]
-    unwanted_data = "LTV% -->"
-    m_key  = nil
-    mm_key = nil
-    previous_key = nil
-
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
-      if (sheet.eql?("Jumbo Series_D"))
-        sheet_data = xlsx.sheet(sheet)
-        (41..72).each do |r|
-          row    = sheet_data.row(r)
-          status = row.compact.count <= 3 || row.compact.include?("FICO/LTV Adjustments - Loan Amount > $1MM")
-
-          if ((row.compact.count > 1) && status) && (!row.compact.include?("California Wholesale Rate Sheet"))
-             # r == 43 / 53 / 63
-            rr = r + 1 # (r == 44) / (r == 54) / (r == 64)
-            max_column_section = row.compact.count - 1
-            (0..max_column_section).each do |max_column|
-              cc = 2 + max_column*9 # (2 / 11)
-              @title = sheet_data.cell(r,cc)
-              if(titles.include?(@title))
-                program_heading = @title.split
-                @term = program_heading[1]
-                @interest_type = program_heading[3]
-                @program = @bank.programs.find_or_create_by(title: @title)
-                @program.update(term: @term,interest_type: 0,loan_type: 0, sheet_name: sheet)
-                @block_hash = {}
-                key = ''
-                unless(table_names.include?(@title))
-                  (0..50).each do |max_row|
-                    @data = []
-                    (0..7).each_with_index do |index, c_i|
-                      rrr = rr + max_row
-                      if rrr <= 71
-                        ccc = cc + c_i
-                        value = sheet_data.cell(rrr,ccc)
-                        # get all verticle columns in columns data
-                        if row_numbers.include?(rr) && value.present? && !value.eql?("n/a") && value.is_a?(String)
-                          columns[:data][ccc] = changed_columns_fields.include?(value) ? value.tr("^0-9", '') : value.split("-").last.split(".").first
-                          columns_entities =                                       [:data]
-                          columns_entities [:indexs]  = [12, 13, 15, 16, 17]
-                          columns_entities[:numbers] = [4,5,6,7,9]
-                        end
-                        # get all horizontal columns in state_ad_columns
-                        if columns_numbers.include?(ccc) && value.present? && value.is_a?(String)
-                          state_ad_columns[value] = changed_columns_fields.include?(value) ? value.tr("^0-9", '') : value.split(" -").first
-                        end
-
-                        if (max_row.eql?(0) && c_i.eql?(0))
-                          key = !@title.eql?("Feature Adjustments") ? sheet_data.cell(rrr + 1,ccc) + "/" + value.split("%")[0] : sheet_data.cell(rrr,ccc)
-                          m_key = key
-                          # prepare first level hash
-                          @block_hash[m_key] = {}
-                        end
-
-                        rows_entities[:main_pair] = state_ad_columns
-                        main_key = rows_entities[:main_pair][value]
-
-                        if ccc.eql?(3) && main_key.present? && !@block_hash[m_key].has_key?(main_key)
-                          # prepare second level hash
-                          mm_key = main_key
-                          @block_hash[m_key][main_key] = {}
-                        elsif @title.eql?("Feature Adjustments") && ccc.eql?(2) && main_key.present? && !@block_hash[m_key].has_key?(main_key)
-                          # prepare second level hash
-                          mm_key = main_key
-                          @block_hash[m_key][main_key] = {}
-                        end
-
-                        if columns_entities[:numbers].include?(ccc)
-                          valume_key = columns_entities[ccc]
-                          # find third level hash key
-                          begin
-                            if valume_key.present? && mm_key.present? && @block_hash[m_key].keys.any? && !@block_hash[m_key][mm_key].has_key?(valume_key)
-                              # assign third level key value
-                              @block_hash[m_key][mm_key][valume_key] = value
-                            end
-                          rescue Exception => e
-                            puts e
-                          end
-
-                          if mm_key.eql?("680") && valume_key.eql?("75")
-                            # @program.update(adjustments: @block_hash.to_json)
-                            @allAdjustments[@program.title] = @block_hash
-                            make_adjust(@block_hash, @program.title, sheet, @program.id)
-                          else
-                            # @program.update(adjustments: @block_hash.to_json)
-                            @allAdjustments[@program.title] = @block_hash
-                            make_adjust(@block_hash, @program.title, sheet, @program.id)
-                          end
-                        end
-                      end
-                    end
-                  end
-                else
-                  (0..50).each do |max_row|
-                    @data = []
-                    (0..6).each_with_index do |index, c_i|
-                      rrr = rr + max_row
-                      ccc = cc + c_i
-                      value = sheet_data.cell(rrr,ccc)
-                      state_ad_columns[value] = value if ccc.eql?(11)
-                      if columns[:data].values.include?(value)
-                        columns[:data][ccc] =  value + (columns[:data].values.count + 1).to_s if rrr.eql?(44) && value.present?
-                      else
-                        columns[:data][ccc] = value if rrr.eql?(44) && value.present?
-                      end
-                      if (c_i == 0)
-                        key = @block_hash.empty? ? value : state_ad_columns[value]
-                        previous_key = key if @block_hash.empty?
-                        @block_hash[key] = {} if @block_hash.empty?
-                        @block_hash[previous_key][key] = {} if previous_key.present? && key.present? && previous_key != key
-                        state_ad_columns[:current_element] = key if previous_key.present? && key.present? && previous_key != key
-                      else
-                        if rrr < 62 && ccc != 14 && value.present? && !columns[:data].has_value?(value)
-                          # if key present like "LLPA"
-                          @block_hash[previous_key][state_ad_columns[:current_element]][columns[:data][ccc]] = value
-                        end
-                      end
-                      @data << value
-                    end
-                    if @data.compact.reject { |c| c.blank? }.length == 0
-                      break # terminate the loop
-                    elsif @title.eql?("Max Price")
-                      begin
-                        @hash1 = Hash[*@data.compact] if @data.compact.include?("20/30 Yr Fixed")
-                        @block_hash = @hash1.merge(Hash[*@data.compact]) if @data.compact.include?("15 Yr Fixed")
-                      rescue Exception => e
-                      end
-                    end
-                  end
-                  @allAdjustments[@program.title] = @block_hash
-                  make_adjust(@block_hash, @program.title, sheet, @program.id)
-                end
-              end
-            end
-          end
-        end
-      end
-    end
-
-    @bank.programs.update(adjustments: @allAdjustments.to_json)
-    redirect_to programs_import_file_path(@bank)
-  end
-
->>>>>>> update in government sheet
   private
 
   def get_bank
