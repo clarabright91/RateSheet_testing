@@ -502,6 +502,49 @@ class ImportFilesController < ApplicationController
             end
           end
         end
+        @adjustment_hash = {}
+        primary_key = nil
+        secondry_key = nil
+        misc_adj_key = nil
+        (37..71).each do |r|
+          row = sheet_data.row(r)
+          if row.compact.count >= 1
+            (0..19).each do |max_column|
+              cc = max_column
+              value = sheet_data.cell(r,cc)
+
+              if value.present?
+                if value == "Loan Level Price Adjustments: See Adjustment Caps"
+                  primary_key = @key = value
+                  @adjustment_hash[@key] = {}
+                elsif value == "All LP Open Access ARMs"
+                  secondry_key = value
+                  @adjustment_hash[@key][value] = {}
+                end
+
+                if primary_key && secondry_key && cc == 8 && r > 39
+                  # @adjustment_hash[primary_key][secondry_key][value] = {}
+                  @adjustment_hash[primary_key][secondry_key][all_lp[:rows][r].values.first] = {}
+                end
+
+                if r >= 40 && cc >= 11 && cc != 15
+                  begin
+                    @adjustment_hash[primary_key][secondry_key][all_lp[:rows][r].values.first][all_lp[cc].values.first] = value if all_lp[:rows][r] && all_lp[cc].values
+                  rescue Exception => e
+                    puts "For row: #{r} and column: #{cc}"
+                  end
+                end
+
+                if r >= 47 && cc >= 12
+                  misc_adj_key = @key = value
+                  @adjustment_hash[@key] = {}
+                  debugger                  
+                end
+              end
+              make_adjust(@adjustment_hash, @program.title, sheet, @program.id)
+            end
+          end
+        end
       end
     end
     redirect_to programs_import_file_path(@bank)
@@ -1940,6 +1983,29 @@ class ImportFilesController < ApplicationController
 
   def get_titles
     return ["FICO/LTV Adjustments - Loan Amount ≤ $1MM", "State Adjustments", "FICO/LTV Adjustments - Loan Amount > $1MM", "Feature Adjustments", "Max Price"]
+  end
+
+  def all_lp
+    data = {
+      11 => {"< 620" => "0"},
+      12 => {"620 - 639" => "620"},
+      13 => {"640 - 659" => "640"},
+      14 => {"660 - 679" => "660"},
+      16 => {"680 - 699" => "680"},
+      17 => {"700 - 719" => "700"},
+      18 => {"720 - 739" => "720"},
+      19 => {">= 740" => "740"},
+      rows: {
+        40 => {"<= 60" => "0"},
+        41 => {"60.01 - 70" => "60.01"},
+        42 => {"70.01 - 75" => "70.01"},
+        43 => {"75.01 - 80" => "75.01"},
+        44 => {"80.01 - 85" => "80.01"},
+        45 => {"> 85 "=> "85"}
+      }
+    }
+
+    return data
   end
 
   def table_data
