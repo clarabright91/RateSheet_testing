@@ -73,14 +73,17 @@ class ImportFilesController < ApplicationController
                   rrr = rr + max_row
                   ccc = cc + c_i
                   value = sheet_data.cell(rrr,ccc)
-                  if (c_i == 0)
-                    key = value
-                    @block_hash[key] = {}
-                  else
-                    # first_row[c_i]
-                    @block_hash[key][15*c_i] = value
+                  if value.present?
+                    if (c_i == 0)
+                      key = value
+                      @block_hash[key] = {}
+                    else
+
+                      # first_row[c_i]
+                      # @block_hash[key][15*c_i] = value
+                    end
+                    @data << value
                   end
-                  @data << value
                 end
                 if @data.compact.reject { |c| c.blank? }.length == 0
                   break # terminate the loop
@@ -91,50 +94,42 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-
-        # xlsx.sheet(sheet).each_with_index do |sheet_row, index|
-        #   index = index+ 1
-        #   if sheet_row.include?("Loan Level Price Adjustments")
-        #     (index..xlsx.sheet(sheet).last_row).drop(1).each do |row_no|
-        #       adj_row = xlsx.sheet(sheet).row(row_no)
-        #       if xlsx.sheet(sheet).row(row_no).compact.length > 0
-        #         rr = row_no # (r == 8) / (r == 36) / (r == 56)
-        #         max_column_section = adj_row.compact.count - 1
-        #         (0..max_column_section).each do |max_column|
-        #           cc = 3 + max_column*8 # (3 / 9 / 15)
-        #           @block_hash = {}
-        #           key = ''
-        #           (0..50).each do |max_row|
-        #             @data = []
-        #             (0..7).each_with_index do |index, c_i|
-        #               rrr = rr + max_row
-        #               ccc = cc + c_i
-        #               value = xlsx.sheet(sheet).cell(rrr,ccc)
-        #               if (c_i == 0)
-        #                 key = value
-        #                 @block_hash[key] = {}
-        #               elsif (index == 2)
-        #                 @block_hash[key][value.split[0]] = {}
-        #                 # first_row[c_i]
-        #                 # {"Credit Score"=> {0 => 4.0, 580 => 2.00, 600 => 1.250},
-        #                 # {"Credit Score"=>{15=>nil, 30=>"< 580", 45=>nil, 60=>nil, 75=>nil, 90=>4.0, 105=>nil}}
-        #                 # @block_hash[key][(value.include?("<") ? value.split[0] : nil ] = value if !(value.include?("<"))
-        #               elsif (index == 6)
-        #                 @block_hash[key][value.split[0]] = value
-        #               end
-        #               @data << value
-        #             end
-
-        #             if @data.compact.reject { |c| c.blank? }.length == 0
-        #               break # terminate the loop
-        #             end
-        #           end
-        #           @program.update(base_rate: @block_hash)
-        #         end
-        #       end
-        #     end
-        #   end
-        # end
+        xlsx.sheet(sheet).each_with_index do |sheet_row, index|
+          index = index+ 1
+          if sheet_row.include?("Loan Level Price Adjustments")
+            begin
+              (index..xlsx.sheet(sheet).last_row).drop(1).each do |row_no|
+                rr = row_no
+                cc = 5
+                @credit_hash = {}
+                main_key = "Credit Score"
+                @credit_hash[main_key] = {}
+                (0..9).each do |max_row|
+                  @data = []
+                  rrr = rr + max_row
+                  ccc = cc
+                  key = xlsx.sheet(sheet).cell(rrr,ccc)
+                  if key.present?
+                    if (key.include?("<"))
+                      key = 0
+                    elsif (key.include?("-"))
+                      key = key.split("-").first
+                    elsif key.include?("≥")
+                      key = key.split.last
+                    else
+                      key
+                    end
+                    value = xlsx.sheet(sheet).cell(rrr,ccc+4)
+                    raise "value is nil at row = #{rrr} and column = #{ccc}" unless value || key
+                    @credit_hash[main_key][key] = value
+                  end
+                end
+              end
+            rescue => e
+            end
+            debugger
+          end
+        end
       end
     end
     redirect_to programs_import_file_path(@bank)
@@ -302,7 +297,15 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
+<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
+=======
+                    if value.class == Float
+                      @block_hash[key][15*c_i] = value.round(3)
+                    else
+                      @block_hash[key][15*c_i] = value
+                    end
+>>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -353,7 +356,7 @@ class ImportFilesController < ApplicationController
               elsif @title.include?("30yr") || @title.include?("30 Yr")
                 @term = @title.scan(/\d+/)[0]
               end
-              
+
               # interest type
               if @title.include?("Fixed")
                 @interest_type = 0
@@ -365,7 +368,7 @@ class ImportFilesController < ApplicationController
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM")
                 @interest_subtype = @title.scan(/\d+/)[0].to_i
               end
-              
+
               # conforming
               if @title.include?("Freddie Mac") || @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Possible") || @title.include?("Freddie Mac Home Ready")
                 @conforming = true
@@ -380,7 +383,7 @@ class ImportFilesController < ApplicationController
               if @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Ready")
                 @fannie_mae = true
               end
-              
+
               @program = @bank.programs.find_or_create_by(title: @title)
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae)
               @block_hash = {}
@@ -396,7 +399,15 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
+<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
+=======
+                    if value.class == Float
+                      @block_hash[key][15*c_i] = value.round(3)
+                    else
+                      @block_hash[key][15*c_i] = value
+                    end
+>>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -421,7 +432,7 @@ class ImportFilesController < ApplicationController
     xlsx.sheets.each do |sheet|
       if (sheet == "LP Open Acces ARMs")
         sheet_data = xlsx.sheet(sheet)
-        
+
         (1..35).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet"))
@@ -459,7 +470,7 @@ class ImportFilesController < ApplicationController
 
               # interest sub type
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                @interest_subtype = @title.scan(/\d+/)[0].to_i              
+                @interest_subtype = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -476,7 +487,7 @@ class ImportFilesController < ApplicationController
               if @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Ready")
                 @fannie_mae = true
               end
-            
+
               @program = @bank.programs.find_or_create_by(title: @title)
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
               @block_hash = {}
@@ -492,7 +503,15 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
+<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
+=======
+                    if value.class == Float
+                      @block_hash[key][15*c_i] = value.round(3)
+                    else
+                      @block_hash[key][15*c_i] = value
+                    end
+>>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -547,7 +566,7 @@ class ImportFilesController < ApplicationController
                 # if r >= 47 && cc >= 12
                 #   debugger
                 #   misc_adj_key = @key = value
-                #   @adjustment_hash[@key] = {}                  
+                #   @adjustment_hash[@key] = {}
                 # end
 
                 # if value == "Misc Adjusters"
@@ -579,7 +598,7 @@ class ImportFilesController < ApplicationController
     xlsx.sheets.each do |sheet|
       if (sheet == "LP Open Access_105")
         sheet_data = xlsx.sheet(sheet)
-        
+
         (1..61).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet")) || (row.include?("LP Open Access 10yr Fixed >125 LTV"))
@@ -589,7 +608,7 @@ class ImportFilesController < ApplicationController
               cc = 3 + max_column*6 # (3 / 9 / 15)
               # title
               @title = sheet_data.cell(r,cc)
-              
+
               # term
               @term = nil
               program_heading = @title.split
@@ -617,7 +636,7 @@ class ImportFilesController < ApplicationController
 
               # interest sub type
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                @interest_subtype = @title.scan(/\d+/)[0].to_i              
+                @interest_subtype = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -634,7 +653,7 @@ class ImportFilesController < ApplicationController
               if @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Ready")
                 @fannie_mae = true
               end
-              
+
               @program = @bank.programs.find_or_create_by(title: @title)
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
               @block_hash = {}
@@ -650,7 +669,15 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
+<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
+=======
+                    if value.class == Float
+                      @block_hash[key][15*c_i] = value.round(3)
+                    else
+                      @block_hash[key][15*c_i] = value
+                    end
+>>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -909,7 +936,7 @@ class ImportFilesController < ApplicationController
     xlsx.sheets.each do |sheet|
       if (sheet == "LP Open Access")
         sheet_data = xlsx.sheet(sheet)
-        
+
         (1..61).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet")) || (row.include?("LP Open Access Super Conforming 10 Yr Fixed"))
@@ -919,7 +946,7 @@ class ImportFilesController < ApplicationController
               cc = 3 + max_column*6 # (3 / 9 / 15)
               # title
               @title = sheet_data.cell(r,cc)
-              
+
               # term
               @term = nil
               program_heading = @title.split
@@ -947,7 +974,7 @@ class ImportFilesController < ApplicationController
 
               # interest sub type
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                @interest_subtype = @title.scan(/\d+/)[0].to_i              
+                @interest_subtype = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -964,7 +991,7 @@ class ImportFilesController < ApplicationController
               if @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Ready")
                 @fannie_mae = true
               end
-              
+
               @program = @bank.programs.find_or_create_by(title: @title)
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
               @block_hash = {}
@@ -980,7 +1007,15 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
+<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
+=======
+                    if value.class == Float
+                      @block_hash[key][15*c_i] = value.round(3)
+                    else
+                      @block_hash[key][15*c_i] = value
+                    end
+>>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -1071,7 +1106,7 @@ class ImportFilesController < ApplicationController
     xlsx.sheets.each do |sheet|
       if (sheet == "Du Refi Plus ARMs")
         sheet_data = xlsx.sheet(sheet)
-        
+
         (1..35).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet"))
@@ -1081,7 +1116,7 @@ class ImportFilesController < ApplicationController
               cc = 3 + max_column*6 # (3 / 9 / 15)
               # title
               @title = sheet_data.cell(r,cc)
-              
+
               # term
               @term = nil
               program_heading = @title.split
@@ -1109,7 +1144,7 @@ class ImportFilesController < ApplicationController
 
               # interest sub type
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                @interest_subtype = @title.scan(/\d+/)[0].to_i              
+                @interest_subtype = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -1126,7 +1161,7 @@ class ImportFilesController < ApplicationController
               if @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Ready")
                 @fannie_mae = true
               end
-              
+
               @program = @bank.programs.find_or_create_by(title: @title)
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
               @block_hash = {}
@@ -1142,7 +1177,15 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
+<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
+=======
+                    if value.class == Float
+                      @block_hash[key][15*c_i] = value.round(3)
+                    else
+                      @block_hash[key][15*c_i] = value
+                    end
+>>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -1244,7 +1287,7 @@ class ImportFilesController < ApplicationController
     xlsx.sheets.each do |sheet|
       if (sheet == "Du Refi Plus Fixed Rate_105")
         sheet_data = xlsx.sheet(sheet)
-        
+
         (1..61).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet")) || (row.include?("DU Refi Plus 10yr Fixed >125 LTV"))
@@ -1254,7 +1297,7 @@ class ImportFilesController < ApplicationController
               cc = 3 + max_column*6 # (3 / 9 / 15)
               # title
               @title = sheet_data.cell(r,cc)
-              
+
               # term
               @term = nil
               program_heading = @title.split
@@ -1282,7 +1325,7 @@ class ImportFilesController < ApplicationController
 
               # interest sub type
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                @interest_subtype = @title.scan(/\d+/)[0].to_i              
+                @interest_subtype = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -1299,7 +1342,7 @@ class ImportFilesController < ApplicationController
               if @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Ready")
                 @fannie_mae = true
               end
-              
+
               @program = @bank.programs.find_or_create_by(title: @title)
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
               @block_hash = {}
@@ -1315,7 +1358,15 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
+<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
+=======
+                    if value.class == Float
+                      @block_hash[key][15*c_i] = value.round(3)
+                    else
+                      @block_hash[key][15*c_i] = value
+                    end
+>>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -1410,7 +1461,7 @@ class ImportFilesController < ApplicationController
     xlsx.sheets.each do |sheet|
       if (sheet == "Du Refi Plus Fixed Rate")
         sheet_data = xlsx.sheet(sheet)
-        
+
         (1..61).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet")) || (row.include?("DU Refi Plus 10yr Fixed High Balance"))
@@ -1420,7 +1471,7 @@ class ImportFilesController < ApplicationController
               cc = 3 + max_column*6 # (3 / 9 / 15)
               # title
               @title = sheet_data.cell(r,cc)
-              
+
               # term
               @term = nil
               program_heading = @title.split
@@ -1448,7 +1499,7 @@ class ImportFilesController < ApplicationController
 
               # interest sub type
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                @interest_subtype = @title.scan(/\d+/)[0].to_i              
+                @interest_subtype = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -1465,7 +1516,7 @@ class ImportFilesController < ApplicationController
               if @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Ready")
                 @fannie_mae = true
               end
-              
+
               @program = @bank.programs.find_or_create_by(title: @title)
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
               @block_hash = {}
@@ -1481,7 +1532,15 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
+<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
+=======
+                    if value.class == Float
+                      @block_hash[key][15*c_i] = value.round(3)
+                    else
+                      @block_hash[key][15*c_i] = value
+                    end
+>>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -1575,7 +1634,7 @@ class ImportFilesController < ApplicationController
     xlsx.sheets.each do |sheet|
       if (sheet == "Dream Big")
         sheet_data = xlsx.sheet(sheet)
-        
+
         (1..33).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("Dream Big Jumbo"))
@@ -1585,7 +1644,7 @@ class ImportFilesController < ApplicationController
               cc = 2 + max_column*6 # (3 / 9 / 15)
               # title
               @title = sheet_data.cell(r,cc)
-              
+
               # term
               @term = nil
               program_heading = @title.split
@@ -1603,7 +1662,7 @@ class ImportFilesController < ApplicationController
               if (@term.nil? && @title.include?("ARM"))
                 @term = 0
               end
-              
+
               # interest type
               if @title.include?("Fixed")
                 @interest_type = 0
@@ -1613,7 +1672,7 @@ class ImportFilesController < ApplicationController
 
               # interest sub type
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                @interest_subtype = @title.scan(/\d+/)[0].to_i              
+                @interest_subtype = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -1630,7 +1689,7 @@ class ImportFilesController < ApplicationController
               if @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Ready")
                 @fannie_mae = true
               end
-              
+
               @program = @bank.programs.find_or_create_by(title: @title)
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
               @block_hash = {}
@@ -1646,7 +1705,15 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
+<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
+=======
+                    if value.class == Float
+                      @block_hash[key][15*c_i] = value.round(3)
+                    else
+                      @block_hash[key][15*c_i] = value
+                    end
+>>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -1661,6 +1728,7 @@ class ImportFilesController < ApplicationController
           end
         end
 
+<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
         # @adjustment_hash = {}
         # @rate_adjustment = {}
         # @title_adjustment = {}
@@ -1678,34 +1746,34 @@ class ImportFilesController < ApplicationController
         #     if adjustment_row.include?("Higher of LTV/CLTV --->")
         #       @adj_data = adjustment_row
         #     end
-  
+
         #     if value.present?
         #       debugger
         #       if value == "LTV Based Adjustments for 20/25/30 Yr Fixed Jumbo Products" || "Rate Adjustments (Increase to rate)" || "Max Price" || "LTV Based Adjustments for 15 Yr Fixed and All ARM Jumbo Products" || "Rate Fall-Out Pricing Special" || "ARM Info"
         #         @main_key = value
         #         @adjustment_hash[@main_key] = {}
         #       elsif cc == 3
-        #         @key = value 
+        #         @key = value
         #         @adjustment_hash[@key] = {}
         #       elsif cc > 3 && cc <= 14
         #         @adjustment_hash[@key][@adj_data[adj_column]] = value
         #       elsif cc == 2 && !adjustment_row.include?("FICO")
-        #         @key = value 
+        #         @key = value
         #         @adjustment_hash[@key] = {}
         #       end
         #     end
         #     @adjustment_data << value
         #   end
 
-          
+
         #   # (16..18).each do |adj|
-        #   #   rr = max_row 
+        #   #   rr = max_row
         #   #   value = sheet_data.cell(rr,adj)
         #   #   if value.present?
         #   #     if adj == 16
         #   #       @new_key = value
         #   #       @rate_adjustment[@new_key] = {}
-        #   #     elsif adj > 16 && adj <= 18 
+        #   #     elsif adj > 16 && adj <= 18
         #   #       @rate_adjustment[@new_key] = value
         #   #     end
         #   #   end
@@ -1721,6 +1789,42 @@ class ImportFilesController < ApplicationController
         # end
         # debugger
         # @program.update(adjustments: @adjustment_hash)
+=======
+        @adjustment_hash = {}
+        @adj_data = []
+        (38..62).each do |max_row|
+          adjustment_row = sheet_data.row(max_row)
+          @adjustment_data = []
+          cc = 2
+          (0..13).each do |adj_column|
+            rr = max_row + 1
+            cc = adj_column + 2
+            value = sheet_data.cell(rr,cc)
+
+            if adjustment_row.include?("Higher of LTV/CLTV --->")
+              @adj_data = adjustment_row
+            end
+
+            if value.present?
+              if cc == 3
+                @key = value
+                @adjustment_hash[@key] = {}
+              elsif cc > 3 && cc <= 14
+                @adjustment_hash[@key][@adj_data[adj_column]] = value
+              elsif cc == 2 && !adjustment_row.include?("FICO")
+                @key = value
+                @adjustment_hash[@key] = {}
+              end
+            end
+            @adjustment_data << value
+          end
+
+          if @adjustment_data.compact.length == 0
+            break # terminate the loop
+          end
+        end
+        @program.update(adjustments: @adjustment_hash)
+>>>>>>> update in government sheet
       end
     end
     redirect_to programs_import_file_path(@bank)
@@ -1732,7 +1836,7 @@ class ImportFilesController < ApplicationController
     xlsx.sheets.each do |sheet|
       if (sheet == "High Balance Extra")
         sheet_data = xlsx.sheet(sheet)
-        
+
         (1..23).each do |r|
           row = sheet_data.row(r)
           if (row.compact.include?("High Balance Extra 30 Yr Fixed"))
@@ -1741,7 +1845,7 @@ class ImportFilesController < ApplicationController
               cc = 2 + max_column*6 # (3 / 9 / 15)
               # title
               @title = sheet_data.cell(r,cc)
-              
+
               # term
               @term = nil
               program_heading = @title.split
@@ -1769,7 +1873,7 @@ class ImportFilesController < ApplicationController
 
               # interest sub type
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                @interest_subtype = @title.scan(/\d+/)[0].to_i              
+                @interest_subtype = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -1786,7 +1890,7 @@ class ImportFilesController < ApplicationController
               if @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Ready")
                 @fannie_mae = true
               end
-              
+
               @program = @bank.programs.find_or_create_by(title: @title)
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
               @block_hash = {}
@@ -1802,7 +1906,15 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
+<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
+=======
+                    if value.class == Float
+                      @block_hash[key][15*c_i] = value.round(3)
+                    else
+                      @block_hash[key][15*c_i] = value
+                    end
+>>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -1827,7 +1939,7 @@ class ImportFilesController < ApplicationController
     xlsx.sheets.each do |sheet|
       if (sheet == "Freddie ARMs")
         sheet_data = xlsx.sheet(sheet)
-        
+
         (1..47).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet")) || (row.include?("Freddie Mac 10-1 ARM (5-2-5) Super Conforming"))
@@ -1837,7 +1949,7 @@ class ImportFilesController < ApplicationController
               cc = 3 + max_column*6 # (3 / 9 / 15)
               # title
               @title = sheet_data.cell(r,cc)
-              
+
               # term
               @term = nil
               program_heading = @title.split
@@ -1865,7 +1977,7 @@ class ImportFilesController < ApplicationController
 
               # interest sub type
               if @title.include?("3-1 ARM") || @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM")
-                @interest_subtype = @title.scan(/\d+/)[0].to_i              
+                @interest_subtype = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -1882,7 +1994,7 @@ class ImportFilesController < ApplicationController
               if @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Ready")
                 @fannie_mae = true
               end
-              
+
               @program = @bank.programs.find_or_create_by(title: @title)
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
               @block_hash = {}
@@ -1898,7 +2010,15 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
+<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
+=======
+                    if value.class == Float
+                      @block_hash[key][15*c_i] = value.round(3)
+                    else
+                      @block_hash[key][15*c_i] = value
+                    end
+>>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -1964,7 +2084,7 @@ class ImportFilesController < ApplicationController
               if @title.include?("High Balance")
                 @jumbo_high_balance = true
               end
-              
+
               @program = @bank.programs.find_or_create_by(title: @title)
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, jumbo_high_balance: @jumbo_high_balance)
               @block_hash = {}
@@ -1980,7 +2100,15 @@ class ImportFilesController < ApplicationController
                     @block_hash[key] = {}
                   else
                     # first_row[c_i]
+<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
                     @block_hash[key][15*c_i] = value
+=======
+                    if value.class == Float
+                      @block_hash[key][15*c_i] = value.round(3)
+                    else
+                      @block_hash[key][15*c_i] = value
+                    end
+>>>>>>> update in government sheet
                   end
                   @data << value
                 end
@@ -2003,6 +2131,170 @@ class ImportFilesController < ApplicationController
     @programs = @bank.programs
   end
 
+<<<<<<< 426bcdb419309de6c73c46ad0bf14810dd0a607d
+=======
+  def import_jumbo_sheet
+    @allAdjustments = {}
+    titles = get_titles
+    table_names = ["State Adjustments", "Max Price"]
+    rows_entities = {}
+    changed_columns_fields = [">= 800", "< =60"]
+    columns_entities = {}#get_columns_entities
+    state_ad_columns = {
+      heading_pair: {}
+    }
+    columns = {
+      data: {},
+      indexs: [12,13,15,16,17]
+    }
+    row_numbers = [44, 54, 64]
+    columns_numbers = [2, 3]
+    unwanted_data = "LTV% -->"
+    m_key  = nil
+    mm_key = nil
+    previous_key = nil
+
+    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    xlsx = Roo::Spreadsheet.open(file)
+    xlsx.sheets.each do |sheet|
+      if (sheet.eql?("Jumbo Series_D"))
+        sheet_data = xlsx.sheet(sheet)
+        (41..72).each do |r|
+          row    = sheet_data.row(r)
+          status = row.compact.count <= 3 || row.compact.include?("FICO/LTV Adjustments - Loan Amount > $1MM")
+
+          if ((row.compact.count > 1) && status) && (!row.compact.include?("California Wholesale Rate Sheet"))
+             # r == 43 / 53 / 63
+            rr = r + 1 # (r == 44) / (r == 54) / (r == 64)
+            max_column_section = row.compact.count - 1
+            (0..max_column_section).each do |max_column|
+              cc = 2 + max_column*9 # (2 / 11)
+              @title = sheet_data.cell(r,cc)
+              if(titles.include?(@title))
+                program_heading = @title.split
+                @term = program_heading[1]
+                @interest_type = program_heading[3]
+                @program = @bank.programs.find_or_create_by(title: @title)
+                @program.update(term: @term,interest_type: 0,loan_type: 0, sheet_name: sheet)
+                @block_hash = {}
+                key = ''
+                unless(table_names.include?(@title))
+                  (0..50).each do |max_row|
+                    @data = []
+                    (0..7).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      if rrr <= 71
+                        ccc = cc + c_i
+                        value = sheet_data.cell(rrr,ccc)
+                        # get all verticle columns in columns data
+                        if row_numbers.include?(rr) && value.present? && !value.eql?("n/a") && value.is_a?(String)
+                          columns[:data][ccc] = changed_columns_fields.include?(value) ? value.tr("^0-9", '') : value.split("-").last.split(".").first
+                          columns_entities =                                       [:data]
+                          columns_entities [:indexs]  = [12, 13, 15, 16, 17]
+                          columns_entities[:numbers] = [4,5,6,7,9]
+                        end
+                        # get all horizontal columns in state_ad_columns
+                        if columns_numbers.include?(ccc) && value.present? && value.is_a?(String)
+                          state_ad_columns[value] = changed_columns_fields.include?(value) ? value.tr("^0-9", '') : value.split(" -").first
+                        end
+
+                        if (max_row.eql?(0) && c_i.eql?(0))
+                          key = !@title.eql?("Feature Adjustments") ? sheet_data.cell(rrr + 1,ccc) + "/" + value.split("%")[0] : sheet_data.cell(rrr,ccc)
+                          m_key = key
+                          # prepare first level hash
+                          @block_hash[m_key] = {}
+                        end
+
+                        rows_entities[:main_pair] = state_ad_columns
+                        main_key = rows_entities[:main_pair][value]
+
+                        if ccc.eql?(3) && main_key.present? && !@block_hash[m_key].has_key?(main_key)
+                          # prepare second level hash
+                          mm_key = main_key
+                          @block_hash[m_key][main_key] = {}
+                        elsif @title.eql?("Feature Adjustments") && ccc.eql?(2) && main_key.present? && !@block_hash[m_key].has_key?(main_key)
+                          # prepare second level hash
+                          mm_key = main_key
+                          @block_hash[m_key][main_key] = {}
+                        end
+
+                        if columns_entities[:numbers].include?(ccc)
+                          valume_key = columns_entities[ccc]
+                          # find third level hash key
+                          begin
+                            if valume_key.present? && mm_key.present? && @block_hash[m_key].keys.any? && !@block_hash[m_key][mm_key].has_key?(valume_key)
+                              # assign third level key value
+                              @block_hash[m_key][mm_key][valume_key] = value
+                            end
+                          rescue Exception => e
+                            puts e
+                          end
+
+                          if mm_key.eql?("680") && valume_key.eql?("75")
+                            # @program.update(adjustments: @block_hash.to_json)
+                            @allAdjustments[@program.title] = @block_hash
+                            make_adjust(@block_hash, @program.title, sheet, @program.id)
+                          else
+                            # @program.update(adjustments: @block_hash.to_json)
+                            @allAdjustments[@program.title] = @block_hash
+                            make_adjust(@block_hash, @program.title, sheet, @program.id)
+                          end
+                        end
+                      end
+                    end
+                  end
+                else
+                  (0..50).each do |max_row|
+                    @data = []
+                    (0..6).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      state_ad_columns[value] = value if ccc.eql?(11)
+                      if columns[:data].values.include?(value)
+                        columns[:data][ccc] =  value + (columns[:data].values.count + 1).to_s if rrr.eql?(44) && value.present?
+                      else
+                        columns[:data][ccc] = value if rrr.eql?(44) && value.present?
+                      end
+                      if (c_i == 0)
+                        key = @block_hash.empty? ? value : state_ad_columns[value]
+                        previous_key = key if @block_hash.empty?
+                        @block_hash[key] = {} if @block_hash.empty?
+                        @block_hash[previous_key][key] = {} if previous_key.present? && key.present? && previous_key != key
+                        state_ad_columns[:current_element] = key if previous_key.present? && key.present? && previous_key != key
+                      else
+                        if rrr < 62 && ccc != 14 && value.present? && !columns[:data].has_value?(value)
+                          # if key present like "LLPA"
+                          @block_hash[previous_key][state_ad_columns[:current_element]][columns[:data][ccc]] = value
+                        end
+                      end
+                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
+                    elsif @title.eql?("Max Price")
+                      begin
+                        @hash1 = Hash[*@data.compact] if @data.compact.include?("20/30 Yr Fixed")
+                        @block_hash = @hash1.merge(Hash[*@data.compact]) if @data.compact.include?("15 Yr Fixed")
+                      rescue Exception => e
+                      end
+                    end
+                  end
+                  @allAdjustments[@program.title] = @block_hash
+                  make_adjust(@block_hash, @program.title, sheet, @program.id)
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+
+    @bank.programs.update(adjustments: @allAdjustments.to_json)
+    redirect_to programs_import_file_path(@bank)
+  end
+
+>>>>>>> update in government sheet
   private
 
   def get_bank
