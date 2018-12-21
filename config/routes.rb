@@ -17,7 +17,6 @@ Rails.application.routes.draw do
       get :dream_big
       get :high_balance_extra
       get :freddie_arms
-      get :import_jumbo_sheet
       get :jumbo_series_d
       get :jumbo_series_f
       get :jumbo_series_h
