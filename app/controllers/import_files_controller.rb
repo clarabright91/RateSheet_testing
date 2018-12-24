@@ -1819,7 +1819,6 @@ class ImportFilesController < ApplicationController
         @adjustment_hash = {}
         primary_key = ''
         secondry_key = ''
-        status = nil
         (25..44).each do |r|
           row = sheet_data.row(r)
           if row.compact.count >= 1
@@ -1858,7 +1857,7 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        make_adjust(@adjustment_hash, @program.title, sheet, @program.id,status)
+        make_adjust(@adjustment_hash, @program.title, sheet, @program.id)
       end
     end
     redirect_to programs_import_file_path(@bank)
@@ -2115,7 +2114,7 @@ class ImportFilesController < ApplicationController
     return hash_keys
   end
 
-  def make_adjust(block_hash, title, sheet_name, program_id, status)
+  def make_adjust(block_hash, title, sheet_name, program_id)
     begin
       adjustment = Adjustment.find_or_create_by(program_title: title)
       adjustment.data = block_hash
