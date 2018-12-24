@@ -1960,7 +1960,6 @@ class ImportFilesController < ApplicationController
         @adjustment_hash = {}
         primary_key = ''
         secondry_key = ''
-        status = nil
         (25..44).each do |r|
           row = sheet_data.row(r)
           if row.compact.count >= 1
