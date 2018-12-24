@@ -1891,6 +1891,40 @@ class ImportFilesController < ApplicationController
             end
           end
         end
+        @adjustment_hash = {}
+        primary_key = ''
+        secondry_key = ''
+        (25..44).each do |r|
+          row = sheet_data.row(r)
+          if row.compact.count >= 1
+            (0..9).each do |max_column|
+              cc = max_column
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "Pricing Adjustments"
+                  primary_key = @key = value
+                  @adjustment_hash[@key] = {}
+                elsif value == "All High Balance Extra Loans"
+                  secondry_key = value
+                  @adjustment_hash[primary_key][secondry_key] = {}
+                end
+
+                if r == 27 && cc >= 3
+                  begin
+                    @adjustment_hash[primary_key][secondry_key][high_bal_adjustment[cc].values.first] = {}
+                  rescue Exception => e
+                    puts "For row: #{r} and column: #{cc}"
+                  end
+                end
+
+                if r > 27 && r <= 32 && cc >= 3
+                  @adjustment_hash[primary_key][secondry_key][high_bal_adjustment[cc].values.first][high_bal_adjustment[:rows][r].values.first] = value
+                end
+                
+              end
+            end
+          end
+        end
       end
     end
     redirect_to programs_import_file_path(@bank)
@@ -2105,6 +2139,26 @@ class ImportFilesController < ApplicationController
         43 => {"75.01 - 80" => "75.01"},
         44 => {"80.01 - 85" => "80.01"},
         45 => {"> 85 "=> "85"}
+      }
+    }
+
+    return data
+  end
+
+  def high_bal_adjustment
+    data = {
+      4 => {"<= 60" => "0"},
+      5 => {"60.01 - 70" => "60.01"},
+      6 => {"70.01 - 75" => "70.01"},
+      7 => {"75.01 - 80" => "75.01"},
+      8 => {"80.01 - 85" => "80.01"},
+      9 => {"85.01 - 90" => "85"},
+      rows: {
+        28 => {">=760" => "0"},
+        29 => {"740-759" => "740"},
+        30 => {"720-739" => "720"},
+        31 => {"700-719" => "700"},
+        32 => {"680-699" => "680"}
       }
     }
 
