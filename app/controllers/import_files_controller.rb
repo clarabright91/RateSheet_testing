@@ -89,7 +89,7 @@ class ImportFilesController < ApplicationController
                 end
               end
 
-              @program.update(interest_points: @block_hash)
+              @program.update(base_rate: @block_hash)
             end
           end
         end
