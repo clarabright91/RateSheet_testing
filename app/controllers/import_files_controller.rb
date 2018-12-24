@@ -59,14 +59,39 @@ class ImportFilesController < ApplicationController
             (0..max_column_section).each do |max_column|
               cc = 3 + max_column*6 # (3 / 9 / 15)
 
+              # title
               @title = sheet_data.cell(r,cc)
-              program_heading = @title.split
-              @term = program_heading[1]
-              @interest_type = program_heading[3]
 
+              # term
+              @term = nil
+              program_heading = @title.split
+              if @title.include?("10yr") || @title.include?("10 Yr")
+                @term = @title.scan(/\d+/)[0]
+              elsif @title.include?("15yr") || @title.include?("15 Yr")
+                @term = @title.scan(/\d+/)[0]
+              elsif @title.include?("20yr") || @title.include?("20 Yr")
+                @term = @title.scan(/\d+/)[0]
+              elsif @title.include?("25yr") || @title.include?("25 Yr")
+                @term = @title.scan(/\d+/)[0]
+              elsif @title.include?("30yr") || @title.include?("30 Yr")
+                @term = @title.scan(/\d+/)[0]
+              end
+
+               # interest type
+              if @title.include?("Fixed")
+                @interest_type = 0
+              elsif @title.include?("ARM")
+                @interest_type = 2
+              end
+
+              # streamline
+              if @title.include?("FHA") || @title.include?("VA") || @title.include?("USDA")
+                @streamline = true  
+              end
+              
               @program = @bank.programs.find_or_create_by(title: @title)
               @programs_ids << @program.id
-              @program.update(term: @term,interest_type: 0,loan_type: 0)
+              @program.update(term: @term,interest_type: 0,loan_type: 0,streamline: @streamline)
               @block_hash = {}
               key = ''
               (0..50).each do |max_row|
@@ -810,7 +835,6 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              # debugger
               @program.update(base_rate: @block_hash.to_json)
             end
           end
