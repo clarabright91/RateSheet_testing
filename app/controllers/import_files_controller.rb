@@ -48,6 +48,7 @@ class ImportFilesController < ApplicationController
     xlsx.sheets.each do |sheet|
       if (sheet == "Government")
         sheet_data = xlsx.sheet(sheet)
+        @programs_ids = []
         (1..95).each do |r|
           row = sheet_data.row(r)
 
@@ -64,6 +65,7 @@ class ImportFilesController < ApplicationController
               @interest_type = program_heading[3]
 
               @program = @bank.programs.find_or_create_by(title: @title)
+              @programs_ids << @program.id
               @program.update(term: @term,interest_type: 0,loan_type: 0)
               @block_hash = {}
               key = ''
@@ -78,9 +80,6 @@ class ImportFilesController < ApplicationController
                       key = value
                       @block_hash[key] = {}
                     else
-
-                      # first_row[c_i]
-                      # @block_hash[key][15*c_i] = value
                     end
                     @data << value
                   end
@@ -94,40 +93,122 @@ class ImportFilesController < ApplicationController
             end
           end
         end
+
+        #For Adjustments
         xlsx.sheet(sheet).each_with_index do |sheet_row, index|
           index = index+ 1
           if sheet_row.include?("Loan Level Price Adjustments")
-            begin
-              (index..xlsx.sheet(sheet).last_row).drop(1).each do |row_no|
-                rr = row_no
-                cc = 5
-                @credit_hash = {}
-                main_key = "Credit Score"
-                @credit_hash[main_key] = {}
-                (0..9).each do |max_row|
-                  @data = []
-                  rrr = rr + max_row
-                  ccc = cc
-                  key = xlsx.sheet(sheet).cell(rrr,ccc)
-                  if key.present?
-                    if (key.include?("<"))
-                      key = 0
-                    elsif (key.include?("-"))
-                      key = key.split("-").first
-                    elsif key.include?("≥")
-                      key = key.split.last
-                    else
-                      key
+            (index..xlsx.sheet(sheet).last_row).each do |adj_row|
+              # First Adjustment
+              if xlsx.sheet(sheet).row(adj_row).include?("Credit Score")
+                begin
+                  rr = adj_row
+                  cc = 5
+                  @credit_hash = {}
+                  main_key = "Credit Score"
+                  @credit_hash[main_key] = {}
+                  @right_adj = {}
+                  (0..9).each do |max_row|
+                    @data = []
+                    rrr = rr + max_row
+                    ccc = cc
+                    key = xlsx.sheet(sheet).cell(rrr,ccc)
+                    if key.present?
+                      if (key.include?("<"))
+                        key = 0
+                      elsif (key.include?("-"))
+                        key = key.split("-").first
+                      elsif key.include?("≥")
+                        key = key.split.last
+                      else
+                        key
+                      end
+                      value = xlsx.sheet(sheet).cell(rrr,ccc+4)
+                      right_adj_key = xlsx.sheet(sheet).cell(rrr,ccc+7)
+                      right_adj_value = xlsx.sheet(sheet).cell(rrr,ccc+13)
+                      raise "value is nil at row = #{rrr} and column = #{ccc}" unless value || key
+                      @credit_hash[main_key][key] = value
+                      @right_adj[right_adj_key] = right_adj_value
                     end
-                    value = xlsx.sheet(sheet).cell(rrr,ccc+4)
-                    raise "value is nil at row = #{rrr} and column = #{ccc}" unless value || key
-                    @credit_hash[main_key][key] = value
+
                   end
+                  @adjustment_left = Adjustment.create(data: @credit_hash, sheet_name: sheet, program_ids: @programs_ids)
+                  @adjustment_right = Adjustment.create(data: @right_adj, sheet_name: sheet, program_ids: @programs_ids)
+                rescue => e
                 end
               end
-            rescue => e
+              # Second Adjustment
+              if xlsx.sheet(sheet).row(adj_row).include?("Loan Size Adjustments")
+                begin
+                  rr = adj_row
+                  cc = 5
+                  @loan_size = {}
+                  main_key = "Loan Size / Loan Type"
+                  @loan_size[main_key] = {}
+                  @loan_size[main_key]["Purchase"] = {}
+                  @loan_size[main_key]["Refinance"] = {}
+                  (0..5).each do |max_row|
+                    @data = []
+                    rrr = rr + max_row
+                    ccc = cc
+                    key = xlsx.sheet(sheet).cell(rrr,ccc)
+                    if key.present?
+                      if (key.include?("<"))
+                        key = 0
+                      elsif (key.include?("-"))
+                        key = key.split("-").first.tr("^0-9", '')
+                      else
+                        key
+                      end
+                      value = xlsx.sheet(sheet).cell(rrr,ccc+4)
+                      value1 = xlsx.sheet(sheet).cell(rrr,ccc+5)
+                      raise "value is nil at row = #{rrr} and column = #{ccc}" unless value || key
+                      @loan_size[main_key]["Purchase"][key] = value
+                      @loan_size[main_key]["Refinance"][key] = value1
+                    end
+                    # debugger
+                  end
+                  @adjustment = Adjustment.create(data: @loan_size, sheet_name: sheet, program_ids: @programs_ids)
+                rescue => e
+                end
+              end
+              # Third Adjustment
+              if xlsx.sheet(sheet).row(adj_row).include?("Loan Size Adjustments for VA BPC Loans\n(In addition to standard adjustments)")
+                begin
+                  rr = adj_row
+                  cc = 5
+                  @loan_size_va_bpc = {}
+                  main_key = "Loan Size / Loan Type / VA BPC"
+                  @loan_size_va_bpc[main_key] = {}
+                  @loan_size_va_bpc[main_key]["Purchase"] = {}
+                  @loan_size_va_bpc[main_key]["Refinance"] = {}
+                  (0..4).each do |max_row|
+                    @data = []
+                    rrr = rr + max_row
+                    ccc = cc
+                    key = xlsx.sheet(sheet).cell(rrr,ccc)
+                    if key.present?
+                      if (key.include?("<"))
+                        key = 0
+                      elsif (key.include?("-"))
+                        key = key.split("-").first.tr("^0-9", '')
+                      elsif (key.include?("≥"))
+                        key = key.split.last.tr("^0-9", '')
+                      else
+                        key
+                      end
+                      value = xlsx.sheet(sheet).cell(rrr,ccc+4)
+                      value1 = xlsx.sheet(sheet).cell(rrr,ccc+5)
+                      raise "value is nil at row = #{rrr} and column = #{ccc}" unless value || key
+                      @loan_size_va_bpc[main_key]["Purchase"][key] = value
+                      @loan_size_va_bpc[main_key]["Refinance"][key] = value1
+                    end
+                  end
+                  @adjustment = Adjustment.create(data: @loan_size_va_bpc, sheet_name: sheet, program_ids: @programs_ids)
+                rescue => e
+                end
+              end
             end
-            debugger
           end
         end
       end
