@@ -88,8 +88,8 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              @block_hash.shift
-              @program.update(base_rate: @block_hash)
+
+              @program.update(interest_points: @block_hash)
             end
           end
         end
@@ -215,7 +215,6 @@ class ImportFilesController < ApplicationController
     end
     redirect_to programs_import_file_path(@bank)
   end
-
   def import_freddie_fixed_rate
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
