@@ -17,7 +17,11 @@ Rails.application.routes.draw do
       get :dream_big
       get :high_balance_extra
       get :freddie_arms
-      get :import_jumbo_sheet
+      get :jumbo_series_d
+      get :jumbo_series_f
+      get :jumbo_series_h
+      get :jumbo_series_i
+      get :jumbo_series_jqm
     end
   end
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

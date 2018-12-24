@@ -1,6 +1,6 @@
 <div class="container">
   <h2>Programs</h2>
-  <table class="table table-dark table-striped">
+  <table class="table table-dark table-striped" id="dttb">
     <thead>
       <tr>
         <th>Title</th>
@@ -30,7 +30,7 @@
           <td><%= program.conforming %></td>
           <td><%= program.fannie_mae %></td>
           <td><%= program.freddie_mac %></td>
-          <td><%= program.interest_points %></td>
+          <td><%= program.base_rate.to_json %></td>
           <td><%= program.adjustments %></td>
         </tr>
       <%end%>

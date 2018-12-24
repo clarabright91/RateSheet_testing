@@ -1,5 +1,5 @@
 <div class="container">
-  <%= link_to "Import Government Sheet", import_jumbo_sheet_import_file_path(@bank), class: "btn btn-primary" %>
+  <%= link_to "Import Government Sheet", import_government_sheet_import_file_path(@bank), class: "btn btn-primary" %>
   <%= link_to "Import Conforming Fixed Rate",import_conforming_fixed_rate_import_file_path(@bank),  class: "btn btn-primary" %>
   <%= link_to "Import Freddie Fixed Rate", import_freddie_fixed_rate_import_file_path(@bank),class: "btn btn-primary" %>
   <%= link_to "Import Home Possible", home_possible_import_file_path(@bank),class: "btn btn-primary" %>
@@ -13,7 +13,11 @@
   <%= link_to "Import Dream Big", dream_big_import_file_path(@bank),class: "btn btn-primary" %>
   <%= link_to "Import High Balance Extra", high_balance_extra_import_file_path(@bank),class: "btn btn-primary" %>
   <%= link_to "Import Freddie ARMs", freddie_arms_import_file_path(@bank),class: "btn btn-primary" %>
-  
+  <%= link_to "Import Jumbo Series D", jumbo_series_d_import_file_path(@bank),class: "btn btn-primary" %>
+  <%= link_to "Import Jumbo Series F", jumbo_series_f_import_file_path(@bank),class: "btn btn-primary" %>
+  <%= link_to "Import Jumbo Series H", jumbo_series_h_import_file_path(@bank),class: "btn btn-primary" %>
+  <%= link_to "Import Jumbo Series I", jumbo_series_i_import_file_path(@bank),class: "btn btn-primary" %>
+  <%= link_to "Import Jumbo Series JQM", jumbo_series_jqm_import_file_path(@bank),class: "btn btn-primary" %>
 
   <h2>Banks Details</h2>
   <table class="table table-dark table-striped">
