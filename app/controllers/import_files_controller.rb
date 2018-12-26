@@ -679,7 +679,10 @@ class ImportFilesController < ApplicationController
     xlsx.sheets.each do |sheet|
       if (sheet == "LP Open Access_105")
         sheet_data = xlsx.sheet(sheet)
-
+        @adjustment_hash = {}
+        primary_key = ''
+        secondry_key = ''
+        ltv_key = ''
         (1..61).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet")) || (row.include?("LP Open Access 10yr Fixed >125 LTV"))
@@ -764,6 +767,79 @@ class ImportFilesController < ApplicationController
             end
           end
         end
+        (63..86).each do |r|
+          row = sheet_data.row(r)
+          if row.compact.count >= 1
+            (0..19).each do |max_column|
+              cc = max_column
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "Loan Level Price Adjustments: See Adjustment Caps"
+                  primary_key = @key = value
+                  @adjustment_hash[@key] = {}
+                elsif value == "All Fixed Conforming > 15yr Terms (All Occupancies)"
+                  secondry_key = value
+                  @adjustment_hash[primary_key][secondry_key] = {}
+                elsif r == 65
+                  ltv_key = value
+                  if ltv_key.include?("<")
+                    ltv_key = 0
+                  elsif ltv_key.include?("-")
+                    ltv_key = ltv_key.split("-").first
+                  elsif ltv_key.include?("≥")
+                    ltv_key = ltv_key.split.last
+                  else
+                    ltv_key  
+                  end
+                  @adjustment_hash[primary_key][secondry_key][ltv_key] = {}
+                end
+
+                if r == 66
+                  # debugger
+                end
+              end
+            end
+          end
+        end
+
+        # (25..44).each do |r|
+        #   row = sheet_data.row(r)
+        #   if row.compact.count >= 1
+        #     (0..9).each do |max_column|
+        #       cc = max_column
+        #       value = sheet_data.cell(r,cc)
+        #       if value.present?
+        #         if value == "Pricing Adjustments" || value == "Cashout (adjustments are cumulative)"
+        #           primary_key = @key = value
+        #           @adjustment_hash[@key] = {}
+        #         elsif value == "All High Balance Extra Loans"
+        #           secondry_key = value
+        #           @adjustment_hash[primary_key][secondry_key] = {}
+        #         end
+
+        #         if r == 27 && cc >= 3
+        #           begin
+        #             @adjustment_hash[primary_key][secondry_key][high_bal_adjustment[cc].values.first] = {}
+        #           rescue Exception => e
+        #             puts "For row: #{r} and column: #{cc}"
+        #           end
+        #         end
+
+        #         if r == 34 && cc >= 3
+        #           @adjustment_hash[primary_key][high_bal_adjustment[cc].values.first] = {}
+        #         end
+
+        #         if r > 27 && r <= 32 && cc >= 3
+        #           @adjustment_hash[primary_key][secondry_key][high_bal_adjustment[cc].values.first][high_bal_adjustment[:rows][r].values.first] = value
+        #         end
+
+        #         if r >= 34 && r <= 38 && cc >= 3
+        #           @adjustment_hash[primary_key][high_bal_adjustment[cc].values.first][high_bal_adjustment[:rows][r].values.first] = value
+        #         end
+        #       end
+        #     end
+        #   end
+        # end
       end
     end
     redirect_to programs_import_file_path(@bank)
@@ -1960,6 +2036,9 @@ class ImportFilesController < ApplicationController
         @adjustment_hash = {}
         primary_key = ''
         secondry_key = ''
+        ltv_key = ''
+        cltv_key = ''
+        key = ''
         (25..44).each do |r|
           row = sheet_data.row(r)
           if row.compact.count >= 1
@@ -1973,6 +2052,9 @@ class ImportFilesController < ApplicationController
                 elsif value == "All High Balance Extra Loans"
                   secondry_key = value
                   @adjustment_hash[primary_key][secondry_key] = {}
+                elsif value == "Subordinate Financing (adjustments are cumulative)"
+                  @key = value
+                  @adjustment_hash[@key] = {}
                 end
 
                 if r == 27 && cc >= 3
@@ -1994,10 +2076,43 @@ class ImportFilesController < ApplicationController
                 if r >= 34 && r <= 38 && cc >= 3
                   @adjustment_hash[primary_key][high_bal_adjustment[cc].values.first][high_bal_adjustment[:rows][r].values.first] = value
                 end
+                # if (r == 41 && value == "LTV") || (r == 41 && value == "CLTV")
+                #   key = value
+                #   @adjustment_hash[key] = {}
+                # end
+                if r >= 40 && r <= 41 && cc == 7
+                  if value == "Max Price"
+                    key = value
+                    @adjustment_hash[key] = {}
+                  else
+                    @adjustment_hash[key] = value
+                  end
+                end
+
+                if r > 41 && r <= 44
+                  if cc == 2
+                    ltv_key = value
+                    if ltv_key.include?("<")
+                      ltv_key = 0
+                    elsif ltv_key.include?("-")
+                      ltv_key = ltv_key.split("-")[0]
+                    end
+                    @adjustment_hash[@key][ltv_key] = {}
+                  elsif cc == 3
+                    cltv_key = value
+                    cltv_key = cltv_key.split.first
+                    @adjustment_hash[@key][cltv_key] = {}
+                  end
+                  if cc > 3 && cc <= 5
+                    @adjustment_hash[@key][ltv_key][high_bal_adjustment[:subordinate][cc].values.first] = value
+                    @adjustment_hash[@key][cltv_key][high_bal_adjustment[:subordinate][cc].values.first] = value
+                  end
+                end
               end
             end
           end
         end
+        debugger
         make_adjust(@adjustment_hash, @program.title, sheet, @program.id)
       end
     end
@@ -2238,6 +2353,10 @@ class ImportFilesController < ApplicationController
         36 => {"720-739" => "720"},
         37 => {"700-719" => "700"},
         38 => {"680-699" => "680"}
+      },
+      subordinate: {
+        4 => {"< 720" => "0"},
+        5 => {">= 720" => "720"}
       }
     }
 
