@@ -1878,66 +1878,91 @@ class ImportFilesController < ApplicationController
           end
         end
 
-        # @adjustment_hash = {}
-        # @rate_adjustment = {}
-        # @title_adjustment = {}
-        # @adj_data = []
-        # (37..62).each do |max_row|
-        #   adjustment_row = sheet_data.row(max_row)
-        #   @adjustment_data = []
-        #   cc = 2
-        #   max_column = adjustment_row.count-1
-        #   (0..max_column).each do |adj_column|
-        #     rr = max_row + 1
-        #     cc = adj_column + 2
-        #     value = sheet_data.cell(rr,cc)
-
-        #     if adjustment_row.include?("Higher of LTV/CLTV --->")
-        #       @adj_data = adjustment_row
-        #     end
-
-        #     if value.present?
-        #       debugger
-        #       if value == "LTV Based Adjustments for 20/25/30 Yr Fixed Jumbo Products" || "Rate Adjustments (Increase to rate)" || "Max Price" || "LTV Based Adjustments for 15 Yr Fixed and All ARM Jumbo Products" || "Rate Fall-Out Pricing Special" || "ARM Info"
-        #         @main_key = value
-        #         @adjustment_hash[@main_key] = {}
-        #       elsif cc == 3
-        #         @key = value
-        #         @adjustment_hash[@key] = {}
-        #       elsif cc > 3 && cc <= 14
-        #         @adjustment_hash[@key][@adj_data[adj_column]] = value
-        #       elsif cc == 2 && !adjustment_row.include?("FICO")
-        #         @key = value
-        #         @adjustment_hash[@key] = {}
-        #       end
-        #     end
-        #     @adjustment_data << value
-        #   end
-
-
-        #   # (16..18).each do |adj|
-        #   #   rr = max_row
-        #   #   value = sheet_data.cell(rr,adj)
-        #   #   if value.present?
-        #   #     if adj == 16
-        #   #       @new_key = value
-        #   #       @rate_adjustment[@new_key] = {}
-        #   #     elsif adj > 16 && adj <= 18
-        #   #       @rate_adjustment[@new_key] = value
-        #   #     end
-        #   #   end
-        #     # if value == "20/25/30 Yr Fixed Only"
-        #     #   main_key = value
-        #     #   @title_adjustment[main_key] = {}
-        #     #   debugger
-        #     # end
-        #   # end
-        #   # if @adjustment_data.compact.length == 0
-        #   #   break # terminate the loop
-        #   # end
-        # end
-        # debugger
-        # @program.update(adjustments: @adjustment_hash)
+        @adjustment_hash = {}
+        term_key = ''
+        rate_type_key = ''
+        jumbo_key = ''
+        primary_key = ''
+        (38..62).each do |r|
+          row = sheet_data.row(r)
+          if row.compact.count >= 1
+            (0..14).each do |max_column|
+              cc = max_column
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if (r == 38 && value.include?("20/25/30")) && (value.include?("Fixed") && value.include?("Jumbo")) || (r == 53 && value.include?("15") && value.include?("Fixed")) && (value.include?("Jumbo") && value.include?("ARM"))
+                  if value.include?("20/25/30")
+                    term_key = "20/25/30"
+                  elsif value.include?("15")
+                    term_key = "15"
+                  end
+                  rate_type_key = "Fixed"
+                  jumbo_key = "Jumbo"
+                  @adjustment_hash[term_key] = {}
+                  @adjustment_hash[term_key][rate_type_key] = {} 
+                  @adjustment_hash[term_key][rate_type_key][jumbo_key] = {}
+                end
+                if r == 39 && cc >= 4
+                  @adjustment_hash[term_key][rate_type_key][jumbo_key][dream_big_adjustment[cc].values.first] = {}
+                end
+                if (r > 39 && r <= 51 && r != 49 && cc >= 4)
+                  @adjustment_hash[term_key][rate_type_key][jumbo_key][dream_big_adjustment[cc].values.first][dream_big_adjustment[:rows][r].values.first] = value
+                end
+                if r == 54  && cc >= 4
+                  @adjustment_hash[term_key][rate_type_key][jumbo_key][dream_big_adjustment[:arm_column][cc].values.first] = {}                  
+                end
+                if r > 54 && r <= 62 && cc >= 4
+                  @adjustment_hash[term_key][rate_type_key][jumbo_key][dream_big_adjustment[:arm_column][cc].values.first][dream_big_adjustment[:rows][r].values.first] = value
+                end
+              end
+            end
+            (0..18).each do |max_column|
+              cc = 16 + max_column
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "Rate Adjustments (Increase to rate)" || value == "Max Price"
+                  @key = value
+                  @adjustment_hash[@key] = {}
+                end
+                if value == "20/25/30 Yr Fixed Only"
+                  term_key = "20/25/30"
+                  @adjustment_hash[@key][term_key] = {}
+                end
+                if value == "Rate Fall-Out Pricing Special" || value == "ARM Info"
+                  @key = value
+                  @adjustment_hash[@key] = {}
+                end
+                if r > 39 && r <= 41 && cc == 16
+                  primary_key = value
+                  @adjustment_hash[@key][term_key][primary_key] = {}
+                elsif r > 42 && r <= 48 && cc == 16
+                  primary_key = value
+                  @adjustment_hash[@key][primary_key] = {}
+                end
+                if r > 39 && r <= 41 && cc == 18
+                  @adjustment_hash[@key][term_key][primary_key] = value
+                elsif r > 42 && r<= 48 && cc == 18
+                  @adjustment_hash[@key][primary_key] = value
+                end
+                if r == 54 && cc == 16
+                  primary_key = value
+                  @adjustment_hash[@key][value] = {}
+                end
+                if r == 54 && cc == 18
+                  @adjustment_hash[@key][primary_key] = value
+                end
+                if r > 56 && r <= 58  && cc == 16
+                  primary_key = value
+                  @adjustment_hash[@key][primary_key] = {}
+                end
+                if r > 56 && r <= 58 && cc == 17
+                   @adjustment_hash[@key][primary_key] = value
+                end
+              end
+            end
+          end
+        end
+        make_adjust(@adjustment_hash, @program.title, sheet, @program.id)
       end
     end
     redirect_to programs_import_file_path(@bank)
@@ -2076,10 +2101,7 @@ class ImportFilesController < ApplicationController
                 if r >= 34 && r <= 38 && cc >= 3
                   @adjustment_hash[primary_key][high_bal_adjustment[cc].values.first][high_bal_adjustment[:rows][r].values.first] = value
                 end
-                # if (r == 41 && value == "LTV") || (r == 41 && value == "CLTV")
-                #   key = value
-                #   @adjustment_hash[key] = {}
-                # end
+
                 if r >= 40 && r <= 41 && cc == 7
                   if value == "Max Price"
                     key = value
@@ -2112,7 +2134,6 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        debugger
         make_adjust(@adjustment_hash, @program.title, sheet, @program.id)
       end
     end
@@ -2334,54 +2355,77 @@ class ImportFilesController < ApplicationController
     return data
   end
 
-  def high_bal_adjustment
-    data = {
-      4 => {"<= 60" => "0"},
-      5 => {"60.01 - 70" => "60.01"},
-      6 => {"70.01 - 75" => "70.01"},
-      7 => {"75.01 - 80" => "75.01"},
-      8 => {"80.01 - 85" => "80.01"},
-      9 => {"85.01 - 90" => "85"},
-      rows: {
-        28 => {">=760" => "0"},
-        29 => {"740-759" => "740"},
-        30 => {"720-739" => "720"},
-        31 => {"700-719" => "700"},
-        32 => {"680-699" => "680"},
-        34 => {">=760" => "0"},
-        35 => {"740-759" => "740"},
-        36 => {"720-739" => "720"},
-        37 => {"700-719" => "700"},
-        38 => {"680-699" => "680"}
-      },
-      subordinate: {
-        4 => {"< 720" => "0"},
-        5 => {">= 720" => "720"}
+   def high_bal_adjustment
+      data = {
+        4 => {"<= 60" => "0"},
+        5 => {"60.01 - 70" => "60.01"},
+        6 => {"70.01 - 75" => "70.01"},
+        7 => {"75.01 - 80" => "75.01"},
+        8 => {"80.01 - 85" => "80.01"},
+        9 => {"85.01 - 90" => "85"},
+        rows: {
+          28 => {">=760" => "0"},
+          29 => {"740-759" => "740"},
+          30 => {"720-739" => "720"},
+          31 => {"700-719" => "700"},
+          32 => {"680-699" => "680"},
+          34 => {">=760" => "0"},
+          35 => {"740-759" => "740"},
+          36 => {"720-739" => "720"},
+          37 => {"700-719" => "700"},
+          38 => {"680-699" => "680"},
+        },
+        subordinate: {
+          4 => {"< 720" => "0"},
+          5 => {">= 720" => "720"}
+        }
       }
-    }
 
     return data
   end
 
-  def high_bal_adjustment
+  def dream_big_adjustment
     data = {
-      4 => {"<= 60" => "0"},
-      5 => {"60.01 - 70" => "60.01"},
-      6 => {"70.01 - 75" => "70.01"},
-      7 => {"75.01 - 80" => "75.01"},
-      8 => {"80.01 - 85" => "80.01"},
-      9 => {"85.01 - 90" => "85"},
+      4 => {"<=50" => "0"},
+      5 => {"50.01 - 55" => "50.01"},
+      6 => {"55.01 - 60" => "55.01"},
+      7 => {"60.01 - 65" => "60.01"},
+      9 => {"65.01 - 70" => "65.01"},
+      10 => {"70.01 - 75" => "70.01"},
+      11 => {"75.01 - 80" => "75.01"},
+      12 => {"80.01 - 85" => "80.01"},
+      14 => {"85.01 - 90" => "85.01"},
       rows: {
-        28 => {">=760" => "0"},
-        29 => {"740-759" => "740"},
-        30 => {"720-739" => "720"},
-        31 => {"700-719" => "700"},
-        32 => {"680-699" => "680"},
-        34 => {">=760" => "0"},
-        35 => {"740-759" => "740"},
-        36 => {"720-739" => "720"},
-        37 => {"700-719" => "700"},
-        38 => {"680-699" => "680"}
+        40 => {"680 - 699" => "680"},
+        41 => {"700 - 719" => "700"},
+        42 => {"720 - 739" => "720"},
+        43 => {"740 - 759" => "740"},
+        44 => {"760-779" => "760"},
+        45 => {">=780"=> "780"},
+        46 => {"Purchase" => "Purchase"},
+        47 => {"Cash Out Refinance" => "Cash Out Refinance"},
+        48 => {"Rate & Term Refinance" => "Rate & Term Refinance"},
+        50 => {"Non Owner Occupied" => "Non Owner Occupied"},
+        51 => {"> 80 LTV No MI" => "> 80 LTV No MI"},
+        55 => {"680 - 699" => "680"},
+        56 => {"700 - 719" => "700"},
+        57 => {"720 - 739" => "720"},
+        58 => {"740 - 759" => "740"},
+        59 => {"760-779" => "760"},
+        60 => {">=780"=> "780"},
+        61 => {"Purchase" => "Purchase"},
+        62 => {"Cash Out Refinance" => "Cash Out Refinance"},
+      },
+      arm_column: {
+        4 => {"<=50" => "0"},
+        5 => {"50.01 - 55" => "50.01"},
+        6 => {"55.01 - 60" => "55.01"},
+        8 => {"60.01 - 65" => "60.01"},
+        9 => {"65.01 - 70" => "65.01"},
+        10 => {"70.01 - 75" => "70.01"},
+        11 => {"75.01 - 80" => "75.01"},
+        12 => {"80.01 - 85" => "80.01"},
+        14 => {"85.01 - 90" => "85.01"},
       }
     }
 
