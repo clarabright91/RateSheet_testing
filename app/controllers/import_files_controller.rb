@@ -1997,6 +1997,7 @@ class ImportFilesController < ApplicationController
         ltv_key = ''
         cltv_key = ''
         key = ''
+
         (25..44).each do |r|
           row = sheet_data.row(r)
           if row.compact.count >= 1
@@ -2034,10 +2035,7 @@ class ImportFilesController < ApplicationController
                 if r >= 34 && r <= 38 && cc >= 3
                   @adjustment_hash[primary_key][high_bal_adjustment[cc].values.first][high_bal_adjustment[:rows][r].values.first] = value
                 end
-                # if (r == 41 && value == "LTV") || (r == 41 && value == "CLTV")
-                #   key = value
-                #   @adjustment_hash[key] = {}
-                # end
+
                 if r >= 40 && r <= 41 && cc == 7
                   if value == "Max Price"
                     key = value
@@ -2070,7 +2068,6 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        debugger
         make_adjust(@adjustment_hash, @program.title, sheet, @program.id)
       end
     end
@@ -2292,7 +2289,7 @@ class ImportFilesController < ApplicationController
     return data
   end
 
-  def high_bal_adjustment
+   def high_bal_adjustment
     data = {
       4 => {"<= 60" => "0"},
       5 => {"60.01 - 70" => "60.01"},
