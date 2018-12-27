@@ -1557,6 +1557,10 @@ class ImportFilesController < ApplicationController
     xlsx.sheets.each do |sheet|
       if (sheet == "Jumbo Series_I")
         sheet_data = xlsx.sheet(sheet)
+        @adjustment_hash = {}
+        primary_key = ''
+        main_key = ''
+        # programs
         (2..32).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet"))
@@ -1612,6 +1616,73 @@ class ImportFilesController < ApplicationController
                 end
                 @block_hash.shift
                 @program.update(base_rate: @block_hash)
+              end
+            end
+          end
+        end
+        # Adjustments
+        (34..73).each do |r|
+          row = sheet_data.row(r)
+          (0..10).each do |max_column|
+            cc = 3 + max_column
+            value = sheet_data.cell(r,cc)
+            if value.present?
+              if value == "Jumbo Series I Adjustments"
+                main_key = value
+                @adjustment_hash[main_key] = {}
+              end
+              if value == "Fixed Adjustments"
+                @key1 = value
+                @adjustment_hash[main_key][@key1] = {}
+              end
+              if value == "Credit Score" || value == "Loan Amount" || value == "Purpose/Property Type"
+                primary_key = value
+                @adjustment_hash[main_key][@key1][primary_key] = {}
+              end
+              if (r == 40 && cc > 3 && cc <= 10) || (r == 49 && cc > 3 && cc <= 10) || (r == 57 && cc > 3 && cc <= 10)
+                @adjustment_hash[main_key][@key1][primary_key][jumbo_series_i_adjustment[cc].values.first] = {}
+              end
+              if (r > 40 && r <= 45 && cc > 3 && cc <= 10) || (r > 49 && r <= 53 && cc > 3 && cc <= 10) || (r > 57 && r <= 62 && cc > 3 && cc <= 10)
+                @adjustment_hash[main_key][@key1][primary_key][jumbo_series_i_adjustment[cc].values.first][jumbo_series_i_adjustment[:rows][r].values.first] = value
+              end
+            end
+          end
+
+          (12..19).each do |max_column|
+            cc = max_column
+            value = sheet_data.cell(r,cc)
+            if value.present?
+              if value == "ARM Adjustments"
+                @key = value
+                @adjustment_hash[main_key][@key] = {} unless @adjustment_hash[main_key].has_key?(@key)
+              end
+              if value == "Credit Score" || value == "Loan Amount" || value == "Purpose/Property Type"
+                primary_key = value
+                @adjustment_hash[main_key][@key][primary_key] = {}
+              end
+              if (r == 40 && cc > 12 && cc <= 19) || (r == 49 && cc > 12 && cc <= 19) || (r == 57 && cc > 12 && cc <= 19)
+                @adjustment_hash[main_key][@key][primary_key][jumbo_series_i_adjustment[cc].values.first] = {}
+              end
+              if (r > 40 && r <= 45 && cc > 12 && cc <= 19) || (r > 49 && r <= 53 && cc > 12 && cc <= 19) || (r > 57 && r <= 62 && cc > 12 && cc <= 19)
+                @adjustment_hash[main_key][@key][primary_key][jumbo_series_i_adjustment[cc].values.first][jumbo_series_i_adjustment[:rows][r].values.first] = value
+              end
+            end
+          end
+
+          (0..17).each do |max_column|
+            cc = 3 + max_column
+            value = sheet_data.cell(r,cc)
+            if value.present?
+              if value == "Other Adjustments" || value == "Maximum Prices"
+                main_key = value
+                @adjustment_hash[main_key] = {}
+              end
+              if (r == 66 && cc == 3) || (r == 66 && cc == 12) || (r >= 72 && r <= 73 && cc == 3) || (r >= 72 && r <= 73 && cc == 12)
+                primary_key = value
+                @adjustment_hash[main_key][primary_key] = {}
+              end
+              if (r == 66 && cc == 7) || (r == 66 && cc == 17) || (r >= 72 && r <= 73 && cc ==7) || (r >= 72 && r <= 73 && cc ==17)
+                @adjustment_hash[main_key][primary_key] = value
               end
             end
           end
@@ -2617,7 +2688,7 @@ class ImportFilesController < ApplicationController
     return data
   end
 
-   def high_bal_adjustment
+  def high_bal_adjustment
       data = {
         4 => {"<= 60" => "0"},
         5 => {"60.01 - 70" => "60.01"},
@@ -2626,12 +2697,12 @@ class ImportFilesController < ApplicationController
         8 => {"80.01 - 85" => "80.01"},
         9 => {"85.01 - 90" => "85"},
         rows: {
-          28 => {">=760" => "0"},
+          28 => {">=760" => "760"},
           29 => {"740-759" => "740"},
           30 => {"720-739" => "720"},
           31 => {"700-719" => "700"},
           32 => {"680-699" => "680"},
-          34 => {">=760" => "0"},
+          34 => {">=760" => "760"},
           35 => {"740-759" => "740"},
           36 => {"720-739" => "720"},
           37 => {"700-719" => "700"},
@@ -2642,7 +2713,38 @@ class ImportFilesController < ApplicationController
           5 => {">= 720" => "720"}
         }
       }
+    return data
+  end
 
+  def jumbo_series_i_adjustment
+      data = {
+        5 => {"≤ 60" => "0"},
+        6 => {"60.01-65" => "60.01"},
+        7 => {"65.01-70" => "65.01"},
+        8 => {"70.01-75" => "70.01"},
+        10 => {"75.01-80" => "75.01"},
+        14 => {"≤ 60" => "0"},
+        16 => {"60.01-65" => "60.01"},
+        17 => {"65.01-70" => "65.01"},
+        18 => {"70.01-75" => "70.01"},
+        19 => {"75.01-80" => "75.01"},
+        rows: {
+          41 => {"< 700" => "0"},
+          42 => {"740-759" => "740"},
+          43 => {"720-739" => "720"},
+          44 => {"700-719" => "700"},
+          45 => {"680-699" => "680"},
+          50 => {"≤ $1MM" => "0"},
+          51 => {"$1MM - $1.5MM" => "$1MM"},
+          52 => {"$1.5MM - $2MM" => "$1.5MM"},
+          53 => {"$2MM - $2.5MM" => "$2MM"},
+          58 => {"2nd Home" => "2nd Home"},
+          59 => {"Purchase (15 Yr Fixed ONLY)" => "Purchase (15 Yr Fixed ONLY)"},
+          60 => {"C/O Refinance" => "C/O Refinance"},
+          61 => {"2-4 Unit" => "2-4 Unit"},
+          62 => {"DTI > 40%" => "DTI > 40%"}
+        }
+      }
     return data
   end
 
