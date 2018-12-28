@@ -1144,7 +1144,7 @@ class ImportFilesController < ApplicationController
                                 make_adjust(@block_hash, @title, sheet, @program_arr, false)
                                 # puts "#{@title} = #{@block_hash}"
                               else
-                                make_adjust(@block_hash, @title, sheet, @program_arr, false)
+                                make_adjust(@block_hash, @program_arr)
                                 # puts "#{@title} = #{@block_hash}"
                               end
                             end
@@ -1197,7 +1197,7 @@ class ImportFilesController < ApplicationController
                         end
                       end
                     end
-                    make_adjust(@block_hash, @title, sheet, @program_arr, false)
+                    make_adjust(@block_hash, @program_arr)
                     # puts "#{@title} = #{@block_hash}"
                   end
                 end
@@ -2877,10 +2877,7 @@ class ImportFilesController < ApplicationController
     end
 
     # create adjustment for each program
-    program_ids.each do |p_id|
-      program = Program.find_by_id p_id
-      make_adjust(@allAdjustments, program.title, "Sheet Name", p_id)
-    end
+    make_adjust(@allAdjustments, program_ids)
 
     redirect_to programs_import_file_path(@bank)
   end
@@ -3153,14 +3150,15 @@ class ImportFilesController < ApplicationController
     return hash_keys
   end
 
-  def make_adjust(block_hash, title, sheet_name, program_id)
+  def make_adjust(block_hash, p_ids)
     begin
-      adjustment = Adjustment.find_or_create_by(program_title: title)
-      adjustment.data = block_hash
-      adjustment.sheet_name = sheet_name
-      adjustment.program_ids = program_id unless adjustment.program_ids.include?(program_id)
-      adjustment.program_ids = adjustment.program_ids.compact.flatten if adjustment.program_ids.include?(nil)
-      adjustment.save
+      adjustment = Adjustment.create(data: block_hash.to_json)
+
+      # assign for all projects
+      p_ids.each do |id|
+        program = Program.find(id)
+        program.adjustments << adjustment
+      end
     rescue Exception => e
       puts e
     end

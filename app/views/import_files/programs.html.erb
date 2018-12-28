@@ -31,7 +31,7 @@
           <td><%= program.fannie_mae %></td>
           <td><%= program.freddie_mac %></td>
           <td><%= program.base_rate.to_json %></td>
-          <td><%= program.adjustments %></td>
+          <td><%= program.adjustments[0].data %></td>
         </tr>
       <%end%>
     </tbody>
