@@ -10,10 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_12_06_095711) do
+ActiveRecord::Schema.define(version: 2018_12_21_132423) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "adjustments", force: :cascade do |t|
+    t.json "data"
+    t.string "program_title"
+    t.string "sheet_name"
+    t.integer "program_ids", default: [], array: true
+    t.integer "program_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "banks", force: :cascade do |t|
     t.string "name"
@@ -47,10 +57,11 @@ ActiveRecord::Schema.define(version: 2018_12_06_095711) do
     t.boolean "usda"
     t.boolean "streamline"
     t.boolean "full_doc"
-    t.text "interest_points"
     t.text "adjustments"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "sheet_name"
+    t.json "base_rate"
   end
 
 end

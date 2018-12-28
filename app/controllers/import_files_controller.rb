@@ -1545,6 +1545,47 @@ class ImportFilesController < ApplicationController
             end
           end
         end
+        (59..sheet_data.last_row).each_with_index do |adj_row, index|
+          @hash = {}
+          index = index +1
+          @hash["Purchase Transactions"] = {}
+          (adj_row+2..adj_row+6).each do |max_row|
+
+            key_val = ''
+            (3..11).each do |max_column|
+              header_r = (adj_row+2) - index
+              ccc = max_column
+              rrr = max_row
+              value = xlsx.sheet(sheet).cell(rrr,ccc)
+              value1 = xlsx.sheet(sheet).cell(header_r,ccc)
+              if value1.present?
+                if (value1.include?("≤"))
+                  value1 = 0
+                elsif (value1.include?("-"))
+                  value1 = value1.split("-").first
+                elsif (value1.include?("≥"))
+                  value1 = value1.split("≥").last
+                else
+                  value1
+                end
+              end
+              if value.present?
+                if ccc == 3
+                  if (value.include?("≥"))
+                    key_val = 0
+                  elsif (value.include?("-"))
+                    key_val = value.split("-").first
+                  else
+                    key_val = value
+                  end
+                  @hash["Purchase Transactions"][key_val] = {}
+                else
+                  @hash["Purchase Transactions"][key_val][value1] = value
+                end
+              end
+            end
+          end
+        end
       end
     end
     redirect_to programs_import_file_path(@bank)
@@ -1718,6 +1759,8 @@ class ImportFilesController < ApplicationController
             end
           end
         end
+        # Adjustment
+
       end
     end
     redirect_to programs_import_file_path(@bank)
