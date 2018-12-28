@@ -58,9 +58,7 @@ class ImportFilesController < ApplicationController
             (0..max_column_section).each do |max_column|
               cc = 3 + max_column*6 # (3 / 9 / 15)
 
-              # title
               @title = sheet_data.cell(r,cc)
-
               # term
               @term = nil
               program_heading = @title.split
@@ -1901,6 +1899,188 @@ class ImportFilesController < ApplicationController
             end
           end
         end
+
+        #For Adjustments
+        xlsx.sheet(sheet).each_with_index do |sheet_row, index|
+          index = index+ 1
+          if sheet_row.include?("Loan Level Price Adjustments: See Adjustment Caps")
+            (index..xlsx.sheet(sheet).last_row).each do |adj_row|
+              # First Adjustment
+              begin
+                key = ''
+                key_array = []
+                rr = adj_row
+                cc = 3
+                @occupancy_hash = {}
+                main_key = "All Occupancies > 15 Yr Terms"
+                @occupancy_hash[main_key] = {}
+
+                (1..3).each do |max_row|
+                  column_count = 0
+                  rrr = rr + max_row
+                  row = xlsx.sheet(sheet).row(rrr)
+
+                  if rrr == (rr + 2)
+                    row.compact.each do |row_val|
+                      val = row_val.split
+                      if val.include?("<")
+                        key_array << 0
+                      else
+                        key_array << row_val.split("-")[0].to_i.round if row_val.include?("-")
+                        key_array << row_val.split[1].to_i.round if row_val.include?(">")
+                      end
+                    end
+                  end
+
+                  (0..16).each do |max_column|
+                    ccc = cc + max_column
+                    value = xlsx.sheet(sheet).cell(rrr,ccc)
+
+                    if row.include?("All Occupancies > 15 Yr Terms")
+                      if value != nil && value.to_s.include?(">") && value != "All Occupancies > 15 Yr Terms" && !value.is_a?(Numeric)
+                        key = value.gsub(/[^0-9A-Za-z]/, '')
+                        @occupancy_hash[main_key][key] = {}
+                      elsif (value != nil) && !value.is_a?(String)
+                        @occupancy_hash[main_key][key][key_array[column_count]] = value
+                        column_count = column_count + 1
+                      end
+                    end
+                  end
+                end
+                # return @occupancy_hash
+              rescue Exception => e
+              end
+
+              # Second Adjustment
+              if adj_row == 86
+                begin
+                  key_array = ""
+                  rr = adj_row
+                  cc = 16
+                  @adjustment_cap = {}
+                  main_key = "Adjustment Caps"
+                  @adjustment_cap[main_key] = {}
+                  key = ''
+
+                  (0..4).each do |max_row|
+                    column_count = 1
+                    rrr = rr + max_row
+                    row = xlsx.sheet(sheet).row(rrr)
+                    if rrr == 86
+                      key_array = row.compact
+                    end
+
+                    (0..3).each do |max_column|
+                      ccc = cc + max_column
+                      value = xlsx.sheet(sheet).cell(rrr,ccc)
+                      if ccc == 16
+                        key = value if value != nil
+                        @adjustment_cap[main_key][key] = {} if value != nil
+                      else
+                        if !key_array.include?(value)
+                          @adjustment_cap[main_key][key][key_array[column_count]] = value if value != nil
+                          column_count = column_count + 1 if value != nil
+                        end
+                      end
+                    end
+                  end
+                  # return @adjustment_cap
+                rescue Exception => e
+                end
+              end
+
+              # Third Adjustment
+              if xlsx.sheet(sheet).row(adj_row).include?("Max YSP")
+                begin
+                  rr = adj_row
+                  cc = 4
+                  @max_ysp_hash = {}
+                  main_key = "Max YSP"
+                  @max_ysp_hash[main_key] = {}
+                  row = xlsx.sheet(sheet).row(rr)
+                  @max_ysp_hash[main_key] = row.compact[5]
+                rescue Exception => e
+                end
+              end
+
+              # Fourth Adjustment
+              if xlsx.sheet(sheet).row(adj_row).include?("Loan Size Adjustments")
+                begin
+                  rr = adj_row
+                  cc = 6
+                  @loan_size = {}
+                  main_key = "Loan Size / Loan Type"
+                  @loan_size[main_key] = {}
+
+                  (0..6).each do |max_row|
+                    @data = []
+                    rrr = rr + max_row
+                    ccc = cc
+                    key = xlsx.sheet(sheet).cell(rrr,ccc)
+                    if key.present?
+
+                      if (key.include?("<"))
+                        key = 0
+                      elsif (key.include?("-"))
+                        key = key.split("-").first.tr("^0-9", '')
+                      else
+                        key
+                      end
+                      value = xlsx.sheet(sheet).cell(rrr,ccc+4)
+                      raise "value is nil at row = #{rrr} and column = #{ccc}" unless value || key
+                      @loan_size[main_key][key] = value
+                    end
+                  end
+                  # @adjustment = Adjustment.create(data: @loan_size, sheet_name: sheet, program_ids: @programs_ids)
+                rescue => e
+                end
+              end
+
+              # Fifth Adjustment
+              if xlsx.sheet(sheet).row(adj_row).include?("Adjustments Applied after Cap")
+                begin
+                  rr = adj_row
+                  cc = 15
+                  @cando_hash = {}
+                  main_key = "PropertyType/LTV/Term"
+                  @cando_hash[main_key] = {}
+
+                  (0..6).each do |max_row|
+                    @data = []
+                    rrr = rr + max_row
+                    ccc = cc
+                    key = xlsx.sheet(sheet).cell(rrr,ccc)
+
+                    if key.include?("Condo")
+                      val = key.split
+                      key1 = "Condo"
+                      key2 = val[1].gsub(/[^0-9A-Za-z]/, '')
+                      key3 = val[3].gsub(/[^0-9A-Za-z]/, '').split("yr")[0]
+                      value = xlsx.sheet(sheet).cell(rrr,ccc+4)
+                      @cando_hash[main_key][key1] = {}
+                      @cando_hash[main_key][key1][key2] = {}
+                      @cando_hash[main_key][key1][key2][key3] = value
+                    end
+
+                    if key == "Manufactured Home"
+                      key1 = "Manufactured Home"
+                      key2 = 0
+                      value = xlsx.sheet(sheet).cell(rrr,ccc+4)
+                      @cando_hash[main_key][key1][key2] = {}
+                      @cando_hash[main_key][key1][key2] = value
+                    end
+                  end
+
+                  # @adjustment = Adjustment.create(data: @loan_size, sheet_name: sheet, program_ids: @programs_ids)
+                rescue => e
+                end
+              end
+
+
+
+            end
+          end
+        end
       end
     end
     redirect_to programs_import_file_path(@bank)
@@ -2876,8 +3056,176 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        # Adjustment
 
+        #For Adjustments
+        xlsx.sheet(sheet).each_with_index do |sheet_row, index|
+          index = index+ 1
+          if sheet_row.include?("Jumbo Series H - Adjustments")
+            (index..xlsx.sheet(sheet).last_row).each do |adj_row|
+              # First Adjustment
+              if xlsx.sheet(sheet).row(adj_row).include?("State Adjustments")
+                begin
+                  key_array = ""
+                  rr = adj_row
+                  cc = 12
+                  @state_hash = {}
+                  main_key = "State"
+                  @state_hash[main_key] = {}
+                  @right_adj = {}
+                  key = ''
+                  (1..11).each do |max_row|
+                    column_count = 1
+                    rrr = rr + max_row
+                    row = xlsx.sheet(sheet).row(rrr)
+                    if row.include?("State")
+                      key_array = row.compact[5..12]
+                    end
+                    (0..8).each do |max_column|
+                      ccc = cc + max_column
+                      value = xlsx.sheet(sheet).cell(rrr,ccc)
+                      if !(row.include?("State"))
+                        if (ccc == 12)
+                          key = value
+                          @state_hash[main_key][key] = {}
+                        else
+                          if value != nil
+                            @state_hash[main_key][key][key_array[column_count]] = value
+                            column_count = column_count + 1
+                          end
+                        end
+                      end
+                    end
+                  end
+                  # return @state_hash
+                rescue => e
+                end
+              end
+
+              # Second Adjustment
+              if xlsx.sheet(sheet).row(adj_row).include?("Credit Score")
+                begin
+                  key_array = []
+                  rr = adj_row
+                  cc = 12
+                  @credit_score = {}
+                  main_key = "Credit Score"
+                  @credit_score[main_key] = {}
+                  (1..7).each do |max_row|
+                    column_count = 0
+                    rrr = rr + max_row
+                    row = xlsx.sheet(sheet).row(rrr)
+
+                    if row.include?("CLTV -->")
+                      row.compact[5..9].each do |row_val|
+                        val = row_val.split
+                        if val.include?("≤") && !val.include?("CLTV")
+                          key_array << 0
+                        elsif !val.include?("CLTV")
+                          key_array << row_val.split("-")[0].to_i.round
+                        end
+                      end
+                    end
+
+                    (0..5).each do |max_column|
+                      ccc = cc + max_column
+                      value = xlsx.sheet(sheet).cell(rrr,ccc)
+                      if !row.include?("CLTV -->")
+                        if ccc == 12
+                          key = value.split("-")[0]
+                          @credit_score[main_key][key] = {}
+                        else
+                          @credit_score[main_key][key][key_array[column_count]] = value if value != nil
+                          column_count = column_count + 1 if value != nil
+                        end
+                      end
+                    end
+                  end
+                  # return @credit_score
+                rescue Exception => e
+                end
+              end
+
+              # Third Adjustment
+              if xlsx.sheet(sheet).row(adj_row).include?("Product Highlights")
+                begin
+                  key_array = ""
+                  rr = adj_row
+                  cc = 4
+                  @product_highlight = {}
+                  main_key = "Product Highlights"
+                  @product_highlight[main_key] = {}
+
+                  (1..4).each do |max_row|
+                    column_count = 1
+                    rrr = rr + max_row
+                    row = xlsx.sheet(sheet).row(rrr)
+                    if row.include?("Purchase/Rate Term")
+                      key_array = row.compact[0..3]
+                    end
+
+                    (0..4).each do |max_column|
+                      ccc = cc + max_column
+                      value = xlsx.sheet(sheet).cell(rrr,ccc)
+                      if !row.include?("Purchase/Rate Term") && !row.include?("Max")
+                        if ccc == 4
+                          key = value
+                          @product_highlight[main_key][key] = {}
+                        else
+                          @product_highlight[main_key][key][key_array[column_count]] = value if value != nil
+                          column_count = column_count + 1 if value != nil
+                        end
+                      end
+                    end
+                  end
+                  # return @product_highlight
+                rescue Exception => e
+                end
+              end
+
+              if xlsx.sheet(sheet).row(adj_row).include?("Product Highlights")
+                begin
+                  check_status = ""
+                  key_array = ""
+                  rr = adj_row
+                  cc = 4
+                  @cash_out = {}
+                  main_key = "Product Highlights"
+                  @cash_out[main_key] = {}
+
+                  key_row = xlsx.sheet(sheet).row(rr + 2)
+                  if key_row.include?("Purchase/Rate Term")
+                    key_array = key_row.compact[0..3]
+                  end
+
+                  (6..7).each do |max_row|
+                    column_count = 1
+                    rrr = rr + max_row
+                    row = xlsx.sheet(sheet).row(rrr)
+
+                    (0..4).each do |max_column|
+                      ccc = cc + max_column
+                      value = xlsx.sheet(sheet).cell(rrr,ccc)
+                      check_status = "Cash Out" if row.include?("Cash Out")
+                      if !row.include?("Cash Out")
+                        check_status = "Cash Out"
+                        if ccc == 4 && check_status == "Cash Out"
+                          key = value
+                          @cash_out[main_key][key] = {}
+                        else
+                          @cash_out[main_key][key][key_array[column_count]] = value if value != nil
+                          column_count = column_count + 1 if value != nil
+                        end
+                      end
+                    end
+                  end
+                  # return @cash_out
+                rescue Exception => e
+                end
+              end
+
+            end
+          end
+        end
       end
     end
     redirect_to programs_import_file_path(@bank)
