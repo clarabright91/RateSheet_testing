@@ -880,6 +880,7 @@ class ImportFilesController < ApplicationController
                   if value.include?(">")
                     cltv_key = value.split.last
                     @adjustment_hash[primary_key][secondry_key][ltv_key][cltv_key] = {} 
+<<<<<<< HEAD
                   end
                 end
                 if r == 69 && cc >= 9 && cc <= 10
@@ -898,9 +899,32 @@ class ImportFilesController < ApplicationController
                     ltv_key = "0"
                   elsif value.include?("-")
                     ltv_key = value.split.last
+=======
+>>>>>>> 3b051552b42bc403b644aae3acd50578f4ed3cf9
+                  end
+                end
+                if r == 69 && cc >= 9 && cc <= 10
+                  @adjustment_hash[primary_key][secondry_key][ltv_key][cltv_key][all_lp[cc].values.first] = {}
+                  @adjustment_hash[primary_key][secondry_key][ltv_key][cltv_key][all_lp[cc].values.first] = value
+                end
+                if r >= 72 && r <= 73 && cc == 3
+                  ltv_key = value
+                  @adjustment_hash[primary_key][secondry_key][ltv_key] = {}
+                end
+<<<<<<< HEAD
+=======
+                if r >= 72 && r <= 73 && cc == 5
+                  @adjustment_hash[primary_key][secondry_key][ltv_key] = value
+                end
+                if r >= 76 && r <= 82 && cc == 6
+                  if value.include?("<")
+                    ltv_key = "0"
+                  elsif value.include?("-")
+                    ltv_key = value.split.last
                   end
                   @adjustment_hash[primary_key][secondry_key][ltv_key] = {}
                 end
+>>>>>>> 3b051552b42bc403b644aae3acd50578f4ed3cf9
                 if r >= 76 && r <= 82 && cc == 10
                   @adjustment_hash[primary_key][secondry_key][ltv_key] = value
                 end
