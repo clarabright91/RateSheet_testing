@@ -1574,6 +1574,7 @@ class ImportFilesController < ApplicationController
           @hash["Loan Amount Adjustments"] = {}
           @hash["Feature Adjustments"] = {}
           @hash["Product Adjustments"] = {}
+          @hash["Special Adjustments (Amort ≥ 240 Months - Fixed Products Only)"] = {}
           (adj_row+2..adj_row+6).each do |max_row|
 
             key_val = ''
@@ -1645,6 +1646,7 @@ class ImportFilesController < ApplicationController
               end
             end
           end
+
           (adj_row+10..adj_row+15).each do |max_row|
             
             key_val = ''
@@ -1677,7 +1679,7 @@ class ImportFilesController < ApplicationController
                   end
                   @hash["R/T Refinance Transactions"][key_val] = {}
                 else
-                  @hash["R/T Refinance Transactions"][key_val][value1] = value
+                  @hash["R/T Refinance Transactions"][key_val][value1] = value if key_val.present? && key_val != ""
                 end
               end
             end
@@ -1708,6 +1710,7 @@ class ImportFilesController < ApplicationController
               end
             end
           end
+
           (adj_row+18..adj_row+22).each do |max_row|
                         
             key_val = ''
@@ -1771,6 +1774,7 @@ class ImportFilesController < ApplicationController
               end
             end
           end
+
           (adj_row+27..adj_row+28).each do |max_row|
                         
             key_val = ''
@@ -1807,6 +1811,7 @@ class ImportFilesController < ApplicationController
               end
             end
           end
+
           (adj_row+33..adj_row+36).each do |max_row|
                         
             key_val = ''
@@ -1845,6 +1850,46 @@ class ImportFilesController < ApplicationController
               end
             end
           end
+
+          (adj_row+29..adj_row+31).each do |max_row|
+                        
+            key_val = ''
+            (15..25).each do |max_column|
+              header_r = (adj_row+33) - index
+              ccc = max_column
+              rrr = max_row
+              value = xlsx.sheet(sheet).cell(rrr,ccc)
+              value1 = xlsx.sheet(sheet).cell(header_r,ccc)
+              if value1.present?
+                if (value1.include?("≤"))
+                  value1 = 0
+                elsif (value1.include?("-"))
+                  value1 = value1.split("-").first
+                elsif (value1.include?("≥"))
+                  value1 = value1.split("≥").last
+                else
+                  value1
+                end
+              end
+              if value.present?
+                if ccc == 15
+                  if (value.include?("≤"))
+                    key_val = 0
+                  elsif (value.include?("≥"))
+                    key_val = (value.split("≥").last)
+                  elsif (value.include?("-"))
+                    key_val = value.split("-").first
+                  else
+                    key_val = value
+                  end
+                  @hash["Special Adjustments (Amort ≥ 240 Months - Fixed Products Only)"][key_val] = {}
+                else
+                  @hash["Special Adjustments (Amort ≥ 240 Months - Fixed Products Only)"][key_val][value1] = value if value1.present?
+                end
+              end
+            end
+          end
+          Adjustment.create(data: @hash,program_title: @program.title, sheet_name: sheet, program_ids: @programs_ids)
         end
       end
     end
@@ -2430,45 +2475,190 @@ class ImportFilesController < ApplicationController
         @adjustment_hash = {}
         primary_key = ''
         secondry_key = ''
-        (25..44).each do |r|
+        cltv_key = ''
+        cltv_data = ''
+        adj_key = ''
+        @cltv_data = []
+        @cltv_data2 = []
+        @max_price_data = []
+        (64..99).each do |r|
           row = sheet_data.row(r)
+          @cltv_data = sheet_data.row(67)
+          @cltv_data2 = sheet_data.row(66)
+          @max_price_data = sheet_data.row(94)
           if row.compact.count >= 1
-            (0..9).each do |max_column|
+            (3..13).each do |max_column|
               cc = max_column
               value = sheet_data.cell(r,cc)
               if value.present?
-                if value == "Pricing Adjustments" || value == "Cashout (adjustments are cumulative)"
-                  primary_key = @key = value
-                  @adjustment_hash[@key] = {}
-                elsif value == "All High Balance Extra Loans"
-                  secondry_key = value
+                if value == "LTV/FICO Adjustments" || value == "State Adjustments"
+                  primary_key = value
+                  @adjustment_hash[primary_key] = {}
+                end
+                if value == "Purchase Transactions" || value == "R/T Refinance Transactions" || value == "C/O Refinance Transactions"
+                  secondry_key = value                  
                   @adjustment_hash[primary_key][secondry_key] = {}
                 end
-
-                if r == 27 && cc >= 3
-                  begin
-                    @adjustment_hash[primary_key][secondry_key][high_bal_adjustment[cc].values.first] = {}
-                  rescue Exception => e
-                    puts "For row: #{r} and column: #{cc}"
+                # Purchase Transactions Adjustment
+                if r >= 68 && r <= 74 && cc == 3
+                  if value.include?("-")
+                    cltv_key = value.split("-").last
+                  elsif value.include?("≥")
+                    cltv_key = value.split("≥").last
                   end
+                  @adjustment_hash[primary_key][secondry_key][cltv_key] = {}
+                end
+                if r >= 68 && r <= 74 && cc >3 && cc <= 13
+                  if @cltv_data[cc-2].include?("≤")
+                    cltv_data = 0
+                  elsif @cltv_data[cc-2].include?("-")
+                    cltv_data = @cltv_data[cc-2].split("-").last
+                  elsif @cltv_data[cc-2].include?("≥")
+                    cltv_data = @cltv_data[cc-2].split("≥").last
+                  end
+                  @adjustment_hash[primary_key][secondry_key][cltv_key][cltv_data] = {}
+                  @adjustment_hash[primary_key][secondry_key][cltv_key][cltv_data] = value
                 end
 
-                if r == 34 && cc >= 3
-                  @adjustment_hash[primary_key][high_bal_adjustment[cc].values.first] = {}
+                # R/T Refinance Transactions Adjustment
+                if r >= 78 && r <= 84 && cc == 3
+                  if value.include?("-")
+                    cltv_key = value.split("-").last
+                  elsif value.include?("≥")
+                    cltv_key = value.split("-").last
+                  end
+                  @adjustment_hash[primary_key][secondry_key][cltv_key] = {}
+                end
+                if r >= 78 && r <= 84 && cc >3 && cc <= 13
+                  if @cltv_data[cc-2].include?("≤")
+                    cltv_data = 0
+                  elsif @cltv_data[cc-2].include?("-")
+                    cltv_data = @cltv_data[cc-2].split("-").last
+                  elsif @cltv_data[cc-2].include?("≥")
+                    cltv_data = @cltv_data[cc-2].split("≥").last
+                  end
+                  @adjustment_hash[primary_key][secondry_key][cltv_key][cltv_data] = {}
+                  @adjustment_hash[primary_key][secondry_key][cltv_key][cltv_data] = value
                 end
 
-                if r > 27 && r <= 32 && cc >= 3
-                  @adjustment_hash[primary_key][secondry_key][high_bal_adjustment[cc].values.first][high_bal_adjustment[:rows][r].values.first] = value
+                # C/O Refinance Transactions Adjustment
+                if r >= 88 && r <= 94 && cc == 3
+                  cltv_key = value.split.last 
+                  @adjustment_hash[primary_key][secondry_key][cltv_key] = {}
+                end
+                if r >= 88 && r <= 94 && cc >3 && cc <= 13
+                  if @cltv_data[cc-2].include?("≤")
+                    cltv_data = 0
+                  elsif @cltv_data[cc-2].include?("-")
+                    cltv_data = @cltv_data[cc-2].split("-").last
+                  elsif @cltv_data[cc-2].include?("≥")
+                    cltv_data = @cltv_data[cc-2].split("≥").last
+                  end
+                  @adjustment_hash[primary_key][secondry_key][cltv_key][cltv_data] = {}
+                  @adjustment_hash[primary_key][secondry_key][cltv_key][cltv_data] = value
                 end
 
-                if r >= 34 && r <= 38 && cc >= 3
-                  @adjustment_hash[primary_key][high_bal_adjustment[cc].values.first][high_bal_adjustment[:rows][r].values.first] = value
+                # State Adjustments
+                if r == 99 && cc == 3
+                  cltv_key = value
+                  @adjustment_hash[primary_key][cltv_key] = {}
+                end
+                if r ==99 && cc >3 && cc <= 13
+                  if @cltv_data[cc-2].include?("≤")
+                    cltv_data = 0
+                  elsif @cltv_data[cc-2].include?("-")
+                    cltv_data = @cltv_data[cc-2].split("-").last
+                  elsif @cltv_data[cc-2].include?("≥")
+                    cltv_data = @cltv_data[cc-2].split("≥").last
+                  end
+                  @adjustment_hash[primary_key][cltv_key][cltv_data] = {}
+                  @adjustment_hash[primary_key][cltv_key][cltv_data] = value
+                end
+              end
+            end
+            (15..25).each do |max_column|
+              cc = max_column
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "Loan Amount Adjustments" || value == "Feature Adjustments" || value == "Product Adjustments" || value == "Max Price"
+                  adj_key = value                  
+                  @adjustment_hash[primary_key][adj_key] = {}
+                end
+                # Loan Amount Adjustments
+                if r >= 67 && r <= 70 && cc == 15
+                  cltv_key = value.split.last 
+                  @adjustment_hash[primary_key][adj_key][cltv_key] = {}
+                end
+                if r >= 67 && r <= 70 && cc >15 && cc <= 25
+                  if @cltv_data2[cc-2].include?("≤")
+                    cltv_data = 0
+                  elsif @cltv_data2[cc-2].include?("-")
+                    cltv_data = @cltv_data2[cc-2].split("-").last
+                  elsif @cltv_data2[cc-2].include?("≥")
+                    cltv_data = @cltv_data2[cc-2].split("≥").last
+                  end
+                  @adjustment_hash[primary_key][adj_key][cltv_key][cltv_data] = {}
+                  @adjustment_hash[primary_key][adj_key][cltv_key][cltv_data] = value
+                end
+
+                # Feature Adjustments
+                if r >= 75 && r <= 80 && cc == 15
+                  cltv_key = value 
+                  @adjustment_hash[primary_key][adj_key][cltv_key] = {}
+                end
+                if r >= 75 && r <= 80 && cc >15 && cc <= 25
+                  if @cltv_data2[cc-2].include?("≤")
+                    cltv_data = 0
+                  elsif @cltv_data2[cc-2].include?("-")
+                    cltv_data = @cltv_data2[cc-2].split("-").last
+                  elsif @cltv_data2[cc-2].include?("≥")
+                    cltv_data = @cltv_data2[cc-2].split("≥").last
+                  end
+                  @adjustment_hash[primary_key][adj_key][cltv_key][cltv_data] = {}
+                  @adjustment_hash[primary_key][adj_key][cltv_key][cltv_data] = value
+                end
+
+               # Product Adjustments
+                if r >= 85 && r <= 90 && cc == 15
+                  cltv_key = value 
+                  @adjustment_hash[primary_key][adj_key][cltv_key] = {}
+                end
+                if r >= 85 && r <= 90 && cc >15 && cc <= 25
+                  if @cltv_data2[cc-2].include?("≤")
+                    cltv_data = 0
+                  elsif @cltv_data2[cc-2].include?("-")
+                    cltv_data = @cltv_data2[cc-2].split("-").last
+                  elsif @cltv_data2[cc-2].include?("≥")
+                    cltv_data = @cltv_data2[cc-2].split("≥").last
+                  end
+                  @adjustment_hash[primary_key][adj_key][cltv_key][cltv_data] = {}
+                  @adjustment_hash[primary_key][adj_key][cltv_key][cltv_data] = value
+                end
+
+                # Max Price Adjustment
+                if r >= 96 && r <= 98 && cc == 16
+                  if value.include?("≤")
+                    cltv_key = 0
+                  elsif value.include?(">")
+                    cltv_key = value.split(">").last
+                  end
+                  @adjustment_hash[primary_key][adj_key][cltv_key] = {}
+                end
+                if r >= 96 && r <= 98 && cc >16 && cc <= 23
+                  if @max_price_data[cc-2].include?("≤")
+                    cltv_data = 0
+                  elsif @max_price_data[cc-2].include?("-")
+                    cltv_data = @max_price_data[cc-2].split("-").last
+                  elsif @max_price_data[cc-2].include?("≥")
+                    cltv_data = @max_price_data[cc-2].split("≥").last
+                  end
+                  @adjustment_hash[primary_key][adj_key][cltv_key][cltv_data] = {}
+                  @adjustment_hash[primary_key][adj_key][cltv_key][cltv_data] = value
                 end
               end
             end
           end
         end
-        make_adjust(@adjustment_hash, @program.title, sheet, @program.id,status)
       end
     end
     redirect_to programs_import_file_path(@bank)
