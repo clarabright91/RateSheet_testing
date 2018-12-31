@@ -2491,11 +2491,11 @@ class ImportFilesController < ApplicationController
               cc = max_column
               value = sheet_data.cell(r,cc)
               if value.present?
-                if value == "LTV/FICO Adjustments" || value == "State Adjustments"
+                if value == "LTV/FICO Adjustments" 
                   primary_key = value
                   @adjustment_hash[primary_key] = {}
                 end
-                if value == "Purchase Transactions" || value == "R/T Refinance Transactions" || value == "C/O Refinance Transactions"
+                if value == "Purchase Transactions" || value == "R/T Refinance Transactions" || value == "C/O Refinance Transactions" || value == "State Adjustments"
                   secondry_key = value                  
                   @adjustment_hash[primary_key][secondry_key] = {}
                 end
@@ -2561,7 +2561,7 @@ class ImportFilesController < ApplicationController
                 # State Adjustments
                 if r == 99 && cc == 3
                   cltv_key = value
-                  @adjustment_hash[primary_key][cltv_key] = {}
+                  @adjustment_hash[primary_key][secondry_key][cltv_key] = {}
                 end
                 if r ==99 && cc >3 && cc <= 13
                   if @cltv_data[cc-2].include?("≤")
@@ -2571,8 +2571,8 @@ class ImportFilesController < ApplicationController
                   elsif @cltv_data[cc-2].include?("≥")
                     cltv_data = @cltv_data[cc-2].split("≥").last
                   end
-                  @adjustment_hash[primary_key][cltv_key][cltv_data] = {}
-                  @adjustment_hash[primary_key][cltv_key][cltv_data] = value
+                  @adjustment_hash[primary_key][secondry_key][cltv_key][cltv_data] = {}
+                  @adjustment_hash[primary_key][secondry_key][cltv_key][cltv_data] = value
                 end
               end
             end
@@ -2645,12 +2645,16 @@ class ImportFilesController < ApplicationController
                   @adjustment_hash[primary_key][adj_key][cltv_key] = {}
                 end
                 if r >= 96 && r <= 98 && cc >16 && cc <= 23
-                  if @max_price_data[cc-2].include?("≤")
-                    cltv_data = 0
-                  elsif @max_price_data[cc-2].include?("-")
-                    cltv_data = @max_price_data[cc-2].split("-").last
-                  elsif @max_price_data[cc-2].include?("≥")
-                    cltv_data = @max_price_data[cc-2].split("≥").last
+                  if @max_price_data[cc-2].include?("30")
+                    cltv_data = 30
+                  elsif @max_price_data[cc-2].include?("15")
+                    cltv_data = 15
+                  elsif @max_price_data[cc-2].include?("10/1")
+                    cltv_data = "10/1"
+                  elsif @max_price_data[cc-2].include?("7/1")
+                    cltv_data = "7/1"
+                  elsif @max_price_data[cc-2].include?("5/1")
+                    cltv_data = "5/1"
                   end
                   @adjustment_hash[primary_key][adj_key][cltv_key][cltv_data] = {}
                   @adjustment_hash[primary_key][adj_key][cltv_key][cltv_data] = value
@@ -2659,6 +2663,7 @@ class ImportFilesController < ApplicationController
             end
           end
         end
+        Adjustment.create(data: @adjustment_hash,program_title: @program.title, sheet_name: sheet, program_ids: @programs_ids)
       end
     end
     redirect_to programs_import_file_path(@bank)
