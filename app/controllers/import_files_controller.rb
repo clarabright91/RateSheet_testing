@@ -299,7 +299,9 @@ class ImportFilesController < ApplicationController
               end
 
               @program = @bank.programs.find_or_create_by(title: @title)
+              @programs_ids << @program.id
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac)
+              @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
               (0..50).each do |max_row|
@@ -719,6 +721,7 @@ class ImportFilesController < ApplicationController
               @program = @bank.programs.find_or_create_by(title: @title)
               @program_ids << @program.id
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, sheet_name: sheet)
+              @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
               (0..50).each do |max_row|
@@ -3097,6 +3100,7 @@ class ImportFilesController < ApplicationController
               @program = @bank.programs.find_or_create_by(title: @title)
               program_ids << @program.id
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
+              @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
               (0..50).each do |max_row|
@@ -3399,6 +3403,7 @@ class ImportFilesController < ApplicationController
               @program = @bank.programs.find_or_create_by(title: @title)
               program_ids << @program.id
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, jumbo_high_balance: @jumbo_high_balance)
+              @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
               (0..50).each do |max_row|
