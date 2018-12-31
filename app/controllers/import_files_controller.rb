@@ -41,6 +41,7 @@ class ImportFilesController < ApplicationController
   end
 
   def import_government_sheet
+    @programs_ids = []
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
@@ -239,15 +240,16 @@ class ImportFilesController < ApplicationController
     end
     redirect_to programs_import_file_path(@bank)
   end
+
   def import_freddie_fixed_rate
-    program_ids = []
+    @program_ids = []
     @allAdjustments = {}
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Freddie Fixed Rate")
         sheet_data = xlsx.sheet(sheet)
-
+        @sheet = sheet
         (1..118).each do |r|
           row = sheet_data.row(r)
 
@@ -299,8 +301,8 @@ class ImportFilesController < ApplicationController
               end
 
               @program = @bank.programs.find_or_create_by(title: @title)
-              @programs_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac)
+              @program_ids << @program.id
+              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, sheet_name: @sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -560,9 +562,9 @@ class ImportFilesController < ApplicationController
     end
 
     # create adjustment for each program
-    make_adjust(@allAdjustments, program_ids)
+    make_adjust(@allAdjustments, @program_ids)
 
-    redirect_to programs_import_file_path(@bank)
+    redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
   def import_conforming_fixed_rate
@@ -720,6 +722,7 @@ class ImportFilesController < ApplicationController
 
               @program = @bank.programs.find_or_create_by(title: @title)
               @program_ids << @program.id
+              @program.adjustments.destroy_all
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
@@ -3586,12 +3589,13 @@ class ImportFilesController < ApplicationController
   end
 
   def freddie_arms
-    program_ids = []
+    @program_ids = []
     @allAdjustments = {}
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Freddie ARMs")
+        @sheet = sheet
         sheet_data = xlsx.sheet(sheet)
 
         (1..47).each do |r|
@@ -3650,8 +3654,8 @@ class ImportFilesController < ApplicationController
               end
 
               @program = @bank.programs.find_or_create_by(title: @title)
-              program_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
+              @program_ids << @program.id
+              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype, sheet_name: @sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -3897,18 +3901,19 @@ class ImportFilesController < ApplicationController
     end
 
     # create adjustment for each program
-    make_adjust(@allAdjustments, program_ids)
+    make_adjust(@allAdjustments, @program_ids)
 
-    redirect_to programs_import_file_path(@bank)
+    redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
   def conforming_arms
-    program_ids = []
+    @program_ids = []
     @allAdjustments = {}
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Conforming ARMs")
+        @sheet = sheet
         sheet_data = xlsx.sheet(sheet)
 
         (1..47).each do |r|
@@ -3953,8 +3958,8 @@ class ImportFilesController < ApplicationController
               end
 
               @program = @bank.programs.find_or_create_by(title: @title)
-              program_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, jumbo_high_balance: @jumbo_high_balance)
+              @program_ids << @program.id
+              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, jumbo_high_balance: @jumbo_high_balance, sheet_name: @sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -3968,7 +3973,6 @@ class ImportFilesController < ApplicationController
                     key = value
                     @block_hash[key] = {}
                   else
-                    # first_row[c_i]
                     @block_hash[key][15*c_i] = value
                   end
                   @data << value
@@ -3978,7 +3982,7 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              @block_hash.shift
+              # @block_hash.shift
               @program.update(base_rate: @block_hash.to_json)
             end
           end
@@ -4194,83 +4198,301 @@ class ImportFilesController < ApplicationController
     end
 
     # create adjustment for each program
-    make_adjust(@allAdjustments, program_ids)
+    make_adjust(@allAdjustments, @program_ids)
 
-    redirect_to programs_import_file_path(@bank)
+    redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
-
   def import_homereddy_sheet
-    xlsx = Roo::Spreadsheet.open("/home/yuva/Desktop/ratesheet/RateSheetExtractor/OB_New_Penn_Financial_Wholesale5806 (1).xls")
+    program_ids = []
+    @allAdjustments = {}
+    # xlsx = Roo::Spreadsheet.open("/home/yuva/Desktop/ratesheet/RateSheetExtractor/OB_New_Penn_Financial_Wholesale5806 (1).xls")
+    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "HomeReady")
         sheet_data = xlsx.sheet(sheet)
 
-       (1..76).each do |r|
-            row = sheet_data.row(r)
-            if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet"))
-              rr = r + 1 # (r == 8) / (r == 36) / (r == 56)
+        (1..76).each do |r|
+          row = sheet_data.row(r)
+          if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet"))
+            rr = r + 1 # (r == 8) / (r == 36) / (r == 56)
+            max_column_section = row.compact.count - 1
+            (0..max_column_section).each do |max_column|
 
-              max_column_section = row.compact.count - 1
-              (0..max_column_section).each do |max_column|
+              cc = 3 + max_column*6 # (3 / 9 / 15) 3/8/13
 
-                cc = 3 + max_column*6 # (3 / 9 / 15) 3/8/13
-
-                @title = sheet_data.cell(r,cc)
-                program_heading = @title.split
-
-
-                @term = program_heading[4] == "ARM" ? 0 : program_heading[3]
-                @interest_type = program_heading[5] == "Fixed" ? 0 : 2
-                if program_heading[3] == "5/1"
-                  @interest_subtype = 5
-                  elsif program_heading[3] == "7/1"
-                    @interest_subtype = 7
-                elsif program_heading[3] == "10/1"
-                  @interest_subtype = 10
-                end
+              @title = sheet_data.cell(r,cc)
+              program_heading = @title.split
 
 
-                if @title.include?("Fannie Mae")
+              @term = program_heading[4] == "ARM" ? 0 : program_heading[3]
+              @interest_type = program_heading[5] == "Fixed" ? 0 : 2
+              if program_heading[3] == "5/1"
+                @interest_subtype = 5
+              elsif program_heading[3] == "7/1"
+                  @interest_subtype = 7
+              elsif program_heading[3] == "10/1"
+                @interest_subtype = 10
+              end
+
+
+              if @title.include?("Fannie Mae")
                 @conforming = true
                 @fannie_mae = true
-                end
-
-                if @title.include?("Fannie Mae HomeReady")
-                  @fannie_mae_home_ready = true
-                end
-
-                @program = @bank.programs.find_or_create_by(title: @title)
-                @program.update(term: @term,interest_type: @interest_type, interest_subtype: @interest_subtype, loan_type: 0, fannie_mae: @fannie_mae, fannie_mae_home_ready: @fannie_mae_home_ready, conforming: @conforming)
-                @block_hash = {}
-                key = ''
-                (0..50).each do |max_row|
-                  @data = []
-                  (0..4).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[key] = {}
-                    else
-                      # first_row[c_i]
-                      @block_hash[key][15*c_i] = value
-                    end
-                    @data << value
-                  end
-
-                  if @data.compact.length == 0
-                    break # terminate the loop
-                  end
               end
-              @program.update(interest_points: @block_hash)
 
+              if @title.include?("Fannie Mae HomeReady")
+                @fannie_mae_home_ready = true
+              end
+
+              @program = @bank.programs.find_or_create_by(title: @title)
+              program_ids << @program.id
+              @program.update(term: @term,interest_type: @interest_type, interest_subtype: @interest_subtype, loan_type: 0, fannie_mae: @fannie_mae, fannie_mae_home_ready: @fannie_mae_home_ready, conforming: @conforming)
+              @program.adjustments.destroy_all
+              @block_hash = {}
+              key = ''
+              (0..50).each do |max_row|
+                @data = []
+                (0..4).each_with_index do |index, c_i|
+                  rrr = rr + max_row
+                  ccc = cc + c_i
+                  value = sheet_data.cell(rrr,ccc)
+                  if (c_i == 0)
+                    key = value
+                    @block_hash[key] = {}
+                  else
+                    # first_row[c_i]
+                    @block_hash[key][15*c_i] = value
+                  end
+                  @data << value
+                end
+
+                if @data.compact.length == 0
+                  break # terminate the loop
+                end
+              end
+
+              @program.update(base_rate: @block_hash)
+            end
+          end
+        end
+
+        # adjustments
+        previous_title = nil
+        @another_title = nil
+        modified_keys  = get_table_keys
+        data = get_table_keys
+        (81..128).each do |r|
+          row    = sheet_data.row(r)
+          # r == 52 / 68 / 81 / 84 / 89 / 94
+          rr = r #+ 1 # (r == 53) / (r == 69) / (r == 82) / (r == 90) / (r == 95)
+          max_column_section = row.compact.count - 1
+          (0..max_column_section).each do |max_column|
+            cc = 3 + max_column * 9 # (2 / 11)
+            @title = sheet_data.cell(r,cc)
+            @block_hash = {}
+
+            if(@title.eql?("All Fixed Conforming\n(does not apply to terms <=15yrs with LTV <=95)"))
+              @block_hash[@title] = {}
+              key = ''
+              another_key = ''
+              keyOfHash = ''
+              # for Misc Adjusters
+              first_key  = ''
+              second_key = ''
+              third_key  = ''
+              (0..48).each do |max_row|
+                @data = []
+                (3..19).each_with_index do |index, c_i|
+                  rrr = rr + max_row
+                  ccc = index
+                  value = sheet_data.cell(rrr,ccc)
+                  # implementation of first key
+                  if rrr.eql?(91)
+                    # for Cash-Out
+                    @title = sheet_data.cell(rrr,cc)
+                    @block_hash[@title] = {} unless @block_hash.has_key?(@title)
+                  elsif rrr.eql?(97) && index == 3
+                    # for Lender Paid MI Adjustments
+                    previous_title = @title = sheet_data.cell(rrr,ccc) unless previous_title == @title
+                    unless @block_hash.has_key?(@title)
+                      @block_hash[@title] = {}
+                      first_key = "LPMI/PremiumType/FICO"
+                      second_key = "LPMI/Term/LTV/FICO"
+                      @block_hash[@title][first_key] = {}
+                      @block_hash[@title][second_key] = {}
+                    end
+                  elsif rrr.eql?(112) && index == 3
+                    # for Subordinate Financing
+                    @title = sheet_data.cell(rrr,ccc)
+                    @block_hash[@title] = {} unless @block_hash.has_key?(@title)
+                  elsif rrr.eql?(112) && index == 13
+                    # for Loan Size Adjustments
+                    @another_title = sheet_data.cell(rrr,index)
+                    @block_hash[@another_title] = {} unless @block_hash.has_key?(@another_title)
+                  elsif rrr.eql?(118) && index == 3
+                    # for Misc Adjusters
+                    @title = sheet_data.cell(rrr,ccc)
+                    @block_hash[@title] = {} unless @block_hash.has_key?(@title)
+                  elsif rrr.eql?(121) && index.eql?(3)
+                    # for Non Owner Occupied
+                    @another_title = sheet_data.cell(rrr,ccc)
+                    @block_hash[@another_title] = {} unless @block_hash.has_key?(@another_title)
+                  elsif rrr.eql?(126) && index.eql?(13)
+                    # for Non Owner Occupied
+                    @title = sheet_data.cell(rrr,ccc)
+                    @block_hash[@title] = {} unless @block_hash.has_key?(@title)
+                  end
+
+                  #implementation of second key inside first key
+                  if rrr > 80 && rrr < 94 && index == 7 && value
+                    # for 1st and 2nd table
+                    key = get_value(value)
+                    @block_hash[@title][key] = {} unless @block_hash[@title].has_key?(key)
+                  elsif (rrr > 96) && (rrr < 110)
+                    # for Lender Paid MI Adjustments
+                    if index == 5 && value
+                      key = value
+                      if rrr < 100
+                        @block_hash[@title][first_key][value] = {} unless @block_hash[@title][first_key].has_key?(value)
+                      else
+                        @block_hash[@title][second_key][value] = {} unless @block_hash[@title][first_key].has_key?(value)
+                      end
+                    elsif index == 6 && rrr < 110 && value
+                      another_key = get_value(value)
+                      @block_hash[@title][second_key][key][another_key] = {} if another_key
+                    end
+                  end
+
+                  if (112..117).to_a.include?(rrr) && ccc < 12
+                    # for Subordinate Financing
+                    if index.eql?(6)
+                      key = sheet_data.cell(rrr,ccc)
+                      key = get_value(key)
+                      @block_hash[@title][key] = {} unless @block_hash[@title].has_key?(key)
+                    elsif index.eql?(7)
+                      keyOfHash = sheet_data.cell(rrr,ccc)
+                      keyOfHash = get_value(keyOfHash)
+                      @block_hash[@title][key][keyOfHash] = {}
+                    end
+                  end
+
+                  if rrr.eql?(112) && [18,19].include?(ccc)
+                    # for Loan Size Adjustments
+                    another_key = sheet_data.cell(rrr,ccc)
+                    another_key = get_value(another_key)
+                    @block_hash[@another_title][another_key] = {} unless @block_hash[@another_title].has_key?(another_key)
+                  end
+
+                  if [121,122,123].include?(rrr) && [7].include?(ccc)
+                    #for Non Owner Occupied
+                    hash_key = sheet_data.cell(rrr,ccc)
+                    hash_key = get_value(hash_key)
+                    key = hash_key
+                    @block_hash[@another_title][hash_key] = {} if hash_key.present?
+                  end
+
+                  if (126..127).to_a.include?(rrr) && @title
+                    # for Adjustment Caps
+                    if index.eql?(17)
+                      another_key = sheet_data.cell(rrr,ccc)
+                      @block_hash[@title][another_key] = {} if another_key
+                    end
+                  end
+
+                  # implementation of third key inside second key with value
+                  if rrr > 80 && rrr < 94 && index > 7 && value
+                    # for 1st and 2nd table
+                    diff_of_row = rrr - 80
+                    hash_key = sheet_data.cell((rrr - diff_of_row),ccc)
+                    hash_key = get_value(hash_key)
+                    if hash_key.present?
+                      @block_hash[@title][key][hash_key] = value unless @block_hash[@title][key].has_key?(hash_key)
+                    end
+                  end
+
+                  if rrr > 96 && rrr <= 109 && index >= 7 && value
+                    # for Lender Paid MI Adjustments
+                    diff_of_row = rrr - 96
+                    hash_key = sheet_data.cell((rrr - diff_of_row),ccc)
+                    hash_key = get_value(hash_key)
+                    if (97..99).to_a.include?(rrr)
+                      @block_hash[@title][first_key][key][hash_key] = value
+                    else
+                      @block_hash[@title][second_key][key][another_key][hash_key] = value if value
+                    end
+                  end
+
+                  if (112..117).to_a.include?(rrr) && ccc > 9 && ccc < 12 && value
+                    # for Subordinate Financing
+                    diff_of_row = rrr - 111
+                    hash_key = sheet_data.cell((rrr - diff_of_row),ccc)
+                    hash_key = get_value(hash_key)
+                    @block_hash[@title][key][keyOfHash][hash_key] = value if hash_key.present?
+                  end
+
+                  if (113..120).to_a.include?(rrr) && ccc > 15 && value
+                    #for Loan Size Adjustments
+                    if ccc.eql?(18)
+                      diff_of_column = ccc - 15
+                      extra_key = sheet_data.cell(rrr,(ccc-diff_of_column))
+                      @block_hash[@another_title]["Purchase"][extra_key] = value
+                    else
+                      diff_of_column = ccc - 15
+                      extra_key = sheet_data.cell(rrr,(ccc-diff_of_column))
+                      @block_hash[@another_title]["Refinance"][extra_key] = value
+                    end
+                  end
+
+                  if (118..120).to_a.include?(rrr) && ccc == 11
+                    #for Misc Adjusters
+                    first_key = sheet_data.cell(rrr,ccc - 5)
+                    @block_hash[@title][first_key] = value
+                  end
+
+                  if [121,122,123].include?(rrr) && [11].include?(ccc)
+                    #for Non Owner Occupied
+                    @block_hash[@another_title][key] = value if key && value
+                  end
+
+                  if (126..128).to_a.include?(rrr)
+                    # for Adjustment Caps
+                    if (18..19).to_a.include?(ccc)
+                      diff_of_row = rrr - 125
+                      has_key = sheet_data.cell((rrr-diff_of_row),ccc)
+                      unless @block_hash[@title][another_key].has_key?(has_key)
+                        @block_hash[@title][another_key][has_key] = value if another_key.present?
+                      else
+                        has_key = has_key + "1"
+                        @block_hash[@title][another_key][has_key] = value if another_key.present?
+                      end
+                    end
+                  end
+                end
+
+                @allAdjustments[@title] = @block_hash[@title]
+                if @another_title
+                  @allAdjustments[@another_title] = @block_hash[@another_title]
+                end
+              end
             end
           end
         end
       end
     end
+
+    # rename first level keys
+    @allAdjustments.keys.each do |key|
+      data = get_table_keys
+      if data[key]
+        @allAdjustments[data[key]] = @allAdjustments.delete(key)
+      end
+    end
+
+    # create adjustment for each program
+    make_adjust(@allAdjustments, program_ids)
+
     redirect_to programs_import_file_path(@bank)
   end
 
@@ -4336,7 +4558,6 @@ class ImportFilesController < ApplicationController
                   end
               end
               @program.update(interest_points: @block_hash)
-
             end
           end
         end
@@ -4413,30 +4634,30 @@ class ImportFilesController < ApplicationController
   end
 
   def high_bal_adjustment
-      data = {
-        4 => {"<= 60" => "0"},
-        5 => {"60.01 - 70" => "60.01"},
-        6 => {"70.01 - 75" => "70.01"},
-        7 => {"75.01 - 80" => "75.01"},
-        8 => {"80.01 - 85" => "80.01"},
-        9 => {"85.01 - 90" => "85"},
-        rows: {
-          28 => {">=760" => "760"},
-          29 => {"740-759" => "740"},
-          30 => {"720-739" => "720"},
-          31 => {"700-719" => "700"},
-          32 => {"680-699" => "680"},
-          34 => {">=760" => "760"},
-          35 => {"740-759" => "740"},
-          36 => {"720-739" => "720"},
-          37 => {"700-719" => "700"},
-          38 => {"680-699" => "680"},
-        },
-        subordinate: {
-          4 => {"< 720" => "0"},
-          5 => {">= 720" => "720"}
-        }
+    data = {
+      4 => {"<= 60" => "0"},
+      5 => {"60.01 - 70" => "60.01"},
+      6 => {"70.01 - 75" => "70.01"},
+      7 => {"75.01 - 80" => "75.01"},
+      8 => {"80.01 - 85" => "80.01"},
+      9 => {"85.01 - 90" => "85"},
+      rows: {
+        28 => {">=760" => "760"},
+        29 => {"740-759" => "740"},
+        30 => {"720-739" => "720"},
+        31 => {"700-719" => "700"},
+        32 => {"680-699" => "680"},
+        34 => {">=760" => "760"},
+        35 => {"740-759" => "740"},
+        36 => {"720-739" => "720"},
+        37 => {"700-719" => "700"},
+        38 => {"680-699" => "680"},
+      },
+      subordinate: {
+        4 => {"< 720" => "0"},
+        5 => {">= 720" => "720"}
       }
+    }
     return data
   end
 
@@ -4555,8 +4776,6 @@ class ImportFilesController < ApplicationController
     return base_key
   end
 
-
-
   def get_table_keys
     table_keys = {
       "All Conforming ARMs (Does not include LP Open Access)" => "Conforming/Term/LTV/FICO",
@@ -4574,7 +4793,6 @@ class ImportFilesController < ApplicationController
 
     return table_keys
   end
-
 
   def get_value value1
     if value1.present?
