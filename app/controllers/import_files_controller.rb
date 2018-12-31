@@ -421,12 +421,13 @@ class ImportFilesController < ApplicationController
   end
 
   def home_possible
-    program_ids = []
+    @program_ids = []
     @allAdjustments = {}
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Home Possible")
+        @sheet = sheet
         sheet_data = xlsx.sheet(sheet)
 
         (1..76).each do |r|
@@ -483,8 +484,8 @@ class ImportFilesController < ApplicationController
               end
 
               @program = @bank.programs.find_or_create_by(title: @title)
-              program_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae)
+              @program_ids << @program.id
+              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, sheet_name: sheet)
               @block_hash = {}
               key = ''
               (0..50).each do |max_row|
@@ -734,11 +735,10 @@ class ImportFilesController < ApplicationController
         @allAdjustments[data[key]] = @allAdjustments.delete(key)
       end
     end
-
     # create adjustment for each program
-    make_adjust(@allAdjustments, program_ids)
+    make_adjust(@allAdjustments, @program_ids)
 
-    redirect_to programs_import_file_path(@bank)
+    redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
   def lp_open_acces_arms
@@ -3555,7 +3555,7 @@ class ImportFilesController < ApplicationController
   end
 
   def programs
-    @programs = @bank.programs
+    @programs = @bank.programs.where(sheet_name: params[:sheet])
   end
 
   private
