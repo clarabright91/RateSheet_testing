@@ -1549,10 +1549,17 @@ class ImportFilesController < ApplicationController
           @hash = {}
           index = index +1
           @hash["Purchase Transactions"] = {}
+          @hash["R/T Refinance Transactions"] = {}
+          @hash["C/O Refinance Transactions"] = {}
+          @hash["State Adjustments"] = {}
+          @hash["Max Price"] = {}
+          @hash["Loan Amount Adjustments"] = {}
+          @hash["Feature Adjustments"] = {}
           (adj_row+2..adj_row+6).each do |max_row|
 
             key_val = ''
-            (3..11).each do |max_column|
+            key_val1 = ''
+            (3..13).each do |max_column|
               header_r = (adj_row+2) - index
               ccc = max_column
               rrr = max_row
@@ -1572,7 +1579,7 @@ class ImportFilesController < ApplicationController
               if value.present?
                 if ccc == 3
                   if (value.include?("≥"))
-                    key_val = 0
+                    key_val = (value.split("≥").last)
                   elsif (value.include?("-"))
                     key_val = value.split("-").first
                   else
@@ -1581,6 +1588,214 @@ class ImportFilesController < ApplicationController
                   @hash["Purchase Transactions"][key_val] = {}
                 else
                   @hash["Purchase Transactions"][key_val][value1] = value
+                end
+              end
+            end
+            (15..25).each do |max_column|
+              header_r = adj_row
+              ccc = max_column
+              rrr = max_row - 1
+              value = xlsx.sheet(sheet).cell(rrr,ccc)
+              value1 = xlsx.sheet(sheet).cell(header_r,ccc)
+              if value1.present?
+                if (value1.include?("≤"))
+                  value1 = 0
+                elsif (value1.include?("-"))
+                  value1 = value1.split("-").first
+                elsif (value1.include?("≥"))
+                  value1 = value1.split("≥").last
+                else
+                  value1
+                end
+              end
+              if value.present?
+                if ccc == 15
+                  if (value.include?("≤"))
+                    key_val1 = 0
+                  elsif (value.include?("≥"))
+                    key_val1 = (value.split("≥").last)
+                  elsif (value.include?("-"))
+                    key_val1 = value.split("-").first
+                  else
+                    key_val1 = value
+                  end
+                  @hash["Loan Amount Adjustments"][key_val1] = {}
+                else
+                  @hash["Loan Amount Adjustments"][key_val1][value1] = value
+                end
+              end
+            end
+          end
+          (adj_row+10..adj_row+15).each do |max_row|
+            
+            key_val = ''
+            (3..13).each do |max_column|
+              header_r = (adj_row+10) - index
+              ccc = max_column
+              rrr = max_row
+              value = xlsx.sheet(sheet).cell(rrr,ccc)
+              value1 = xlsx.sheet(sheet).cell(header_r,ccc)
+              if value1.present?
+                if (value1.include?("≤"))
+                  value1 = 0
+                elsif (value1.include?("-"))
+                  value1 = value1.split("-").first
+                elsif (value1.include?("≥"))
+                  value1 = value1.split("≥").last
+                else
+                  value1
+                end
+              end
+              if value.present?
+                if ccc == 3
+                  if (value.include?("≥"))
+                    key_val = (value.split("≥").last)
+                  elsif (value.include?("-"))
+                    key_val = value.split("-").first
+                  else
+                    key_val = value
+                  end
+                  @hash["R/T Refinance Transactions"][key_val] = {}
+                else
+                  @hash["R/T Refinance Transactions"][key_val][value1] = value
+                end
+              end
+            end
+            (15..25).each do |max_column|
+              debugger
+              header_r = adj_row+8
+              ccc = max_column
+              rrr = max_row - 1
+              value = xlsx.sheet(sheet).cell(rrr,ccc)
+              value1 = xlsx.sheet(sheet).cell(header_r,ccc)
+              if value1.present?
+                if (value1.include?("≤"))
+                  value1 = 0
+                elsif (value1.include?("-"))
+                  value1 = value1.split("-").first
+                elsif (value1.include?("≥"))
+                  value1 = value1.split("≥").last
+                else
+                  value1
+                end
+              end
+              if value.present?
+                if ccc == 15
+                  key_val1 = value
+                  @hash["Loan Amount Adjustments"][key_val1] = {}
+                else
+                  @hash["Loan Amount Adjustments"][key_val1][value1] = value
+                end
+              end
+            end
+          end
+          debugger
+          (adj_row+18..adj_row+22).each do |max_row|
+                        
+            key_val = ''
+            (3..13).each do |max_column|
+              header_r = (adj_row+18) - index
+              ccc = max_column
+              rrr = max_row
+              value = xlsx.sheet(sheet).cell(rrr,ccc)
+              value1 = xlsx.sheet(sheet).cell(header_r,ccc)
+              if value1.present?
+                if (value1.include?("≤"))
+                  value1 = 0
+                elsif (value1.include?("-"))
+                  value1 = value1.split("-").first
+                elsif (value1.include?("≥"))
+                  value1 = value1.split("≥").last
+                else
+                  value1
+                end
+              end
+              if value.present?
+                if ccc == 3
+                  if (value.include?("≥"))
+                    key_val = (value.split("≥").last)
+                  elsif (value.include?("-"))
+                    key_val = value.split("-").first
+                  else
+                    key_val = value
+                  end
+                  @hash["C/O Refinance Transactions"][key_val] = {}
+                else
+                  @hash["C/O Refinance Transactions"][key_val][value1] = value
+                end
+              end
+            end
+          end
+          (adj_row+27..adj_row+28).each do |max_row|
+                        
+            key_val = ''
+            (3..13).each do |max_column|
+              header_r = (adj_row+27) - index
+              ccc = max_column
+              rrr = max_row
+              value = xlsx.sheet(sheet).cell(rrr,ccc)
+              value1 = xlsx.sheet(sheet).cell(header_r,ccc)
+              if value1.present?
+                if (value1.include?("≤"))
+                  value1 = 0
+                elsif (value1.include?("-"))
+                  value1 = value1.split("-").first
+                elsif (value1.include?("≥"))
+                  value1 = value1.split("≥").last
+                else
+                  value1
+                end
+              end
+              if value.present?
+                if ccc == 3
+                  if (value.include?("≥"))
+                    key_val = (value.split("≥").last)
+                  elsif (value.include?("-"))
+                    key_val = value.split("-").first
+                  else
+                    key_val = value
+                  end
+                  @hash["State Adjustments"][key_val] = {}
+                else
+                  @hash["State Adjustments"][key_val][value1] = value
+                end
+              end
+            end
+          end
+          (adj_row+33..adj_row+36).each do |max_row|
+                        
+            key_val = ''
+            (3..13).each do |max_column|
+              header_r = (adj_row+33) - index
+              ccc = max_column
+              rrr = max_row
+              value = xlsx.sheet(sheet).cell(rrr,ccc)
+              value1 = xlsx.sheet(sheet).cell(header_r,ccc)
+              # if value1.present?
+              #   if (value1.include?("≤"))
+              #     value1 = 0
+              #   elsif (value1.include?("-"))
+              #     value1 = value1.split("-").first
+              #   elsif (value1.include?("≥"))
+              #     value1 = value1.split("≥").last
+              #   else
+              #     value1
+              #   end
+              # end
+              if value.present?
+                if ccc == 3
+                  if (value.include?("≤"))
+                    key_val = 0
+                  elsif (value.include?("≥"))
+                    key_val = (value.split("≥").last)
+                  elsif (value.include?("-"))
+                    key_val = value.split("-").first
+                  else
+                    key_val = value
+                  end
+                  @hash["Max Price"][key_val] = {}
+                else
+                  @hash["Max Price"][key_val][value1] = value if value1.present?
                 end
               end
             end
