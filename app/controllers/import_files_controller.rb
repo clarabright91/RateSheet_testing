@@ -3035,12 +3035,13 @@ class ImportFilesController < ApplicationController
   end
 
   def freddie_arms
-    program_ids = []
+    @program_ids = []
     @allAdjustments = {}
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Freddie ARMs")
+        @sheet = sheet
         sheet_data = xlsx.sheet(sheet)
 
         (1..47).each do |r|
@@ -3099,8 +3100,8 @@ class ImportFilesController < ApplicationController
               end
 
               @program = @bank.programs.find_or_create_by(title: @title)
-              program_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
+              @program_ids << @program.id
+              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype, sheet_name: @sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -3346,18 +3347,19 @@ class ImportFilesController < ApplicationController
     end
 
     # create adjustment for each program
-    make_adjust(@allAdjustments, program_ids)
+    make_adjust(@allAdjustments, @program_ids)
 
-    redirect_to programs_import_file_path(@bank)
+    redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
   def conforming_arms
-    program_ids = []
+    @program_ids = []
     @allAdjustments = {}
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Conforming ARMs")
+        @sheet = sheet
         sheet_data = xlsx.sheet(sheet)
 
         (1..47).each do |r|
@@ -3402,8 +3404,8 @@ class ImportFilesController < ApplicationController
               end
 
               @program = @bank.programs.find_or_create_by(title: @title)
-              program_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, jumbo_high_balance: @jumbo_high_balance)
+              @program_ids << @program.id
+              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, jumbo_high_balance: @jumbo_high_balance, sheet_name: @sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -3417,7 +3419,6 @@ class ImportFilesController < ApplicationController
                     key = value
                     @block_hash[key] = {}
                   else
-                    # first_row[c_i]
                     @block_hash[key][15*c_i] = value
                   end
                   @data << value
@@ -3427,7 +3428,7 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              @block_hash.shift
+              # @block_hash.shift
               @program.update(base_rate: @block_hash.to_json)
             end
           end
@@ -3643,9 +3644,9 @@ class ImportFilesController < ApplicationController
     end
 
     # create adjustment for each program
-    make_adjust(@allAdjustments, program_ids)
+    make_adjust(@allAdjustments, @program_ids)
 
-    redirect_to programs_import_file_path(@bank)
+    redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
 
