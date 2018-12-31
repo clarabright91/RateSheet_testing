@@ -24,6 +24,7 @@
           <td><%= program.loan_type %></td>
           <td><%= program.term %></td>
           <td><%= program.interest_type %></td>
+          <td><%=program.try(:interest_subtype)%>
           <td><%= program.fha %></td>
           <td><%= program.interest_subtype %></td>
           <td><%= program.jumbo_high_balance %></td>

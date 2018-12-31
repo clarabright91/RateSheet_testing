@@ -1,6 +1,5 @@
 class ImportFilesController < ApplicationController
-  before_action :get_bank, only: [:import_government_sheet, :programs, :import_freddie_fixed_rate, :import_conforming_fixed_rate, :home_possible, :conforming_arms, :lp_open_acces_arms, :lp_open_access_105, :lp_open_access, :du_refi_plus_arms, :du_refi_plus_fixed_rate_105, :du_refi_plus_fixed_rate, :dream_big, :high_balance_extra, :freddie_arms, :jumbo_series_d,:jumbo_series_f, :jumbo_series_h, :jumbo_series_i, :jumbo_series_jqm]
-
+  before_action :get_bank, only: [:import_government_sheet, :programs, :import_freddie_fixed_rate, :import_conforming_fixed_rate, :home_possible, :conforming_arms, :lp_open_acces_arms, :lp_open_access_105, :lp_open_access, :du_refi_plus_arms, :du_refi_plus_fixed_rate_105, :du_refi_plus_fixed_rate, :dream_big, :high_balance_extra, :freddie_arms, :jumbo_series_d,:jumbo_series_f, :jumbo_series_h, :jumbo_series_i, :jumbo_series_jqm, :import_homereddy_sheet, :import_HomeReadyhb_sheet]
   require 'roo'
   require 'roo-xls'
 
@@ -85,9 +84,9 @@ class ImportFilesController < ApplicationController
 
               # streamline
               if @title.include?("FHA") || @title.include?("VA") || @title.include?("USDA")
-                @streamline = true  
+                @streamline = true
               end
-              
+
               @program = @bank.programs.find_or_create_by(title: @title)
               @programs_ids << @program.id
               @program.update(term: @term,interest_type: 0,loan_type: 0,streamline: @streamline)
@@ -840,7 +839,7 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        
+
         (37..71).each do |r|
           row = sheet_data.row(r)
           if row.compact.count >= 1
@@ -869,7 +868,7 @@ class ImportFilesController < ApplicationController
                     @adjustment_hash[primary_key][secondry_key][all_lp[:rows][r].values.first][all_lp[:cltv][r].values.first] = {}
                   else
                     @adjustment_hash[primary_key][secondry_key][all_lp[:rows][r].values.first][all_lp[:cltv][r].values.first] = {}
-                  end  
+                  end
                 end
                 if r >= 48 && r <= 54 && cc >= 9 && cc <= 10
                   @adjustment_hash[primary_key][secondry_key][all_lp[:rows][r].values.first][all_lp[:cltv][r].values.first][all_lp[cc].values.first] = value
@@ -900,7 +899,7 @@ class ImportFilesController < ApplicationController
               cc = max_column
               value = sheet_data.cell(r,cc)
               if value.present?
-                if  value == "Misc Adjusters" || value == "Adjustment Caps" 
+                if  value == "Misc Adjusters" || value == "Adjustment Caps"
                   @key = value
                   @adjustment_hash[primary_key][@key] = {}
                 end
@@ -916,7 +915,7 @@ class ImportFilesController < ApplicationController
                   @adjustment_hash[primary_key][@key][misc_key] = value
                 end
 
-                if r >= 61 && r <= 65 && cc == 16 
+                if r >= 61 && r <= 65 && cc == 16
                   misc_adj_key = value
                   @adjustment_hash[primary_key][@key][misc_adj_key] = {}
                 end
@@ -925,7 +924,7 @@ class ImportFilesController < ApplicationController
                     term_key = "0"
                   elsif value.include?(">")
                     term_key = value.split.last
-                  else 
+                  else
                     term_key = value
                   end
                   @adjustment_hash[primary_key][@key][misc_adj_key][term_key] = {}
@@ -935,7 +934,7 @@ class ImportFilesController < ApplicationController
                     ltv_key = "0"
                   elsif value.include?(">")
                     ltv_key = value.split.last
-                  else 
+                  else
                     ltv_key = value
                   end
                   @adjustment_hash[primary_key][@key][misc_adj_key][term_key][ltv_key] = {}
@@ -1106,7 +1105,7 @@ class ImportFilesController < ApplicationController
                 if r == 69 && cc == 6
                   if value.include?(">")
                     cltv_key = value.split.last
-                    @adjustment_hash[primary_key][secondry_key][ltv_key][cltv_key] = {} 
+                    @adjustment_hash[primary_key][secondry_key][ltv_key][cltv_key] = {}
                   end
                 end
                 if r == 69 && cc >= 9 && cc <= 10
@@ -1144,7 +1143,7 @@ class ImportFilesController < ApplicationController
               cc = max_column
               value = sheet_data.cell(r,cc)
               if value.present?
-                if  value == "Misc Adjusters" || value == "Adjustment Caps" 
+                if  value == "Misc Adjusters" || value == "Adjustment Caps"
                   @key = value
                   @adjustment_hash[primary_key][@key] = {}
                 end
@@ -1646,7 +1645,7 @@ class ImportFilesController < ApplicationController
               cc = max_column
               value = sheet_data.cell(r,cc)
               if value.present?
-                if  value == "Misc Adjusters" || value == "Adjustment Caps" 
+                if  value == "Misc Adjusters" || value == "Adjustment Caps"
                   @key = value
                   @adjustment_hash[primary_key][@key] = {}
                 end
@@ -2554,7 +2553,7 @@ class ImportFilesController < ApplicationController
                   rate_type_key = "Fixed"
                   jumbo_key = "Jumbo"
                   @adjustment_hash[term_key] = {}
-                  @adjustment_hash[term_key][rate_type_key] = {} 
+                  @adjustment_hash[term_key][rate_type_key] = {}
                   @adjustment_hash[term_key][rate_type_key][jumbo_key] = {}
                 end
                 if r == 39 && cc >= 4
@@ -2564,7 +2563,7 @@ class ImportFilesController < ApplicationController
                   @adjustment_hash[term_key][rate_type_key][jumbo_key][dream_big_adjustment[cc].values.first][dream_big_adjustment[:rows][r].values.first] = value
                 end
                 if r == 54  && cc >= 4
-                  @adjustment_hash[term_key][rate_type_key][jumbo_key][dream_big_adjustment[:arm_column][cc].values.first] = {}                  
+                  @adjustment_hash[term_key][rate_type_key][jumbo_key][dream_big_adjustment[:arm_column][cc].values.first] = {}
                 end
                 if r > 54 && r <= 62 && cc >= 4
                   @adjustment_hash[term_key][rate_type_key][jumbo_key][dream_big_adjustment[:arm_column][cc].values.first][dream_big_adjustment[:rows][r].values.first] = value
@@ -3407,6 +3406,156 @@ class ImportFilesController < ApplicationController
 
     redirect_to programs_import_file_path(@bank)
   end
+
+
+  def import_homereddy_sheet
+    xlsx = Roo::Spreadsheet.open("/home/yuva/Desktop/ratesheet/RateSheetExtractor/OB_New_Penn_Financial_Wholesale5806 (1).xls")
+    xlsx.sheets.each do |sheet|
+      if (sheet == "HomeReady")
+        sheet_data = xlsx.sheet(sheet)
+
+       (1..76).each do |r|
+            row = sheet_data.row(r)
+            if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet"))
+              rr = r + 1 # (r == 8) / (r == 36) / (r == 56)
+
+              max_column_section = row.compact.count - 1
+              (0..max_column_section).each do |max_column|
+
+                cc = 3 + max_column*6 # (3 / 9 / 15) 3/8/13
+
+                @title = sheet_data.cell(r,cc)
+                program_heading = @title.split
+
+
+                @term = program_heading[4] == "ARM" ? 0 : program_heading[3]
+                @interest_type = program_heading[5] == "Fixed" ? 0 : 2
+                if program_heading[3] == "5/1"
+                  @interest_subtype = 5
+                  elsif program_heading[3] == "7/1"
+                    @interest_subtype = 7
+                elsif program_heading[3] == "10/1"
+                  @interest_subtype = 10
+                end
+
+
+                if @title.include?("Fannie Mae")
+                @conforming = true
+                @fannie_mae = true
+                end
+
+                if @title.include?("Fannie Mae HomeReady")
+                  @fannie_mae_home_ready = true
+                end
+
+                @program = @bank.programs.find_or_create_by(title: @title)
+                @program.update(term: @term,interest_type: @interest_type, interest_subtype: @interest_subtype, loan_type: 0, fannie_mae: @fannie_mae, fannie_mae_home_ready: @fannie_mae_home_ready, conforming: @conforming)
+                @block_hash = {}
+                key = ''
+                (0..50).each do |max_row|
+                  @data = []
+                  (0..4).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if (c_i == 0)
+                      key = value
+                      @block_hash[key] = {}
+                    else
+                      # first_row[c_i]
+                      @block_hash[key][15*c_i] = value
+                    end
+                    @data << value
+                  end
+
+                  if @data.compact.length == 0
+                    break # terminate the loop
+                  end
+              end
+              @program.update(interest_points: @block_hash)
+
+            end
+          end
+        end
+      end
+    end
+    redirect_to programs_import_file_path(@bank)
+  end
+
+  def import_HomeReadyhb_sheet
+    xlsx = Roo::Spreadsheet.open("/home/yuva/Desktop/ratesheet/RateSheetExtractor/OB_New_Penn_Financial_Wholesale5806 (1).xls")
+    xlsx.sheets.each do |sheet|
+      if (sheet == "HomeReady HB")
+        sheet_data = xlsx.sheet(sheet)
+
+       (1..75).each do |r|
+            row = sheet_data.row(r)
+            if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet"))
+              rr = r + 1 # (r == 8) / (r == 36) / (r == 56)
+
+              max_column_section = row.compact.count - 1
+              (0..max_column_section).each do |max_column|
+
+                cc = 3 + max_column*6 # (3 / 9 / 15) 3/8/13
+
+                @title = sheet_data.cell(r,cc)
+                program_heading = @title.split
+
+
+                @term = program_heading[4] == "ARM" ? 0 : program_heading[3]
+                @interest_type = program_heading[5] == "Fixed" ? 0 : 2
+                if program_heading[3] == "5/1"
+                  @interest_subtype = 5
+                  elsif program_heading[3] == "7/1"
+                    @interest_subtype = 7
+                elsif program_heading[3] == "10/1"
+                  @interest_subtype = 10
+                end
+                if @title.include?("Fannie Mae")
+                @conforming = true
+                @fannie_mae = true
+                end
+
+                if @title.include?("Fannie Mae HomeReady")
+                  @fannie_mae_home_ready = true
+                end
+                @program = @bank.programs.find_or_create_by(title: @title)
+                @program.update(term: @term,interest_type: @interest_type, interest_subtype: @interest_subtype, loan_type: 0, fannie_mae: @fannie_mae, fannie_mae_home_ready: @fannie_mae_home_ready, conforming: @conforming)
+                @block_hash = {}
+                key = ''
+                (0..50).each do |max_row|
+                  @data = []
+                  (0..4).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if (c_i == 0)
+                      key = value
+                      @block_hash[key] = {}
+                    else
+                      # first_row[c_i]
+                      @block_hash[key][15*c_i] = value
+                    end
+                    @data << value
+                  end
+
+                  if @data.compact.length == 0
+                    break # terminate the loop
+                  end
+              end
+              @program.update(interest_points: @block_hash)
+
+            end
+          end
+        end
+      end
+    end
+    redirect_to programs_import_file_path(@bank)
+  end
+
+
+
+
 
   def programs
     @programs = @bank.programs
