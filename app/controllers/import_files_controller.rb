@@ -240,14 +240,14 @@ class ImportFilesController < ApplicationController
     redirect_to programs_import_file_path(@bank)
   end
   def import_freddie_fixed_rate
-    program_ids = []
+    @program_ids = []
     @allAdjustments = {}
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Freddie Fixed Rate")
         sheet_data = xlsx.sheet(sheet)
-
+        @sheet = sheet
         (1..118).each do |r|
           row = sheet_data.row(r)
 
@@ -299,8 +299,8 @@ class ImportFilesController < ApplicationController
               end
 
               @program = @bank.programs.find_or_create_by(title: @title)
-              @programs_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac)
+              @program_ids << @program.id
+              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, sheet_name: @sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -560,9 +560,9 @@ class ImportFilesController < ApplicationController
     end
 
     # create adjustment for each program
-    make_adjust(@allAdjustments, program_ids)
+    make_adjust(@allAdjustments, @program_ids)
 
-    redirect_to programs_import_file_path(@bank)
+    redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
   def import_conforming_fixed_rate
