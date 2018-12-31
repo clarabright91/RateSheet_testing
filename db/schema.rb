@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_12_21_132423) do
+ActiveRecord::Schema.define(version: 2018_12_28_121535) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -35,6 +35,13 @@ ActiveRecord::Schema.define(version: 2018_12_21_132423) do
     t.string "state_code"
     t.string "zip"
     t.string "state_eligibility"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "program_adjustments", force: :cascade do |t|
+    t.integer "program_id"
+    t.integer "adjustment_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

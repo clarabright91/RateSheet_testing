@@ -13,7 +13,7 @@
         <th>Conforming</th>
         <th>Fannie Mae</th>
         <th>Freddie Mac</th>
-        <th>Interest Points</th>
+        <th>Base Rate</th>
         <th>Adjustment</th>
       </tr>
     </thead>
@@ -24,6 +24,7 @@
           <td><%= program.loan_type %></td>
           <td><%= program.term %></td>
           <td><%= program.interest_type %></td>
+          <!-- <td><%#=program.try(:interest_subtype)%> -->
           <td><%= program.fha %></td>
           <td><%= program.interest_subtype %></td>
           <td><%= program.jumbo_high_balance %></td>
@@ -31,7 +32,11 @@
           <td><%= program.fannie_mae %></td>
           <td><%= program.freddie_mac %></td>
           <td><%= program.base_rate.to_json %></td>
-          <td><%= program.adjustments[0].data %></td>
+          <td>
+            <% program.adjustments.each do |adj| %>
+              <%= adj.data %>
+            <%end%>
+          </td>
         </tr>
       <%end%>
     </tbody>
