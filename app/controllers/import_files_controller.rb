@@ -485,6 +485,7 @@ class ImportFilesController < ApplicationController
 
               @program = @bank.programs.find_or_create_by(title: @title)
               @program_ids << @program.id
+              @program.adjustments.destroy_all
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, sheet_name: sheet)
               @block_hash = {}
               key = ''
