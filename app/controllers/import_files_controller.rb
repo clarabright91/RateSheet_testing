@@ -995,7 +995,7 @@ class ImportFilesController < ApplicationController
         (1..35).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet"))
-            rr = r + 1 # (r == 8) / (r == 36) / (r == 56)
+            rr = r + 1 
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
               cc = 3 + max_column*6 # (3 / 9 / 15)
@@ -1050,6 +1050,7 @@ class ImportFilesController < ApplicationController
               @program = @bank.programs.find_or_create_by(title: @title)
               @programs_ids << @program.id
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
+              @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
               (0..50).each do |max_row|
@@ -1078,6 +1079,7 @@ class ImportFilesController < ApplicationController
           end
         end
 
+        # Adjustments
         (37..71).each do |r|
           row = sheet_data.row(r)
           if row.compact.count >= 1
@@ -1191,11 +1193,10 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        # make_adjust(@adjustment_hash, @program.title, sheet, @program.id)
-        Adjustment.create(data: @adjustment_hash,program_title: @program.title, sheet_name: sheet, program_ids: @programs_ids)
+        make_adjust(@adjustment_hash, @programs_ids)
       end
     end
-    redirect_to programs_import_file_path(@bank)
+    redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
   def lp_open_access_105
@@ -1216,10 +1217,10 @@ class ImportFilesController < ApplicationController
         (1..61).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet")) || (row.include?("LP Open Access 10yr Fixed >125 LTV"))
-            rr = r + 1 # (r == 8) / (r == 36) / (r == 56)
+            rr = r + 1 
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
-              cc = 3 + max_column*6 # (3 / 9 / 15)
+              cc = 3 + max_column*6 
               # title
               @title = sheet_data.cell(r,cc)
 
@@ -1271,6 +1272,7 @@ class ImportFilesController < ApplicationController
               @program = @bank.programs.find_or_create_by(title: @title)
               @programs_ids << @program.id
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
+              @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
               (0..50).each do |max_row|
@@ -1452,11 +1454,10 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        # make_adjust(@adjustment_hash, @program.title, sheet, @programs_ids)
-        Adjustment.create(data: @adjustment_hash,program_title: @program.title, sheet_name: sheet, program_ids: @programs_ids)
+        make_adjust(@adjustment_hash, @programs_ids)
       end
     end
-    redirect_to programs_import_file_path(@bank)
+    redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
   def jumbo_series_d
@@ -1766,6 +1767,7 @@ class ImportFilesController < ApplicationController
               @program = @bank.programs.find_or_create_by(title: @title)
               @programs_ids << @program.id
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
+              @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
               (0..50).each do |max_row|
@@ -1960,10 +1962,10 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        Adjustment.create(data: @adjustment_hash,program_title: @program.title, sheet_name: sheet, program_ids: @programs_ids)
+        make_adjust(@adjustment_hash, @programs_ids)
       end
     end
-    redirect_to programs_import_file_path(@bank)
+    redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
   def jumbo_series_f
@@ -2357,7 +2359,7 @@ class ImportFilesController < ApplicationController
         end
       end
     end
-    redirect_to programs_import_file_path(@bank)
+    redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
   def du_refi_plus_arms
@@ -2675,6 +2677,7 @@ class ImportFilesController < ApplicationController
                 else
                   @program.update(term: @term,interest_type: @interest_type,loan_type: 0)
                 end
+                @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
                 (0..50).each do |max_row|
@@ -2769,11 +2772,10 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        # make_adjust(@adjustment_hash, @program.title, sheet, @program_ids)
-        Adjustment.create(data: @adjustment_hash,program_title: @program.title, sheet_name: sheet, program_ids: @programs_ids)
+        make_adjust(@adjustment_hash, @programs_ids)
       end
     end
-    redirect_to programs_import_file_path(@bank)
+    redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
   def du_refi_plus_fixed_rate
@@ -2878,6 +2880,16 @@ class ImportFilesController < ApplicationController
     xlsx.sheets.each do |sheet|
       if (sheet == "Jumbo Series_JQM")
         sheet_data = xlsx.sheet(sheet)
+        @programs_ids = []
+        @adjustment_hash = {}
+        primary_key = ''
+        secondry_key = ''
+        cltv_key = ''
+        cltv_data = ''
+        adj_key = ''
+        @cltv_data = []
+        @cltv_data2 = []
+        @max_price_data = []
         (2..60).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet"))
@@ -2904,11 +2916,13 @@ class ImportFilesController < ApplicationController
                   end
                 end
                 @program = @bank.programs.find_or_create_by(title: @title)
+                @programs_ids << @program.id
                 if @interest_subtype.present?
                   @program.update(term: @term,interest_type: @interest_type,loan_type: 0 ,interest_subtype: @interest_subtype )
                 else
                   @program.update(term: @term,interest_type: @interest_type,loan_type: 0)
                 end
+                @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
                 (0..50).each do |max_row|
@@ -2936,15 +2950,8 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        @adjustment_hash = {}
-        primary_key = ''
-        secondry_key = ''
-        cltv_key = ''
-        cltv_data = ''
-        adj_key = ''
-        @cltv_data = []
-        @cltv_data2 = []
-        @max_price_data = []
+        
+        # Adjustments
         (64..99).each do |r|
           row = sheet_data.row(r)
           @cltv_data = sheet_data.row(67)
@@ -2965,42 +2972,22 @@ class ImportFilesController < ApplicationController
                 end
                 # Purchase Transactions Adjustment
                 if r >= 68 && r <= 74 && cc == 3
-                  if value.include?("-")
-                    cltv_key = value.split("-").last
-                  elsif value.include?("≥")
-                    cltv_key = value.split("≥").last
-                  end
+                  cltv_key = get_value value
                   @adjustment_hash[primary_key][secondry_key][cltv_key] = {}
                 end
                 if r >= 68 && r <= 74 && cc >3 && cc <= 13
-                  if @cltv_data[cc-2].include?("≤")
-                    cltv_data = 0
-                  elsif @cltv_data[cc-2].include?("-")
-                    cltv_data = @cltv_data[cc-2].split("-").last
-                  elsif @cltv_data[cc-2].include?("≥")
-                    cltv_data = @cltv_data[cc-2].split("≥").last
-                  end
+                  cltv_data = get_value @cltv_data[cc-2]
                   @adjustment_hash[primary_key][secondry_key][cltv_key][cltv_data] = {}
                   @adjustment_hash[primary_key][secondry_key][cltv_key][cltv_data] = value
                 end
 
                 # R/T Refinance Transactions Adjustment
                 if r >= 78 && r <= 84 && cc == 3
-                  if value.include?("-")
-                    cltv_key = value.split("-").last
-                  elsif value.include?("≥")
-                    cltv_key = value.split("-").last
-                  end
+                  cltv_key = get_value value
                   @adjustment_hash[primary_key][secondry_key][cltv_key] = {}
                 end
                 if r >= 78 && r <= 84 && cc >3 && cc <= 13
-                  if @cltv_data[cc-2].include?("≤")
-                    cltv_data = 0
-                  elsif @cltv_data[cc-2].include?("-")
-                    cltv_data = @cltv_data[cc-2].split("-").last
-                  elsif @cltv_data[cc-2].include?("≥")
-                    cltv_data = @cltv_data[cc-2].split("≥").last
-                  end
+                  cltv_data = get_value @cltv_data[cc-2]
                   @adjustment_hash[primary_key][secondry_key][cltv_key][cltv_data] = {}
                   @adjustment_hash[primary_key][secondry_key][cltv_key][cltv_data] = value
                 end
@@ -3011,13 +2998,7 @@ class ImportFilesController < ApplicationController
                   @adjustment_hash[primary_key][secondry_key][cltv_key] = {}
                 end
                 if r >= 88 && r <= 94 && cc >3 && cc <= 13
-                  if @cltv_data[cc-2].include?("≤")
-                    cltv_data = 0
-                  elsif @cltv_data[cc-2].include?("-")
-                    cltv_data = @cltv_data[cc-2].split("-").last
-                  elsif @cltv_data[cc-2].include?("≥")
-                    cltv_data = @cltv_data[cc-2].split("≥").last
-                  end
+                  cltv_data = get_value @cltv_data[cc-2]
                   @adjustment_hash[primary_key][secondry_key][cltv_key][cltv_data] = {}
                   @adjustment_hash[primary_key][secondry_key][cltv_key][cltv_data] = value
                 end
@@ -3028,13 +3009,7 @@ class ImportFilesController < ApplicationController
                   @adjustment_hash[primary_key][secondry_key][cltv_key] = {}
                 end
                 if r ==99 && cc >3 && cc <= 13
-                  if @cltv_data[cc-2].include?("≤")
-                    cltv_data = 0
-                  elsif @cltv_data[cc-2].include?("-")
-                    cltv_data = @cltv_data[cc-2].split("-").last
-                  elsif @cltv_data[cc-2].include?("≥")
-                    cltv_data = @cltv_data[cc-2].split("≥").last
-                  end
+                  cltv_data = get_value @cltv_data[cc-2]
                   @adjustment_hash[primary_key][secondry_key][cltv_key][cltv_data] = {}
                   @adjustment_hash[primary_key][secondry_key][cltv_key][cltv_data] = value
                 end
@@ -3054,13 +3029,7 @@ class ImportFilesController < ApplicationController
                   @adjustment_hash[primary_key][adj_key][cltv_key] = {}
                 end
                 if r >= 67 && r <= 70 && cc >15 && cc <= 25
-                  if @cltv_data2[cc-2].include?("≤")
-                    cltv_data = 0
-                  elsif @cltv_data2[cc-2].include?("-")
-                    cltv_data = @cltv_data2[cc-2].split("-").last
-                  elsif @cltv_data2[cc-2].include?("≥")
-                    cltv_data = @cltv_data2[cc-2].split("≥").last
-                  end
+                  cltv_data = get_value @cltv_data2[cc-2]
                   @adjustment_hash[primary_key][adj_key][cltv_key][cltv_data] = {}
                   @adjustment_hash[primary_key][adj_key][cltv_key][cltv_data] = value
                 end
@@ -3071,13 +3040,7 @@ class ImportFilesController < ApplicationController
                   @adjustment_hash[primary_key][adj_key][cltv_key] = {}
                 end
                 if r >= 75 && r <= 80 && cc >15 && cc <= 25
-                  if @cltv_data2[cc-2].include?("≤")
-                    cltv_data = 0
-                  elsif @cltv_data2[cc-2].include?("-")
-                    cltv_data = @cltv_data2[cc-2].split("-").last
-                  elsif @cltv_data2[cc-2].include?("≥")
-                    cltv_data = @cltv_data2[cc-2].split("≥").last
-                  end
+                  cltv_data = get_value @cltv_data2[cc-2]
                   @adjustment_hash[primary_key][adj_key][cltv_key][cltv_data] = {}
                   @adjustment_hash[primary_key][adj_key][cltv_key][cltv_data] = value
                 end
@@ -3088,13 +3051,7 @@ class ImportFilesController < ApplicationController
                   @adjustment_hash[primary_key][adj_key][cltv_key] = {}
                 end
                 if r >= 85 && r <= 90 && cc >15 && cc <= 25
-                  if @cltv_data2[cc-2].include?("≤")
-                    cltv_data = 0
-                  elsif @cltv_data2[cc-2].include?("-")
-                    cltv_data = @cltv_data2[cc-2].split("-").last
-                  elsif @cltv_data2[cc-2].include?("≥")
-                    cltv_data = @cltv_data2[cc-2].split("≥").last
-                  end
+                  cltv_data = get_value @cltv_data2[cc-2]
                   @adjustment_hash[primary_key][adj_key][cltv_key][cltv_data] = {}
                   @adjustment_hash[primary_key][adj_key][cltv_key][cltv_data] = value
                 end
@@ -3127,10 +3084,10 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        Adjustment.create(data: @adjustment_hash,program_title: @program.title, sheet_name: sheet, program_ids: @programs_ids)
+        make_adjust(@adjustment_hash, @programs_ids)
       end
     end
-    redirect_to programs_import_file_path(@bank)
+    redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
   def dream_big
@@ -3139,7 +3096,12 @@ class ImportFilesController < ApplicationController
     xlsx.sheets.each do |sheet|
       if (sheet == "Dream Big")
         sheet_data = xlsx.sheet(sheet)
-
+        @adjustment_hash = {}
+        @programs_ids = []
+        term_key = ''
+        rate_type_key = ''
+        jumbo_key = ''
+        primary_key = ''
         (1..33).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("Dream Big Jumbo"))
@@ -3196,7 +3158,9 @@ class ImportFilesController < ApplicationController
               end
 
               @program = @bank.programs.find_or_create_by(title: @title)
+              @programs_ids << @program.id
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
+              @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
               (0..50).each do |max_row|
@@ -3225,11 +3189,6 @@ class ImportFilesController < ApplicationController
           end
         end
 
-        @adjustment_hash = {}
-        term_key = ''
-        rate_type_key = ''
-        jumbo_key = ''
-        primary_key = ''
         (38..62).each do |r|
           row = sheet_data.row(r)
           if row.compact.count >= 1
@@ -3309,10 +3268,10 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        make_adjust(@adjustment_hash, @program.title, sheet, @program.id)
+        make_adjust(@adjustment_hash, @programs_ids)
       end
     end
-    redirect_to programs_import_file_path(@bank)
+    redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
   def high_balance_extra
@@ -3379,6 +3338,7 @@ class ImportFilesController < ApplicationController
               @program = @bank.programs.find_or_create_by(title: @title)
               @programs_ids << @program.id
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
+              @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
               (0..50).each do |max_row|
@@ -3482,10 +3442,10 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        Adjustment.create(data: @adjustment_hash,program_title: @program.title, sheet_name: sheet, program_ids: @programs_ids)
+        make_adjust(@adjustment_hash, @programs_ids)
       end
     end
-    redirect_to programs_import_file_path(@bank)
+    redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
   def freddie_arms
