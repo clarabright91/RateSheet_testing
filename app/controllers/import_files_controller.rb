@@ -880,7 +880,6 @@ class ImportFilesController < ApplicationController
                   if value.include?(">")
                     cltv_key = value.split.last
                     @adjustment_hash[primary_key][secondry_key][ltv_key][cltv_key] = {} 
-<<<<<<< HEAD
                   end
                 end
                 if r == 69 && cc >= 9 && cc <= 10
@@ -899,8 +898,6 @@ class ImportFilesController < ApplicationController
                     ltv_key = "0"
                   elsif value.include?("-")
                     ltv_key = value.split.last
-=======
->>>>>>> 3b051552b42bc403b644aae3acd50578f4ed3cf9
                   end
                 end
                 if r == 69 && cc >= 9 && cc <= 10
@@ -911,8 +908,6 @@ class ImportFilesController < ApplicationController
                   ltv_key = value
                   @adjustment_hash[primary_key][secondry_key][ltv_key] = {}
                 end
-<<<<<<< HEAD
-=======
                 if r >= 72 && r <= 73 && cc == 5
                   @adjustment_hash[primary_key][secondry_key][ltv_key] = value
                 end
@@ -924,7 +919,6 @@ class ImportFilesController < ApplicationController
                   end
                   @adjustment_hash[primary_key][secondry_key][ltv_key] = {}
                 end
->>>>>>> 3b051552b42bc403b644aae3acd50578f4ed3cf9
                 if r >= 76 && r <= 82 && cc == 10
                   @adjustment_hash[primary_key][secondry_key][ltv_key] = value
                 end
@@ -1579,6 +1573,7 @@ class ImportFilesController < ApplicationController
           @hash["Max Price"] = {}
           @hash["Loan Amount Adjustments"] = {}
           @hash["Feature Adjustments"] = {}
+          @hash["Product Adjustments"] = {}
           (adj_row+2..adj_row+6).each do |max_row|
 
             key_val = ''
@@ -1589,7 +1584,7 @@ class ImportFilesController < ApplicationController
               rrr = max_row
               value = xlsx.sheet(sheet).cell(rrr,ccc)
               value1 = xlsx.sheet(sheet).cell(header_r,ccc)
-              if value1.present?
+              if value1.present? 
                 if (value1.include?("≤"))
                   value1 = 0
                 elsif (value1.include?("-"))
@@ -1621,7 +1616,7 @@ class ImportFilesController < ApplicationController
               rrr = max_row - 1
               value = xlsx.sheet(sheet).cell(rrr,ccc)
               value1 = xlsx.sheet(sheet).cell(header_r,ccc)
-              if value1.present?
+              if value1.present? && value1.class == String
                 if (value1.include?("≤"))
                   value1 = 0
                 elsif (value1.include?("-"))
@@ -1653,6 +1648,7 @@ class ImportFilesController < ApplicationController
           (adj_row+10..adj_row+15).each do |max_row|
             
             key_val = ''
+            key_val1 = ''
             (3..13).each do |max_column|
               header_r = (adj_row+10) - index
               ccc = max_column
@@ -1686,13 +1682,12 @@ class ImportFilesController < ApplicationController
               end
             end
             (15..25).each do |max_column|
-              debugger
               header_r = adj_row+8
               ccc = max_column
               rrr = max_row - 1
               value = xlsx.sheet(sheet).cell(rrr,ccc)
               value1 = xlsx.sheet(sheet).cell(header_r,ccc)
-              if value1.present?
+              if value1.present? && value1.class == String
                 if (value1.include?("≤"))
                   value1 = 0
                 elsif (value1.include?("-"))
@@ -1708,15 +1703,15 @@ class ImportFilesController < ApplicationController
                   key_val1 = value
                   @hash["Loan Amount Adjustments"][key_val1] = {}
                 else
-                  @hash["Loan Amount Adjustments"][key_val1][value1] = value
+                  @hash["Loan Amount Adjustments"][key_val1][value1] = value if key_val1.present?
                 end
               end
             end
           end
-          debugger
           (adj_row+18..adj_row+22).each do |max_row|
                         
             key_val = ''
+            key_val1 = ''
             (3..13).each do |max_column|
               header_r = (adj_row+18) - index
               ccc = max_column
@@ -1745,7 +1740,33 @@ class ImportFilesController < ApplicationController
                   end
                   @hash["C/O Refinance Transactions"][key_val] = {}
                 else
-                  @hash["C/O Refinance Transactions"][key_val][value1] = value
+                  @hash["C/O Refinance Transactions"][key_val][value1] = value if key_val.present? && key_val != ""
+                end
+              end
+            end
+            (15..25).each do |max_column|
+              header_r = adj_row+9
+              ccc = max_column
+              rrr = max_row + 1
+              value = xlsx.sheet(sheet).cell(rrr,ccc)
+              value1 = xlsx.sheet(sheet).cell(header_r,ccc)
+              if value1.present? && value1.class == String
+                if (value1.include?("≤"))
+                  value1 = 0
+                elsif (value1.include?("-"))
+                  value1 = value1.split("-").first
+                elsif (value1.include?("≥"))
+                  value1 = value1.split("≥").last
+                else
+                  value1
+                end
+              end
+              if value.present?
+                if ccc == 15
+                  key_val1 = value
+                  @hash["Product Adjustments"][key_val1] = {}
+                else
+                  @hash["Product Adjustments"][key_val1][value1] = value if key_val1.present?
                 end
               end
             end
@@ -1781,7 +1802,7 @@ class ImportFilesController < ApplicationController
                   end
                   @hash["State Adjustments"][key_val] = {}
                 else
-                  @hash["State Adjustments"][key_val][value1] = value
+                  @hash["State Adjustments"][key_val][value1] = value if key_val.present? && key_val != ""
                 end
               end
             end
