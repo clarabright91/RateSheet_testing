@@ -92,7 +92,7 @@ class ImportFilesController < ApplicationController
               @program.update(term: @term,interest_type: 0,loan_type: 0,streamline: @streamline)
               @block_hash = {}
               key = ''
-              (0..50).each do |max_row|
+              (1..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
                   rrr = rr + max_row
@@ -103,6 +103,7 @@ class ImportFilesController < ApplicationController
                       key = value
                       @block_hash[key] = {}
                     else
+                      @block_hash[key][15*c_i] = value
                     end
                     @data << value
                   end
@@ -111,7 +112,6 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-
               @program.update(base_rate: @block_hash)
             end
           end
@@ -155,8 +155,10 @@ class ImportFilesController < ApplicationController
                     end
 
                   end
-                  @adjustment_left = Adjustment.create(data: @credit_hash, sheet_name: sheet, program_ids: @programs_ids)
-                  @adjustment_right = Adjustment.create(data: @right_adj, sheet_name: sheet, program_ids: @programs_ids)
+                  make_adjust(@credit_hash, @programs_ids)
+                  make_adjust(@right_adj, @programs_ids)
+                  # @adjustment_left = Adjustment.create(data: @credit_hash, sheet_name: sheet, program_ids: @programs_ids)
+                  # @adjustment_right = Adjustment.create(data: @right_adj, sheet_name: sheet, program_ids: @programs_ids)
                 rescue => e
                 end
               end
@@ -191,7 +193,8 @@ class ImportFilesController < ApplicationController
                     end
                     # debugger
                   end
-                  @adjustment = Adjustment.create(data: @loan_size, sheet_name: sheet, program_ids: @programs_ids)
+                  make_adjust(@loan_size, @programs_ids)
+                  # @adjustment = Adjustment.create(data: @loan_size, sheet_name: sheet, program_ids: @programs_ids)
                 rescue => e
                 end
               end
@@ -227,7 +230,8 @@ class ImportFilesController < ApplicationController
                       @loan_size_va_bpc[main_key]["Refinance"][key] = value1
                     end
                   end
-                  @adjustment = Adjustment.create(data: @loan_size_va_bpc, sheet_name: sheet, program_ids: @programs_ids)
+                  make_adjust(@loan_size_va_bpc, @programs_ids)
+                  # @adjustment = Adjustment.create(data: @loan_size_va_bpc, sheet_name: sheet, program_ids: @programs_ids)
                 rescue => e
                 end
               end

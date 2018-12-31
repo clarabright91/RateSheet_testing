@@ -13,7 +13,7 @@
         <th>Conforming</th>
         <th>Fannie Mae</th>
         <th>Freddie Mac</th>
-        <th>Interest Points</th>
+        <th>Base Rate</th>
         <th>Adjustment</th>
       </tr>
     </thead>
@@ -32,7 +32,11 @@
           <td><%= program.fannie_mae %></td>
           <td><%= program.freddie_mac %></td>
           <td><%= program.base_rate.to_json %></td>
-          <td><%= program.adjustments[0].data %></td>
+          <td>
+            <% program.adjustments.each do |adj| %>
+              <%= adj.data %>
+            <%end%>
+          </td>
         </tr>
       <%end%>
     </tbody>
