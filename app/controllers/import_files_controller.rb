@@ -90,6 +90,7 @@ class ImportFilesController < ApplicationController
               @program = @bank.programs.find_or_create_by(title: @title)
               @programs_ids << @program.id
               @program.update(term: @term,interest_type: 0,loan_type: 0,streamline: @streamline)
+              @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
               (1..50).each do |max_row|
@@ -157,8 +158,6 @@ class ImportFilesController < ApplicationController
                   end
                   make_adjust(@credit_hash, @programs_ids)
                   make_adjust(@right_adj, @programs_ids)
-                  # @adjustment_left = Adjustment.create(data: @credit_hash, sheet_name: sheet, program_ids: @programs_ids)
-                  # @adjustment_right = Adjustment.create(data: @right_adj, sheet_name: sheet, program_ids: @programs_ids)
                 rescue => e
                 end
               end
@@ -191,10 +190,8 @@ class ImportFilesController < ApplicationController
                       @loan_size[main_key]["Purchase"][key] = value
                       @loan_size[main_key]["Refinance"][key] = value1
                     end
-                    # debugger
                   end
                   make_adjust(@loan_size, @programs_ids)
-                  # @adjustment = Adjustment.create(data: @loan_size, sheet_name: sheet, program_ids: @programs_ids)
                 rescue => e
                 end
               end
@@ -3556,10 +3553,6 @@ class ImportFilesController < ApplicationController
     end
     redirect_to programs_import_file_path(@bank)
   end
-
-
-
-
 
   def programs
     @programs = @bank.programs
