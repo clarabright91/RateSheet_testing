@@ -2784,7 +2784,20 @@ class ImportFilesController < ApplicationController
     xlsx.sheets.each do |sheet|
       if (sheet == "Du Refi Plus Fixed Rate")
         sheet_data = xlsx.sheet(sheet)
-
+        @adjustment_hash = {}
+        @programs_ids = []
+        @fixed_data = []
+        @sub_data = []
+        sub_data = ''
+        primary_key = ''
+        secondry_key = ''
+        fixed_key = ''
+        ltv_key = ''
+        cltv_key = ''
+        misc_key = ''
+        adj_key = ''
+        term_key = ''
+        @sheet = sheet
         (1..61).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet")) || (row.include?("DU Refi Plus 10yr Fixed High Balance"))
@@ -2841,7 +2854,9 @@ class ImportFilesController < ApplicationController
               end
 
               @program = @bank.programs.find_or_create_by(title: @title)
+              @programs_ids << @program.id
               @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
+              @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
               (0..50).each do |max_row|
@@ -2869,9 +2884,131 @@ class ImportFilesController < ApplicationController
             end
           end
         end
+        (63..94).each do |r|
+          row = sheet_data.row(r)
+          @fixed_data = sheet_data.row(65)
+          @sub_data = sheet_data.row(75)
+          if row.compact.count >= 1
+            (3..19).each do |max_column|
+              cc = max_column
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "Loan Level Price Adjustments: See Adjustment Caps" || value == "Adjustments Applied after Cap"
+                  primary_key = value
+                  @adjustment_hash[primary_key] = {}
+                end
+                if (r == 65 && cc == 3)
+                  secondry_key = "Conforming/RateType/Term/LTV/FICO"
+                  @adjustment_hash[primary_key][secondry_key] = {}
+                end
+                if value == "Subordinate Financing"
+                  secondry_key = "FinancingType/LTV/CLTV/FICO"
+                  @adjustment_hash[primary_key][secondry_key] = {}
+                end
+                if value == "Loan Size Adjustments"
+                  secondry_key = "Loan Size Adjustments"
+                  @adjustment_hash[primary_key][secondry_key] = {}
+                end
+
+                # All Fixed Confoming Adjustment
+                if r >= 66 && r <= 73 && cc == 8
+                  fixed_key = get_value value
+                  @adjustment_hash[primary_key][secondry_key][fixed_key] = {}
+                end
+                if r >= 66 && r <= 73 && cc >8 && cc <= 19
+                  fixed_data = get_value @fixed_data[cc-2]
+                  @adjustment_hash[primary_key][secondry_key][fixed_key][fixed_data] = value
+                end
+
+                # Subordinate Financing Adjustment
+                if r >= 76 && r <= 80 && cc == 5
+                  ltv_key = get_value value
+                  @adjustment_hash[primary_key][secondry_key][ltv_key] = {}
+                end
+                if r >= 76 && r <= 80 && cc == 6
+                  cltv_key = get_value value
+                  @adjustment_hash[primary_key][secondry_key][ltv_key][cltv_key] = {}
+                end
+                if r >= 76 && r <= 80 && cc > 6 && cc <= 10
+                  sub_data = get_value @sub_data[cc-2]
+                  @adjustment_hash[primary_key][secondry_key][ltv_key][cltv_key][sub_data] = value
+                end
+
+                # Adjustments Applied after Cap
+                if r >= 83 && r <= 89 && cc == 6
+                  ltv_key = get_value value
+                  @adjustment_hash[primary_key][secondry_key][ltv_key] = {}
+                end
+                if r >= 83 && r <= 89 && cc > 6 && cc <= 10
+                  @adjustment_hash[primary_key][secondry_key][ltv_key] = value
+                end
+
+                # Other Adjustment
+                if r >= 92 && r <= 94 && cc == 3
+                  ltv_key = value
+                  @adjustment_hash[primary_key][ltv_key] = {}
+                end
+                if r >= 92 && r <= 94 && cc == 10
+                  @adjustment_hash[primary_key][ltv_key] = value
+                end
+              end
+            end
+            (12..19).each do |max_column|
+              cc = max_column
+              value = sheet_data.cell(r,cc)
+              
+              if value.present?
+                if value == "Misc Adjusters" || value == "Adjustment Caps"
+                  misc_key = value
+                  @adjustment_hash[misc_key] = {}
+                end
+
+                # Misc Adjustments
+                if r >= 75 && r <= 83 && cc == 15
+                  if value.include?("Condo")
+                    adj_key = "Condo/75/15"
+                  else
+                    adj_key = value
+                  end
+                  @adjustment_hash[misc_key][adj_key] = {}
+                end
+                if r >= 75 && r <= 83 && cc == 19
+                  @adjustment_hash[misc_key][adj_key] = value
+                end
+
+                # Other Adjustment
+                if r == 85 && cc == 13
+                  adj_key = value
+                  @adjustment_hash[adj_key] = {}
+                end
+                if r == 85 && cc == 17
+                  @adjustment_hash[adj_key] = value
+                end
+
+                # Adjustment Caps
+                if r >= 89 && r <= 93 && cc == 16
+                  adj_key = value
+                  @adjustment_hash[misc_key][adj_key] = {}
+                end
+                if r >= 89 && r <= 93 && cc == 17
+                  term_key = get_value value
+                  @adjustment_hash[misc_key][adj_key][term_key] = {}
+                end
+                if r >= 89 && r <= 93 && cc == 18
+                  ltv_key = get_value value
+                  @adjustment_hash[misc_key][adj_key][term_key][ltv_key] = {}
+                end
+                if r >= 89 && r <= 93 && cc == 19
+                  @adjustment_hash[misc_key][adj_key][term_key][ltv_key] = value
+                end
+              end
+            end
+          end
+        end
+        make_adjust(@adjustment_hash, @program_ids)
       end
     end
-    redirect_to programs_import_file_path(@bank)
+    redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
   def jumbo_series_jqm
