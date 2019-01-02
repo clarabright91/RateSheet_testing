@@ -3569,10 +3569,15 @@ class ImportFilesController < ApplicationController
         sheet_data = xlsx.sheet(sheet)
         @adjustment_hash = {}
         @program_ids = []
+        @ltv_data = []
+        @ltv_arm_data = []
         term_key = ''
         rate_type_key = ''
         jumbo_key = ''
         primary_key = ''
+        fixed_key = ''
+        ltv_key = ''
+        fixed_key1 = ''
         @sheet = sheet
         (1..33).each do |r|
           row = sheet_data.row(r)
@@ -3664,6 +3669,8 @@ class ImportFilesController < ApplicationController
         # Adjustments
         (38..62).each do |r|
           row = sheet_data.row(r)
+          @ltv_data = sheet_data.row(39)
+          @ltv_arm_data = sheet_data.row(54)
           if row.compact.count >= 1
             (0..14).each do |max_column|
               cc = max_column
@@ -3681,17 +3688,37 @@ class ImportFilesController < ApplicationController
                   @adjustment_hash[term_key][rate_type_key] = {}
                   @adjustment_hash[term_key][rate_type_key][jumbo_key] = {}
                 end
-                if r == 39 && cc >= 4
-                  @adjustment_hash[term_key][rate_type_key][jumbo_key][dream_big_adjustment[cc].values.first] = {}
+
+                # LTV Based Adjustments for 20/25/30 Yr Fixed Jumbo Products
+                if (r >= 40 && r <= 45 && cc == 3) || (r >= 55 && r <= 60 && cc == 3)
+                  ltv_key = get_value value
+                  @adjustment_hash[term_key][rate_type_key][jumbo_key][ltv_key] = {}
                 end
-                if (r > 39 && r <= 51 && r != 49 && cc >= 4)
-                  @adjustment_hash[term_key][rate_type_key][jumbo_key][dream_big_adjustment[cc].values.first][dream_big_adjustment[:rows][r].values.first] = value
+                if (r >= 46 && r <= 51 && cc == 2) || (r >= 55 && r <= 60 && cc > 3 && cc == 2)
+                  ltv_key = value
+                  @adjustment_hash[term_key][rate_type_key][jumbo_key][ltv_key] = {}
                 end
-                if r == 54  && cc >= 4
-                  @adjustment_hash[term_key][rate_type_key][jumbo_key][dream_big_adjustment[:arm_column][cc].values.first] = {}
+                if r >= 40 && r <= 45 && cc > 3 && cc <= 14
+                  fixed_key = get_value @ltv_data[cc-2]
+                  @adjustment_hash[term_key][rate_type_key][jumbo_key][ltv_key][fixed_key] = {}
+                  @adjustment_hash[term_key][rate_type_key][jumbo_key][ltv_key][fixed_key] = value
                 end
-                if r > 54 && r <= 62 && cc >= 4
-                  @adjustment_hash[term_key][rate_type_key][jumbo_key][dream_big_adjustment[:arm_column][cc].values.first][dream_big_adjustment[:rows][r].values.first] = value
+                if r >= 46 && r <= 51 && cc > 2 && cc <= 14
+                  fixed_key = get_value @ltv_data[cc-2]
+                  @adjustment_hash[term_key][rate_type_key][jumbo_key][ltv_key][fixed_key] = {}
+                  @adjustment_hash[term_key][rate_type_key][jumbo_key][ltv_key][fixed_key] =value
+                end
+
+                # LTV Based Adjustments for 15 Yr Fixed and All ARM Jumbo Products
+                if r >= 55 && r <= 60 && cc > 3 && cc <= 14
+                  fixed_key1 = get_value @ltv_arm_data[cc-2]
+                  @adjustment_hash[term_key][rate_type_key][jumbo_key][ltv_key][fixed_key1] = {}
+                  @adjustment_hash[term_key][rate_type_key][jumbo_key][ltv_key][fixed_key1] = value
+                end
+                if r >= 60 && r <= 61 && cc > 3 && cc <= 14
+                  fixed_key1 = get_value @ltv_arm_data[cc-2]
+                  @adjustment_hash[term_key][rate_type_key][jumbo_key][ltv_key][fixed_key1] = {}
+                  @adjustment_hash[term_key][rate_type_key][jumbo_key][ltv_key][fixed_key1] = value
                 end
               end
             end
