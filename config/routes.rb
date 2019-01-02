@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get 'ob_cmg_wholesales/index'
   root :to => "import_files#index"
   resources :import_files, only: [:index] do
     member do
