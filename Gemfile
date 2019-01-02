@@ -42,7 +42,6 @@ gem 'roo-xls'
 # gem 'bundler', '~> 2.0', '>= 2.0.1'
 gem 'sidekiq'
 gem 'google_drive'
-gem 'oauth2'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

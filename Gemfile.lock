@@ -114,7 +114,6 @@ GEM
       signet (~> 0.7)
     httpclient (2.8.3)
     i18n (1.1.1)
->>>>>>> Feature #Added file upload and download through drive
       concurrent-ruby (~> 1.0)
     io-like (0.3.0)
     jbuilder (2.8.0)
