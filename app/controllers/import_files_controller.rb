@@ -3561,10 +3561,18 @@ class ImportFilesController < ApplicationController
   def high_balance_extra
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
+    @programs_ids = []
     xlsx.sheets.each do |sheet|
       if (sheet == "High Balance Extra")
         sheet_data = xlsx.sheet(sheet)
-        @programs_ids = []
+        @program_ids = []
+        @adjustment_hash = {}
+        primary_key = ''
+        secondry_key = ''
+        ltv_key = ''
+        cltv_key = ''
+        key = ''
+        @sheet = sheet
         (1..23).each do |r|
           row = sheet_data.row(r)
           if (row.compact.include?("High Balance Extra 30 Yr Fixed"))
@@ -3620,8 +3628,8 @@ class ImportFilesController < ApplicationController
               end
 
               @program = @bank.programs.find_or_create_by(title: @title)
-              @programs_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
+              @program_ids << @program.id
+              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -3650,12 +3658,7 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        @adjustment_hash = {}
-        primary_key = ''
-        secondry_key = ''
-        ltv_key = ''
-        cltv_key = ''
-        key = ''
+
         (25..44).each do |r|
           row = sheet_data.row(r)
           if row.compact.count >= 1
@@ -3726,7 +3729,7 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        make_adjust(@adjustment_hash, @programs_ids)
+        make_adjust(@adjustment_hash, @program_ids)
       end
     end
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
