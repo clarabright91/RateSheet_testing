@@ -1906,50 +1906,50 @@ class ImportFilesController < ApplicationController
           if sheet_row.include?("Loan Level Price Adjustments: See Adjustment Caps")
             (index..xlsx.sheet(sheet).last_row).each do |adj_row|
               # First Adjustment
-              begin
-                key = ''
-                key_array = []
-                rr = adj_row
-                cc = 3
-                @occupancy_hash = {}
-                main_key = "All Occupancies"
-                @occupancy_hash[main_key] = {}
+              if adj_row == 65
+                begin
+                  key = ''
+                  key_array = []
+                  rr = adj_row
+                  cc = 3
+                  @occupancy_hash = {}
+                  main_key = "All Occupancies"
+                  @occupancy_hash[main_key] = {}
 
-                (1..3).each do |max_row|
-                  column_count = 0
-                  rrr = rr + max_row
-                  row = xlsx.sheet(sheet).row(rrr)
+                  (0..2).each do |max_row|
+                    column_count = 0
+                    rrr = rr + max_row
+                    row = xlsx.sheet(sheet).row(rrr)
 
-                  if rrr == (rr + 2)
-                    row.compact.each do |row_val|
-                      val = row_val.split
-                      if val.include?("<")
-                        key_array << 0
-                      else
-                        key_array << row_val.split("-")[0].to_i.round if row_val.include?("-")
-                        key_array << row_val.split[1].to_i.round if row_val.include?(">")
+                    if rrr == rr
+                      row.compact.each do |row_val|
+                        val = row_val.split
+                        if val.include?("<")
+                          key_array << 0
+                        else
+                          key_array << row_val.split("-")[0].to_i.round if row_val.include?("-")
+                          key_array << row_val.split[1].to_i.round if row_val.include?(">")
+                        end
+                      end
+                    end
+
+                    (0..16).each do |max_column|
+                      ccc = cc + max_column
+                      value = xlsx.sheet(sheet).cell(rrr,ccc)
+                      if row.include?("All Occupancies > 15 Yr Terms")
+                        if value != nil && value.to_s.include?(">") && value != "All Occupancies > 15 Yr Terms" && !value.is_a?(Numeric)
+                          key = value.gsub(/[^0-9A-Za-z]/, '')
+                          @occupancy_hash[main_key][key] = {}
+                        elsif (value != nil) && !value.is_a?(String)
+                          @occupancy_hash[main_key][key][key_array[column_count]] = value
+                          column_count = column_count + 1
+                        end
                       end
                     end
                   end
-
-                  (0..16).each do |max_column|
-                    ccc = cc + max_column
-                    value = xlsx.sheet(sheet).cell(rrr,ccc)
-
-                    if row.include?("All Occupancies > 15 Yr Terms")
-                      if value != nil && value.to_s.include?(">") && value != "All Occupancies > 15 Yr Terms" && !value.is_a?(Numeric)
-                        key = value.gsub(/[^0-9A-Za-z]/, '')
-                        @occupancy_hash[main_key][key] = {}
-                      elsif (value != nil) && !value.is_a?(String)
-                        @occupancy_hash[main_key][key][key_array[column_count]] = value
-                        column_count = column_count + 1
-                      end
-                    end
-                  end
+                  make_adjust(@occupancy_hash, @program_ids)
+                rescue Exception => e
                 end
-                # make_adjust(@occupancy_hash, @program_ids)
-                # redirect_to programs_import_file_path(@bank, sheet: @sheet)
-              rescue Exception => e
               end
 
               # Second Adjustment(Adjustment Caps)
