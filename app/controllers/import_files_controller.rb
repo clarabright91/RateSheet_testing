@@ -2789,7 +2789,6 @@ class ImportFilesController < ApplicationController
         (2..32).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet"))
-            # r == 7 / 35 / 55
             rr = r + 1 # (r == 8)/ (r == 21)
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
