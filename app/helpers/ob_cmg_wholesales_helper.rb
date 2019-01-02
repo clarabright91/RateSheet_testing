@@ -1,0 +1,2 @@
+module ObCmgWholesalesHelper
+end
