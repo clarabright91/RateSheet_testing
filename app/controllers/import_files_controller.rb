@@ -984,17 +984,19 @@ class ImportFilesController < ApplicationController
   def lp_open_acces_arms
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
+    @programs_ids = []
     xlsx.sheets.each do |sheet|
       if (sheet == "LP Open Acces ARMs")
         sheet_data = xlsx.sheet(sheet)
         @adjustment_hash = {}
-        @programs_ids = []
+        @program_ids = []
         primary_key = ''
         secondry_key = ''
         misc_adj_key = ''
         term_key = ''
         ltv_key = ''
         misc_key = ''
+        @sheet = sheet
         (1..35).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet"))
@@ -1051,8 +1053,8 @@ class ImportFilesController < ApplicationController
               end
 
               @program = @bank.programs.find_or_create_by(title: @title)
-              @programs_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
+              @program_ids << @program.id
+              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -1196,7 +1198,7 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        make_adjust(@adjustment_hash, @programs_ids)
+        make_adjust(@adjustment_hash, @program_ids)
       end
     end
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
@@ -1205,11 +1207,12 @@ class ImportFilesController < ApplicationController
   def lp_open_access_105
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
+    @programs_ids = []
     xlsx.sheets.each do |sheet|
       if (sheet == "LP Open Access_105")
         sheet_data = xlsx.sheet(sheet)
         @adjustment_hash = {}
-        @programs_ids = []
+        @program_ids = []
         primary_key = ''
         secondry_key = ''
         ltv_key = ''
@@ -1217,6 +1220,7 @@ class ImportFilesController < ApplicationController
         term_key = ''
         caps_key = ''
         max_key = ''
+        @sheet = sheet
         (1..61).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet")) || (row.include?("LP Open Access 10yr Fixed >125 LTV"))
@@ -1273,8 +1277,8 @@ class ImportFilesController < ApplicationController
               end
 
               @program = @bank.programs.find_or_create_by(title: @title)
-              @programs_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
+              @program_ids << @program.id
+              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -1457,7 +1461,7 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        make_adjust(@adjustment_hash, @programs_ids)
+        make_adjust(@adjustment_hash, @program_ids)
       end
     end
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
@@ -1699,11 +1703,12 @@ class ImportFilesController < ApplicationController
   def lp_open_access
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
+    @programs_ids = []
     xlsx.sheets.each do |sheet|
       if (sheet == "LP Open Access")
         sheet_data = xlsx.sheet(sheet)
         @adjustment_hash = {}
-        @programs_ids = []
+        @program_ids = []
         primary_key = ''
         secondry_key = ''
         ltv_key = ''
@@ -1712,6 +1717,7 @@ class ImportFilesController < ApplicationController
         caps_key = ''
         term_key = ''
         max_key = ''
+        @sheet = sheet
         (1..61).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet")) || (row.include?("LP Open Access Super Conforming 10 Yr Fixed"))
@@ -1768,8 +1774,8 @@ class ImportFilesController < ApplicationController
               end
 
               @program = @bank.programs.find_or_create_by(title: @title)
-              @programs_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
+              @program_ids << @program.id
+              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -1965,7 +1971,7 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        make_adjust(@adjustment_hash, @programs_ids)
+        make_adjust(@adjustment_hash, @program_ids)
       end
     end
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
@@ -2443,7 +2449,7 @@ class ImportFilesController < ApplicationController
 
               @program = @bank.programs.find_or_create_by(title: @title)
               @program_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
+              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -2490,11 +2496,6 @@ class ImportFilesController < ApplicationController
                   secondry_key = value
                   @adjustment_hash[primary_key][secondry_key] = {}
                 end
-
-                # if value == "Loan Size Adjustments"
-                #   secondry_key = "Loan Size Adjustments"
-                #   @adjustment_hash[primary_key][secondry_key] = {}
-                # end
 
                 # All du refi plus Adjustment
                 if r >= 40 && r <= 47 && cc == 8
@@ -2591,7 +2592,7 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        make_adjust(@allAdjustments, @program_ids)
+        make_adjust(@adjustment_hash, @program_ids)
       end
     end
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
@@ -2775,13 +2776,15 @@ class ImportFilesController < ApplicationController
   def jumbo_series_i
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
+    @programs_ids = []
     xlsx.sheets.each do |sheet|
       if (sheet == "Jumbo Series_I")
         sheet_data = xlsx.sheet(sheet)
         @adjustment_hash = {}
-        @programs_ids = []
+        @program_ids = []
         primary_key = ''
         main_key = ''
+        @sheet = sheet
         # programs
         (2..32).each do |r|
           row = sheet_data.row(r)
@@ -2810,11 +2813,11 @@ class ImportFilesController < ApplicationController
                 end
 
                 @program = @bank.programs.find_or_create_by(title: @title)
-                @programs_ids << @program.id
+                @program_ids << @program.id
                 if @interest_subtype.present?
-                  @program.update(term: @term,interest_type: @interest_type,loan_type: 0 ,interest_subtype: @interest_subtype )
+                  @program.update(term: @term,interest_type: @interest_type,loan_type: 0 ,interest_subtype: @interest_subtype, sheet_name: sheet )
                 else
-                  @program.update(term: @term,interest_type: @interest_type,loan_type: 0)
+                  @program.update(term: @term,interest_type: @interest_type,loan_type: 0, sheet_name: sheet)
                 end
                 @program.adjustments.destroy_all
                 @block_hash = {}
@@ -2911,7 +2914,7 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        make_adjust(@adjustment_hash, @programs_ids)
+        make_adjust(@adjustment_hash, @program_ids)
       end
     end
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
@@ -2995,7 +2998,7 @@ class ImportFilesController < ApplicationController
 
               @program = @bank.programs.find_or_create_by(title: @title)
               @program_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
+              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -3155,10 +3158,11 @@ class ImportFilesController < ApplicationController
   def jumbo_series_jqm
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
+    @programs_ids = []
     xlsx.sheets.each do |sheet|
       if (sheet == "Jumbo Series_JQM")
         sheet_data = xlsx.sheet(sheet)
-        @programs_ids = []
+        @program_ids = []
         @adjustment_hash = {}
         primary_key = ''
         secondry_key = ''
@@ -3168,6 +3172,7 @@ class ImportFilesController < ApplicationController
         @cltv_data = []
         @cltv_data2 = []
         @max_price_data = []
+        @sheet = sheet
         (2..60).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet"))
@@ -3194,11 +3199,11 @@ class ImportFilesController < ApplicationController
                   end
                 end
                 @program = @bank.programs.find_or_create_by(title: @title)
-                @programs_ids << @program.id
+                @program_ids << @program.id
                 if @interest_subtype.present?
-                  @program.update(term: @term,interest_type: @interest_type,loan_type: 0 ,interest_subtype: @interest_subtype )
+                  @program.update(term: @term,interest_type: @interest_type,loan_type: 0 ,interest_subtype: @interest_subtype, sheet_name: sheet )
                 else
-                  @program.update(term: @term,interest_type: @interest_type,loan_type: 0)
+                  @program.update(term: @term,interest_type: @interest_type,loan_type: 0, sheet_name: sheet)
                 end
                 @program.adjustments.destroy_all
                 @block_hash = {}
@@ -3362,7 +3367,7 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        make_adjust(@adjustment_hash, @programs_ids)
+        make_adjust(@adjustment_hash, @program_ids)
       end
     end
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
@@ -3371,15 +3376,17 @@ class ImportFilesController < ApplicationController
   def dream_big
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
+    @programs_ids = []
     xlsx.sheets.each do |sheet|
       if (sheet == "Dream Big")
         sheet_data = xlsx.sheet(sheet)
         @adjustment_hash = {}
-        @programs_ids = []
+        @program_ids = []
         term_key = ''
         rate_type_key = ''
         jumbo_key = ''
         primary_key = ''
+        @sheet = sheet
         (1..33).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("Dream Big Jumbo"))
@@ -3436,8 +3443,8 @@ class ImportFilesController < ApplicationController
               end
 
               @program = @bank.programs.find_or_create_by(title: @title)
-              @programs_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype)
+              @program_ids << @program.id
+              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -3467,6 +3474,7 @@ class ImportFilesController < ApplicationController
           end
         end
 
+        # Adjustments
         (38..62).each do |r|
           row = sheet_data.row(r)
           if row.compact.count >= 1
@@ -3546,7 +3554,7 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        make_adjust(@adjustment_hash, @programs_ids)
+        make_adjust(@adjustment_hash, @program_ids)
       end
     end
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
