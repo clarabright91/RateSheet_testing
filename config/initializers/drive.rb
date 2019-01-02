@@ -12,6 +12,7 @@
 # unless folder_exist
 # 	drive.root_collection.create_subcollection("Uploaded files")
 # end
+require "google_drive"
 
 # Creates a session. This will prompt the credential via command line for the
 # first time and save it to config.json file for later usages.
@@ -30,6 +31,18 @@
 # session.upload_from_file("/path/to/hello.txt", "hello.txt", convert: false)
 # folder_id = folder.id 
 # session.upload_from_file("/home/yuva/Downloads/OB_New_Penn_Financial_Wholesale5806.xls", "OB_New_Penn_Financial_Wholesale5806.xls", convert: false)
+session = GoogleDrive::Session.from_config("config.json")
+# create folder
+folder  = session.root_collection.create_subcollection("Uploaded files")
+p folder
+# Gets list of remote files.
+session.files.each do |file|
+  p file.title
+end
+# Uploads a local file.
+# session.upload_from_file("/path/to/hello.txt", "hello.txt", convert: false)
+# folder_id = folder.id 
+# session.upload_from_file("/home/yuva/Downloads/InvoiceTemplate.docx", "hello.txt", convert: false)
 
 
 # Downloads to a local file.
@@ -89,3 +102,9 @@
 # require 'open-uri'
 # download = open('http://example.com/image.png')
 # IO.copy_stream(download, '~/image.png')
+
+# upload a file inside specific folder 
+# session.folder_by_url("https://drive.google.com/drive/folders/1akTg67Rl1CHLQUVOQnWwbrjwOa2lR4ny?ogsrc=32").upload_from_file("/home/yuva/Downloads/InvoiceTemplate.docx", "hello.txt", convert: false)
+
+
+
