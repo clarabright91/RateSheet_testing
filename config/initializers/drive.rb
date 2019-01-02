@@ -44,7 +44,6 @@ session = GoogleDrive::Session.from_config("config.json")
 # folder_id = folder.id 
 # session.upload_from_file("/home/yuva/Downloads/OB_New_Penn_Financial_Wholesale5806.xls", "OB_New_Penn_Financial_Wholesale5806.xls", convert: false)
 
-
 # Downloads to a local file.
 # name of drive file which you want to download
 # file = session.file_by_title("hello.txt")
@@ -80,7 +79,6 @@ session = GoogleDrive::Session.from_config("config.json")
 # require 'open-uri'
 # download = open('http://example.com/image.png')
 # IO.copy_stream(download, '~/image.png')
-
 
 # controller code
 # drive_access = GoogleDrive::Session.from_config("config.json")
