@@ -3119,7 +3119,7 @@ class ImportFilesController < ApplicationController
                   @adjustment_hash[misc_key][adj_key] = value
                 end
 
-                # Other Adjustment
+                # Other Adjustments
                 if r == 85 && cc == 13
                   adj_key = value
                   @adjustment_hash[adj_key] = {}
