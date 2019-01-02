@@ -1438,6 +1438,8 @@ class ImportFilesController < ApplicationController
         sheet_data = xlsx.sheet(sheet)
         @adjustment_hash = {}
         @program_ids = []
+        @fixed_data = []
+        @sub_data = []
         primary_key = ''
         secondry_key = ''
         ltv_key = ''
@@ -1445,6 +1447,7 @@ class ImportFilesController < ApplicationController
         term_key = ''
         caps_key = ''
         max_key = ''
+        fixed_key = ''
         @sheet = sheet
         (1..61).each do |r|
           row = sheet_data.row(r)
@@ -1535,6 +1538,8 @@ class ImportFilesController < ApplicationController
         # Adjustment
         (63..86).each do |r|
           row = sheet_data.row(r)
+          @fixed_data = sheet_data.row(65)
+          @sub_data = sheet_data.row(68)
           if row.compact.count >= 1
             (0..19).each do |max_column|
               cc = max_column
@@ -1561,29 +1566,34 @@ class ImportFilesController < ApplicationController
                   secondry_key = "Loan Size Adjustments"
                   @adjustment_hash[primary_key][secondry_key] = {}
                 end
+
+                # All Fixed Conforming Adjustments
                 if r == 66 && cc == 6
-                  if value.include?(">")
-                    ltv_key = value.split.last
-                  end
+                  ltv_key = get_value value
                   @adjustment_hash[primary_key][secondry_key][ltv_key] = {}
                 end
-                if r == 66 && cc > 6 && cc <= 19
-                  @adjustment_hash[primary_key][secondry_key][ltv_key] = value
+                if r == 66 && cc > 6 && cc <= 19 && cc != 15
+                  fixed_key = get_value @fixed_data[cc-2]
+                  @adjustment_hash[primary_key][secondry_key][ltv_key][fixed_key] = {}
+                  @adjustment_hash[primary_key][secondry_key][ltv_key][fixed_key] = value
                 end
+
+                # Subordinate Financing
                 if r == 69 && cc == 5
                   ltv_key = value
                   @adjustment_hash[primary_key][secondry_key][ltv_key] = {}
                 end
                 if r == 69 && cc == 6
-                  if value.include?(">")
-                    cltv_key = value.split.last
-                    @adjustment_hash[primary_key][secondry_key][ltv_key][cltv_key] = {}
-                  end
+                  cltv_key = get_value value
+                  @adjustment_hash[primary_key][secondry_key][ltv_key][cltv_key] = {}
                 end
                 if r == 69 && cc >= 9 && cc <= 10
-                  @adjustment_hash[primary_key][secondry_key][ltv_key][cltv_key][all_lp[cc].values.first] = {}
-                  @adjustment_hash[primary_key][secondry_key][ltv_key][cltv_key][all_lp[cc].values.first] = value
+                  fixed_key = get_value @sub_data[cc-2]
+                  @adjustment_hash[primary_key][secondry_key][ltv_key][cltv_key][fixed_key] = {}
+                  @adjustment_hash[primary_key][secondry_key][ltv_key][cltv_key][fixed_key] = value
                 end
+
+                # Number Of Units
                 if r >= 72 && r <= 73 && cc == 3
                   ltv_key = value
                   @adjustment_hash[primary_key][secondry_key][ltv_key] = {}
@@ -1591,35 +1601,17 @@ class ImportFilesController < ApplicationController
                 if r >= 72 && r <= 73 && cc == 5
                   @adjustment_hash[primary_key][secondry_key][ltv_key] = value
                 end
+
+                # Adjustments Applied after Cap
                 if r >= 76 && r <= 82 && cc == 6
-                  if value.include?("<")
-                    ltv_key = "0"
-                  elsif value.include?("-")
-                    ltv_key = value.split.last
-                  end
-                end
-                if r == 69 && cc >= 9 && cc <= 10
-                  @adjustment_hash[primary_key][secondry_key][ltv_key][cltv_key][all_lp[cc].values.first] = {}
-                  @adjustment_hash[primary_key][secondry_key][ltv_key][cltv_key][all_lp[cc].values.first] = value
-                end
-                if r >= 72 && r <= 73 && cc == 3
-                  ltv_key = value
-                  @adjustment_hash[primary_key][secondry_key][ltv_key] = {}
-                end
-                if r >= 72 && r <= 73 && cc == 5
-                  @adjustment_hash[primary_key][secondry_key][ltv_key] = value
-                end
-                if r >= 76 && r <= 82 && cc == 6
-                  if value.include?("<")
-                    ltv_key = "0"
-                  elsif value.include?("-")
-                    ltv_key = value.split.last
-                  end
+                  ltv_key = get_value value
                   @adjustment_hash[primary_key][secondry_key][ltv_key] = {}
                 end
                 if r >= 76 && r <= 82 && cc == 10
                   @adjustment_hash[primary_key][secondry_key][ltv_key] = value
                 end
+
+                # Other Adjustments
                 if r >= 84 && r <= 86 && cc == 3
                   ltv_key = value
                   @adjustment_hash[primary_key][ltv_key] = {}
@@ -1637,6 +1629,8 @@ class ImportFilesController < ApplicationController
                   @key = value
                   @adjustment_hash[primary_key][@key] = {}
                 end
+
+                # Misc Adjustments
                 if r >= 68 && r <= 72 && cc == 15
                   if value.include?("Condo")
                     cltv_key = "Condo=>105=>15.01"
@@ -1648,33 +1642,25 @@ class ImportFilesController < ApplicationController
                 if r >= 68 && r <= 72 && cc == 19
                   @adjustment_hash[primary_key][@key][cltv_key] = value
                 end
+
+                # Adjustment Caps
                 if r > 76 && r <= 79 && cc == 16
                   caps_key = value
                   @adjustment_hash[primary_key][@key][caps_key] = {}
                 end
                 if r > 76 && r <= 79 && cc == 17
-                  if value.include?("<")
-                    term_key = "0"
-                  elsif value.include?(">")
-                    term_key = value.split.last
-                  else
-                    term_key = value
-                  end
+                  term_key = get_value value
                   @adjustment_hash[primary_key][@key][caps_key][term_key] = {}
                 end
                 if r > 76 && r <= 79 && cc == 18
-                  if value.include?("<")
-                    ltv_key = "0"
-                  elsif value.include?(">")
-                    ltv_key = value.split.last
-                  else
-                    ltv_key = value
-                  end
+                  ltv_key = get_value value
                   @adjustment_hash[primary_key][@key][caps_key][term_key][ltv_key] = {}
                 end
                 if r > 76 && r <= 79 && cc == 19
                   @adjustment_hash[primary_key][@key][caps_key][term_key][ltv_key] = value
                 end
+
+                # Other Adjustments
                 if r == 82 && cc == 12
                   max_key = value
                   @adjustment_hash[primary_key][max_key] = {}
