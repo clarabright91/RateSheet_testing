@@ -3567,11 +3567,15 @@ class ImportFilesController < ApplicationController
         sheet_data = xlsx.sheet(sheet)
         @program_ids = []
         @adjustment_hash = {}
+        @bal_data = []
+        @sub_data = []
         primary_key = ''
         secondry_key = ''
         ltv_key = ''
         cltv_key = ''
         key = ''
+        bal_data = ''
+        sub_data = ''
         @sheet = sheet
         (1..23).each do |r|
           row = sheet_data.row(r)
@@ -3659,71 +3663,68 @@ class ImportFilesController < ApplicationController
           end
         end
 
+        # Adjustments
         (25..44).each do |r|
           row = sheet_data.row(r)
+          @bal_data = sheet_data.row(27)
+          @sub_data = sheet_data.row(41)
           if row.compact.count >= 1
             (0..9).each do |max_column|
               cc = max_column
               value = sheet_data.cell(r,cc)
               if value.present?
-                if value == "Pricing Adjustments" || value == "Cashout (adjustments are cumulative)"
-                  primary_key = @key = value
-                  @adjustment_hash[@key] = {}
-                elsif value == "All High Balance Extra Loans"
+                if value == "Pricing Adjustments" #|| 
+                  primary_key = value
+                  @adjustment_hash[primary_key] = {}
+                end
+                if value == "All High Balance Extra Loans" || value == "Cashout (adjustments are cumulative)" || value == "Subordinate Financing (adjustments are cumulative)"
                   secondry_key = value
                   @adjustment_hash[primary_key][secondry_key] = {}
-                elsif value == "Subordinate Financing (adjustments are cumulative)"
-                  @key = value
-                  @adjustment_hash[@key] = {}
+                end
+                if value == "Max Price"
+                  key = value
+                  @adjustment_hash[primary_key][key] = {}
+                end
+                # All High Balance Extra Loans
+                if r >= 28 && r <= 32 && cc == 2
+                  ltv_key = get_value value
+                  @adjustment_hash[primary_key][secondry_key][ltv_key] = {}
+                end
+                if r >= 28 && r <= 32 && cc > 3 && cc <= 9
+                  bal_data = get_value @bal_data[cc-2]
+                  @adjustment_hash[primary_key][secondry_key][ltv_key][bal_data] = {}
+                  @adjustment_hash[primary_key][secondry_key][ltv_key][bal_data] = value
                 end
 
-                if r == 27 && cc >= 3
-                  begin
-                    @adjustment_hash[primary_key][secondry_key][high_bal_adjustment[cc].values.first] = {}
-                  rescue Exception => e
-                    puts "For row: #{r} and column: #{cc}"
-                  end
+                # Cashout Adjustments
+                if r >= 34 && r <= 38 && cc == 2
+                  ltv_key = get_value value
+                  @adjustment_hash[primary_key][secondry_key][ltv_key] = {}
+                end
+                if r >= 34 && r <= 38 && cc > 3 && cc <= 9
+                  bal_data = get_value @bal_data[cc-2]
+                  @adjustment_hash[primary_key][secondry_key][ltv_key][bal_data] = {}
+                  @adjustment_hash[primary_key][secondry_key][ltv_key][bal_data] = value
                 end
 
-                if r == 34 && cc >= 3
-                  @adjustment_hash[primary_key][high_bal_adjustment[cc].values.first] = {}
+                # Subordinate Financing Adjustments
+                if r >= 42 && r <= 44 && cc == 2
+                  ltv_key = get_value value
+                  @adjustment_hash[primary_key][secondry_key][ltv_key] = {}
+                end
+                if r >= 42 && r <= 44 && cc == 3
+                  cltv_key = get_value value
+                  @adjustment_hash[primary_key][secondry_key][ltv_key][cltv_key] = {}
+                end
+                if r >= 42 && r <= 44 && cc > 3 && cc <= 5
+                  sub_data = get_value @sub_data[cc-2]
+                  @adjustment_hash[primary_key][secondry_key][ltv_key][cltv_key][sub_data] = {}
+                  @adjustment_hash[primary_key][secondry_key][ltv_key][cltv_key][sub_data] = value
                 end
 
-                if r > 27 && r <= 32 && cc >= 3
-                  @adjustment_hash[primary_key][secondry_key][high_bal_adjustment[cc].values.first][high_bal_adjustment[:rows][r].values.first] = value
-                end
-
-                if r >= 34 && r <= 38 && cc >= 3
-                  @adjustment_hash[primary_key][high_bal_adjustment[cc].values.first][high_bal_adjustment[:rows][r].values.first] = value
-                end
-
-                if r >= 40 && r <= 41 && cc == 7
-                  if value == "Max Price"
-                    key = value
-                    @adjustment_hash[key] = {}
-                  else
-                    @adjustment_hash[key] = value
-                  end
-                end
-
-                if r > 41 && r <= 44
-                  if cc == 2
-                    ltv_key = value
-                    if ltv_key.include?("<")
-                      ltv_key = 0
-                    elsif ltv_key.include?("-")
-                      ltv_key = ltv_key.split("-")[0]
-                    end
-                    @adjustment_hash[@key][ltv_key] = {}
-                  elsif cc == 3
-                    cltv_key = value
-                    cltv_key = cltv_key.split.first
-                    @adjustment_hash[@key][cltv_key] = {}
-                  end
-                  if cc > 3 && cc <= 5
-                    @adjustment_hash[@key][ltv_key][high_bal_adjustment[:subordinate][cc].values.first] = value
-                    @adjustment_hash[@key][cltv_key][high_bal_adjustment[:subordinate][cc].values.first] = value
-                  end
+                # Max Price Adjustments
+                if r == 41 && cc ==7
+                  @adjustment_hash[primary_key][key] = value
                 end
               end
             end
