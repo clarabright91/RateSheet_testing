@@ -33,16 +33,16 @@ require "google_drive"
 # session.upload_from_file("/home/yuva/Downloads/OB_New_Penn_Financial_Wholesale5806.xls", "OB_New_Penn_Financial_Wholesale5806.xls", convert: false)
 session = GoogleDrive::Session.from_config("config.json")
 # create folder
-folder  = session.root_collection.create_subcollection("Uploaded files")
-p folder
+# folder  = session.root_collection.create_subcollection("Uploaded files")
+# p folder
 # Gets list of remote files.
-session.files.each do |file|
-  p file.title
-end
+# session.files.each do |file|
+#   p file.title
+# end
 # Uploads a local file.
 # session.upload_from_file("/path/to/hello.txt", "hello.txt", convert: false)
 # folder_id = folder.id 
-# session.upload_from_file("/home/yuva/Downloads/InvoiceTemplate.docx", "hello.txt", convert: false)
+# session.upload_from_file("/home/yuva/Downloads/OB_New_Penn_Financial_Wholesale5806.xls", "OB_New_Penn_Financial_Wholesale5806.xls", convert: false)
 
 
 # Downloads to a local file.
@@ -103,8 +103,13 @@ end
 # download = open('http://example.com/image.png')
 # IO.copy_stream(download, '~/image.png')
 
-# upload a file inside specific folder 
-# session.folder_by_url("https://drive.google.com/drive/folders/1akTg67Rl1CHLQUVOQnWwbrjwOa2lR4ny?ogsrc=32").upload_from_file("/home/yuva/Downloads/InvoiceTemplate.docx", "hello.txt", convert: false)
+
+# controller code
+# drive_access = GoogleDrive::Session.from_config("config.json")
+# folder = drive_access.folder_by_id("1p9gWPr4DPKgdQinWm7F8fU-hNVvKKaDM")
+# file = folder.file_by_title("OB_New_Penn_Financial_Wholesale5806.xls")
 
 
 
+# new_session.spreadsheet_by_title("OB_New_Penn_Financial_Wholesale5806").web_view_link
+# ws = drive_access.spreadsheet_by_key("1q8sGJ7h3x8w6F5knzLFiST_FzNDVWYYOvkNHrf7zN9M").worksheets[0]
