@@ -3109,11 +3109,13 @@ class ImportFilesController < ApplicationController
   end
 
   def jumbo_series_h
+    @program_ids = []
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Jumbo Series_H")
         sheet_data = xlsx.sheet(sheet)
+        @sheet = sheet
         (2..86).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("Jumbo Series H Product and Pricing"))
@@ -3146,12 +3148,14 @@ class ImportFilesController < ApplicationController
                   end
 
                 @program = @bank.programs.find_or_create_by(title: @title)
+                @program_ids << @program.id
 
                 if @interest_subtype.present?
                   @program.update(term: @term,interest_type: @interest_type,loan_type: @loan_type ,interest_subtype: @interest_subtype )
                 else
                   @program.update(term: @term,interest_type: @interest_type,loan_type: @loan_type)
                 end
+                @program.adjustments.destroy_all
 
                 @block_hash = {}
                 key = ''
@@ -3220,7 +3224,7 @@ class ImportFilesController < ApplicationController
                       end
                     end
                   end
-                  # return @state_hash
+                  make_adjust(@state_hash, @program_ids)
                 rescue => e
                 end
               end
@@ -3264,86 +3268,80 @@ class ImportFilesController < ApplicationController
                       end
                     end
                   end
-                  # return @credit_score
+                  make_adjust(@credit_score, @program_ids)
                 rescue Exception => e
                 end
               end
 
               # Third Adjustment
-              if xlsx.sheet(sheet).row(adj_row).include?("Product Highlights")
+              if xlsx.sheet(sheet).row(adj_row).include?("Other Adjustments")
                 begin
-                  key_array = ""
                   rr = adj_row
-                  cc = 4
-                  @product_highlight = {}
-                  main_key = "Product Highlights"
-                  @product_highlight[main_key] = {}
+                  cc = 13
 
-                  (1..4).each do |max_row|
-                    column_count = 1
+                  (1..2).each do |max_row|
                     rrr = rr + max_row
                     row = xlsx.sheet(sheet).row(rrr)
-                    if row.include?("Purchase/Rate Term")
-                      key_array = row.compact[0..3]
+
+                    if row.include?("Loan Amount >=$1MM")
+                      loan_amount = {}
+                      main_key = "LoanAmount"
+                      loan_amount[main_key] = {}
+                      key = 1000000 if xlsx.sheet(sheet).cell(rrr,cc).split[2].include?(">")
+                      value = xlsx.sheet(sheet).cell(rrr,cc+4)
+
+                      loan_amount[main_key][key] = {}
+                      loan_amount[main_key][key] = value
+                      make_adjust(loan_amount, @program_ids)
                     end
 
-                    (0..4).each do |max_column|
-                      ccc = cc + max_column
-                      value = xlsx.sheet(sheet).cell(rrr,ccc)
-                      if !row.include?("Purchase/Rate Term") && !row.include?("Max")
-                        if ccc == 4
-                          key = value
-                          @product_highlight[main_key][key] = {}
-                        else
-                          @product_highlight[main_key][key][key_array[column_count]] = value if value != nil
-                          column_count = column_count + 1 if value != nil
-                        end
-                      end
+                    if row.include?("Second Home")
+                      second_home = {}
+                      main_key = "PropertyType"
+                      second_home[main_key] = {}
+
+                      key = "2nd Home" if xlsx.sheet(sheet).cell(rrr,cc).include?("Second Home")
+                      value = xlsx.sheet(sheet).cell(rrr,cc+4)
+
+                      second_home[main_key][key] = {}
+                      second_home[main_key][key] = value
+                      make_adjust(second_home, @program_ids)
                     end
                   end
-                  # return @product_highlight
                 rescue Exception => e
                 end
               end
 
-              if xlsx.sheet(sheet).row(adj_row).include?("Product Highlights")
-                begin
-                  check_status = ""
-                  key_array = ""
-                  rr = adj_row
-                  cc = 4
-                  @cash_out = {}
-                  main_key = "Product Highlights"
-                  @cash_out[main_key] = {}
 
-                  key_row = xlsx.sheet(sheet).row(rr + 2)
-                  if key_row.include?("Purchase/Rate Term")
-                    key_array = key_row.compact[0..3]
-                  end
+              # Fourth Adjustment
+              if xlsx.sheet(sheet).row(adj_row).include?("Cash Out Refi")
+                if adj_row == 95
+                  begin
+                    rr = adj_row
+                    cc = 15
+                    @data_hash = {}
+                    main_key = "LoanType/RefinanceOption/LTV"
+                    key = "True"
+                    key1 = "Cash Out"
+                    @data_hash[main_key] = {}
+                    @data_hash[main_key][key] = {}
+                    @data_hash[main_key][key][key1] = {}
 
-                  (6..7).each do |max_row|
-                    column_count = 1
-                    rrr = rr + max_row
-                    row = xlsx.sheet(sheet).row(rrr)
+                    (0..2).each do |max_row|
+                      rrr = rr + max_row
+                      row = xlsx.sheet(sheet).row(rrr)
+                      cell_value = xlsx.sheet(sheet).cell(rrr,cc)
 
-                    (0..4).each do |max_column|
-                      ccc = cc + max_column
-                      value = xlsx.sheet(sheet).cell(rrr,ccc)
-                      check_status = "Cash Out" if row.include?("Cash Out")
-                      if !row.include?("Cash Out")
-                        check_status = "Cash Out"
-                        if ccc == 4 && check_status == "Cash Out"
-                          key = value
-                          @cash_out[main_key][key] = {}
-                        else
-                          @cash_out[main_key][key][key_array[column_count]] = value if value != nil
-                          column_count = column_count + 1 if value != nil
-                        end
-                      end
+                      key2 = get_value(cell_value)
+                      value = xlsx.sheet(sheet).cell(rrr,cc+2)
+
+                      @data_hash[main_key][key][key1][key2] = {}
+                      @data_hash[main_key][key][key1][key2] = value
+
                     end
+                    make_adjust(@data_hash, @program_ids)
+                  rescue Exception => e
                   end
-                  # return @cash_out
-                rescue Exception => e
                 end
               end
 
@@ -3457,52 +3455,53 @@ class ImportFilesController < ApplicationController
           if sheet_row.include?("Loan Level Price Adjustments: See Adjustment Caps")
             (index..xlsx.sheet(sheet).last_row).each do |adj_row|
               # First Adjustment
-              begin
-                key = ''
-                key_array = []
-                rr = adj_row
-                cc = 3
-                @occupancy_hash = {}
-                main_key = "All Occupancies > 15 Yr Terms"
-                @occupancy_hash[main_key] = {}
+              if adj_row == 65
+                begin
+                  key = ''
+                  key_array = []
+                  rr = adj_row
+                  cc = 3
+                  @occupancy_hash = {}
+                  main_key = "All Occupancies"
+                  @occupancy_hash[main_key] = {}
 
-                (1..3).each do |max_row|
-                  column_count = 0
-                  rrr = rr + max_row
-                  row = xlsx.sheet(sheet).row(rrr)
+                  (0..2).each do |max_row|
+                    column_count = 0
+                    rrr = rr + max_row
+                    row = xlsx.sheet(sheet).row(rrr)
 
-                  if rrr == (rr + 2)
-                    row.compact.each do |row_val|
-                      val = row_val.split
-                      if val.include?("<")
-                        key_array << 0
-                      else
-                        key_array << row_val.split("-")[0].to_i.round if row_val.include?("-")
-                        key_array << row_val.split[1].to_i.round if row_val.include?(">")
+                    if rrr == rr
+                      row.compact.each do |row_val|
+                        val = row_val.split
+                        if val.include?("<")
+                          key_array << 0
+                        else
+                          key_array << row_val.split("-")[0].to_i.round if row_val.include?("-")
+                          key_array << row_val.split[1].to_i.round if row_val.include?(">")
+                        end
+                      end
+                    end
+
+                    (0..16).each do |max_column|
+                      ccc = cc + max_column
+                      value = xlsx.sheet(sheet).cell(rrr,ccc)
+                      if row.include?("All Occupancies > 15 Yr Terms")
+                        if value != nil && value.to_s.include?(">") && value != "All Occupancies > 15 Yr Terms" && !value.is_a?(Numeric)
+                          key = value.gsub(/[^0-9A-Za-z]/, '')
+                          @occupancy_hash[main_key][key] = {}
+                        elsif (value != nil) && !value.is_a?(String)
+                          @occupancy_hash[main_key][key][key_array[column_count]] = value
+                          column_count = column_count + 1
+                        end
                       end
                     end
                   end
-
-                  (0..16).each do |max_column|
-                    ccc = cc + max_column
-                    value = xlsx.sheet(sheet).cell(rrr,ccc)
-
-                    if row.include?("All Occupancies > 15 Yr Terms")
-                      if value != nil && value.to_s.include?(">") && value != "All Occupancies > 15 Yr Terms" && !value.is_a?(Numeric)
-                        key = value.gsub(/[^0-9A-Za-z]/, '')
-                        @occupancy_hash[main_key][key] = {}
-                      elsif (value != nil) && !value.is_a?(String)
-                        @occupancy_hash[main_key][key][key_array[column_count]] = value
-                        column_count = column_count + 1
-                      end
-                    end
-                  end
+                  make_adjust(@occupancy_hash, @program_ids)
+                rescue Exception => e
                 end
-                # return @occupancy_hash
-              rescue Exception => e
               end
 
-              # Second Adjustment
+              # Second Adjustment(Adjustment Caps)
               if adj_row == 86
                 begin
                   key_array = ""
@@ -3535,7 +3534,7 @@ class ImportFilesController < ApplicationController
                       end
                     end
                   end
-                  # return @adjustment_cap
+                  make_adjust(@adjustment_cap, @program_ids)
                 rescue Exception => e
                 end
               end
@@ -3550,11 +3549,12 @@ class ImportFilesController < ApplicationController
                   @max_ysp_hash[main_key] = {}
                   row = xlsx.sheet(sheet).row(rr)
                   @max_ysp_hash[main_key] = row.compact[5]
+                  make_adjust(@max_ysp_hash, @program_ids)
                 rescue Exception => e
                 end
               end
 
-              # Fourth Adjustment
+              # Fourth Adjustment (Adjustments Applied after Cap)
               if xlsx.sheet(sheet).row(adj_row).include?("Loan Size Adjustments")
                 begin
                   rr = adj_row
@@ -3582,12 +3582,12 @@ class ImportFilesController < ApplicationController
                       @loan_size[main_key][key] = value
                     end
                   end
-                  # @adjustment = Adjustment.create(data: @loan_size, sheet_name: sheet, program_ids: @programs_ids)
+                  make_adjust(@loan_size, @program_ids)
                 rescue => e
                 end
               end
 
-              # Fifth Adjustment
+              # Fifth Adjustment(Misc Adjusters)
               if xlsx.sheet(sheet).row(adj_row).include?("Adjustments Applied after Cap")
                 begin
                   rr = adj_row
@@ -3617,18 +3617,155 @@ class ImportFilesController < ApplicationController
                       key1 = "Manufactured Home"
                       key2 = 0
                       value = xlsx.sheet(sheet).cell(rrr,ccc+4)
+                      @cando_hash[main_key][key1] = {}
                       @cando_hash[main_key][key1][key2] = {}
                       @cando_hash[main_key][key1][key2] = value
                     end
                   end
-
-                  # @adjustment = Adjustment.create(data: @loan_size, sheet_name: sheet, program_ids: @programs_ids)
+                  make_adjust(@cando_hash, @program_ids)
                 rescue => e
                 end
               end
 
+              # Sixth Adjustment(Misc Adjusters (2-4 Units))
+              if xlsx.sheet(sheet).row(adj_row).include?("Adjustments Applied after Cap")
+                begin
+                  rr = adj_row
+                  cc = 15
+                  @unit_hash = {}
+                  main_key = "PropertyType/LTV"
+                  @unit_hash[main_key] = {}
+
+                  rrr = rr + 1
+                  ccc = cc
+                  key = xlsx.sheet(sheet).cell(rrr,ccc)
+
+                  if key.include?("Units")
+                    key1 = "2-4 unit"
+                    value = xlsx.sheet(sheet).cell(rrr,ccc+4)
+                    @unit_hash[main_key][key1] = {}
+                    @unit_hash[main_key][key1] = value
+                  end
+                  make_adjust(@unit_hash, @program_ids)
+                rescue Exception => e
+                end
+              end
 
 
+              # Seventh Adjustment(Misc Adjusters)
+              if xlsx.sheet(sheet).row(adj_row).include?("Adjustments Applied after Cap")
+                begin
+                  rr = adj_row
+                  cc = 15
+                  @data_hash = {}
+                  main_key = "MiscAdjuster"
+                  @data_hash[main_key] = {}
+
+                  (0..2).each do |max_row|
+                    rrr = rr + max_row
+                    ccc = cc
+                    key = xlsx.sheet(sheet).cell(rrr,ccc)
+
+                    if !key.include?("Units")
+                      key1 = key.include?(">") ? key.split(" >")[0] : key
+                      value = xlsx.sheet(sheet).cell(rrr,ccc+4)
+                      @data_hash[main_key][key1] = {}
+                      @data_hash[main_key][key1] = value
+                    end
+                  end
+                  make_adjust(@data_hash, @program_ids)
+                rescue Exception => e
+                end
+              end
+
+              # LTV Adjustment(Misc Adjusters)
+              if xlsx.sheet(sheet).row(adj_row).include?("Adjustments Applied after Cap")
+                begin
+                  rr = adj_row
+                  cc = 15
+                  @ltv_hash = {}
+                  main_key = "LTV"
+                  @ltv_hash[main_key] = {}
+
+
+                  (0..6).each do |max_row|
+                    rrr = rr + max_row
+                    ccc = cc
+                    key = xlsx.sheet(sheet).cell(rrr,ccc)
+
+                    if key.include?("LTV") && !key.include?("Condo")
+                      key1 = key.split[1].to_i.round
+                      key2 = key.include?("<") ? 0 : 30
+                      value = xlsx.sheet(sheet).cell(rrr,ccc+4)
+                      @ltv_hash[main_key][key1] = {} if @ltv_hash[main_key] == {}
+                      @ltv_hash[main_key][key1][key2] = {}
+                      @ltv_hash[main_key][key1][key2] = value
+                    end
+                  end
+                  make_adjust(@ltv_hash, @program_ids)
+                rescue Exception => e
+                end
+              end
+
+              # CA Escrow Waiver Adjustment
+              if xlsx.sheet(sheet).row(adj_row).include?("Expanded Approval **")
+                begin
+                  rr = adj_row
+                  cc = 3
+                  @misc_adjuster = {}
+                  main_key = "MiscAdjuster"
+                  @misc_adjuster[main_key] = {}
+
+                  (0..2).each do |max_row|
+                    rrr = rr + max_row
+                    ccc = cc
+                    key = xlsx.sheet(sheet).cell(rrr,ccc)
+
+                    if key.include?("CA Escrow Waiver") || key.include?("Expanded Approval **")
+                      value = xlsx.sheet(sheet).cell(rrr,ccc+7)
+                      @misc_adjuster[main_key][key] = {}
+                      @misc_adjuster[main_key][key] = value
+                    end
+                  end
+                  make_adjust(@misc_adjuster, @program_ids)
+                rescue Exception => e
+                end
+              end
+
+              # Subordinate Financing Adjustment
+              if xlsx.sheet(sheet).row(adj_row).include?("Subordinate Financing")
+                begin
+                  rr = adj_row
+                  cc = 6
+                  @subordinate_hash = {}
+                  main_key = "FinancingType/LTV/CLTV/FICO"
+                  key1 = "Subordinate Financing"
+
+                  sub_key1 = row.compact[2].include?("<") ? 0 : row.compact[2].split(" ")[1].to_i
+                  sub_key2 = row.compact[3].include?(">") ? row.compact[3].split(" ")[1].to_i : row.compact[3].to_i
+
+                  @subordinate_hash[main_key] = {}
+                  @subordinate_hash[main_key][key1] = {}
+
+                  (1..2).each do |max_row|
+                    rrr = rr + max_row
+                    ccc = cc
+                    key = xlsx.sheet(sheet).cell(rrr,ccc)
+
+                    if key.include?(">") || key == "ALL"
+                      key2 = (key.include?(">")) ? key.gsub(/[^0-9A-Za-z]/, '') : key
+                      value = xlsx.sheet(sheet).cell(rrr,ccc+3)
+                      value1 = xlsx.sheet(sheet).cell(rrr,ccc+4)
+
+                      @subordinate_hash[main_key][key1][key2] ={}
+                      @subordinate_hash[main_key][key1][key2][sub_key1] = value
+                      @subordinate_hash[main_key][key1][key2][sub_key2] = value1
+                    end
+                  end
+                  make_adjust(@subordinate_hash, @program_ids)
+                rescue => e
+                end
+              end
             end
           end
         end
