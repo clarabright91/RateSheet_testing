@@ -63,8 +63,6 @@ session = GoogleDrive::Session.from_config("config.json")
 # folder = drive_access.folder_by_id("1p9gWPr4DPKgdQinWm7F8fU-hNVvKKaDM")
 # file = folder.file_by_title("OB_New_Penn_Financial_Wholesale5806.xls")
 
-
-
 # new_session.spreadsheet_by_title("OB_New_Penn_Financial_Wholesale5806").web_view_link
 # ws = drive_access.spreadsheet_by_key("1q8sGJ7h3x8w6F5knzLFiST_FzNDVWYYOvkNHrf7zN9M").worksheets[0]
 
