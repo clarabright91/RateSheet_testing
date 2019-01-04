@@ -1699,9 +1699,10 @@ class ImportFilesController < ApplicationController
     @all_data = {}
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
-    @program_arr =[]
+    @programs_ids =[]
     xlsx.sheets.each do |sheet|
       if (sheet == "Jumbo Series_D")
+        @sheet = sheet
         sheet_data = xlsx.sheet(sheet)
         (1..22).each do |r|
           row = sheet_data.row(r)
@@ -1715,8 +1716,9 @@ class ImportFilesController < ApplicationController
                 @term =  program_heading[3]
                 @interest_type = program_heading[5]
                 @program = @bank.programs.find_or_create_by(title: @title)
-                @program_arr  << @program.id
-                @program.update(term: @term,interest_type: @interest_type,loan_type: 0)
+                @programs_ids  << @program.id
+                @program.update(term: @term,interest_type: @interest_type,loan_type: 0, sheet_name: sheet)
+                @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
               (0..50).each do |max_row|
@@ -1746,7 +1748,7 @@ class ImportFilesController < ApplicationController
           end
         end
 
-        if @program_arr.any?
+        if @programs_ids.any?
           (41..72).each do |r|
             row    = sheet_data.row(r)
             status = row.compact.count <= 3 || row.compact.include?("FICO/LTV Adjustments - Loan Amount > $1MM")
@@ -1759,11 +1761,6 @@ class ImportFilesController < ApplicationController
                 cc = 2 + max_column*9 # (2 / 11)
                 @title = sheet_data.cell(r,cc)
                 if(titles.include?(@title))
-                  # program_heading = @title.split
-                  # @term = program_heading[1]
-                  # @interest_type = program_heading[3]
-                  # @program = @bank.programs.find_or_create_by(title: @title)
-                  # @program.update(term: @term,interest_type: 0,loan_type: 0, sheet_name: sheet)
                   @block_hash = {}
                   key = ''
                   unless(table_names.include?(@title))
@@ -1827,11 +1824,10 @@ class ImportFilesController < ApplicationController
                                 indexing = "1000000" if @title.eql?("FICO/LTV Adjustments - Loan Amount > $1MM")
                                 @allAdjustments[@allAdjustments.keys.first][indexing] = {}
                                 @allAdjustments[@allAdjustments.keys.first][indexing] = @block_hash[@block_hash.keys.first]
-                                make_adjust(@block_hash, @title, sheet, @program_arr, true)
-                                puts "#{@title} = #{@block_hash}"
+                                if rrr.eql?(71) && ccc.eql?(9)
+                                  @all_data[m_key] = @allAdjustments[m_key]
+                                end
                               else
-                                make_adjust(@block_hash, @title, sheet, @program_arr, false)
-                                # puts "#{@title} = #{@block_hash}"
                               end
                             else
                               if @title.eql?("FICO/LTV Adjustments - Loan Amount ≤ $1MM") or @title.eql?("FICO/LTV Adjustments - Loan Amount > $1MM")
@@ -1839,11 +1835,13 @@ class ImportFilesController < ApplicationController
                                 indexing = "1000000" if @title.eql?("FICO/LTV Adjustments - Loan Amount > $1MM")
                                 @allAdjustments[@allAdjustments.keys.first][indexing] = {}
                                 @allAdjustments[@allAdjustments.keys.first][indexing] = @block_hash[@block_hash.keys.first]
-                                make_adjust(@block_hash, @title, sheet, @program_arr, false)
-                                # puts "#{@title} = #{@block_hash}"
+                                if rrr.eql?(71) && ccc.eql?(7)
+                                  @all_data[m_key] = @allAdjustments[m_key]
+                                end
                               else
-                                make_adjust(@block_hash, @program_arr)
-                                # puts "#{@title} = #{@block_hash}"
+                                if rrr.eql?(71) && ccc.eql?(9)
+                                  @all_data[m_key] = @block_hash[m_key]
+                                end
                               end
                             end
                           end
@@ -1877,7 +1875,9 @@ class ImportFilesController < ApplicationController
                         else
                           if rrr < 62 && ccc != 14 && value.present? && !columns[:data].has_value?(value)
                             @block_hash[previous_key][previous_element] = value
-                            # @all_data[@program.title] = @block_hash
+                            if rrr.eql?(61) && ccc.eql?(15)
+                              @all_data[previous_key] = @block_hash[previous_key]
+                            end
                           end
                         end
                         @data << value
@@ -1889,14 +1889,13 @@ class ImportFilesController < ApplicationController
                           @hash1 = Hash[*@data.compact] if @data.compact.include?("20/30 Yr Fixed")
                           @block_hash["Max Price"] = @hash1.merge(Hash[*@data.compact]) if @data.compact.include?("15 Yr Fixed")
                           @block_hash.delete("20/30 Yr Fixed") if @data.compact.include?("15 Yr Fixed")
-                          make_adjust(@block_hash, @title, sheet, @program_arr) if @data.compact.include?("15 Yr Fixed")
-                          puts "#{@title} = #{@block_hash}" if @data.compact.include?("15 Yr Fixed")
+                          if rr.eql?(64) && cc.eql?(11) && @block_hash.has_key?(@title)
+                            @all_data[@title] = @block_hash[@title]
+                          end
                         rescue Exception => e
                         end
                       end
                     end
-                    make_adjust(@block_hash, @program_arr)
-                    # puts "#{@title} = #{@block_hash}"
                   end
                 end
               end
@@ -2228,7 +2227,11 @@ class ImportFilesController < ApplicationController
         end
       end
     end
-    redirect_to programs_import_file_path(@bank)
+
+    # create adjustment for each program
+    make_adjust(@all_data, @programs_ids)
+
+    redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
   def lp_open_access
