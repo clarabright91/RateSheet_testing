@@ -448,7 +448,19 @@ class ImportFilesController < ApplicationController
                     # for Misc Adjusters
                     if index.eql?(6)
                       key = sheet_data.cell(rrr,ccc)
-                      @block_hash[@title][key] = {}
+                      if key && key.eql?("Condo > 75 LTV (>15yr Term)")
+                        first_key = key.split(" >")[0]
+                        @block_hash[@title][first_key] = {}
+                        second_key = sheet_data.cell(rrr,ccc).split(" ")[2] + ".01"
+                        @block_hash[@title][first_key][second_key] = {}
+                        third_key = sheet_data.cell(rrr,ccc).split(" ")[4].split("(>")[1].split("yr")[0] + ".01"
+                      elsif key && key.eql?(">90 LTV")
+                        first_key  = key.split(" ")[1]
+                        @block_hash[@title][first_key] = {}
+                        second_key = key.split(">")[1].split(" ").first
+                      else
+                        @block_hash[@title][key] = {}
+                      end
                     end
                   end
 
@@ -512,18 +524,26 @@ class ImportFilesController < ApplicationController
                     if ccc.eql?(18)
                       diff_of_column = ccc - 15
                       extra_key = sheet_data.cell(rrr,(ccc-diff_of_column))
+                      extra_key = get_value(extra_key)
+                      extra_key = extra_key.eql?(0) ? extra_key : get_value(extra_key)
                       @block_hash[@another_title]["Purchase"][extra_key] = value
                     else
                       diff_of_column = ccc - 15
                       extra_key = sheet_data.cell(rrr,(ccc-diff_of_column))
+                      extra_key = get_value(extra_key)
+                      extra_key = extra_key.eql?(0) ? extra_key : get_value(extra_key)
                       @block_hash[@another_title]["Refinance"][extra_key] = value
                     end
                   end
 
                   if (163..166).to_a.include?(rrr) && ccc == 11
                     #for Misc Adjusters
-                    first_key = sheet_data.cell(rrr,ccc - 5)
-                    @block_hash[@title][first_key] = value
+                    if rrr.eql?(163)
+                      @block_hash[@title][first_key][second_key][third_key] = value
+                    else
+                      first_key = sheet_data.cell(rrr,ccc - 5)
+                      @block_hash[@title][first_key] = value
+                    end
                   end
 
                   if [167,168,169].include?(rrr) && [11].include?(ccc)
@@ -762,6 +782,26 @@ class ImportFilesController < ApplicationController
                     @block_hash[@another_title][another_key] = {} unless @block_hash[@another_title].has_key?(another_key)
                   end
 
+                  if (161..165).to_a.include?(rrr)
+                    # for Misc Adjusters
+                    if index.eql?(6)
+                      key = sheet_data.cell(rrr,ccc)
+                      if key && key.eql?("Attached Condo > 75 LTV (>15yr Term)")
+                        first_key = key.split(" >")[0]
+                        @block_hash[@title][first_key] = {}
+                        second_key = sheet_data.cell(rrr,ccc).split(" ")[3] + ".01"
+                        @block_hash[@title][first_key][second_key] = {}
+                        third_key = sheet_data.cell(rrr,ccc).split(" ")[5].split("(>")[1].split("yr")[0] + ".01"
+                      elsif key && key.eql?(">90 LTV")
+                        first_key  = key.split(" ")[1]
+                        @block_hash[@title][first_key] = {}
+                        second_key = key.split(">")[1].split(" ").first
+                      else
+                        @block_hash[@title][key] = {}
+                      end
+                    end
+                  end
+
                   if [166,167,168].include?(rrr) && [7].include?(ccc)
                     #for Non Owner Occupied
                     hash_key = sheet_data.cell(rrr,ccc)
@@ -808,18 +848,26 @@ class ImportFilesController < ApplicationController
                     if ccc.eql?(18)
                       diff_of_column = ccc - 15
                       extra_key = sheet_data.cell(rrr,(ccc-diff_of_column))
+                      extra_key = get_value(extra_key)
+                      extra_key = extra_key.eql?(0) ? extra_key : get_value(extra_key)
                       @block_hash[@another_title]["Purchase"][extra_key] = value
                     else
                       diff_of_column = ccc - 15
                       extra_key = sheet_data.cell(rrr,(ccc-diff_of_column))
+                      extra_key = get_value(extra_key)
+                      extra_key = extra_key.eql?(0) ? extra_key : get_value(extra_key)
                       @block_hash[@another_title]["Refinance"][extra_key] = value
                     end
                   end
 
                   if (161..165).to_a.include?(rrr) && ccc == 11
                     #for Misc Adjusters
-                    first_key = sheet_data.cell(rrr,ccc - 5)
-                    @block_hash[@title][first_key] = value
+                    if rrr.eql?(163)
+                      @block_hash[@title][first_key][second_key][third_key] = value
+                    else
+                      first_key = sheet_data.cell(rrr,ccc - 5)
+                      @block_hash[@title][first_key] = value
+                    end
                   end
 
                   if [166,167,168].include?(rrr) && [11].include?(ccc)
@@ -1078,6 +1126,22 @@ class ImportFilesController < ApplicationController
                     end
                   end
 
+                  if (119..120).to_a.include?(rrr)
+                    # for Misc Adjusters
+                    if index.eql?(6)
+                      key = sheet_data.cell(rrr,ccc)
+                      if key && key.eql?("Attached Condo > 75 LTV (>15yr Term)")
+                        first_key = key.split(" >")[0]
+                        @block_hash[@title][first_key] = {}
+                        second_key = sheet_data.cell(rrr,ccc).split(" ")[3] + ".01"
+                        @block_hash[@title][first_key][second_key] = {}
+                        third_key = sheet_data.cell(rrr,ccc).split(" ")[5].split("(>")[1].split("yr")[0] + ".01"
+                      else
+                        @block_hash[@title][key] = {}
+                      end
+                    end
+                  end
+
                   if rrr.eql?(114) && [18,19].include?(ccc)
                     # for Loan Size Adjustments
                     another_key = sheet_data.cell(rrr,ccc)
@@ -1135,8 +1199,12 @@ class ImportFilesController < ApplicationController
 
                   if [119,120].include?(rrr) && ccc == 11
                     #for Misc Adjusters
-                    first_key = sheet_data.cell(rrr,ccc - 5)
-                    @block_hash[@title][first_key] = value
+                    if rrr.eql?(119)
+                      @block_hash[@title][first_key][second_key][third_key] = value
+                    else
+                      first_key = sheet_data.cell(rrr,ccc - 5)
+                      @block_hash[@title][first_key] = value
+                    end
                   end
 
                   if (115..122).to_a.include?(rrr) && ccc > 15 && value
@@ -1144,10 +1212,14 @@ class ImportFilesController < ApplicationController
                     if ccc.eql?(18)
                       diff_of_column = ccc - 15
                       extra_key = sheet_data.cell(rrr,(ccc-diff_of_column))
+                      extra_key = get_value(extra_key)
+                      extra_key = extra_key.eql?(0) ? extra_key : get_value(extra_key)
                       @block_hash[@another_title]["Purchase"][extra_key] = value
                     else
                       diff_of_column = ccc - 15
                       extra_key = sheet_data.cell(rrr,(ccc-diff_of_column))
+                      extra_key = get_value(extra_key)
+                      extra_key = extra_key.eql?(0) ? extra_key : get_value(extra_key)
                       @block_hash[@another_title]["Refinance"][extra_key] = value
                     end
                   end
@@ -5023,10 +5095,14 @@ class ImportFilesController < ApplicationController
                       if ccc.eql?(18)
                         diff_of_column = ccc - 15
                         extra_key = sheet_data.cell(rrr,(ccc-diff_of_column))
+                        extra_key = get_value(extra_key)
+                        extra_key = extra_key.eql?(0) ? extra_key : get_value(extra_key)
                         @block_hash[@another_title]["Purchase"][extra_key] = value
                       else
                         diff_of_column = ccc - 15
                         extra_key = sheet_data.cell(rrr,(ccc-diff_of_column))
+                        extra_key = get_value(extra_key)
+                        extra_key = extra_key.eql?(0) ? extra_key : get_value(extra_key)
                         @block_hash[@another_title]["Refinance"][extra_key] = value
                       end
                     end
@@ -5520,7 +5596,7 @@ class ImportFilesController < ApplicationController
                     @another_title = sheet_data.cell(rrr,ccc)
                     @block_hash[@another_title] = {} unless @block_hash.has_key?(@another_title)
                   elsif rrr.eql?(126) && index.eql?(13)
-                    # for Non Owner Occupied
+                    # for Adjustment Caps
                     @title = sheet_data.cell(rrr,ccc)
                     @block_hash[@title] = {} unless @block_hash.has_key?(@title)
                   end
@@ -5563,6 +5639,21 @@ class ImportFilesController < ApplicationController
                     another_key = sheet_data.cell(rrr,ccc)
                     another_key = get_value(another_key)
                     @block_hash[@another_title][another_key] = {} unless @block_hash[@another_title].has_key?(another_key)
+                  end
+
+                  if (118..120).to_a.include?(rrr)
+                    # for Misc Adjusters
+                    if index.eql?(6)
+                      key = sheet_data.cell(rrr,ccc)
+
+                      if key && key.eql?("Attached Condo > 75 LTV (>15yr Term)")
+                        first_key = key.split(" >")[0]
+                        @block_hash[@title][first_key] = {}
+                        second_key = sheet_data.cell(rrr,ccc).split(" ")[3] + ".01"
+                        @block_hash[@title][first_key][second_key] = {}
+                        third_key = sheet_data.cell(rrr,ccc).split(" ")[5].split("(>")[1].split("yr")[0] + ".01"
+                      end
+                    end
                   end
 
                   if [121,122,123].include?(rrr) && [7].include?(ccc)
@@ -5627,8 +5718,14 @@ class ImportFilesController < ApplicationController
 
                   if (118..120).to_a.include?(rrr) && ccc == 11
                     #for Misc Adjusters
-                    first_key = sheet_data.cell(rrr,ccc - 5)
-                    @block_hash[@title][first_key] = value
+                    # first_key = sheet_data.cell(rrr,ccc - 5)
+                    # @block_hash[@title][first_key] = value
+                    if rrr.eql?(119)
+                      @block_hash[@title][first_key][second_key][third_key] = value
+                    else
+                      first_key = sheet_data.cell(rrr,ccc - 5)
+                      @block_hash[@title][first_key] = value
+                    end
                   end
 
                   if [121,122,123].include?(rrr) && [11].include?(ccc)
@@ -5852,6 +5949,24 @@ class ImportFilesController < ApplicationController
                     @block_hash[@another_title][another_key] = {} unless @block_hash[@another_title].has_key?(another_key)
                   end
 
+                  if (117..122).to_a.include?(rrr)
+                    # for Misc Adjusters
+                    if index.eql?(6)
+                      key = sheet_data.cell(rrr,ccc)
+                      if key && key.eql?("Attached Condo > 75 LTV (>15yr Term)")
+                        first_key = key.split(" >")[0]
+                        @block_hash[@title][first_key] = {}
+                        second_key = sheet_data.cell(rrr,ccc).split(" ")[3] + ".01"
+                        @block_hash[@title][first_key][second_key] = {}
+                        third_key = sheet_data.cell(rrr,ccc).split(" ")[5].split("(>")[1].split("yr")[0] + ".01"
+                      elsif key && key.eql?(">90 LTV")
+                        first_key  = key.split(" ")[1]
+                        @block_hash[@title][first_key] = {}
+                        second_key = key.split(">")[1].split(" ").first
+                      end
+                    end
+                  end
+
                   if (125..127).to_a.include?(rrr) && @title
                     # for Adjustment Caps
                     if index.eql?(17)
@@ -5896,18 +6011,26 @@ class ImportFilesController < ApplicationController
                     if ccc.eql?(18)
                       diff_of_column = ccc - 15
                       extra_key = sheet_data.cell(rrr,(ccc-diff_of_column))
+                      extra_key = get_value(extra_key)
+                      extra_key = extra_key.eql?(0) ? extra_key : get_value(extra_key)
                       @block_hash[@another_title]["Purchase"][extra_key] = value
                     else
                       diff_of_column = ccc - 15
                       extra_key = sheet_data.cell(rrr,(ccc-diff_of_column))
+                      extra_key = get_value(extra_key)
+                      extra_key = extra_key.eql?(0) ? extra_key : get_value(extra_key)
                       @block_hash[@another_title]["Refinance"][extra_key] = value
                     end
                   end
 
                   if (117..122).to_a.include?(rrr) && ccc == 11
                     #for Misc Adjusters
-                    first_key = sheet_data.cell(rrr,ccc - 5)
-                    @block_hash[@title][first_key] = value
+                    if rrr.eql?(118)
+                      @block_hash[@title][first_key][second_key][third_key] = value
+                    else
+                      first_key = sheet_data.cell(rrr,ccc - 5)
+                      @block_hash[@title][first_key] = value
+                    end
                   end
 
                   if (125..127).to_a.include?(rrr)
@@ -5965,162 +6088,23 @@ class ImportFilesController < ApplicationController
   end
 
   def all_lp
-    data = {
-      5 => {"<=80" => "0"},
-      6 => {"80.01 - 85" => "80.01"},
-      7 => {"> 85" => "85"},
-      9 => {"< 720" => "0"},
-      10 => {">= 720" => "720"},
-      11 => {"< 620" => "0"},
-      12 => {"620 - 639" => "620"},
-      13 => {"640 - 659" => "640"},
-      14 => {"660 - 679" => "660"},
-      16 => {"680 - 699" => "680"},
-      17 => {"700 - 719" => "700"},
-      18 => {"720 - 739" => "720"},
-      19 => {">= 740" => "740"},
-      rows: {
-        40 => {"<= 60" => "0"},
-        41 => {"60.01 - 70" => "60.01"},
-        42 => {"70.01 - 75" => "70.01"},
-        43 => {"75.01 - 80" => "75.01"},
-        44 => {"80.01 - 85" => "80.01"},
-        45 => {"> 85 "=> "85"},
-        48 => {"<=75" => "0"},
-        49 => {"<=65" => "0"},
-        50 => {"65.01-75" => "65.01"},
-        51 => {"75.01-80" => "75.01"},
-        52 => {"80.01-90" => "80.01"},
-        53 => {"90.01-95" => "90.01"},
-        54 => {"All" => "All"},
-        57 => {"2 Units" => "2 Unit"},
-        58 => {"3-4 units" => "3-4 Unit"},
-        61 => {"<$50,000" => "0"},
-        62 => {"$50,000 - $99,999" => "$50,000"},
-        63 => {"$100,000 - $149,999" => "$100,000"},
-        64 => {"$150,000 - $199,999" => "$150,000"},
-        65 => {"$200,000 - $249,999" => "$200,000"},
-        66 => {"$250,000 - $299,999" => "$250,000"},
-        67 => {"$300,000 - Conforming Limit" => "$300,000"},
-      },
-      cltv: {
-        48 => {"<=80" => "0"},
-        49 => {"80.01 - 95" => "80.01"},
-        50 => {"80.01 - 95" => "80.01"},
-        51 => {"76.01 - 95" => "76.01"},
-        52 => {"81.01 - 95" => "81.01"},
-        53 => {"91.01 - 95" => "91.01"},
-        54 => {"> 95" => "95"}
-      }
-    }
+    data = Adjustment::ALL_IP
 
     return data
   end
 
   def high_bal_adjustment
-    data = {
-      4 => {"<= 60" => "0"},
-      5 => {"60.01 - 70" => "60.01"},
-      6 => {"70.01 - 75" => "70.01"},
-      7 => {"75.01 - 80" => "75.01"},
-      8 => {"80.01 - 85" => "80.01"},
-      9 => {"85.01 - 90" => "85"},
-      rows: {
-        28 => {">=760" => "760"},
-        29 => {"740-759" => "740"},
-        30 => {"720-739" => "720"},
-        31 => {"700-719" => "700"},
-        32 => {"680-699" => "680"},
-        34 => {">=760" => "760"},
-        35 => {"740-759" => "740"},
-        36 => {"720-739" => "720"},
-        37 => {"700-719" => "700"},
-        38 => {"680-699" => "680"},
-      },
-      subordinate: {
-        4 => {"< 720" => "0"},
-        5 => {">= 720" => "720"}
-      }
-    }
+    data = Adjustment::HIGH_BALANCE_ADJUSTMENT
     return data
   end
 
   def jumbo_series_i_adjustment
-      data = {
-        5 => {"≤ 60" => "0"},
-        6 => {"60.01-65" => "60.01"},
-        7 => {"65.01-70" => "65.01"},
-        8 => {"70.01-75" => "70.01"},
-        10 => {"75.01-80" => "75.01"},
-        14 => {"≤ 60" => "0"},
-        16 => {"60.01-65" => "60.01"},
-        17 => {"65.01-70" => "65.01"},
-        18 => {"70.01-75" => "70.01"},
-        19 => {"75.01-80" => "75.01"},
-        rows: {
-          41 => {"< 700" => "0"},
-          42 => {"740-759" => "740"},
-          43 => {"720-739" => "720"},
-          44 => {"700-719" => "700"},
-          45 => {"680-699" => "680"},
-          50 => {"≤ $1MM" => "0"},
-          51 => {"$1MM - $1.5MM" => "$1MM"},
-          52 => {"$1.5MM - $2MM" => "$1.5MM"},
-          53 => {"$2MM - $2.5MM" => "$2MM"},
-          58 => {"2nd Home" => "2nd Home"},
-          59 => {"Purchase (15 Yr Fixed ONLY)" => "Purchase (15 Yr Fixed ONLY)"},
-          60 => {"C/O Refinance" => "C/O Refinance"},
-          61 => {"2-4 Unit" => "2-4 Unit"},
-          62 => {"DTI > 40%" => "DTI > 40%"}
-        }
-      }
+      data = Adjustment::JUMBO_SERIES_I_ADJUSTMENT
     return data
   end
 
   def dream_big_adjustment
-    data = {
-      4 => {"<=50" => "0"},
-      5 => {"50.01 - 55" => "50.01"},
-      6 => {"55.01 - 60" => "55.01"},
-      7 => {"60.01 - 65" => "60.01"},
-      9 => {"65.01 - 70" => "65.01"},
-      10 => {"70.01 - 75" => "70.01"},
-      11 => {"75.01 - 80" => "75.01"},
-      12 => {"80.01 - 85" => "80.01"},
-      14 => {"85.01 - 90" => "85.01"},
-      rows: {
-        40 => {"680 - 699" => "680"},
-        41 => {"700 - 719" => "700"},
-        42 => {"720 - 739" => "720"},
-        43 => {"740 - 759" => "740"},
-        44 => {"760-779" => "760"},
-        45 => {">=780"=> "780"},
-        46 => {"Purchase" => "Purchase"},
-        47 => {"Cash Out Refinance" => "Cash Out Refinance"},
-        48 => {"Rate & Term Refinance" => "Rate & Term Refinance"},
-        50 => {"Non Owner Occupied" => "Non Owner Occupied"},
-        51 => {"> 80 LTV No MI" => "> 80 LTV No MI"},
-        55 => {"680 - 699" => "680"},
-        56 => {"700 - 719" => "700"},
-        57 => {"720 - 739" => "720"},
-        58 => {"740 - 759" => "740"},
-        59 => {"760-779" => "760"},
-        60 => {">=780"=> "780"},
-        61 => {"Purchase" => "Purchase"},
-        62 => {"Cash Out Refinance" => "Cash Out Refinance"},
-      },
-      arm_column: {
-        4 => {"<=50" => "0"},
-        5 => {"50.01 - 55" => "50.01"},
-        6 => {"55.01 - 60" => "55.01"},
-        8 => {"60.01 - 65" => "60.01"},
-        9 => {"65.01 - 70" => "65.01"},
-        10 => {"70.01 - 75" => "70.01"},
-        11 => {"75.01 - 80" => "75.01"},
-        12 => {"80.01 - 85" => "80.01"},
-        14 => {"85.01 - 90" => "85.01"},
-      }
-    }
+    data = Adjustment::DREAM_BIG_ADJUSTMENT
 
     return data
   end
@@ -6161,20 +6145,7 @@ class ImportFilesController < ApplicationController
   end
 
   def get_table_keys
-    table_keys = {
-      "All Conforming ARMs (Does not include LP Open Access)" => "Conforming/Term/LTV/FICO",
-      "Cash-Out" => "RefinanceType/LTV/FICO",
-      "Lender Paid MI Adjustments" => "Term/LTV/FICO",
-      "Premium Adjustments" => "LPMI/PremiumType/FICO",
-      "LTV Adjustments" => "LPMI/Term/LTV/FICO",
-      "Number Of Units" => "PropertyType/LTV",
-      "Subordinate Financing" => "FinancingType/LTV/CLTV/FICO",
-      "Misc Adjusters" => "PropertyType/LTV/Term",
-      "Non Owner Occupied" => "PropertyType/LTV",
-      "Loan Size Adjustments" => "RateType/Conforming/LTV/FICO",
-      "Super Conforming" => "Conforming/LTV/FICO",
-    }
-
+    table_keys = Adjustment::MAIN_KEYS
     return table_keys
   end
 
@@ -6192,6 +6163,8 @@ class ImportFilesController < ApplicationController
         value1.split(">").last.squish
       elsif (value1.include?("+"))
         value1.split("+").first
+      elsif value1.include?("$")
+        value1.split("$").last.squish
       else
         value1
       end
