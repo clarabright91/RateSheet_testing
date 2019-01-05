@@ -5,7 +5,7 @@
 # See this document to learn how to create config.json:
 # https://github.com/gimite/google-drive-ruby/blob/master/doc/authorization.md
 # new_session = GoogleDrive::Session.from_config("config.json")
-session = GoogleDrive::Session.from_config("config.json")
+# session = GoogleDrive::Session.from_config("config.json")
 # create folder
 # folder  = session.root_collection.create_subcollection("Uploaded files")
 # p folder
@@ -65,3 +65,14 @@ session = GoogleDrive::Session.from_config("config.json")
 
 # new_session.spreadsheet_by_title("OB_New_Penn_Financial_Wholesale5806").web_view_link
 # ws = drive_access.spreadsheet_by_key("1q8sGJ7h3x8w6F5knzLFiST_FzNDVWYYOvkNHrf7zN9M").worksheets[0]
+
+# require 'open-uri'
+# open('image.png', 'wb') do |file|
+#   file << open('http://example.com/image.png').read
+# end
+
+# IO.copy_stream(open('http://example.com/image.png'), 'destination.png')
+
+# require 'open-uri'
+# download = open('http://example.com/image.png')
+# IO.copy_stream(download, '~/image.png')
