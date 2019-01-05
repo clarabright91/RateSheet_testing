@@ -76,6 +76,7 @@ session = GoogleDrive::Session.from_config("config.json")
 
 # require 'open-uri'
 # download = open('http://example.com/image.png')
+
 # IO.copy_stream(download, '~/image.png')
 
 # controller code
