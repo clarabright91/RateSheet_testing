@@ -3786,7 +3786,13 @@ class ImportFilesController < ApplicationController
         sheet_data = xlsx.sheet(sheet)
         @adjustment_hash = {}
         @program_ids = []
+        @credit_data = []
         primary_key = ''
+        key = ''
+        cltv_key = ''
+        key1 = ''
+        cltv_key1 = ''
+        credit_data = ''
         main_key = ''
         @sheet = sheet
         # programs
@@ -3853,12 +3859,13 @@ class ImportFilesController < ApplicationController
         # Adjustments
         (34..73).each do |r|
           row = sheet_data.row(r)
+          @credit_data = sheet_data.row(40)
           (0..10).each do |max_column|
             cc = 3 + max_column
             value = sheet_data.cell(r,cc)
             if value.present?
               if value == "Jumbo Series I Adjustments"
-                main_key = value
+                main_key = "RateType/FICO/CLTV"
                 @adjustment_hash[main_key] = {}
               end
               if value == "Fixed Adjustments"
@@ -3869,11 +3876,14 @@ class ImportFilesController < ApplicationController
                 primary_key = value
                 @adjustment_hash[main_key][@key1][primary_key] = {}
               end
-              if (r == 40 && cc > 3 && cc <= 10) || (r == 49 && cc > 3 && cc <= 10) || (r == 57 && cc > 3 && cc <= 10)
-                @adjustment_hash[main_key][@key1][primary_key][jumbo_series_i_adjustment[cc].values.first] = {}
+              if (r >= 41 && r <= 45 && cc == 3) || (r >= 50 && r <= 53 && cc == 3) || (r >= 58 && r<= 62 && cc == 3)
+                key = get_value value
+                @adjustment_hash[main_key][@key1][primary_key][key] = {}
               end
-              if (r > 40 && r <= 45 && cc > 3 && cc <= 10) || (r > 49 && r <= 53 && cc > 3 && cc <= 10) || (r > 57 && r <= 62 && cc > 3 && cc <= 10)
-                @adjustment_hash[main_key][@key1][primary_key][jumbo_series_i_adjustment[cc].values.first][jumbo_series_i_adjustment[:rows][r].values.first] = value
+              if (r >= 41 && r <= 45 && cc > 3 && cc <= 10 && cc != 9) || (r >= 50 && r <= 53 && cc > 3 && cc <= 10 && cc != 9) || ( r >= 58 && r <= 62 && cc > 3 && cc <= 10 && cc != 9)
+                cltv_key = get_value @credit_data[cc-2]
+                @adjustment_hash[main_key][@key1][primary_key][key][cltv_key] = {}
+                @adjustment_hash[main_key][@key1][primary_key][key][cltv_key] = value
               end
             end
           end
@@ -3883,18 +3893,21 @@ class ImportFilesController < ApplicationController
             value = sheet_data.cell(r,cc)
             if value.present?
               if value == "ARM Adjustments"
-                @key = value
+                @key = "ARM"
                 @adjustment_hash[main_key][@key] = {} unless @adjustment_hash[main_key].has_key?(@key)
               end
               if value == "Credit Score" || value == "Loan Amount" || value == "Purpose/Property Type"
                 primary_key = value
                 @adjustment_hash[main_key][@key][primary_key] = {}
               end
-              if (r == 40 && cc > 12 && cc <= 19) || (r == 49 && cc > 12 && cc <= 19) || (r == 57 && cc > 12 && cc <= 19)
-                @adjustment_hash[main_key][@key][primary_key][jumbo_series_i_adjustment[cc].values.first] = {}
+              if (r >= 41 && r <= 45 && cc == 12) || (r >= 50 && r <= 53 && cc == 12) || (r >= 58 && r <= 62 && cc == 12)
+                key1 = get_value value
+                @adjustment_hash[main_key][@key][primary_key][key1] = {}
               end
-              if (r > 40 && r <= 45 && cc > 12 && cc <= 19) || (r > 49 && r <= 53 && cc > 12 && cc <= 19) || (r > 57 && r <= 62 && cc > 12 && cc <= 19)
-                @adjustment_hash[main_key][@key][primary_key][jumbo_series_i_adjustment[cc].values.first][jumbo_series_i_adjustment[:rows][r].values.first] = value
+              if (r >= 41 && r <= 45 && cc > 12 && cc <= 19 && cc != 15) || (r >= 50 && r <= 53 && cc > 12 && cc <= 19 && cc != 15) || (r >= 58 && r <= 62 && cc > 12 && cc <= 19 && cc != 15)
+                cltv_key1 = get_value @credit_data[cc-2]
+                @adjustment_hash[main_key][@key][primary_key][key1][cltv_key1] = {}
+                @adjustment_hash[main_key][@key][primary_key][key1][cltv_key1] = value
               end
             end
           end
