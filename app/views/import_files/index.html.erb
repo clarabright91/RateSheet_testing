@@ -47,3 +47,28 @@
     </tbody>
   </table>
 </div>
+
+
+<div class="container">
+  <div class="row col-md-6 col-md-offset-2 custyle">
+  <table class="table table-striped custab">
+  <thead>
+  <h2>Sheets</h2>
+  <tr>
+    <th>No.</th>
+    <th>Name</th>
+    <th>Phone</th>
+    <th class="text-center">Action</th>
+  </tr>
+  </thead>
+    <% @banks.each_with_index do |bank, index|%>
+      <tr>
+        <td><%= index +1 %></td>
+        <td><%= bank.name%></td>
+        <td><%= bank.phone%></td>
+        <td class="text-center"><a class='btn btn-info btn-xs' href="<%=import_files_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
+      </tr>
+    <%end%>
+  </table>
+  </div>
+</div>
