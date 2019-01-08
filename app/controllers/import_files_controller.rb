@@ -76,9 +76,15 @@ class ImportFilesController < ApplicationController
 
                # interest type
               if @title.include?("Fixed")
-                @interest_type = 0
+                @rate_type = "Fixed"
               elsif @title.include?("ARM")
-                @interest_type = 2
+                @rate_type = "ARM"
+              elsif @title.include?("Floating")
+                @rate_type = "Floating"
+              elsif @title.include?("Variable")
+                @rate_type = "Variable"
+              else
+                @rate_type = nil
               end
 
               # streamline
@@ -86,9 +92,9 @@ class ImportFilesController < ApplicationController
                 @streamline = true
               end
 
-              @program = @bank.programs.find_or_create_by(title: @title)
+              @program = @bank.programs.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
-              @program.update(term: @term,interest_type: 0,loan_type: 0,streamline: @streamline)
+              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,streamline: @streamline)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -278,9 +284,15 @@ class ImportFilesController < ApplicationController
 
               # interest type
               if @title.include?("Fixed")
-                @interest_type = 0
+                @rate_type = "Fixed"
               elsif @title.include?("ARM")
-                @interest_type = 2
+                @rate_type = "ARM"
+              elsif @title.include?("Floating")
+                @rate_type = "Floating"
+              elsif @title.include?("Variable")
+                @rate_type = "Variable"
+              else
+                @rate_type = nil
               end
 
               # conforming
@@ -298,9 +310,9 @@ class ImportFilesController < ApplicationController
                 @fannie_mae = true
               end
 
-              @program = @bank.programs.find_or_create_by(title: @title)
+              @program = @bank.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, sheet_name: @sheet)
+              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, sheet_name: @sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -624,9 +636,15 @@ class ImportFilesController < ApplicationController
 
               # interest type
               if @title.include?("Fixed")
-                @interest_type = 0
+                @rate_type = "Fixed"
               elsif @title.include?("ARM")
-                @interest_type = 2
+                @rate_type = "ARM"
+              elsif @title.include?("Floating")
+                @rate_type = "Floating"
+              elsif @title.include?("Variable")
+                @rate_type = "Variable"
+              else
+                @rate_type = nil
               end
 
               # conforming
@@ -644,9 +662,9 @@ class ImportFilesController < ApplicationController
                 @fannie_mae = true
               end
 
-              @program = @bank.programs.find_or_create_by(title: @title)
+              @program = @bank.programs.find_or_create_by(program_name: @title)
               program_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, sheet_name: sheet)
+              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -947,14 +965,20 @@ class ImportFilesController < ApplicationController
 
               # interest type
               if @title.include?("Fixed")
-                @interest_type = 0
+                @rate_type = "Fixed"
               elsif @title.include?("ARM")
-                @interest_type = 2
+                @rate_type = "ARM"
+              elsif @title.include?("Floating")
+                @rate_type = "Floating"
+              elsif @title.include?("Variable")
+                @rate_type = "Variable"
+              else
+                @rate_type = nil
               end
 
               # interest sub type
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM")
-                @interest_subtype = @title.scan(/\d+/)[0].to_i
+                @rate_arm = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -972,10 +996,10 @@ class ImportFilesController < ApplicationController
                 @fannie_mae = true
               end
 
-              @program = @bank.programs.find_or_create_by(title: @title)
+              @program = @bank.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
               @program.adjustments.destroy_all
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, sheet_name: sheet)
+              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -1310,14 +1334,20 @@ class ImportFilesController < ApplicationController
 
               # interest type
               if @title.include?("Fixed")
-                @interest_type = 0
+                @rate_type = "Fixed"
               elsif @title.include?("ARM")
-                @interest_type = 2
+                @rate_type = "ARM"
+              elsif @title.include?("Floating")
+                @rate_type = "Floating"
+              elsif @title.include?("Variable")
+                @rate_type = "Variable"
+              else
+                @rate_type = nil
               end
 
               # interest sub type
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                @interest_subtype = @title.scan(/\d+/)[0].to_i
+                @rate_arm = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -1335,9 +1365,9 @@ class ImportFilesController < ApplicationController
                 @fannie_mae = true
               end
 
-              @program = @bank.programs.find_or_create_by(title: @title)
+              @program = @bank.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype, sheet_name: sheet)
+              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, rate_arm: @rate_arm, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -1548,14 +1578,20 @@ class ImportFilesController < ApplicationController
 
               # interest type
               if @title.include?("Fixed")
-                @interest_type = 0
+                @rate_type = "Fixed"
               elsif @title.include?("ARM")
-                @interest_type = 2
+                @rate_type = "ARM"
+              elsif @title.include?("Floating")
+                @rate_type = "Floating"
+              elsif @title.include?("Variable")
+                @rate_type = "Variable"
+              else
+                @rate_type = nil
               end
 
               # interest sub type
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                @interest_subtype = @title.scan(/\d+/)[0].to_i
+                @rate_arm = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -1573,9 +1609,9 @@ class ImportFilesController < ApplicationController
                 @fannie_mae = true
               end
 
-              @program = @bank.programs.find_or_create_by(title: @title)
+              @program = @bank.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype, sheet_name: sheet)
+              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, rate_arm: @rate_arm, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -1786,10 +1822,10 @@ class ImportFilesController < ApplicationController
               @title = sheet_data.cell(r,cc)
                 program_heading = @title.split
                 @term =  program_heading[3]
-                @interest_type = program_heading[5]
-                @program = @bank.programs.find_or_create_by(title: @title)
+                @rate_type = program_heading[5]
+                @program = @bank.programs.find_or_create_by(program_name: @title)
                 @programs_ids  << @program.id
-                @program.update(term: @term,interest_type: @interest_type,loan_type: 0, sheet_name: sheet)
+                @program.update(term: @term,rate_type: @rate_type,loan_type: 0, sheet_name: sheet)
                 @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -2359,14 +2395,20 @@ class ImportFilesController < ApplicationController
 
               # interest type
               if @title.include?("Fixed")
-                @interest_type = 0
+                @rate_type = "Fixed"
               elsif @title.include?("ARM")
-                @interest_type = 2
+                @rate_type = "ARM"
+              elsif @title.include?("Floating")
+                @rate_type = "Floating"
+              elsif @title.include?("Variable")
+                @rate_type = "Variable"
+              else
+                @rate_type = nil
               end
 
               # interest sub type
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                @interest_subtype = @title.scan(/\d+/)[0].to_i
+                @rate_arm = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -2384,9 +2426,9 @@ class ImportFilesController < ApplicationController
                 @fannie_mae = true
               end
 
-              @program = @bank.programs.find_or_create_by(title: @title)
+              @program = @bank.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype, sheet_name: sheet)
+              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, rate_arm: @rate_arm, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -2580,22 +2622,22 @@ class ImportFilesController < ApplicationController
               program_heading = @title.split
               # @term =  program_heading[3]
               if program_heading[5] == "ARM"
-                @interest_type = 2
+                @rate_type = 2
                 if @title.scan(/\d+/)[0] == "5"
-                  @interest_subtype = @title.scan(/\d+/)[0]
+                  @rate_arm = @title.scan(/\d+/)[0]
                 elsif @title.scan(/\d+/)[0] == "7"
-                  @interest_subtype = @title.scan(/\d+/)[0]
+                  @rate_arm = @title.scan(/\d+/)[0]
                 elsif @title.scan(/\d+/)[0] == "10"
-                  @interest_subtype = @title.scan(/\d+/)[0]
+                  @rate_arm = @title.scan(/\d+/)[0]
                 end
               elsif program_heading[5] == "Fixed"
-                @interest_type = 0
+                @rate_type = 0
               end
-              @program = @bank.programs.find_or_create_by(title: @title)
-              if @interest_subtype.present?
-                @program.update(term: @term,interest_type: @interest_type,loan_type: 0,interest_subtype: @interest_subtype )
+              @program = @bank.programs.find_or_create_by(program_name: @title)
+              if @rate_arm.present?
+                @program.update(term: @term,rate_type: @rate_type,loan_type: 0,rate_arm: @rate_arm )
               else
-                @program.update(term: @term,interest_type: @interest_type,loan_type: 0)
+                @program.update(term: @term,rate_type: @rate_type,loan_type: 0)
               end
               @block_hash = {}
               key = ''
@@ -2949,7 +2991,7 @@ class ImportFilesController < ApplicationController
               end
             end
           end
-          Adjustment.create(data: @hash,program_title: @program.title, sheet_name: sheet, program_ids: @programs_ids)
+          Adjustment.create(data: @hash,program_name: @program.program_name, sheet_name: sheet, program_ids: @programs_ids)
         end
       end
     end
@@ -3007,14 +3049,20 @@ class ImportFilesController < ApplicationController
 
               # interest type
               if @title.include?("Fixed")
-                @interest_type = 0
+                @rate_type = "Fixed"
               elsif @title.include?("ARM")
-                @interest_type = 2
+                @rate_type = "ARM"
+              elsif @title.include?("Floating")
+                @rate_type = "Floating"
+              elsif @title.include?("Variable")
+                @rate_type = "Variable"
+              else
+                @rate_type = nil
               end
 
               # interest sub type
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                @interest_subtype = @title.scan(/\d+/)[0].to_i
+                @rate_arm = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -3032,9 +3080,9 @@ class ImportFilesController < ApplicationController
                 @fannie_mae = true
               end
 
-              @program = @bank.programs.find_or_create_by(title: @title)
+              @program = @bank.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype, sheet_name: sheet)
+              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, rate_arm: @rate_arm, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -3204,16 +3252,16 @@ class ImportFilesController < ApplicationController
                   program_heading = @title.split
                   if program_heading[5] == "ARM"
                     @term = 0
-                    @interest_type = 2
+                    @rate_type = 2
                     if @title.scan(/\d+/)[0] == "5"
-                      @interest_subtype = @title.scan(/\d+/)[0]
+                      @rate_arm = @title.scan(/\d+/)[0]
                     elsif @title.scan(/\d+/)[0] == "7"
-                      @interest_subtype = @title.scan(/\d+/)[0]
+                      @rate_arm = @title.scan(/\d+/)[0]
                     elsif @title.scan(/\d+/)[0] == "10"
-                      @interest_subtype = @title.scan(/\d+/)[0]
+                      @rate_arm = @title.scan(/\d+/)[0]
                     end
                   elsif program_heading[5] == "Fixed"
-                    @interest_type = 0
+                    @rate_type = 0
                     @term =  program_heading[3]
                   end
                   if @title.scan(/\w+/).include?("Refinance")
@@ -3222,13 +3270,13 @@ class ImportFilesController < ApplicationController
                     @loan_type = 0
                   end
 
-                @program = @bank.programs.find_or_create_by(title: @title)
+                @program = @bank.programs.find_or_create_by(program_name: @title)
                 @program_ids << @program.id
 
-                if @interest_subtype.present?
-                  @program.update(term: @term,interest_type: @interest_type,loan_type: @loan_type ,interest_subtype: @interest_subtype )
+                if @rate_arm.present?
+                  @program.update(term: @term,rate_type: @rate_type,loan_type: @loan_type ,rate_arm: @rate_arm )
                 else
-                  @program.update(term: @term,interest_type: @interest_type,loan_type: @loan_type)
+                  @program.update(term: @term,rate_type: @rate_type,loan_type: @loan_type)
                 end
                 @program.adjustments.destroy_all
 
@@ -3466,14 +3514,20 @@ class ImportFilesController < ApplicationController
 
               # interest type
               if @title.include?("Fixed")
-                @interest_type = 0
+                @rate_type = "Fixed"
               elsif @title.include?("ARM")
-                @interest_type = 2
+                @rate_type = "ARM"
+              elsif @title.include?("Floating")
+                @rate_type = "Floating"
+              elsif @title.include?("Variable")
+                @rate_type = "Variable"
+              else
+                @rate_type = nil
               end
 
               # interest sub type
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                @interest_subtype = @title.scan(/\d+/)[0].to_i
+                @rate_arm = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -3491,10 +3545,10 @@ class ImportFilesController < ApplicationController
                 @fannie_mae = true
               end
 
-              @program = @bank.programs.find_or_create_by(title: @title)
+              @program = @bank.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
 
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype, sheet_name: @sheet)
+              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, rate_arm: @rate_arm, sheet_name: @sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -3880,25 +3934,25 @@ class ImportFilesController < ApplicationController
                 program_heading = @title.split
                 if @title.scan(/\w+/).include?("ARM")
                   @term = 0
-                  @interest_type = 2
+                  @rate_type = 2
                   if @title.scan(/\d+/)[0] == "5"
-                    @interest_subtype = @title.scan(/\d+/)[0]
+                    @rate_arm = @title.scan(/\d+/)[0]
                   elsif @title.scan(/\d+/)[0] == "7"
-                    @interest_subtype = @title.scan(/\d+/)[0]
+                    @rate_arm = @title.scan(/\d+/)[0]
                   elsif @title.scan(/\d+/)[0] == "10"
-                    @interest_subtype = @title.scan(/\d+/)[0]
+                    @rate_arm = @title.scan(/\d+/)[0]
                   end
                 elsif @title.scan(/\w+/).include?("Fixed")
-                  @interest_type = 0
+                  @rate_type = 0
                   @term =  program_heading[3]
                 end
 
-                @program = @bank.programs.find_or_create_by(title: @title)
+                @program = @bank.programs.find_or_create_by(program_name: @title)
                 @program_ids << @program.id
-                if @interest_subtype.present?
-                  @program.update(term: @term,interest_type: @interest_type,loan_type: 0 ,interest_subtype: @interest_subtype, sheet_name: sheet )
+                if @rate_arm.present?
+                  @program.update(term: @term,rate_type: @rate_type,loan_type: 0 ,rate_arm: @rate_arm, sheet_name: sheet )
                 else
-                  @program.update(term: @term,interest_type: @interest_type,loan_type: 0, sheet_name: sheet)
+                  @program.update(term: @term,rate_type: @rate_type,loan_type: 0, sheet_name: sheet)
                 end
                 @program.adjustments.destroy_all
                 @block_hash = {}
@@ -4059,14 +4113,20 @@ class ImportFilesController < ApplicationController
 
               # interest type
               if @title.include?("Fixed")
-                @interest_type = 0
+                @rate_type = "Fixed"
               elsif @title.include?("ARM")
-                @interest_type = 2
+                @rate_type = "ARM"
+              elsif @title.include?("Floating")
+                @rate_type = "Floating"
+              elsif @title.include?("Variable")
+                @rate_type = "Variable"
+              else
+                @rate_type = nil
               end
 
               # interest sub type
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                @interest_subtype = @title.scan(/\d+/)[0].to_i
+                @rate_arm = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -4084,9 +4144,9 @@ class ImportFilesController < ApplicationController
                 @fannie_mae = true
               end
 
-              @program = @bank.programs.find_or_create_by(title: @title)
+              @program = @bank.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype, sheet_name: sheet)
+              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, rate_arm: @rate_arm, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -4272,25 +4332,25 @@ class ImportFilesController < ApplicationController
               if @title.present?
                 program_heading = @title.split
                 if @title.scan(/\w+/).include?("Fixed")
-                  @interest_type = 0
+                  @rate_type = 0
                   # @term =  program_heading[3]
                 elsif @title.scan(/\w+/).include?("ARM")
                   @term = 0
-                  @interest_type = 2
+                  @rate_type = 2
                   if @title.scan(/\d+/)[0] == "5"
-                    @interest_subtype = @title.scan(/\d+/)[0]
+                    @rate_arm = @title.scan(/\d+/)[0]
                   elsif @title.scan(/\d+/)[0] == "7"
-                    @interest_subtype = @title.scan(/\d+/)[0]
+                    @rate_arm = @title.scan(/\d+/)[0]
                   elsif @title.scan(/\d+/)[0] == "10"
-                    @interest_subtype = @title.scan(/\d+/)[0]
+                    @rate_arm = @title.scan(/\d+/)[0]
                   end
                 end
-                @program = @bank.programs.find_or_create_by(title: @title)
+                @program = @bank.programs.find_or_create_by(program_name: @title)
                 @program_ids << @program.id
-                if @interest_subtype.present?
-                  @program.update(term: @term,interest_type: @interest_type,loan_type: 0 ,interest_subtype: @interest_subtype, sheet_name: sheet )
+                if @rate_arm.present?
+                  @program.update(term: @term,rate_type: @rate_type,loan_type: 0 ,rate_arm: @rate_arm, sheet_name: sheet )
                 else
-                  @program.update(term: @term,interest_type: @interest_type,loan_type: 0, sheet_name: sheet)
+                  @program.update(term: @term,rate_type: @rate_type,loan_type: 0, sheet_name: sheet)
                 end
                 @program.adjustments.destroy_all
                 @block_hash = {}
@@ -4509,14 +4569,20 @@ class ImportFilesController < ApplicationController
 
               # interest type
               if @title.include?("Fixed")
-                @interest_type = 0
+                @rate_type = "Fixed"
               elsif @title.include?("ARM")
-                @interest_type = 2
+                @rate_type = "ARM"
+              elsif @title.include?("Floating")
+                @rate_type = "Floating"
+              elsif @title.include?("Variable")
+                @rate_type = "Variable"
+              else
+                @rate_type = nil
               end
 
               # interest sub type
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                @interest_subtype = @title.scan(/\d+/)[0].to_i
+                @rate_arm = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -4534,9 +4600,9 @@ class ImportFilesController < ApplicationController
                 @fannie_mae = true
               end
 
-              @program = @bank.programs.find_or_create_by(title: @title)
+              @program = @bank.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype, sheet_name: sheet)
+              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, rate_arm: @rate_arm, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -4722,14 +4788,20 @@ class ImportFilesController < ApplicationController
 
               # interest type
               if @title.include?("Fixed")
-                @interest_type = 0
+                @rate_type = "Fixed"
               elsif @title.include?("ARM")
-                @interest_type = 2
+                @rate_type = "ARM"
+              elsif @title.include?("Floating")
+                @rate_type = "Floating"
+              elsif @title.include?("Variable")
+                @rate_type = "Variable"
+              else
+                @rate_type = nil
               end
 
               # interest sub type
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                @interest_subtype = @title.scan(/\d+/)[0].to_i
+                @rate_arm = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -4747,9 +4819,9 @@ class ImportFilesController < ApplicationController
                 @fannie_mae = true
               end
 
-              @program = @bank.programs.find_or_create_by(title: @title)
+              @program = @bank.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype, sheet_name: sheet)
+              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, rate_arm: @rate_arm, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -4892,14 +4964,20 @@ class ImportFilesController < ApplicationController
 
               # interest type
               if @title.include?("Fixed")
-                @interest_type = 0
+                @rate_type = "Fixed"
               elsif @title.include?("ARM")
-                @interest_type = 2
+                @rate_type = "ARM"
+              elsif @title.include?("Floating")
+                @rate_type = "Floating"
+              elsif @title.include?("Variable")
+                @rate_type = "Variable"
+              else
+                @rate_type = nil
               end
 
               # interest sub type
               if @title.include?("3-1 ARM") || @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM")
-                @interest_subtype = @title.scan(/\d+/)[0].to_i
+                @rate_arm = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -4917,9 +4995,9 @@ class ImportFilesController < ApplicationController
                 @fannie_mae = true
               end
 
-              @program = @bank.programs.find_or_create_by(title: @title)
+              @program = @bank.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, interest_subtype: @interest_subtype, sheet_name: @sheet)
+              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, rate_arm: @rate_arm, sheet_name: @sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -5208,9 +5286,15 @@ class ImportFilesController < ApplicationController
                 @term = @title.scan(/\d+/)[0]
               end
               if @title.include?("Fixed")
-                @interest_type = 0
+                @rate_type = "Fixed"
               elsif @title.include?("ARM")
-                @interest_type = 2
+                @rate_type = "ARM"
+              elsif @title.include?("Floating")
+                @rate_type = "Floating"
+              elsif @title.include?("Variable")
+                @rate_type = "Variable"
+              else
+                @rate_type = nil
               end
               if @title.include?("Freddie Mac")
                 @freddie_mac = true
@@ -5225,9 +5309,9 @@ class ImportFilesController < ApplicationController
                 @jumbo_high_balance = true
               end
 
-              @program = @bank.programs.find_or_create_by(title: @title)
+              @program = @bank.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, jumbo_high_balance: @jumbo_high_balance, sheet_name: @sheet)
+              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, jumbo_high_balance: @jumbo_high_balance, sheet_name: @sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -5496,13 +5580,13 @@ class ImportFilesController < ApplicationController
 
 
               @term = program_heading[4] == "ARM" ? 0 : program_heading[3]
-              @interest_type = program_heading[5] == "Fixed" ? 0 : 2
+              @rate_type = program_heading[5] == "Fixed" ? 0 : 2
               if program_heading[3] == "5/1"
-                @interest_subtype = 5
+                @rate_arm = 5
               elsif program_heading[3] == "7/1"
-                  @interest_subtype = 7
+                  @rate_arm = 7
               elsif program_heading[3] == "10/1"
-                @interest_subtype = 10
+                @rate_arm = 10
               end
 
 
@@ -5515,9 +5599,9 @@ class ImportFilesController < ApplicationController
                 @fannie_mae_home_ready = true
               end
 
-              @program = @bank.programs.find_or_create_by(title: @title)
+              @program = @bank.programs.find_or_create_by(program_name: @title)
               program_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type, interest_subtype: @interest_subtype, loan_type: 0, fannie_mae: @fannie_mae, fannie_mae_home_ready: @fannie_mae_home_ready, conforming: @conforming, sheet_name: sheet)
+              @program.update(term: @term,rate_type: @rate_type, rate_arm: @rate_arm, loan_type: 0, fannie_mae: @fannie_mae, fannie_mae_home_ready: @fannie_mae_home_ready, conforming: @conforming, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -5811,13 +5895,13 @@ class ImportFilesController < ApplicationController
 
 
               @term = program_heading[4] == "ARM" ? 0 : program_heading[3]
-              @interest_type = program_heading[5] == "Fixed" ? 0 : 2
+              @rate_type = program_heading[5] == "Fixed" ? 0 : 2
               if program_heading[3] == "5/1"
-                @interest_subtype = 5
+                @rate_arm = 5
                 elsif program_heading[3] == "7/1"
-                  @interest_subtype = 7
+                  @rate_arm = 7
               elsif program_heading[3] == "10/1"
-                @interest_subtype = 10
+                @rate_arm = 10
               end
               if @title.include?("Fannie Mae")
               @conforming = true
@@ -5827,9 +5911,9 @@ class ImportFilesController < ApplicationController
               if @title.include?("Fannie Mae HomeReady")
                 @fannie_mae_home_ready = true
               end
-              @program = @bank.programs.find_or_create_by(title: @title)
+              @program = @bank.programs.find_or_create_by(program_name: @title)
               program_ids << @program.id
-              @program.update(term: @term,interest_type: @interest_type, interest_subtype: @interest_subtype, loan_type: 0, fannie_mae: @fannie_mae, fannie_mae_home_ready: @fannie_mae_home_ready, conforming: @conforming, sheet_name: sheet)
+              @program.update(term: @term,rate_type: @rate_type, rate_arm: @rate_arm, loan_type: 0, fannie_mae: @fannie_mae, fannie_mae_home_ready: @fannie_mae_home_ready, conforming: @conforming, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''

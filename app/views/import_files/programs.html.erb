@@ -20,13 +20,13 @@
     <tbody>
       <% @programs.each do |program|%>
         <tr>
-          <td><%= program.title %></td>
+          <td><%= program.program_name %></td>
           <td><%= program.loan_type %></td>
           <td><%= program.term %></td>
-          <td><%= program.interest_type %></td>
+          <td><%= program.rate_type %></td>
           <!-- <td><%#=program.try(:interest_subtype)%> -->
           <td><%= program.fha %></td>
-          <td><%= program.interest_subtype %></td>
+          <td><%= program.rate_arm %></td>
           <td><%= program.jumbo_high_balance %></td>
           <td><%= program.conforming %></td>
           <td><%= program.fannie_mae %></td>
