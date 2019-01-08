@@ -1,6 +1,19 @@
 Rails.application.routes.draw do
   root :to => "dashboard#index"
   # root :to => "import_files#index"
+  get 'ob_cmg_wholesales/index'
+  get 'ob_cmg_wholesales/import_gov_sheet'
+  get 'ob_cmg_wholesales/import_durp_sheet'
+  get 'ob_cmg_wholesales/import_oa_sheet'
+  get 'ob_cmg_wholesales/import_jumbo700_sheet'
+  get 'ob_cmg_wholesales/import_jumbo6200_sheet'
+  get 'ob_cmg_wholesales/import_jumbo7200_6700_sheet'
+  get 'ob_cmg_wholesales/import_jummbo6600_sheet'
+  get 'ob_cmg_wholesales/import_jummbo7600_sheet'
+  get 'ob_cmg_wholesales/import_jummbo6400_sheet'
+  get 'ob_cmg_wholesales/import_jummbo6800_sheet'
+  get 'ob_cmg_wholesales/import_jumbo6900_7900_sheet'
+  root :to => "import_files#index"
   resources :import_files, only: [:index] do
     member do
       get :programs
