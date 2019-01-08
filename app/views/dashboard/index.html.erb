@@ -1,25 +1,78 @@
 <div class="container">
   <div class="row col-md-6 col-md-offset-2 custyle">
   <table class="table table-striped custab">
-  <thead>
-  <h2>Banks</h2>
-  <tr>
-    <th>No.</th>
-    <th>Name</th>
-    <th>Phone</th>
-    <th class="text-center">Action</th>
-  </tr>
-  </thead>
-    <% if @banks.present? %>
-      <% @banks.each_with_index do |bank, index|%>
-        <tr>
-          <td><%= index +1 %></td>
-          <td><%= bank.name%></td>
-          <td><%= bank.phone%></td>
-          <td class="text-center"><a class='btn btn-info btn-xs' href="<%=import_files_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
-        </tr>
+    <thead>
+      <h2>Banks</h2>
+      <tr>
+        <th>No.</th>
+        <th>Name</th>
+        <th>Phone</th>
+        <th class="text-center">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- searching form -->
+      <div class="container">
+        <div>
+          <%= form_tag calculator_index_dashboard_index_path do %>
+            <div class="row" id="search-form">
+              <div class="">
+                <div class="form-group">
+                  <label>Zip Code</label>
+                  <%= text_field_tag :zip_code, @zip_code, :class=> "form-control" %>
+                </div>
+              </div>
+
+              <div class="">
+                <div class="form-group">
+                  <label>Purpose</label>
+                  <% @purpose_list = [] %>
+                  <%= select_tag 'purpose', options_for_select(@purpose_list), :class=> "form-control" %>
+                </div>
+              </div>
+
+              <div class="">
+                <div class="form-group">
+                  <label>Home Price</label>
+                  <div class="input-group">
+                    <%= text_field_tag :home_price, @home_price, :class=> "form-control" %>
+                  </div>
+                </div>
+              </div>
+
+              <div class="">
+                <div class="form-group">
+                  <label>Down Payment</label>
+                  <%= text_field_tag :down_payment, @down_payment, :class=> "form-control" %>
+                </div>
+              </div>
+
+              <div class="">
+                <div class="form-group">
+                  <%= submit_tag "Search", :class => "btn btn-info" %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <!-- end searching form -->
+      <% if @banks.present? %>
+        <% @banks.each_with_index do |bank, index|%>
+          <tr>
+            <td><%= index +1 %></td>
+            <td><%= bank.name%></td>
+            <td><%= bank.phone%></td>
+            <td class="text-center"><a class='btn btn-info btn-xs' href="<%=import_files_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
+          </tr>
+        <%end%>
       <%end%>
-    <%end%>
+    </tbody>
   </table>
   </div>
 </div>
+<style type="text/css">
+  #search-form{
+    display: -webkit-inline-box;
+  }
+</style>
