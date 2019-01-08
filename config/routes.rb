@@ -11,7 +11,8 @@ Rails.application.routes.draw do
   get 'ob_cmg_wholesales/import_jummbo6400_sheet'
   get 'ob_cmg_wholesales/import_jummbo6800_sheet'
   get 'ob_cmg_wholesales/import_jumbo6900_7900_sheet'
-  root :to => "import_files#index"
+  root :to => "dashboard#index"
+  # root :to => "import_files#index"
   resources :import_files, only: [:index] do
     member do
       get :programs
@@ -44,4 +45,12 @@ Rails.application.routes.draw do
   #   end
   # end
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+  resources :ob_cmg_wholesales do
+  end
+
+  resources :dashboard, only: [:index] do
+    collection do
+      post :calculator_index
+    end
+  end
 end
