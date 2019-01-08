@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_03_111715) do
+ActiveRecord::Schema.define(version: 2019_01_08_104919) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -48,11 +48,7 @@ ActiveRecord::Schema.define(version: 2019_01_03_111715) do
 
   create_table "programs", force: :cascade do |t|
     t.integer "bank_id"
-    t.string "title"
-    t.integer "loan_type"
     t.integer "term"
-    t.integer "interest_type"
-    t.integer "interest_subtype"
     t.boolean "jumbo_high_balance"
     t.boolean "conforming"
     t.boolean "fannie_mae"
@@ -69,6 +65,12 @@ ActiveRecord::Schema.define(version: 2019_01_03_111715) do
     t.datetime "updated_at", null: false
     t.string "sheet_name"
     t.json "base_rate"
+    t.string "program_category"
+    t.string "bank_name"
+    t.string "program_name"
+    t.string "rate_type"
+    t.integer "rate_arm"
+    t.string "loan_type"
   end
 
   create_table "sheets", force: :cascade do |t|
