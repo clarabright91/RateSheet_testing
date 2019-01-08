@@ -61,9 +61,6 @@ Rails.application.routes.draw do
   resources :ob_cmg_wholesales do
   end
 
-  resources :dashboard, only: [:index] do
-    collection do
-      post :calculator_index
-    end
+  match "dashboard/index" ,via: [:get, :post]
+  
   end
-end

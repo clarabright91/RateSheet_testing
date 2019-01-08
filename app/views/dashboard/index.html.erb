@@ -1,4 +1,56 @@
 <div class="container">
+  <!-- searching form -->
+      <div class="">
+        <br/>
+          <%= form_tag dashboard_index_path do %>
+            <div class="row">
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label>Loan Type</label>
+                  <% @loan_type_list =[["Fixed",1], ["ARM",2], ["Floating",3], ["Variable",4]]%>
+                  <%= select_tag 'loan_type', options_for_select(@loan_type_list, @loan_type), :class=> "form-control" %>
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label>Interest</label>
+                  <%= text_field_tag :interest,@interest, :class=> "form-control" %>
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label>Term</label>
+                  <div class="input-group">
+                    <% @term_list =[["ARM",0], ["10 yrs",10], ["15 yrs",15]]%>
+                    <%= select_tag 'purpose', options_for_select(@term_list, @term), :class=> "form-control" %>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label>Days</label>
+                  <div class="input-group">
+                    <% @days_list =[["15 days",15], ["30 day",30], ["45 day",45], ["60 day",60]]%>
+                    <%= select_tag 'purpose', options_for_select(@days_list, @day), :class=> "form-control" %>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <div class="form-group">
+                  <div>
+                    <label></label>
+                  </div>
+                  <%= submit_tag "Search", :class => "btn btn-info" %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+      </div>
+      <!-- end searching form -->
+
   <div class="row col-md-6 col-md-offset-2 custyle">
   <table class="table table-striped custab">
     <thead>
@@ -11,59 +63,13 @@
       </tr>
     </thead>
     <tbody>
-      <!-- searching form -->
-      <div class="container">
-        <div>
-          <%= form_tag calculator_index_dashboard_index_path do %>
-            <div class="row" id="search-form">
-              <div class="">
-                <div class="form-group">
-                  <label>Zip Code</label>
-                  <%= text_field_tag :zip_code, @zip_code, :class=> "form-control" %>
-                </div>
-              </div>
-
-              <div class="">
-                <div class="form-group">
-                  <label>Purpose</label>
-                  <% @purpose_list = [] %>
-                  <%= select_tag 'purpose', options_for_select(@purpose_list), :class=> "form-control" %>
-                </div>
-              </div>
-
-              <div class="">
-                <div class="form-group">
-                  <label>Home Price</label>
-                  <div class="input-group">
-                    <%= text_field_tag :home_price, @home_price, :class=> "form-control" %>
-                  </div>
-                </div>
-              </div>
-
-              <div class="">
-                <div class="form-group">
-                  <label>Down Payment</label>
-                  <%= text_field_tag :down_payment, @down_payment, :class=> "form-control" %>
-                </div>
-              </div>
-
-              <div class="">
-                <div class="form-group">
-                  <%= submit_tag "Search", :class => "btn btn-info" %>
-                </div>
-              </div>
-            </div>
-          <% end %>
-        </div>
-      </div>
-      <!-- end searching form -->
       <% if @banks.present? %>
         <% @banks.each_with_index do |bank, index|%>
           <tr>
             <td><%= index +1 %></td>
             <td><%= bank.name%></td>
             <td><%= bank.phone%></td>
-            <td class="text-center"><a class='btn btn-info btn-xs' href="<%=import_files_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
+            <td class="text-center"><a class='btn btn-info btn-xs' href="<%=import_files_path()%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
           </tr>
         <%end%>
       <%end%>
