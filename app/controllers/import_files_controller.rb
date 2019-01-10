@@ -96,9 +96,32 @@ class ImportFilesController < ApplicationController
                 @streamline = true
               end
 
+               # Fha Va, USDA
+             if @title.include?("FHA")
+               @fha = true
+               @va = false
+               @usda = false
+             elsif @title.include?("VA")
+               @va = true
+               @fha = false
+               @usda = false
+             elsif @title.include?("USDA")
+               @usda = true
+               @fha = false
+               @va = false
+             else
+              @fha = false
+              @va = false
+              @usda = false
+             end
+
+             if @title.include?("High-Balance")
+              
+             end
+
               @program = @bank.programs.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
-              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,streamline: @streamline,sheet_name: sheet)
+              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,streamline: @streamline,sheet_name: sheet, fha: @fha, va: @va, usda: @usda)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
