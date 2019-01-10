@@ -16,18 +16,27 @@ class DashboardController < ApplicationController
     @lock_period = "30"
     @base_rate = 0.0
     @program_name = "Fannie Mae 30yr Fixed"
+    @sheet = "Cover Zone 1"
+    @gov_sheet = "FHA"
   end
 
   def set_variable
-    @rate_type = params[:rate_type]
-    @interest = params[:interest].to_s
-    @term = params[:term].to_i
-    @lock_period = params[:lock_period]
+    @rate_type = params[:rate_type] if params[:rate_type].present?
+    @interest = params[:interest] if params[:interest].present?
+    @lock_period = params[:lock_period] if params[:lock_period].present?
+    @sheet = params[:sheet] if params[:sheet].present?
+    @gov_sheet = params[:gov] if params[:gov].present?
+    if params[:rate_type] =="ARM" && params[:rate_type].present?
+      @term = params[:term_arm].to_i if params[:term].present?
+    else
+      @term = params[:term].to_i if params[:term].present?
+    end
   end
 
   def find_base_rate
-    programs = Program.where(term: @term, rate_type: @rate_type)
-    program = programs.find_by_program_name("Fannie Mae 30yr Fixed")
+    debugger
+    programs_list = Program.where(term: @term, rate_type: @rate_type)
+    program = programs_list.find_by_sheet_name(@sheet)
     if program.present?
       # Adjustment::MAIN_KEYS.key("FinancingType/LTV/CLTV/FICO")
       @adjustment =  program.adjustments.first

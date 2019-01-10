@@ -7,8 +7,10 @@ class ImportFilesController < ApplicationController
     @banks = Bank.all
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
+    @sheetlist =[]
     begin
       xlsx.sheets.each do |sheet|
+        @sheetlist.push(sheet)
         if (sheet == "Cover Zone 1")
           headers = ["Phone", "General Contacts", "Mortgagee Clause (Wholesale)"]
           xlsx.sheet(sheet).each_with_index do |row, index|
@@ -32,6 +34,7 @@ class ImportFilesController < ApplicationController
               @phone = c_row[phone_index]
             end
           end
+          
           @bank = Bank.find_or_create_by(name: @name)
           @bank.update(phone: @phone, address1: @address_a.join, state_code: @state_code, zip: @zip)
         end
@@ -95,7 +98,7 @@ class ImportFilesController < ApplicationController
 
               @program = @bank.programs.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
-              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,streamline: @streamline)
+              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,streamline: @streamline,sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''

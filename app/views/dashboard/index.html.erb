@@ -4,53 +4,74 @@
         <br/>
           <%= form_tag dashboard_index_path do %>
             <div class="row">
-              <div class="col-md-3">
+              <div class="col-md-2">
                 <div class="form-group">
-                  <label>Loan Type</label>
+                  <label>Sheet Name</label>
+                  <%# @sheet_name_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"]]%>
+                  <%@sheet_name_list = [["HELOC"], ["SmartSeries"], ["Government"], ["Conforming Fixed Rate"], ["Freddie Fixed Rate"], ["HomeReady"], ["HomeReady HB"], ["Home Possible"], ["Conforming ARMs"], ["Freddie ARMs"], ["High Balance Extra"], ["Jumbo Series_C"], ["Jumbo Series_D"], ["Jumbo Series_F"], ["Jumbo Series_H"], ["Jumbo Series_I"], ["Jumbo Series_JQM"], ["Dream Big"], ["Du Refi Plus Fixed Rate"], ["Du Refi Plus Fixed Rate_105"], ["Du Refi Plus ARMs"], ["LP Open Access"], ["LP Open Access_105"], ["LP Open Acces ARMs"]]%>
+                  <%= select_tag 'sheet', options_for_select(@sheet_name_list, @sheet), :class=> "form-control" %>
+                </div>
+                <p>Base Rate = <%= @base_rate%></p>
+              </div>
+
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Rate Type</label>
                   <% @rate_type_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"]]%>
                   <%= select_tag 'rate_type', options_for_select(@rate_type_list, @rate_type), :class=> "form-control" %>
                 </div>
-                <p>Base Rate = <%= @base_rate %></p>
               </div>
 
-              <div class="col-md-3">
+              <div class="col-md-2 term">
                 <div class="form-group">
-                  <label>Interest</label>
+                  <label>Term</label>
+                  <div class="input-group">
+                   <% @term_list =[["10 yrs",10], ["15 yrs"], ["20 yrs",20], ["25 yrs",25], ["30 yrs",30]] %>
+                    <%= select_tag 'term', options_for_select(@term_list, @term), :class=> "form-control" %>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2 term-arm">
+                <div class="form-group">
+                  <label>Term</label>
+                  <div class="input-group">
+                   <% @term_list_arm =[["1/1 ARM",1], ["2/1 ARM",2], ["3/1 ARM",3], ["4/1 ARM",4], ["5/1 ARM",5], ["6/1 ARM",6], ["7/1 ARM",7], ["8/1 ARM",8], ["9/1 ARM",9], ["10/1 ARM",10]] %>
+                    <%= select_tag 'term_arm', options_for_select(@term_list_arm),  :id=>"term_arm", :class=> "form-control" %>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Goverment</label>
+                  <div class="input-group">
+                    <% @gov_list =[["FHA"], ["VA"], ["USDA"]]%>
+                    <%= select_tag 'gov', options_for_select(@gov_list, @gov_sheet), :class=> "form-control" %>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Interest Rate</label>
                    <% @interest_list =[["3.250"],["3.375"],["3.625"],["3.750"],["3.875"],["4.000"],["4.125"],["4.250"],["4.375"],["4.500"],["4.625"],["4.750"],["4.875"],["5.000"],["5.125"],["5.250"],["5.375"],["5.500"],["5.625"],["5.750"],["5.875"]]%>
                   <%= select_tag 'interest', options_for_select(@interest_list, @interest), :class=> "form-control" %>
                   <%#= text_field_tag :interest,@interest, :class=> "form-control" %>
                 </div>
               </div>
 
-              <div class="col-md-3">
-                <div class="form-group">
-                  <label>Term</label>
-                  <div class="input-group">
-                    <% @term_list =[["ARM",0], ["10 yrs",10], ["15 yrs"], ["20 yrs",20], ["25 yrs",25], ["30 yrs",30]]%>
-                    <%= select_tag 'term', options_for_select(@term_list, @term), :class=> "form-control" %>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-3">
+              <div class="col-md-2">
                 <div class="form-group">
                   <label>Lock Period</label>
                   <div class="input-group">
-                    <% @days_list =[["15 days"], ["30 days",30], ["45 days",45], ["60 days",60]]%>
-                    <%= select_tag 'lock_period', options_for_select(@days_list, @lock_period), :class=> "form-control" %>
+                    <% @lock_period_list =[["15 days"], ["30 days",30], ["45 days",45], ["60 days",60]]%>
+                    <%= select_tag 'lock_period', options_for_select(@lock_period_list, @lock_period), :class=> "form-control" %>
                   </div>
                 </div>
-              </div>
-              <div class="col-md-3">
-                <div class="form-group">
-                  <label>Lock Period</label>
-                  <div class="input-group">
-                    <% @days_list =[["Freddie Fixed Rate"], ["Conforming Fixed Rate"], ["45 days"], ["60 days"]]%>
-                    <%= select_tag 'lock_period', options_for_select(@days_list, @lock_period), :class=> "form-control" %>
-                  </div>
-                </div>
-              </div>
+              </div>            
 
-              <div class="col-md-3">
+              <div class="col-md-2">
                 <div class="form-group">
                   <div>
                     <label></label>
@@ -94,3 +115,23 @@
     display: -webkit-inline-box;
   }
 </style>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    $( "#sheet" ).select2({
+         theme: "bootstrap"
+     });
+
+     $(".term-arm").hide()
+
+   $("#rate_type").on('click', function(e){   
+     if ($(this).val()=="ARM"){
+      $(".term").hide()
+      $(".term-arm").show()
+     }else{
+      $(".term").show()
+      $(".term-arm").hide()
+     }
+   });
+  });
+</script>

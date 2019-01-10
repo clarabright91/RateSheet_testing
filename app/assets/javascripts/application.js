@@ -17,6 +17,9 @@
 //= require datatables
 //= require popper
 //= require bootstrap
+//= require select2
+//= require select2-full
+
 //= require_tree .
 
 $(document).ready(function() {
@@ -26,3 +29,13 @@ $(document).ready(function() {
     }
   });
 });
+
+
+// $(document).ready(function(){
+// 	$("#sheet").on('click', function(e){
+// 		$( "#sheet" ).select2({
+// 		    theme: "bootstrap"
+// 		});
+// 		$(this).val()
+// 	});
+// });
