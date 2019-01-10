@@ -1,6 +1,5 @@
 class ObCmgWholesalesController < ApplicationController
 	# before_action :get_sheet, only: [:import_gov_sheet]
-	# before_action :get_bank, only: [:import_gov_sheet]
   def index
   	file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -124,7 +123,7 @@ class ObCmgWholesalesController < ApplicationController
               elsif @title.include?("4151")
               	@program_category = "4151"
               end
-              debugger
+
               @program = Program.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc)
@@ -1803,6 +1802,7 @@ class ObCmgWholesalesController < ApplicationController
   	redirect_to root_path
   end
 
+
   # def programs
   #   @programs = @sheet.programs.where(sheet_name: params[:sheet])
   # end
@@ -1829,4 +1829,8 @@ class ObCmgWholesalesController < ApplicationController
   # 	debugger
   #   @bank = Bank.find(params[:id])
   # end
+  private
+  def get_sheet
+  	@sheet = Sheet.find(params[:id])
+  end
 end
