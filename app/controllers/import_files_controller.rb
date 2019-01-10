@@ -1469,54 +1469,54 @@ class ImportFilesController < ApplicationController
               @title = sheet_data.cell(r,cc)
 
               # term
-              @term = nil
+              term = nil
               program_heading = @title.split
               if @title.include?("10yr") || @title.include?("10 Yr")
-                @term = @title.scan(/\d+/)[0]
+                term = @title.scan(/\d+/)[0]
               elsif @title.include?("15yr") || @title.include?("15 Yr")
-                @term = @title.scan(/\d+/)[0]
+                term = @title.scan(/\d+/)[0]
               elsif @title.include?("20yr") || @title.include?("20 Yr")
-                @term = @title.scan(/\d+/)[0]
+                term = @title.scan(/\d+/)[0]
               elsif @title.include?("25yr") || @title.include?("25 Yr")
-                @term = @title.scan(/\d+/)[0]
+                term = @title.scan(/\d+/)[0]
               elsif @title.include?("30yr") || @title.include?("30 Yr")
-                @term = @title.scan(/\d+/)[0]
-              end
-              if (@term.nil? && @title.include?("ARM"))
-                @term = 0
+                term = @title.scan(/\d+/)[0]
               end
 
               # interest type
               if @title.include?("Fixed")
-                @rate_type = "Fixed"
+                rate_type = "Fixed"
               elsif @title.include?("ARM")
-                @rate_type = "ARM"
+                rate_type = "ARM"
               elsif @title.include?("Floating")
-                @rate_type = "Floating"
+                rate_type = "Floating"
               elsif @title.include?("Variable")
-                @rate_type = "Variable"
+                rate_type = "Variable"
               else
-                @rate_type = nil
+                rate_type = nil
               end
 
               # rate arm
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                @rate_arm = @title.scan(/\d+/)[0].to_i
+                rate_arm = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
+              conforming = false
               if @title.include?("Freddie Mac") || @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Possible") || @title.include?("Freddie Mac Home Ready")
-                @conforming = true
+                conforming = true
               end
 
               # freddie_mac
+              freddie_mac = false
               if @title.include?("Freddie Mac")
-                @freddie_mac = true
+                freddie_mac = true
               end
 
               # fannie_mae
+              fannie_mae = false
               if @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Ready")
-                @fannie_mae = true
+                fannie_mae = true
               end
 
               @program = @bank.programs.find_or_create_by(program_name: @title)
@@ -1535,7 +1535,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, rate_arm: @rate_arm, sheet_name: sheet)
+              @program.update(term: term,rate_type: rate_type,loan_type: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
