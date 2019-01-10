@@ -95,13 +95,19 @@ class ImportFilesController < ApplicationController
               if @title.include?("FHA") 
                 @streamline = true
                 @fha = true
+                @va = false
+                @usda = false
                 @full_doc = true
               elsif @title.include?("VA")
                 @streamline = true
+                @fha = false
                 @va = true
+                @usda = false
                 @full_doc = true
               elsif @title.include?("USDA")
                 @streamline = true
+                @fha = false
+                @va = false
                 @usda = true
                 @full_doc = true
               else
@@ -120,11 +126,13 @@ class ImportFilesController < ApplicationController
               # High Balance
               if @title.include?("High Balance")
                 @jumbo_high_balance = true
+              else
+                @jumbo_high_balance = false
               end
 
               @program = @bank.programs.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
-              @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline, fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance,sheet: sheet)
+              @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline, fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance,sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
