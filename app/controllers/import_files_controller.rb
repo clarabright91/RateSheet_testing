@@ -4,6 +4,7 @@ class ImportFilesController < ApplicationController
   require 'roo-xls'
 
   def index
+    @banks = Bank.all
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     begin
@@ -1393,7 +1394,7 @@ class ImportFilesController < ApplicationController
                   @adjustment_hash[primary_key][secondry_key][ltv_key] = {}
                 end
                 if r >= 40 && r<= 45 && cc > 8 && cc != 15 && cc <= 19
-                  fixed_key = get_value @fixed_data[cc-2] 
+                  fixed_key = get_value @fixed_data[cc-2]
                   @adjustment_hash[primary_key][secondry_key][ltv_key][fixed_key] = {}
                   @adjustment_hash[primary_key][secondry_key][ltv_key][fixed_key] = value
                 end
@@ -1424,7 +1425,7 @@ class ImportFilesController < ApplicationController
                   @adjustment_hash[primary_key][secondry_key][ltv_key][sub_data] = value
                 end
 
-                # Adjustments Applied after Cap 
+                # Adjustments Applied after Cap
                 if r >= 61 && r <= 67 && cc == 6
                   ltv_key = get_value value
                   @adjustment_hash[primary_key][secondry_key][ltv_key] = {}
@@ -4776,7 +4777,7 @@ class ImportFilesController < ApplicationController
               cc = max_column
               value = sheet_data.cell(r,cc)
               if value.present?
-                if value == "Pricing Adjustments" #|| 
+                if value == "Pricing Adjustments" #||
                   primary_key = value
                   @adjustment_hash[primary_key] = {}
                 end
