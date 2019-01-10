@@ -64,70 +64,87 @@ class ImportFilesController < ApplicationController
 
               @title = sheet_data.cell(r,cc)
               # term
-              @term = nil
               program_heading = @title.split
               if @title.include?("10yr") || @title.include?("10 Yr")
-                @term = @title.scan(/\d+/)[0]
+                term = @title.scan(/\d+/)[0]
               elsif @title.include?("15yr") || @title.include?("15 Yr")
-                @term = @title.scan(/\d+/)[0]
+                term = @title.scan(/\d+/)[0]
               elsif @title.include?("20yr") || @title.include?("20 Yr")
-                @term = @title.scan(/\d+/)[0]
+                term = @title.scan(/\d+/)[0]
               elsif @title.include?("25yr") || @title.include?("25 Yr")
-                @term = @title.scan(/\d+/)[0]
+                term = @title.scan(/\d+/)[0]
               elsif @title.include?("30yr") || @title.include?("30 Yr")
-                @term = @title.scan(/\d+/)[0]
+                term = @title.scan(/\d+/)[0]
+              else
+                term = nil
               end
 
                # rate arm
               if @title.include?("Fixed")
-                @rate_type = "Fixed"
+                rate_type = "Fixed"
               elsif @title.include?("ARM")
-                @rate_type = "ARM"
+                rate_type = "ARM"
               elsif @title.include?("Floating")
-                @rate_type = "Floating"
+                rate_type = "Floating"
               elsif @title.include?("Variable")
-                @rate_type = "Variable"
+                rate_type = "Variable"
               else
-                @rate_type = nil
+                rate_type = nil
               end
 
               # streamline && fha, Va , Usda
               if @title.include?("FHA") 
-                @streamline = true
-                @fha = true
-                @full_doc = true
+                streamline = true
+                fha = true
+                full_doc = true
               elsif @title.include?("VA")
-                @streamline = true
-                @va = true
-                @full_doc = true
+                streamline = true
+                va = true
+                full_doc = true
               elsif @title.include?("USDA")
-                @streamline = true
-                @usda = true
-                @full_doc = true
+                streamline = true
+                usda = true
+                full_doc = true
               else
-                @streamline = false
-                @fha = false
-                @va = false
-                @usda = false
-                @full_doc = false
+                streamline = false
+                fha = false
+                va = false
+                usda = false
+                full_doc = false
               end
 
                # rate arm
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM")
-                @rate_arm = @title.scan(/\d+/)[0].to_i
+                rate_arm = @title.scan(/\d+/)[0].to_i
               end
 
               # High Balance
               if @title.include?("High Balance")
-                @jumbo_high_balance = true
+                jumbo_high_balance = true
               end
 
               @program = @bank.programs.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
-              @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline, fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance,sheet: sheet)
+              @program.update(term: term,rate_type: rate_type,loan_type: "Purchase",streamline: streamline, fha: fha, va: va, usda: usda, full_doc: full_doc, jumbo_high_balance: jumbo_high_balance,sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
+              main_key = ''
+              if @program.fha
+                gov_key = "FHA"
+              elsif @program.va
+                gov_key = "VA"  
+              elsif @program.usda
+                gov_key = "USDA"
+              end
+              if @program.term.present?
+                term = @program.term
+              end
+              if @program.rate_type.present?
+                rate_type = @program.rate_type
+              end
+              main_key = gov_key + "/" + term.to_s + "/"+ rate_type + "/InterestRate/LockPeriod"
+              @block_hash[main_key] = {}
               (1..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -137,9 +154,13 @@ class ImportFilesController < ApplicationController
                   if value.present?
                     if (c_i == 0)
                       key = value
-                      @block_hash[key] = {}
+                      @block_hash[main_key][key] = {}
                     else
-                      @block_hash[key][15*c_i] = value
+                      if @program.lock_period.length <= 3
+                        @program.lock_period << 15*c_i
+                        @program.save
+                      end
+                      @block_hash[main_key][key][15*c_i] = value
                     end
                     @data << value
                   end
