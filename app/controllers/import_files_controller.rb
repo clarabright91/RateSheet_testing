@@ -117,11 +117,14 @@ class ImportFilesController < ApplicationController
                 @rate_arm = @title.scan(/\d+/)[0].to_i
               end
 
+<<<<<<< HEAD
               # High Balance
               if @title.include?("High Balance")
                 @jumbo_high_balance = true
               end
 
+=======
+>>>>>>> 185b9c651239b24449fb3910e657de35648a1a4e
                # Fha Va, USDA
              if @title.include?("FHA")
                @fha = true
