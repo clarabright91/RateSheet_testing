@@ -57,7 +57,7 @@
                   <label>Goverment</label>
                   <div class="input-group">
                     <% @gov_list =[["FHA"], ["VA"], ["USDA"]]%>
-                    <%= select_tag 'gov', options_for_select(@gov_list, @gov_sheet), :class=> "form-control" %>
+                    <%= select_tag 'gov', options_for_select(@gov_list), :class=> "form-control" %>
                   </div>
                 </div>
               </div>
@@ -133,7 +133,11 @@
          theme: "bootstrap"
      });
 
+    if ($("#rate_type").val() == "ARM") {
+      $(".term-arm").show()
+    }else{
      $(".term-arm").hide()
+    }
 
    $("#rate_type").on('click', function(e){   
      if ($(this).val()=="ARM"){
