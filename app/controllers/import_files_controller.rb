@@ -89,13 +89,39 @@ class ImportFilesController < ApplicationController
               end
 
               # streamline
-              if @title.include?("FHA") || @title.include?("VA") || @title.include?("USDA")
+              if @title.include?("FHA") 
                 @streamline = true
+                @fha = true
+                @full_doc = true
+              elsif @title.include?("VA")
+                @streamline = true
+                @va = true
+                @full_doc = true
+              elsif @title.include?("USDA")
+                @streamline = true
+                @usda = true
+                @full_doc = true
+              else
+                @streamline = false
+                @fha = false
+                @va = false
+                @usda = false
+                @full_doc = false
+              end
+
+               # rate arm
+              if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM")
+                @rate_arm = @title.scan(/\d+/)[0].to_i
+              end
+
+              # High Balance
+              if @title.include?("High Balance")
+                @jumbo_high_balance = true
               end
 
               @program = @bank.programs.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
-              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,streamline: @streamline)
+              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,streamline: @streamline, fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -1346,7 +1372,7 @@ class ImportFilesController < ApplicationController
                 @rate_type = nil
               end
 
-              # interest sub type
+              # rate arm
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
                 @rate_arm = @title.scan(/\d+/)[0].to_i
               end
@@ -1368,10 +1394,27 @@ class ImportFilesController < ApplicationController
 
               @program = @bank.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
+               # Loan Limit Type
+              if @title.include?("Non-Conforming")
+                @program.loan_limit_type << "Non-Conforming"
+              end
+              if @title.include?("Conforming")
+                @program.loan_limit_type << "Conforming"
+              end
+              if @title.include?("Jumbo")
+                @program.loan_limit_type << "Jumbo"
+              end
+              if @title.include?("High Balance")
+                @program.loan_limit_type << "High Balance"
+              end
+              @program.save
               @program.update(term: @term,rate_type: @rate_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, rate_arm: @rate_arm, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
+              main_key = ''
+              main_key = @program.term.to_s + "/" + @program.rate_type + "/InterestRate/LockPeriod"
+              @block_hash[main_key] = {}
               (0..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -1380,10 +1423,13 @@ class ImportFilesController < ApplicationController
                   value = sheet_data.cell(rrr,ccc)
                   if (c_i == 0)
                     key = value
-                    @block_hash[key] = {}
+                    @block_hash[main_key][key] = {}
                   else
-                    # first_row[c_i]
-                    @block_hash[key][15*c_i] = value
+                    if @program.lock_period.length <= 3
+                      @program.lock_period << 15*c_i
+                      @program.save
+                    end
+                    @block_hash[main_key][key][15*c_i] = value
                   end
                   @data << value
                 end
@@ -1392,7 +1438,9 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              @block_hash.shift
+              if @block_hash.values.first.keys.first.nil?
+                @block_hash.values.first.shift
+              end
               @program.update(base_rate: @block_hash)
             end
           end
@@ -1523,6 +1571,7 @@ class ImportFilesController < ApplicationController
             end
           end
         end
+        
         make_adjust(@adjustment_hash, @program_ids)
       end
     end
@@ -2992,7 +3041,8 @@ class ImportFilesController < ApplicationController
               end
             end
           end
-          Adjustment.create(data: @hash,program_name: @program.program_name, sheet_name: sheet, program_ids: @programs_ids)
+          # Adjustment.create(data: @hash,program_name: @program.program_name, sheet_name: sheet, program_ids: @programs_ids)
+          make_adjust(@hash, @program_ids)
         end
       end
     end
@@ -6247,22 +6297,32 @@ class ImportFilesController < ApplicationController
     return table_keys
   end
 
+  # def get_value value1
+  #   if value1.present?
+  #     if (value1.include?("≤")) || (value1.include?("<"))
+  #       value1 = 0
+  #     elsif (value1.include?("-"))
+  #       value1 = value1.split("-").first.squish
+  #     elsif (value1.include?("≥"))
+  #       value1 = value1.split("≥").last.squish
+  #     elsif (value1.include?(">="))
+  #       value1.split(">=").last.squish
+  #     elsif (value1.include?(">"))
+  #       value1.split(">").last.squish
+  #     elsif (value1.include?("+"))
+  #       value1.split("+").first
+  #     elsif value1.include?("$")
+  #       value1.split("$").last.squish
+  #     else
+  #       value1
+  #     end
+  #   end
+  # end
+
   def get_value value1
     if value1.present?
-      if (value1.include?("≤")) || (value1.include?("<"))
-        value1 = 0
-      elsif (value1.include?("-"))
-        value1 = value1.split("-").first.squish
-      elsif (value1.include?("≥"))
-        value1 = value1.split("≥").last.squish
-      elsif (value1.include?(">="))
-        value1.split(">=").last.squish
-      elsif (value1.include?(">"))
-        value1.split(">").last.squish
-      elsif (value1.include?("+"))
-        value1.split("+").first
-      elsif value1.include?("$")
-        value1.split("$").last.squish
+      if value1.include?("<")
+        value1 = "0"+value1
       else
         value1
       end

@@ -47,6 +47,9 @@ Rails.application.routes.draw do
   # end
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   resources :ob_cmg_wholesales do
+    member do
+      get :programs
+    end
   end
 
   match "dashboard/index" ,via: [:get, :post]
