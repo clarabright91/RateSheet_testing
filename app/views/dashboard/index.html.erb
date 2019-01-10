@@ -26,17 +26,26 @@
                 <div class="form-group">
                   <label>Term</label>
                   <div class="input-group">
-                    <% @term_list =[["ARM",0], ["10 yrs",10], ["15 yrs",15], ["20 yrs",20], ["25 yrs",25], ["30 yrs",30]]%>
+                    <% @term_list =[["ARM",0], ["10 yrs",10], ["15 yrs"], ["20 yrs",20], ["25 yrs",25], ["30 yrs",30]]%>
                     <%= select_tag 'term', options_for_select(@term_list, @term), :class=> "form-control" %>
                   </div>
                 </div>
               </div>
               <div class="col-md-3">
                 <div class="form-group">
-                  <label>Days</label>
+                  <label>Lock Period</label>
                   <div class="input-group">
-                    <% @days_list =[["15 days",15], ["30 day",30], ["45 day",45], ["60 day",60]]%>
-                    <%= select_tag 'day', options_for_select(@days_list, @day), :class=> "form-control" %>
+                    <% @days_list =[["15 days"], ["30 days",30], ["45 days",45], ["60 days",60]]%>
+                    <%= select_tag 'lock_period', options_for_select(@days_list, @lock_period), :class=> "form-control" %>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label>Lock Period</label>
+                  <div class="input-group">
+                    <% @days_list =[["Freddie Fixed Rate"], ["Conforming Fixed Rate"], ["45 days"], ["60 days"]]%>
+                    <%= select_tag 'lock_period', options_for_select(@days_list, @lock_period), :class=> "form-control" %>
                   </div>
                 </div>
               </div>
@@ -57,26 +66,25 @@
 
   <div class="row col-md-6 col-md-offset-2 custyle">
   <table class="table table-striped custab">
-    <thead>
-      <h2>Banks</h2>
-      <tr>
-        <th>No.</th>
-        <th>Name</th>
-        <th>Phone</th>
-        <th class="text-center">Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% if @banks.present? %>
-        <% @banks.each_with_index do |bank, index|%>
-          <tr>
-            <td><%= index +1 %></td>
-            <td><%= bank.name%></td>
-            <td><%= bank.phone%></td>
-            <td class="text-center"><a class='btn btn-info btn-xs' href="<%=import_files_path()%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
-          </tr>
-        <%end%>
+  <thead>
+  <h2>Banks</h2>
+  <tr>
+    <th>No.</th>
+    <th>Name</th>
+    <th>Phone</th>
+    <th class="text-center">Action</th>
+  </tr>
+  </thead>
+    <% if @banks.present? %>
+      <% @banks.each_with_index do |bank, index|%>
+        <tr>
+          <td><%= index +1 %></td>
+          <td><%= bank.name%></td>
+          <td><%= bank.phone%></td>
+          <td class="text-center"><a class='btn btn-info btn-xs' href="<%=import_files_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
+        </tr>
       <%end%>
+    <%end%>
     </tbody>
   </table>
   </div>
