@@ -78,7 +78,7 @@ class ImportFilesController < ApplicationController
                 @term = @title.scan(/\d+/)[0]
               end
 
-               # interest type
+               # rate arm
               if @title.include?("Fixed")
                 @rate_type = "Fixed"
               elsif @title.include?("ARM")
@@ -91,7 +91,7 @@ class ImportFilesController < ApplicationController
                 @rate_type = nil
               end
 
-              # streamline
+              # streamline && fha, Va , Usda
               if @title.include?("FHA") 
                 @streamline = true
                 @fha = true
@@ -122,32 +122,9 @@ class ImportFilesController < ApplicationController
                 @jumbo_high_balance = true
               end
 
-               # Fha Va, USDA
-             if @title.include?("FHA")
-               @fha = true
-               @va = false
-               @usda = false
-             elsif @title.include?("VA")
-               @va = true
-               @fha = false
-               @usda = false
-             elsif @title.include?("USDA")
-               @usda = true
-               @fha = false
-               @va = false
-             else
-              @fha = false
-              @va = false
-              @usda = false
-             end
-
-             if @title.include?("High-Balance")
-              
-             end
-
               @program = @bank.programs.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
-              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,streamline: @streamline, fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance)
+              @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline, fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance,sheet: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
