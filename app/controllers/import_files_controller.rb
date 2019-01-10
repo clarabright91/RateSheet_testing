@@ -2020,14 +2020,31 @@ class ImportFilesController < ApplicationController
               cc = 2 + max_column*6 # (2 / 8 / 14)
               @title = sheet_data.cell(r,cc)
                 program_heading = @title.split
-                @term =  program_heading[3]
-                @rate_type = program_heading[5]
+                term =  program_heading[3]
+                rate_type = program_heading[5]
                 @program = @bank.programs.find_or_create_by(program_name: @title)
                 @programs_ids  << @program.id
-                @program.update(term: @term,rate_type: @rate_type,loan_type: 0, sheet_name: sheet)
+                 # Loan Limit Type
+              if @title.include?("Non-Conforming")
+                @program.loan_limit_type << "Non-Conforming"
+              end
+              if @title.include?("Conforming")
+                @program.loan_limit_type << "Conforming"
+              end
+              if @title.include?("Jumbo")
+                @program.loan_limit_type << "Jumbo"
+              end
+              if @title.include?("High Balance")
+                @program.loan_limit_type << "High Balance"
+              end
+              @program.save
+                @program.update(term: term,rate_type: rate_type,loan_type: "Purchase", sheet_name: sheet)
                 @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
+              main_key = ''
+              main_key = term.to_s + "/"+ rate_type.to_s + "/InterestRate/LockPeriod"
+              @block_hash[main_key] = {}
               (0..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -2036,11 +2053,14 @@ class ImportFilesController < ApplicationController
                   value = sheet_data.cell(rrr,ccc)
                   if (c_i == 0)
                     key = value
-                    @block_hash[key] = {} if key.present?
+                    @block_hash[main_key][key] = {} if key.present?
                   else
-                    # first_row[c_i]
+                    if @program.lock_period.length <= 3
+                      @program.lock_period << 15*c_i
+                      @program.save
+                    end
                     begin
-                      @block_hash[key][15*c_i] = value if key.present? &&value.present?
+                      @block_hash[main_key][key][15*c_i] = value if key.present? &&value.present?
                     rescue Exception => e
                     end
                   end
@@ -2049,6 +2069,9 @@ class ImportFilesController < ApplicationController
                 if @data.compact.length == 0
                   break # terminate the loop
                 end
+              end
+              if @block_hash.values.first.keys.first.nil?
+                @block_hash.values.first.shift
               end
               @program.update(base_rate: @block_hash.to_json)
             end
