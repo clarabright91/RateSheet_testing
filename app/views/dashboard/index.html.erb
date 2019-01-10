@@ -1,4 +1,60 @@
 <div class="container">
+  <!-- searching form -->
+      <div class="">
+        <br/>
+          <%= form_tag dashboard_index_path do %>
+            <div class="row">
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label>Loan Type</label>
+                  <% @rate_type_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"]]%>
+                  <%= select_tag 'rate_type', options_for_select(@rate_type_list, @rate_type), :class=> "form-control" %>
+                </div>
+                <p>Base Rate = <%= @base_rate %></p>
+              </div>
+
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label>Interest</label>
+                   <% @interest_list =[["3.250"],["3.375"],["3.625"],["3.750"],["3.875"],["4.000"],["4.125"],["4.250"],["4.375"],["4.500"],["4.625"],["4.750"],["4.875"],["5.000"],["5.125"],["5.250"],["5.375"],["5.500"],["5.625"],["5.750"],["5.875"]]%>
+                  <%= select_tag 'interest', options_for_select(@interest_list, @interest), :class=> "form-control" %>
+                  <%#= text_field_tag :interest,@interest, :class=> "form-control" %>
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label>Term</label>
+                  <div class="input-group">
+                    <% @term_list =[["ARM",0], ["10 yrs",10], ["15 yrs",15], ["20 yrs",20], ["25 yrs",25], ["30 yrs",30]]%>
+                    <%= select_tag 'term', options_for_select(@term_list, @term), :class=> "form-control" %>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label>Days</label>
+                  <div class="input-group">
+                    <% @days_list =[["15 days",15], ["30 day",30], ["45 day",45], ["60 day",60]]%>
+                    <%= select_tag 'day', options_for_select(@days_list, @day), :class=> "form-control" %>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <div class="form-group">
+                  <div>
+                    <label></label>
+                  </div>
+                  <%= submit_tag "Search", :class => "btn btn-info" %>
+                </div>
+              </div>
+
+            </div>
+          <% end %>
+      </div>
+      <!-- end searching form -->
+
   <div class="row col-md-6 col-md-offset-2 custyle">
   <table class="table table-striped custab">
     <thead>
@@ -11,59 +67,13 @@
       </tr>
     </thead>
     <tbody>
-      <!-- searching form -->
-      <div class="container">
-        <div>
-          <%= form_tag calculator_index_dashboard_index_path do %>
-            <div class="row" id="search-form">
-              <div class="">
-                <div class="form-group">
-                  <label>Zip Code</label>
-                  <%= text_field_tag :zip_code, @zip_code, :class=> "form-control" %>
-                </div>
-              </div>
-
-              <div class="">
-                <div class="form-group">
-                  <label>Purpose</label>
-                  <% @purpose_list = [] %>
-                  <%= select_tag 'purpose', options_for_select(@purpose_list), :class=> "form-control" %>
-                </div>
-              </div>
-
-              <div class="">
-                <div class="form-group">
-                  <label>Home Price</label>
-                  <div class="input-group">
-                    <%= text_field_tag :home_price, @home_price, :class=> "form-control" %>
-                  </div>
-                </div>
-              </div>
-
-              <div class="">
-                <div class="form-group">
-                  <label>Down Payment</label>
-                  <%= text_field_tag :down_payment, @down_payment, :class=> "form-control" %>
-                </div>
-              </div>
-
-              <div class="">
-                <div class="form-group">
-                  <%= submit_tag "Search", :class => "btn btn-info" %>
-                </div>
-              </div>
-            </div>
-          <% end %>
-        </div>
-      </div>
-      <!-- end searching form -->
       <% if @banks.present? %>
         <% @banks.each_with_index do |bank, index|%>
           <tr>
             <td><%= index +1 %></td>
             <td><%= bank.name%></td>
             <td><%= bank.phone%></td>
-            <td class="text-center"><a class='btn btn-info btn-xs' href="<%=import_files_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
+            <td class="text-center"><a class='btn btn-info btn-xs' href="<%=import_files_path()%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
           </tr>
         <%end%>
       <%end%>

@@ -1,5 +1,5 @@
 class Program < ApplicationRecord
-  belongs_to :bank
+  belongs_to :bank, optional: true
   has_many :program_adjustments
   has_many :adjustments, through: :program_adjustments
 
