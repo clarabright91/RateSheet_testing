@@ -7,8 +7,10 @@ class ImportFilesController < ApplicationController
     @banks = Bank.all
     file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
+    @sheetlist =[]
     begin
       xlsx.sheets.each do |sheet|
+        @sheetlist.push(sheet)
         if (sheet == "Cover Zone 1")
           headers = ["Phone", "General Contacts", "Mortgagee Clause (Wholesale)"]
           xlsx.sheet(sheet).each_with_index do |row, index|
@@ -32,6 +34,7 @@ class ImportFilesController < ApplicationController
               @phone = c_row[phone_index]
             end
           end
+          
           @bank = Bank.find_or_create_by(name: @name)
           @bank.update(phone: @phone, address1: @address_a.join, state_code: @state_code, zip: @zip)
         end
@@ -114,10 +117,36 @@ class ImportFilesController < ApplicationController
                 @rate_arm = @title.scan(/\d+/)[0].to_i
               end
 
+<<<<<<< HEAD
               # High Balance
               if @title.include?("High Balance")
                 @jumbo_high_balance = true
               end
+
+=======
+>>>>>>> 185b9c651239b24449fb3910e657de35648a1a4e
+               # Fha Va, USDA
+             if @title.include?("FHA")
+               @fha = true
+               @va = false
+               @usda = false
+             elsif @title.include?("VA")
+               @va = true
+               @fha = false
+               @usda = false
+             elsif @title.include?("USDA")
+               @usda = true
+               @fha = false
+               @va = false
+             else
+              @fha = false
+              @va = false
+              @usda = false
+             end
+
+             if @title.include?("High-Balance")
+              
+             end
 
               @program = @bank.programs.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
