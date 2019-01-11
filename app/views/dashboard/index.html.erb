@@ -4,22 +4,13 @@
         <br/>
           <%= form_tag dashboard_index_path do %>
             <div class="row">
-              <!-- <div class="col-md-2"> -->
-                <!-- <div class="form-group">
-                  <label>Sheet Name</label>
-                  <%# @sheet_name_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"]]%>
-                  <%#@sheet_name_list = [["HELOC"], ["SmartSeries"], ["Government"], ["Conforming Fixed Rate"], ["Freddie Fixed Rate"], ["HomeReady"], ["HomeReady HB"], ["Home Possible"], ["Conforming ARMs"], ["Freddie ARMs"], ["High Balance Extra"], ["Jumbo Series_C"], ["Jumbo Series_D"], ["Jumbo Series_F"], ["Jumbo Series_H"], ["Jumbo Series_I"], ["Jumbo Series_JQM"], ["Dream Big"], ["Du Refi Plus Fixed Rate"], ["Du Refi Plus Fixed Rate_105"], ["Du Refi Plus ARMs"], ["LP Open Access"], ["LP Open Access_105"], ["LP Open Acces ARMs"]]%>
-                  <%#= select_tag 'sheet', options_for_select(@sheet_name_list, @sheet), :class=> "form-control" %>
-                </div>
-                
-              </div> -->
-              <p>Base Rate = <%= @base_rate%></p>
               <div class="col-md-2">
                 <div class="form-group">
                   <label>Rate Type</label>
-                  <% @rate_type_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"], ["Any"]]%>
-                  <%= select_tag 'rate_type', options_for_select(@rate_type_list), :class=> "form-control" %>
+                  <% @rate_type_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"]]%>
+                  <%= select_tag 'rate_type', options_for_select(@rate_type_list, @rate_type), { prompt: 'Select rate-type', :class=> "form-control"} %>
                 </div>
+                <p>Base Rate = <%= @base_rate%></p>
               </div>
 
               <div class="col-md-2 term">
@@ -27,7 +18,7 @@
                   <label>Term</label>
                   <div class="input-group">
                    <% @term_list =[["10 yrs",10], ["15 yrs"], ["20 yrs",20], ["25 yrs",25], ["30 yrs",30]] %>
-                    <%= select_tag 'term', options_for_select(@term_list), :class=> "form-control" %>
+                    <%= select_tag 'term', options_for_select(@term_list), { prompt: 'Select term', :class=> "form-control"} %>
                   </div>
                 </div>
               </div>
@@ -46,8 +37,8 @@
                 <div class="form-group">
                   <label>Loan Limit Type</label>
                   <div class="input-group">
-                    <% @loan_limit_type_list =[["Non-Conforming"], ["Conforming"], ["Jumbo"], ["High-Balance"], ["Fannie Mae"], ["Fannie Mae Home Ready"], ["Freddie Mac"], ["Freddie Mac Home Possible"], ["Any"]]%>
-                    <%= select_tag 'loan_limit_type', options_for_select(@loan_limit_type_list), :class=> "form-control" %>
+                    <% @loan_limit_type_list =[["Non-Conforming"], ["Conforming"], ["Jumbo"], ["High-Balance"]]%>
+                    <%= select_tag 'loan_limit_type', options_for_select(@loan_limit_type_list), { prompt: 'Select Loan Type', :class=> "form-control" }%>
                   </div>
                 </div>
               </div>
@@ -56,7 +47,7 @@
                 <div class="form-group">
                   <label>Goverment</label>
                   <div class="input-group">
-                    <% @gov_list =[["FHA"], ["VA"], ["USDA"], ["Any"]]%>
+                    <% @gov_list =[["FHA"], ["VA"], ["USDA"]]%>
                     <%= select_tag 'gov', options_for_select(@gov_list), :class=> "form-control" %>
                   </div>
                 </div>
@@ -135,8 +126,10 @@
 
     if ($("#rate_type").val() == "ARM") {
       $(".term-arm").show()
+      $(".term").hide()
     }else{
      $(".term-arm").hide()
+     $(".term").show()
     }
 
    $("#rate_type").on('click', function(e){ 
