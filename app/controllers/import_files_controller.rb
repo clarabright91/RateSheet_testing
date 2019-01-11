@@ -2612,7 +2612,7 @@ class ImportFilesController < ApplicationController
                 term = @title.scan(/\d+/)[0]
               end
 
-              # interest type
+              # rate type
               if @title.include?("Fixed")
                 rate_type = "Fixed"
               elsif @title.include?("ARM")
@@ -2625,7 +2625,7 @@ class ImportFilesController < ApplicationController
                 rate_type = nil
               end
 
-              # interest sub type
+              # rate arm
               rate_arm = false
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
                 rate_arm = @title.scan(/\d+/)[0].to_i
@@ -2865,27 +2865,66 @@ class ImportFilesController < ApplicationController
               cc = 6 + max_column*6 # (6 / 12 / 18)
               @title = sheet_data.cell(r,cc)
               program_heading = @title.split
-              # @term =  program_heading[3]
-              if program_heading[5] == "ARM"
-                @rate_type = 2
-                if @title.scan(/\d+/)[0] == "5"
-                  @rate_arm = @title.scan(/\d+/)[0]
-                elsif @title.scan(/\d+/)[0] == "7"
-                  @rate_arm = @title.scan(/\d+/)[0]
-                elsif @title.scan(/\d+/)[0] == "10"
-                  @rate_arm = @title.scan(/\d+/)[0]
-                end
-              elsif program_heading[5] == "Fixed"
-                @rate_type = 0
+              
+              # term
+              term = nil
+              program_heading = @title.split
+              if @title.include?("10yr") || @title.include?("10 Yr")
+                term = @title.scan(/\d+/)[0]
+              elsif @title.include?("15yr") || @title.include?("15 Yr")
+                term = @title.scan(/\d+/)[0]
+              elsif @title.include?("20yr") || @title.include?("20 Yr")
+                term = @title.scan(/\d+/)[0]
+              elsif @title.include?("25yr") || @title.include?("25 Yr")
+                term = @title.scan(/\d+/)[0]
+              elsif @title.include?("30yr") || @title.include?("30 Yr")
+                term = @title.scan(/\d+/)[0]
+              elsif @title.include?("20/25/30 Yr")
+                term = 20
+              elsif @title.include?("10/15 Yr")
+                term = 10
               end
-              @program = @bank.programs.find_or_create_by(program_name: @title)
-              if @rate_arm.present?
-                @program.update(term: @term,rate_type: @rate_type,loan_type: 0,rate_arm: @rate_arm )
+
+              # rate type
+              if @title.include?("Fixed")
+                rate_type = "Fixed"
+              elsif @title.include?("ARM")
+                rate_type = "ARM"
+              elsif @title.include?("Floating")
+                rate_type = "Floating"
+              elsif @title.include?("Variable")
+                rate_type = "Variable"
               else
-                @program.update(term: @term,rate_type: @rate_type,loan_type: 0)
+                rate_type = nil
               end
+
+              # rate arm
+              rate_arm = false
+              if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 LIBOR ARM") || @title.include?("7/1 LIBOR ARM") || @title.include?("10/1 LIBOR ARM")
+                rate_arm = @title.scan(/\d+/)[0].to_i
+              end
+
+              @program = @bank.programs.find_or_create_by(program_name: @title)
+              # Loan Limit Type
+              if @title.include?("Non-Conforming")
+                @program.loan_limit_type << "Non-Conforming"
+              end
+              if @title.include?("Conforming")
+                @program.loan_limit_type << "Conforming"
+              end
+              if @title.include?("Jumbo")
+                @program.loan_limit_type << "Jumbo"
+              end
+              if @title.include?("High Balance")
+                @program.loan_limit_type << "High Balance"
+              end
+              @program.save
+              @program.update(term: term,rate_type: @rate_type,loan_type: "Purchase",rate_arm: rate_arm)
               @block_hash = {}
               key = ''
+              main_key = ''
+              main_key = term.to_s + "/"+ rate_type.to_s + "/InterestRate/LockPeriod"
+              @block_hash[main_key] = {}
               (0..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -2894,9 +2933,13 @@ class ImportFilesController < ApplicationController
                   value = sheet_data.cell(rrr,ccc)
                   if (c_i == 0)
                     key = value
-                    @block_hash[key] = {}
+                    @block_hash[main_key][key] = {}
                   else
-                    @block_hash[key][15*c_i] = value
+                    if @program.lock_period.length <= 3
+                      @program.lock_period << 15*c_i
+                      @program.save
+                    end
+                    @block_hash[main_key][key][15*c_i] = value
                   end
                   @data << value
                 end
@@ -2905,7 +2948,9 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              @block_hash.shift
+              if @block_hash.values.first.keys.first.nil?
+                @block_hash.values.first.shift
+              end
               @program.update(base_rate: @block_hash.to_json)
             end
           end
@@ -3276,62 +3321,85 @@ class ImportFilesController < ApplicationController
               @title = sheet_data.cell(r,cc)
 
               # term
-              @term = nil
+              term = nil
               program_heading = @title.split
               if @title.include?("10yr") || @title.include?("10 Yr")
-                @term = @title.scan(/\d+/)[0]
+                term = @title.scan(/\d+/)[0]
               elsif @title.include?("15yr") || @title.include?("15 Yr")
-                @term = @title.scan(/\d+/)[0]
+                term = @title.scan(/\d+/)[0]
               elsif @title.include?("20yr") || @title.include?("20 Yr")
-                @term = @title.scan(/\d+/)[0]
+                term = @title.scan(/\d+/)[0]
               elsif @title.include?("25yr") || @title.include?("25 Yr")
-                @term = @title.scan(/\d+/)[0]
+                term = @title.scan(/\d+/)[0]
               elsif @title.include?("30yr") || @title.include?("30 Yr")
-                @term = @title.scan(/\d+/)[0]
-              end
-              if (@term.nil? && @title.include?("ARM"))
-                @term = 0
+                term = @title.scan(/\d+/)[0]
               end
 
-              # interest type
+              # rate type
               if @title.include?("Fixed")
-                @rate_type = "Fixed"
+                rate_type = "Fixed"
               elsif @title.include?("ARM")
-                @rate_type = "ARM"
+                rate_type = "ARM"
               elsif @title.include?("Floating")
-                @rate_type = "Floating"
+                rate_type = "Floating"
               elsif @title.include?("Variable")
-                @rate_type = "Variable"
+                rate_type = "Variable"
               else
-                @rate_type = nil
+                rate_type = nil
               end
 
-              # interest sub type
+              # rate arm
+              rate_arm = false
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                @rate_arm = @title.scan(/\d+/)[0].to_i
+                rate_arm = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
+              conforming = false
               if @title.include?("Freddie Mac") || @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Possible") || @title.include?("Freddie Mac Home Ready")
-                @conforming = true
+                conforming = true
               end
 
               # freddie_mac
+              freddie_mac = false
               if @title.include?("Freddie Mac")
-                @freddie_mac = true
+                freddie_mac = true
               end
 
               # fannie_mae
+              fannie_mae = false
               if @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Ready")
-                @fannie_mae = true
+                fannie_mae = true
+              end
+
+              # High Balance
+              if @title.include?("High Balance")
+                jumbo_high_balance = true
               end
 
               @program = @bank.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
-              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, rate_arm: @rate_arm, sheet_name: sheet)
+              # Loan Limit Type
+              if @title.include?("Non-Conforming")
+                @program.loan_limit_type << "Non-Conforming"
+              end
+              if @title.include?("Conforming")
+                @program.loan_limit_type << "Conforming"
+              end
+              if @title.include?("Jumbo")
+                @program.loan_limit_type << "Jumbo"
+              end
+              if @title.include?("High Balance")
+                @program.loan_limit_type << "High Balance"
+              end
+              @program.save
+              @program.update(term: term,rate_type: rate_type,loan_type: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet, jumbo_high_balance: jumbo_high_balance)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
+              main_key = ''
+              main_key = term.to_s + "/"+ rate_type.to_s + "/InterestRate/LockPeriod"
+              @block_hash[main_key] = {}
               (0..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -3340,10 +3408,13 @@ class ImportFilesController < ApplicationController
                   value = sheet_data.cell(rrr,ccc)
                   if (c_i == 0)
                     key = value
-                    @block_hash[key] = {}
+                    @block_hash[main_key][key] = {}
                   else
-                    # first_row[c_i]
-                    @block_hash[key][15*c_i] = value
+                    if @program.lock_period.length <= 3
+                      @program.lock_period << 15*c_i
+                      @program.save
+                    end
+                    @block_hash[main_key][key][15*c_i] = value
                   end
                   @data << value
                 end
@@ -3352,7 +3423,9 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              @block_hash.shift
+              if @block_hash.values.first.keys.first.nil?
+                @block_hash.values.first.shift
+              end
               @program.update(base_rate: @block_hash.to_json)
             end
           end
@@ -3496,38 +3569,94 @@ class ImportFilesController < ApplicationController
               @title = sheet_data.cell(r,cc)
               if @title.present?
                   program_heading = @title.split
-                  if program_heading[5] == "ARM"
-                    @term = 0
-                    @rate_type = 2
-                    if @title.scan(/\d+/)[0] == "5"
-                      @rate_arm = @title.scan(/\d+/)[0]
-                    elsif @title.scan(/\d+/)[0] == "7"
-                      @rate_arm = @title.scan(/\d+/)[0]
-                    elsif @title.scan(/\d+/)[0] == "10"
-                      @rate_arm = @title.scan(/\d+/)[0]
-                    end
-                  elsif program_heading[5] == "Fixed"
-                    @rate_type = 0
-                    @term =  program_heading[3]
+                  # term
+                  term = nil
+                  program_heading = @title.split
+                  if @title.include?("10yr") || @title.include?("10 Yr")
+                    term = @title.scan(/\d+/)[0]
+                  elsif @title.include?("15yr") || @title.include?("15 Yr")
+                    term = @title.scan(/\d+/)[0]
+                  elsif @title.include?("20yr") || @title.include?("20 Yr")
+                    term = @title.scan(/\d+/)[0]
+                  elsif @title.include?("25yr") || @title.include?("25 Yr")
+                    term = @title.scan(/\d+/)[0]
+                  elsif @title.include?("30yr") || @title.include?("30 Yr")
+                    term = @title.scan(/\d+/)[0]
                   end
-                  if @title.scan(/\w+/).include?("Refinance")
-                    @loan_type = 1
+
+                  # rate type
+                  if @title.include?("Fixed")
+                    rate_type = "Fixed"
+                  elsif @title.include?("ARM")
+                    rate_type = "ARM"
+                  elsif @title.include?("Floating")
+                    rate_type = "Floating"
+                  elsif @title.include?("Variable")
+                    rate_type = "Variable"
                   else
-                    @loan_type = 0
+                    rate_type = nil
+                  end
+
+                  # rate arm
+                  rate_arm = false
+                  if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 Yr ARM") || @title.include?("7/1 Yr ARM") || @title.include?("10/1 Yr ARM") 
+                    rate_arm = @title.scan(/\d+/)[0].to_i
+                  end
+
+                  # conforming
+                  conforming = false
+                  if @title.include?("Freddie Mac") || @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Possible") || @title.include?("Freddie Mac Home Ready")
+                    conforming = true
+                  end
+
+                  # freddie_mac
+                  freddie_mac = false
+                  if @title.include?("Freddie Mac")
+                    freddie_mac = true
+                  end
+
+                  # fannie_mae
+                  fannie_mae = false
+                  if @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Ready")
+                    fannie_mae = true
+                  end
+
+                  # High Balance
+                  if @title.include?("High Balance")
+                    jumbo_high_balance = true
+                  end
+
+                  # Purchase & Refinance
+                  if @title.include?("Purchase")
+                    loan_type = "Purchase"
+                  elsif @title.include?("Refinance")
+                    loan_type = "Refinance"
                   end
 
                 @program = @bank.programs.find_or_create_by(program_name: @title)
                 @program_ids << @program.id
-
-                if @rate_arm.present?
-                  @program.update(term: @term,rate_type: @rate_type,loan_type: @loan_type ,rate_arm: @rate_arm )
-                else
-                  @program.update(term: @term,rate_type: @rate_type,loan_type: @loan_type)
+                # Loan Limit Type
+                if @title.include?("Non-Conforming")
+                  @program.loan_limit_type << "Non-Conforming"
                 end
+                if @title.include?("Conforming")
+                  @program.loan_limit_type << "Conforming"
+                end
+                if @title.include?("Jumbo")
+                  @program.loan_limit_type << "Jumbo"
+                end
+                if @title.include?("High Balance")
+                  @program.loan_limit_type << "High Balance"
+                end
+                @program.save
+                @program.update(term: term,rate_type: rate_type,loan_type: loan_type ,rate_arm: rate_arm )
                 @program.adjustments.destroy_all
 
                 @block_hash = {}
                 key = ''
+                main_key = ''
+              main_key = loan_type.to_s + "/" + term.to_s + "/"+ rate_type.to_s + "/InterestRate/LockPeriod"
+              @block_hash[main_key] = {}
                 (0..50).each do |max_row|
                   @data = []
                   (0..4).each_with_index do |index, c_i|
@@ -3536,9 +3665,13 @@ class ImportFilesController < ApplicationController
                     value = sheet_data.cell(rrr,ccc)
                     if (c_i == 0)
                       key = value
-                      @block_hash[key] = {}
+                      @block_hash[main_key][key] = {}
                     else
-                      @block_hash[key][15*c_i] = value
+                      if @program.lock_period.length <= 3
+                        @program.lock_period << 15*c_i
+                        @program.save
+                      end
+                      @block_hash[main_key][key][15*c_i] = value
                     end
                     @data << value
                   end
@@ -3547,7 +3680,9 @@ class ImportFilesController < ApplicationController
                     break # terminate the loop
                   end
                 end
-                @block_hash.shift
+                if @block_hash.values.first.keys.first.nil?
+                  @block_hash.values.first.shift
+                end
                 @program.update(base_rate: @block_hash)
               end
             end
