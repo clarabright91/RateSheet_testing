@@ -4,21 +4,21 @@
         <br/>
           <%= form_tag dashboard_index_path do %>
             <div class="row">
-              <div class="col-md-2">
-                <div class="form-group">
+              <!-- <div class="col-md-2"> -->
+                <!-- <div class="form-group">
                   <label>Sheet Name</label>
                   <%# @sheet_name_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"]]%>
-                  <%@sheet_name_list = [["HELOC"], ["SmartSeries"], ["Government"], ["Conforming Fixed Rate"], ["Freddie Fixed Rate"], ["HomeReady"], ["HomeReady HB"], ["Home Possible"], ["Conforming ARMs"], ["Freddie ARMs"], ["High Balance Extra"], ["Jumbo Series_C"], ["Jumbo Series_D"], ["Jumbo Series_F"], ["Jumbo Series_H"], ["Jumbo Series_I"], ["Jumbo Series_JQM"], ["Dream Big"], ["Du Refi Plus Fixed Rate"], ["Du Refi Plus Fixed Rate_105"], ["Du Refi Plus ARMs"], ["LP Open Access"], ["LP Open Access_105"], ["LP Open Acces ARMs"]]%>
-                  <%= select_tag 'sheet', options_for_select(@sheet_name_list, @sheet), :class=> "form-control" %>
+                  <%#@sheet_name_list = [["HELOC"], ["SmartSeries"], ["Government"], ["Conforming Fixed Rate"], ["Freddie Fixed Rate"], ["HomeReady"], ["HomeReady HB"], ["Home Possible"], ["Conforming ARMs"], ["Freddie ARMs"], ["High Balance Extra"], ["Jumbo Series_C"], ["Jumbo Series_D"], ["Jumbo Series_F"], ["Jumbo Series_H"], ["Jumbo Series_I"], ["Jumbo Series_JQM"], ["Dream Big"], ["Du Refi Plus Fixed Rate"], ["Du Refi Plus Fixed Rate_105"], ["Du Refi Plus ARMs"], ["LP Open Access"], ["LP Open Access_105"], ["LP Open Acces ARMs"]]%>
+                  <%#= select_tag 'sheet', options_for_select(@sheet_name_list, @sheet), :class=> "form-control" %>
                 </div>
-                <p>Base Rate = <%= @base_rate%></p>
-              </div>
-
+                
+              </div> -->
+              <p>Base Rate = <%= @base_rate%></p>
               <div class="col-md-2">
                 <div class="form-group">
                   <label>Rate Type</label>
-                  <% @rate_type_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"]]%>
-                  <%= select_tag 'rate_type', options_for_select(@rate_type_list, @rate_type), :class=> "form-control" %>
+                  <% @rate_type_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"], ["Any"]]%>
+                  <%= select_tag 'rate_type', options_for_select(@rate_type_list), :class=> "form-control" %>
                 </div>
               </div>
 
@@ -27,7 +27,7 @@
                   <label>Term</label>
                   <div class="input-group">
                    <% @term_list =[["10 yrs",10], ["15 yrs"], ["20 yrs",20], ["25 yrs",25], ["30 yrs",30]] %>
-                    <%= select_tag 'term', options_for_select(@term_list, @term), :class=> "form-control" %>
+                    <%= select_tag 'term', options_for_select(@term_list), :class=> "form-control" %>
                   </div>
                 </div>
               </div>
@@ -46,8 +46,8 @@
                 <div class="form-group">
                   <label>Loan Limit Type</label>
                   <div class="input-group">
-                    <% @loan_limit_type_list =[["Non-Conforming"], ["Conforming"], ["Jumbo"], ["High-Balance"]]%>
-                    <%= select_tag 'loan_limit_type', options_for_select(@loan_limit_type_list, @loan_limit_type), :class=> "form-control" %>
+                    <% @loan_limit_type_list =[["Non-Conforming"], ["Conforming"], ["Jumbo"], ["High-Balance"], ["Fannie Mae"], ["Fannie Mae Home Ready"], ["Freddie Mac"], ["Freddie Mac Home Possible"], ["Any"]]%>
+                    <%= select_tag 'loan_limit_type', options_for_select(@loan_limit_type_list), :class=> "form-control" %>
                   </div>
                 </div>
               </div>
@@ -56,8 +56,8 @@
                 <div class="form-group">
                   <label>Goverment</label>
                   <div class="input-group">
-                    <% @gov_list =[["FHA"], ["VA"], ["USDA"]]%>
-                    <%= select_tag 'gov', options_for_select(@gov_list, @gov_sheet), :class=> "form-control" %>
+                    <% @gov_list =[["FHA"], ["VA"], ["USDA"], ["Any"]]%>
+                    <%= select_tag 'gov', options_for_select(@gov_list), :class=> "form-control" %>
                   </div>
                 </div>
               </div>
@@ -133,9 +133,13 @@
          theme: "bootstrap"
      });
 
+    if ($("#rate_type").val() == "ARM") {
+      $(".term-arm").show()
+    }else{
      $(".term-arm").hide()
+    }
 
-   $("#rate_type").on('click', function(e){   
+   $("#rate_type").on('click', function(e){ 
      if ($(this).val()=="ARM"){
       $(".term").hide()
       $(".term-arm").show()
@@ -144,5 +148,39 @@
       $(".term-arm").hide()
      }
    });
+
+   // $('#sheet').change(function() {
+   //  if ($(this).val() == '')
+   //  {
+   //    debugger
+   //  }
+   //  else {
+   //    debugger
+   //    $.ajax({
+   //      type: "GET",
+   //      url: "/dashboard/fetch_program_list/",
+   //      data: {"sheet_name": $(this).val()},
+   //      success: function(data){
+   //         if (data.content == 'None')  
+   //           {
+   //            debugger
+   //           // $('#profile_state').empty();
+   //           // $('#profile_state').append( $('<option>No state provided for your country</option>'));
+   //           }
+   //          else
+   //           {
+   //            debugger
+   //           $('#profile_state').empty();
+   //           $('#profile_state').append( $('<option>Select your State</option>'));
+   //           jQuery.each(data,function(i, v) {
+   //            debugger
+   //             // $('#profile_state').append( $('<option value="'+ data[i][1] +'">'+data[i][0] +'</option>'));
+   //           });
+   //         }
+   //       }
+   //    });  
+   //  }
+   // });
+
   });
 </script>
