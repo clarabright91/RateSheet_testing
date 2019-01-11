@@ -163,7 +163,11 @@ class ImportFilesController < ApplicationController
               if @program.rate_type.present?
                 rate_type = @program.rate_type
               end
-              main_key = gov_key + "/" + term.to_s + "/"+ rate_type + "/InterestRate/LockPeriod"
+              if @program.term.present? 
+                main_key = "Term/RateType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
               @block_hash[main_key] = {}
               (1..50).each do |max_row|
                 @data = []
@@ -405,7 +409,11 @@ class ImportFilesController < ApplicationController
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              main_key = term.to_s + "/"+ rate_type.to_s + "/InterestRate/LockPeriod"
+              if @program.term.present? 
+                main_key = "Term/RateType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
               @block_hash[main_key] = {}
               (0..50).each do |max_row|
                 @data = []
@@ -789,7 +797,11 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              main_key = term.to_s + "/"+ rate_type.to_s + "/InterestRate/LockPeriod"
+              if @program.term.present? 
+                main_key = "Term/RateType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
               @block_hash[main_key] = {}
               (0..50).each do |max_row|
                 @data = []
@@ -1150,7 +1162,11 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              main_key = term.to_s + "/"+ rate_type.to_s + "/InterestRate/LockPeriod"
+              if @program.term.present? 
+                main_key = "Term/RateType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
               @block_hash[main_key] = {}
               (0..50).each do |max_row|
                 @data = []
@@ -1540,7 +1556,11 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              main_key = @program.term.to_s + "/" + @program.rate_type + "/InterestRate/LockPeriod"
+              if @program.term.present? 
+                main_key = "Term/RateType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
               @block_hash[main_key] = {}
               (0..50).each do |max_row|
                 @data = []
@@ -1807,7 +1827,11 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              main_key = term.to_s + "/"+ rate_type.to_s + "/InterestRate/LockPeriod"
+              if @program.term.present? 
+                main_key = "Term/RateType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
               @block_hash[main_key] = {}
               (0..50).each do |max_row|
                 @data = []
@@ -2043,7 +2067,11 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              main_key = term.to_s + "/"+ rate_type.to_s + "/InterestRate/LockPeriod"
+              if @program.term.present? 
+                main_key = "Term/RateType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
               @block_hash[main_key] = {}
               (0..50).each do |max_row|
                 @data = []
@@ -2670,7 +2698,11 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              main_key = term.to_s + "/"+ rate_type.to_s + "/InterestRate/LockPeriod"
+              if @program.term.present? 
+                main_key = "Term/RateType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
               @block_hash[main_key] = {}
               (0..50).each do |max_row|
                 @data = []
@@ -2923,7 +2955,11 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              main_key = term.to_s + "/"+ rate_type.to_s + "/InterestRate/LockPeriod"
+              if @program.term.present? 
+                main_key = "Term/RateType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
               @block_hash[main_key] = {}
               (0..50).each do |max_row|
                 @data = []
@@ -3398,7 +3434,11 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              main_key = term.to_s + "/"+ rate_type.to_s + "/InterestRate/LockPeriod"
+              if @program.term.present? 
+                main_key = "Term/RateType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
               @block_hash[main_key] = {}
               (0..50).each do |max_row|
                 @data = []
@@ -3655,7 +3695,11 @@ class ImportFilesController < ApplicationController
                 @block_hash = {}
                 key = ''
                 main_key = ''
-              main_key = loan_type.to_s + "/" + term.to_s + "/"+ rate_type.to_s + "/InterestRate/LockPeriod"
+              if @program.term.present? 
+                main_key = loan_type.to_s + "/" +"Term/RateType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
               @block_hash[main_key] = {}
                 (0..50).each do |max_row|
                   @data = []
@@ -3947,7 +3991,11 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              main_key = term.to_s + "/"+ rate_type.to_s + "/InterestRate/LockPeriod"
+              if @program.term.present? 
+                main_key = "Term/RateType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
               @block_hash[main_key] = {}
               (0..50).each do |max_row|
                 @data = []
@@ -4389,7 +4437,11 @@ class ImportFilesController < ApplicationController
                 @block_hash = {}
                 key = ''
                 new_key = ''
-                new_key = term.to_s + "/"+ rate_type.to_s + "/InterestRate/LockPeriod"
+                if @program.term.present? 
+                  new_key = "Term/RateType/InterestRate/LockPeriod"
+                else
+                  new_key = "InterestRate/LockPeriod"
+                end
                 @block_hash[new_key] = {}
                 (0..50).each do |max_row|
                   @data = []
@@ -4599,7 +4651,11 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              main_key = term.to_s + "/"+ rate_type.to_s + "/InterestRate/LockPeriod"
+              if @program.term.present? 
+                main_key = "Term/RateType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
               @block_hash[main_key] = {}
               (0..50).each do |max_row|
                 @data = []
@@ -4844,7 +4900,11 @@ class ImportFilesController < ApplicationController
                 @block_hash = {}
                 key = ''
                 main_key = ''
-                main_key = term.to_s + "/"+ rate_type.to_s + "/InterestRate/LockPeriod"
+                if @program.term.present? 
+                main_key = "Term/RateType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
                 @block_hash[main_key] = {}
                 (0..50).each do |max_row|
                   @data = []
@@ -5325,7 +5385,11 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              main_key = term.to_s + "/"+ rate_type.to_s + "/InterestRate/LockPeriod"
+              if @program.term.present? 
+                main_key = "Term/RateType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
               @block_hash[main_key] = {}
               (0..50).each do |max_row|
                 @data = []
@@ -5523,7 +5587,11 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              main_key = term.to_s + "/"+ rate_type.to_s + "/InterestRate/LockPeriod"
+              if @program.term.present? 
+                main_key = "Term/RateType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
               @block_hash[main_key] = {}
               (0..50).each do |max_row|
                 @data = []
@@ -5801,49 +5869,80 @@ class ImportFilesController < ApplicationController
               cc = 3 + max_column*6 # (3 / 9 / 15)
 
               @title = sheet_data.cell(r,cc)
-              @term = nil
+              term = nil
               program_heading = @title.split
               if @title.include?("10yr") || @title.include?("10 Yr")
-                @term = @title.scan(/\d+/)[0]
+                term = @title.scan(/\d+/)[0]
               elsif @title.include?("15yr") || @title.include?("15 Yr")
-                @term = @title.scan(/\d+/)[0]
+                term = @title.scan(/\d+/)[0]
               elsif @title.include?("20yr") || @title.include?("20 Yr")
-                @term = @title.scan(/\d+/)[0]
+                term = @title.scan(/\d+/)[0]
               elsif @title.include?("25yr") || @title.include?("25 Yr")
-                @term = @title.scan(/\d+/)[0]
+                term = @title.scan(/\d+/)[0]
               elsif @title.include?("30yr") || @title.include?("30 Yr")
-                @term = @title.scan(/\d+/)[0]
+                term = @title.scan(/\d+/)[0]
               end
+
               if @title.include?("Fixed")
-                @rate_type = "Fixed"
+                rate_type = "Fixed"
               elsif @title.include?("ARM")
-                @rate_type = "ARM"
+                rate_type = "ARM"
               elsif @title.include?("Floating")
-                @rate_type = "Floating"
+                rate_type = "Floating"
               elsif @title.include?("Variable")
-                @rate_type = "Variable"
+                rate_type = "Variable"
               else
-                @rate_type = nil
+                rate_type = nil
               end
+
+              freddie_mac = false
               if @title.include?("Freddie Mac")
-                @freddie_mac = true
+                freddie_mac = true
               end
+
+              conforming = false
               if @title.include?("Freddie Mac") || @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Possible") || @title.include?("Freddie Mac Home Ready")
-                @conforming = true
+                conforming = true
               end
+
+              fannie_mae = false
               if @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Ready")
-                @fannie_mae = true
+                fannie_mae = true
               end
+
+              # High Balance
+              jumbo_high_balance = false
               if @title.include?("High Balance")
-                @jumbo_high_balance = true
+                jumbo_high_balance = true
               end
 
               @program = @bank.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
-              @program.update(term: @term,rate_type: @rate_type,loan_type: 0,conforming: @conforming,freddie_mac: @freddie_mac, fannie_mae: @fannie_mae, jumbo_high_balance: @jumbo_high_balance, sheet_name: @sheet)
+              # Loan Limit Type
+              if @title.include?("Non-Conforming")
+                @program.loan_limit_type << "Non-Conforming"
+              end
+              if @title.include?("Conforming")
+                @program.loan_limit_type << "Conforming"
+              end
+              if @title.include?("Jumbo")
+                @program.loan_limit_type << "Jumbo"
+              end
+              if @title.include?("High Balance")
+                @program.loan_limit_type << "High Balance"
+              end
+              @program.save
+              @program.update(term: term,rate_type: rate_type,loan_type: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, jumbo_high_balance: jumbo_high_balance, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
+              main_key = ''
+              if @program.term.present? 
+                main_key = "Term/RateType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
+              @block_hash[main_key] = {}
               (0..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -5852,9 +5951,13 @@ class ImportFilesController < ApplicationController
                   value = sheet_data.cell(rrr,ccc)
                   if (c_i == 0)
                     key = value
-                    @block_hash[key] = {}
+                    @block_hash[main_key][key] = {}
                   else
-                    @block_hash[key][15*c_i] = value
+                    if @program.lock_period.length <= 3
+                      @program.lock_period << 15*c_i
+                      @program.save
+                    end
+                    @block_hash[main_key][key][15*c_i] = value
                   end
                   @data << value
                 end
@@ -5863,7 +5966,9 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              # @block_hash.shift
+              if @block_hash.values.first.keys.first.nil?
+                @block_hash.values.first.shift
+              end
               @program.update(base_rate: @block_hash.to_json)
             end
           end
@@ -6108,32 +6213,77 @@ class ImportFilesController < ApplicationController
               program_heading = @title.split
 
 
-              @term = program_heading[4] == "ARM" ? 0 : program_heading[3]
-              @rate_type = program_heading[5] == "Fixed" ? 0 : 2
-              if program_heading[3] == "5/1"
-                @rate_arm = 5
-              elsif program_heading[3] == "7/1"
-                  @rate_arm = 7
-              elsif program_heading[3] == "10/1"
-                @rate_arm = 10
+              # term
+              term = nil
+              program_heading = @title.split
+              if @title.include?("10yr") || @title.include?("10 Yr")
+                term = @title.scan(/\d+/)[0]
+              elsif @title.include?("15yr") || @title.include?("15 Yr")
+                term = @title.scan(/\d+/)[0]
+              elsif @title.include?("20yr") || @title.include?("20 Yr")
+                term = @title.scan(/\d+/)[0]
+              elsif @title.include?("25yr") || @title.include?("25 Yr")
+                term = @title.scan(/\d+/)[0]
+              elsif @title.include?("30yr") || @title.include?("30 Yr")
+                term = @title.scan(/\d+/)[0]
               end
 
+              # rate type
+              if @title.include?("Fixed")
+                rate_type = "Fixed"
+              elsif @title.include?("ARM")
+                rate_type = "ARM"
+              elsif @title.include?("Floating")
+                rate_type = "Floating"
+              elsif @title.include?("Variable")
+                rate_type = "Variable"
+              else
+                rate_type = nil
+              end
 
+              # rate arm
+              if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
+                rate_arm = @title.scan(/\d+/)[0].to_i
+              end
+
+              conforming = false
+              fannie_mae = false
               if @title.include?("Fannie Mae")
-                @conforming = true
-                @fannie_mae = true
+                conforming = true
+                fannie_mae = true
               end
-
+              fannie_mae_home_ready = false
               if @title.include?("Fannie Mae HomeReady")
-                @fannie_mae_home_ready = true
+                fannie_mae_home_ready = true
               end
 
               @program = @bank.programs.find_or_create_by(program_name: @title)
               program_ids << @program.id
-              @program.update(term: @term,rate_type: @rate_type, rate_arm: @rate_arm, loan_type: 0, fannie_mae: @fannie_mae, fannie_mae_home_ready: @fannie_mae_home_ready, conforming: @conforming, sheet_name: sheet)
+               # Loan Limit Type
+              if @title.include?("Non-Conforming")
+                @program.loan_limit_type << "Non-Conforming"
+              end
+              if @title.include?("Conforming")
+                @program.loan_limit_type << "Conforming"
+              end
+              if @title.include?("Jumbo")
+                @program.loan_limit_type << "Jumbo"
+              end
+              if @title.include?("High Balance")
+                @program.loan_limit_type << "High Balance"
+              end
+              @program.save
+              @program.update(term: term,rate_type: rate_type, rate_arm: rate_arm, loan_type: "Purchase", fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, conforming: conforming, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
+              main_key = ''
+              if @program.term.present? 
+                main_key = "Term/RateType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
+              @block_hash[main_key] = {}
               (0..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -6142,10 +6292,13 @@ class ImportFilesController < ApplicationController
                   value = sheet_data.cell(rrr,ccc)
                   if (c_i == 0)
                     key = value
-                    @block_hash[key] = {}
+                    @block_hash[main_key][key] = {}
                   else
-                    # first_row[c_i]
-                    @block_hash[key][15*c_i] = value
+                    if @program.lock_period.length <= 3
+                      @program.lock_period << 15*c_i
+                      @program.save
+                    end
+                    @block_hash[main_key][key][15*c_i] = value
                   end
                   @data << value
                 end
@@ -6154,7 +6307,9 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-
+              if @block_hash.values.first.keys.first.nil?
+                @block_hash.values.first.shift
+              end
               @program.update(base_rate: @block_hash)
             end
           end
@@ -6422,30 +6577,62 @@ class ImportFilesController < ApplicationController
               @title = sheet_data.cell(r,cc)
               program_heading = @title.split
 
-
-              @term = program_heading[4] == "ARM" ? 0 : program_heading[3]
-              @rate_type = program_heading[5] == "Fixed" ? 0 : 2
-              if program_heading[3] == "5/1"
-                @rate_arm = 5
-                elsif program_heading[3] == "7/1"
-                  @rate_arm = 7
-              elsif program_heading[3] == "10/1"
-                @rate_arm = 10
+               # term
+              term = nil
+              program_heading = @title.split
+              if @title.include?("10yr") || @title.include?("10 Yr")
+                term = @title.scan(/\d+/)[0]
+              elsif @title.include?("15yr") || @title.include?("15 Yr")
+                term = @title.scan(/\d+/)[0]
+              elsif @title.include?("20yr") || @title.include?("20 Yr")
+                term = @title.scan(/\d+/)[0]
+              elsif @title.include?("25yr") || @title.include?("25 Yr")
+                term = @title.scan(/\d+/)[0]
+              elsif @title.include?("30yr") || @title.include?("30 Yr")
+                term = @title.scan(/\d+/)[0]
               end
+
+              # rate type
+              if @title.include?("Fixed")
+                rate_type = "Fixed"
+              elsif @title.include?("ARM")
+                rate_type = "ARM"
+              elsif @title.include?("Floating")
+                rate_type = "Floating"
+              elsif @title.include?("Variable")
+                rate_type = "Variable"
+              else
+                rate_type = nil
+              end
+
+              # rate arm
+              if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
+                rate_arm = @title.scan(/\d+/)[0].to_i
+              end
+
+              conforming = false
+              fannie_mae = false
               if @title.include?("Fannie Mae")
-              @conforming = true
-              @fannie_mae = true
+                conforming = true
+                fannie_mae = true
               end
-
+              fannie_mae_home_ready = false
               if @title.include?("Fannie Mae HomeReady")
-                @fannie_mae_home_ready = true
+                fannie_mae_home_ready = true
               end
               @program = @bank.programs.find_or_create_by(program_name: @title)
               program_ids << @program.id
-              @program.update(term: @term,rate_type: @rate_type, rate_arm: @rate_arm, loan_type: 0, fannie_mae: @fannie_mae, fannie_mae_home_ready: @fannie_mae_home_ready, conforming: @conforming, sheet_name: sheet)
+              @program.update(term: term,rate_type: rate_type, rate_arm: rate_arm, loan_type: "Purchase", fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, conforming: conforming, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
+              main_key = ''
+              if @program.term.present? 
+                main_key = "Term/RateType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
+              @block_hash[main_key] = {}
               (0..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -6454,10 +6641,13 @@ class ImportFilesController < ApplicationController
                   value = sheet_data.cell(rrr,ccc)
                   if (c_i == 0)
                     key = value
-                    @block_hash[key] = {}
+                    @block_hash[main_key][key] = {}
                   else
-                    # first_row[c_i]
-                    @block_hash[key][15*c_i] = value
+                    if @program.lock_period.length <= 3
+                      @program.lock_period << 15*c_i
+                      @program.save
+                    end
+                    @block_hash[main_key][key][15*c_i] = value
                   end
                   @data << value
                 end
@@ -6466,7 +6656,9 @@ class ImportFilesController < ApplicationController
                   break # terminate the loop
                 end
               end
-
+              if @block_hash.values.first.keys.first.nil?
+                @block_hash.values.first.shift
+              end
               @program.update(base_rate: @block_hash)
             end
           end
