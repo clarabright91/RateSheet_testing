@@ -9,6 +9,10 @@ class DashboardController < ApplicationController
     end
   end
 
+  def fetch_program_list
+    
+  end
+
   def set_default
     @rate_type = "None"
     @interest = "4.375"
@@ -61,10 +65,22 @@ class DashboardController < ApplicationController
         @Jumbo = true
       elsif @loan_limit_type == "High-Balance"
         @high_balance = true
+      elsif @loan_limit_type == "Fannie Mae"
+        @fannie_mae = true
+      elsif @loan_limit_type == "Fannie Mae Home Ready"
+        @fannie_mae_home_ready = true
+      elsif @loan_limit_type == "Freddie Mac"
+        @freddie_mac = true
+      elsif @loan_limit_type == "Freddie Mac Home Possible"
+        @freddie_mac_home_possible = true
       else
         @conforming = false
         @Jumbo = false
         @high_balance = false
+        @fannie_mae = false
+        @fannie_mae_home_ready = false
+        @freddie_mac = false
+        @freddie_mac_home_possible = false
       end
     end
   end
