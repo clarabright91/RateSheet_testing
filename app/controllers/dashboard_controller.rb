@@ -2,11 +2,11 @@ class DashboardController < ApplicationController
   before_action :set_default
 
   def index
-    # @banks = Bank.all
-    # if request.post?
-    #   set_variable
-    #   find_base_rate
-    # end
+    @banks = Bank.all
+    if request.post?
+      set_variable
+      find_base_rate
+    end
   end
 
   def set_default

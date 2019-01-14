@@ -1,1 +1,149 @@
-hello rohit
+<div class="container">
+  <!-- searching form -->
+      <div class="">
+        <br/>
+          <%= form_tag dashboard_index_path do %>
+            <div class="row">
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Rate Type</label>
+                  <% @rate_type_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"]]%>
+                  <%= select_tag 'rate_type', options_for_select(@rate_type_list, @rate_type), { prompt: 'Select rate-type', :class=> "form-control"} %>
+                </div>
+                <p>Base Rate = <%= @base_rate%></p>
+              </div>
+
+              <div class="col-md-2 term">
+                <div class="form-group">
+                  <label>Term</label>
+                  <div class="input-group">
+                   <% @term_list =[["10 yrs",10], ["15 yrs"], ["20 yrs",20], ["25 yrs",25], ["30 yrs",30]] %>
+                    <%= select_tag 'term', options_for_select(@term_list), { prompt: 'Select term', :class=> "form-control"} %>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2 term-arm">
+                <div class="form-group">
+                  <label>Term</label>
+                  <div class="input-group">
+                   <% @term_list_arm =[["1/1 ARM",1], ["2/1 ARM",2], ["3/1 ARM",3], ["4/1 ARM",4], ["5/1 ARM",5], ["6/1 ARM",6], ["7/1 ARM",7], ["8/1 ARM",8], ["9/1 ARM",9], ["10/1 ARM",10]] %>
+                    <%= select_tag 'term_arm', options_for_select(@term_list_arm), { prompt: 'Select Term', :class=> "form-control", :id=>"term_arm"}%>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Loan Limit Type</label>
+                  <div class="input-group">
+                    <% @loan_limit_type_list =[["Non-Conforming"], ["Conforming"], ["Jumbo"], ["High-Balance"]]%>
+                    <%= select_tag 'loan_limit_type', options_for_select(@loan_limit_type_list), { prompt: 'Select Loan Type', :class=> "form-control" }%>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Gov</label>
+                  <div class="input-group">
+                    <% @gov_list =[["FHA"], ["VA"], ["USDA"]]%>
+                    <%= select_tag 'gov', options_for_select(@gov_list), { prompt: 'Select Gov', :class=> "form-control" }%>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Interest Rate</label>
+                   <% @interest_list =[["3.250"],["3.375"],["3.625"],["3.750"],["3.875"],["4.000"],["4.125"],["4.250"],["4.375"],["4.500"],["4.625"],["4.750"],["4.875"],["5.000"],["5.125"],["5.250"],["5.375"],["5.500"],["5.625"],["5.750"],["5.875"]]%>
+                  <%= select_tag 'interest', options_for_select(@interest_list, @interest), :class=> "form-control" %>
+                  <%#= text_field_tag :interest,@interest, :class=> "form-control" %>
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Lock Period</label>
+                  <div class="input-group">
+                    <% @lock_period_list =[["15 days"], ["30 days",30], ["45 days",45], ["60 days",60]]%>
+                    <%= select_tag 'lock_period', options_for_select(@lock_period_list, @lock_period), :class=> "form-control" %>
+                  </div>
+                </div>
+              </div>            
+
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div>
+                    <label></label>
+                  </div>
+                  <%= submit_tag "Search", :class => "btn btn-info" %>
+                </div>
+              </div>
+
+            </div>
+          <% end %>
+      </div>
+      <!-- end searching form -->
+
+  <div class="row col-md-6 col-md-offset-2 custyle">
+  <table class="table table-striped custab">
+  <thead>
+  <h2>Banks</h2>
+  <tr>
+    <th>No.</th>
+    <th>Name</th>
+    <th>Phone</th>
+    <th class="text-center">Action</th>
+  </tr>
+  </thead>
+    <% if @banks.present? %>
+      <% @banks.each_with_index do |bank, index|%>
+        <tr>
+          <td><%= index +1 %></td>
+          <td><%= bank.name%></td>
+          <td><%= bank.phone%></td>
+          <td class="text-center"><a class='btn btn-info btn-xs' href="<%=import_files_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
+        </tr>
+      <%end%>
+    <%end%>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<style type="text/css">
+  #search-form{
+    display: -webkit-inline-box;
+  }
+</style>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+
+    $(".alert-error" ).fadeOut(3000);
+
+    $( "#sheet" ).select2({
+         theme: "bootstrap"
+     });
+
+    if ($("#rate_type").val() == "ARM") {
+      $(".term-arm").show()
+      $(".term").hide()
+    }else{
+     $(".term-arm").hide()
+     $(".term").show()
+    }
+
+   $("#rate_type").on('click', function(e){ 
+     if ($(this).val()=="ARM"){
+      $(".term").hide()
+      $(".term-arm").show()
+     }else{
+      $(".term").show()
+      $(".term-arm").hide()
+     }
+   });
+
+  });
+</script>
