@@ -91,7 +91,7 @@ class ObCmgWholesalesController < ApplicationController
               	@fha = false
               	@va = false
               	@usda = false
-              	@full_doc =
+              	@full_doc = false
               end
 
               # High Balance
