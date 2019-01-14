@@ -28,7 +28,7 @@
                   <label>Term</label>
                   <div class="input-group">
                    <% @term_list_arm =[["1/1 ARM",1], ["2/1 ARM",2], ["3/1 ARM",3], ["4/1 ARM",4], ["5/1 ARM",5], ["6/1 ARM",6], ["7/1 ARM",7], ["8/1 ARM",8], ["9/1 ARM",9], ["10/1 ARM",10]] %>
-                    <%= select_tag 'term_arm', options_for_select(@term_list_arm),  :id=>"term_arm", :class=> "form-control" %>
+                    <%= select_tag 'term_arm', options_for_select(@term_list_arm), { prompt: 'Select Term', :class=> "form-control", :id=>"term_arm"}%>
                   </div>
                 </div>
               </div>
@@ -45,10 +45,10 @@
 
               <div class="col-md-2">
                 <div class="form-group">
-                  <label>Goverment</label>
+                  <label>Gov</label>
                   <div class="input-group">
                     <% @gov_list =[["FHA"], ["VA"], ["USDA"]]%>
-                    <%= select_tag 'gov', options_for_select(@gov_list), :class=> "form-control" %>
+                    <%= select_tag 'gov', options_for_select(@gov_list), { prompt: 'Select Gov', :class=> "form-control" }%>
                   </div>
                 </div>
               </div>
@@ -120,6 +120,9 @@
 
 <script type="text/javascript">
   $(document).ready(function(){
+
+    $(".alert-error" ).fadeOut(3000);
+
     $( "#sheet" ).select2({
          theme: "bootstrap"
      });
