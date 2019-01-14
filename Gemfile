@@ -39,7 +39,7 @@ gem 'bootstrap'
 gem 'jquery-rails'
 gem "roo", "~> 2.7.0"
 gem 'roo-xls'
-
+gem 'bundler', '~> 2.0.0.pre.3'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'pry-byebug', platforms: [:mri, :mingw, :x64_mingw]

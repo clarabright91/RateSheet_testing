@@ -238,6 +238,7 @@ PLATFORMS
 DEPENDENCIES
   bootsnap (>= 1.1.0)
   bootstrap
+  bundler (~> 2.0.0.pre.3)
   capybara (>= 2.15)
   chromedriver-helper
   coffee-rails (~> 4.2)
