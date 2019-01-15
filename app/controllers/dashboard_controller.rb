@@ -13,7 +13,7 @@ class DashboardController < ApplicationController
     @base_rate = 0.0
     @filter_data = {}
     @interest = "4.375"
-    @lock_period ="30"
+    @lock_period =30
   end
 
   def set_variable
