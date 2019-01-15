@@ -25,6 +25,18 @@ class ObCmgWholesalesController < ApplicationController
       if (sheet == "GOV")
         sheet_data = xlsx.sheet(sheet)
         @programs_ids = []
+        first_key = ''
+        second_key = ''
+        state_key = ''
+        cc = ''
+        ccc = ''
+        cltv_key = ''
+        k_val = ''
+        key_val = ''
+        value1 = ''
+        @block_hash = {}
+        @data_hash = {}
+        adj_key = []
         (10..60).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 4))
@@ -138,6 +150,84 @@ class ObCmgWholesalesController < ApplicationController
             end
           end
         end
+        # Adjustments
+        (67..87).each do |r|
+          row = sheet_data.row(r)
+          @key_data = sheet_data.row(40)
+          if (row.compact.count >= 1)
+            (0..7).each do |max_column|
+              cc = max_column
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "GOVERNMENT ADJUSTMENTS"
+                  first_key = "GovermentAdjustments"
+                  @data_hash[first_key] = {}
+                end
+
+                if value == "FICO, LOAN AMOUNT & PROPERTY TYPE ADJUSTMENTS"
+                  second_key = "FicoLoanAmont"
+                  @data_hash[first_key][second_key] = {}
+                end
+
+                if r >= 70 && r <= 76 && cc == 1
+                  value = get_value value
+                  ccc = cc + 6
+                  c_val = sheet_data.cell(r,ccc)
+                  @data_hash[first_key][second_key][value] = c_val
+                end
+
+                if r >= 78 && r <= 82 && cc == 1
+                  value = get_value value
+                  ccc = cc + 6
+                  c_val = sheet_data.cell(r,ccc)
+                  @data_hash[first_key][second_key][value] = c_val
+                end
+
+                if r >= 83 && r <= 87 && cc == 1
+                  value = get_value value
+                  ccc = cc + 6
+                  c_val = sheet_data.cell(r,ccc)
+                  @data_hash[first_key][second_key][value] = c_val
+                end
+              end
+            end
+
+            (10..16).each do |max_column|
+              cc = max_column
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "MISCELLANEOUS"
+                  second_key = "Miscellaneous"
+                  @data_hash[first_key][second_key] = {}
+                end
+
+                if r >= 70 && r <= 77 && cc == 10
+                  value1 = get_key value
+                  ccc = cc + 6
+                  c_val = sheet_data.cell(r,ccc)
+                  @data_hash[first_key][second_key][value] = c_val
+                end
+
+                if value == "STATE ADJUSTMENTS"
+                  second_key = "StateAdjustments"
+                  @data_hash[first_key][second_key] = {}
+                end
+
+                if r >= 80 && r <= 87 && cc == 11
+                  adj_key = value.split(', ')
+                  adj_key.each do |f_key|
+                    key_val = f_key
+                    ccc = cc + 5
+                    k_val = sheet_data.cell(r,ccc)
+                    @data_hash[first_key][second_key][key_val] = k_val
+                  end
+                end
+
+              end
+            end
+          end
+        end
+        Adjustment.create(data: @data_hash, sheet_name: sheet)
       end
     end
     # redirect_to programs_import_file_path(@bank)
@@ -148,6 +238,7 @@ class ObCmgWholesalesController < ApplicationController
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
+    	# Programs
       if (sheet == "AGENCY")
         sheet_data = xlsx.sheet(sheet)
         @programs_ids = []
@@ -252,6 +343,51 @@ class ObCmgWholesalesController < ApplicationController
             end
           end
         end
+      end
+      # Adjustments
+      if (sheet == "AGENCYLLPAS")
+      	sheet_data = xlsx.sheet(sheet)
+      	@ltv_data = []
+      	@adjustment_hash = {}
+      	primary_key = ''
+      	secondary_key = ''
+      	ltv_key = ''
+      	(8..62).each do |r|
+      		row = sheet_data.row(r)
+      		@ltv_data = sheet_data.row(10)
+      		(0..16).each do |cc|
+      			value = sheet_data.cell(r,cc)
+      			if value.present?
+      				if value == "AGENCY FIXED AND ARM ADJUSTMENTS"
+      					primary_key = "RateType/Term/FICO/LTV"
+      					@adjustment_hash[primary_key] = {}
+      				end
+      				if value.class == String && value.include?("Cash Out with FICO")
+      					primary_key = "CashOut/FICO/LTV"
+      					@adjustment_hash[primary_key] = {}
+      				end
+      				# AGENCY FIXED AND ARM ADJUSTMENTS
+      				if r >= 11 && r <= 24 && r != 16 && cc == 1
+      					secondary_key = get_value value
+      					@adjustment_hash[primary_key][secondary_key] = {}
+      				end
+      				if r >= 11 && r <= 24 && r != 16 && cc >= 9 && cc <= 16
+      					ltv_key = get_value @ltv_data[cc-1]
+      					@adjustment_hash[primary_key][secondary_key][ltv_key] = {}
+      					@adjustment_hash[primary_key][secondary_key][ltv_key] = value
+      				end
+      				# if r >= 25 && r <= 31 && cc == 1
+      				# 	secondary_key = value
+      				# 	@adjustment_hash[primary_key][secondary_key] = {}
+      				# end
+      				# if r >= 25 && r <= 31 && cc >= 9 && cc <= 16
+      				# 	ltv_key = @ltv_data[cc-1]
+      				# 	@adjustment_hash[primary_key][secondary_key][ltv_key] = {}
+      				# 	@adjustment_hash[primary_key][secondary_key][ltv_key] = value
+      				# end
+      			end
+      		end
+      	end
       end
     end
     # redirect_to programs_import_file_path(@bank)
@@ -384,7 +520,7 @@ class ObCmgWholesalesController < ApplicationController
         					primary_key = "FNMA/DU"
         					@adjustment_hash[primary_key] = {}
         				elsif value == "SUBORDINATE FINANCING"
-        					primary_key = "FinancingType/LTV/CLTV/FICO"
+        					primary_key = "FinancingType/FICO/LTV/CLTV"
         					sub_key = "Subordinate Financing"
         					@adjustment_hash[primary_key] = {}
         					@adjustment_hash[primary_key][sub_key] = {}
@@ -612,7 +748,7 @@ class ObCmgWholesalesController < ApplicationController
         					primary_key = "FHLMC/LP"
         					@adjustment_hash[primary_key] = {}
         				elsif value == "SUBORDINATE FINANCING"
-        					primary_key = "FinancingType/LTV/CLTV/FICO"
+        					primary_key = "FinancingType/FICO/LTV/CLTV"
         					sub_key = "Subordinate Financing"
         					@adjustment_hash[primary_key] = {}
         					@adjustment_hash[primary_key][sub_key] = {}
@@ -923,6 +1059,14 @@ class ObCmgWholesalesController < ApplicationController
     xlsx.sheets.each do |sheet|
       if (sheet == "JUMBO 6200")
         sheet_data = xlsx.sheet(sheet)
+        first_key = ''
+        second_key = ''
+        cc = ''
+        cltv_key = ''
+        key_val = ''
+        @data_hash = {}
+        @key_data = []
+        @key2_data = []
         @programs_ids = []
         (10..34).each do |r|
           row = sheet_data.row(r)
@@ -1023,6 +1167,90 @@ class ObCmgWholesalesController < ApplicationController
             end
           end
         end
+        # Adjustments
+        (37..88).each do |r|
+          row = sheet_data.row(r)
+          @key_data = sheet_data.row(40)
+          @key2_data = sheet_data.row(83)
+          if (row.compact.count >= 1)
+            (0..13).each do |max_column|
+              cc = max_column
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "PREMIER JUMBO 6200 SERIES ADJUSTMENTS"
+                  first_key = "LoanType/FICO/LTV"
+                  @data_hash[first_key] = {}
+                end
+                if value == "Purchase Transaction"
+                  second_key = "Purchase"
+                  @data_hash[first_key][second_key] = {}
+                end
+                if value == "Rate/Term Transaction"
+                  second_key = "Rate/Term"
+                  @data_hash[first_key][second_key] = {}
+                end
+                if value == "Cash Out Transaction"
+                  second_key = "CashOut"
+                  @data_hash[first_key][second_key] = {}
+                end
+
+                # Purchase Transaction Adjustment
+                if r >= 41 && r <= 46 && cc == 1
+                  cltv_key = get_value value
+                  @data_hash[first_key][second_key][cltv_key] = {}
+                end
+                if r >= 41 && r <= 46 && cc >= 6 && cc <= 13
+                  key_val = get_value @key_data[cc-1]
+                  @data_hash[first_key][second_key][cltv_key][key_val] = value
+                end
+
+                # Rate/Term Transaction Adjustment
+                if r >= 49 && r <= 54 && cc == 1
+                  cltv_key = get_value value
+                  @data_hash[first_key][second_key][cltv_key] = {}
+                end
+                if r >= 49 && r <= 54 && cc >= 6 && cc <= 13
+                  key_val = get_value @key_data[cc-1]
+                  @data_hash[first_key][second_key][cltv_key][key_val] = value
+                end
+
+                # Cash Out Transaction Adjustment
+                if r >= 57 && r <= 77 && cc == 1
+                  cltv_key = get_value value
+                  @data_hash[first_key][second_key][cltv_key] = {}
+                end
+                if r >= 57 && r <= 77 && cc >= 6 && cc <= 13
+                  key_val = get_value @key_data[cc-1]
+                  @data_hash[first_key][second_key][cltv_key][key_val] = value
+                end
+
+                # MISCELLANEOUS Adjustment
+                if value == "MISCELLANEOUS"
+                  second_key = "Miscellaneous"
+                  @data_hash[first_key][second_key] = {}
+                  k_val = sheet_data.cell(r+1,cc)
+                  v_val = sheet_data.cell(r+1,cc+3)
+                  @data_hash[first_key][second_key][k_val] = v_val
+                end
+
+                # MAX PRICE AFTER ADJUSTMENTS
+                if value == "MAX PRICE AFTER ADJUSTMENTS"
+                  second_key = "MaxPriceAfterAdjustments"
+                  @data_hash[first_key][second_key] = {}
+                end
+                if r >= 84 && r <= 85 && cc == 1
+                  cltv_key = value
+                  @data_hash[first_key][second_key][cltv_key] = {}
+                end
+                if r >= 84 && r <= 85 && cc >= 2 && cc <= 4
+                  key_val = @key2_data[cc-1]
+                  @data_hash[first_key][second_key][cltv_key][key_val] = value
+                end
+              end
+            end
+          end
+        end
+        Adjustment.create(data: @data_hash, sheet_name: sheet)
       end
     end
     # redirect_to programs_import_file_path(@bank)
@@ -1271,10 +1499,10 @@ class ObCmgWholesalesController < ApplicationController
         			value = sheet_data.cell(r,cc)
         			if value.present?
         				if value == "Purchase Transaction"
-        					primary_key = "LoanType/LTV/FICO"
+        					primary_key = "LoanType/FICO/LTV"
         					@purchase_adjustment[primary_key] = {}
         				elsif value == "Rate/Term Transaction"
-        					primary_key = "RateType/Term/LTV/FICO"
+        					primary_key = "RateType/Term/FICO/LTV"
         					@rate_adjustment[primary_key] = {}
         				elsif value == "Cash Out Transaction"
         					primary_key = "LoanType/RefinanceOption/LTV"
@@ -1357,13 +1585,13 @@ class ObCmgWholesalesController < ApplicationController
         			value = sheet_data.cell(r,cc)
         			if value.present?
         				if value == "Purchase Transaction"
-        					primary_key = "Jumbo/LoanType/LTV/FICO"
+        					primary_key = "Jumbo/LoanType/FICO/LTV"
         					@jumbo_purchase_adjustment[primary_key] = {}
         				elsif value == "Rate/Term Transaction"
-        					primary_key = "Jumbo/RateType/Term/LTV/FICO"
+        					primary_key = "Jumbo/RateType/Term/FICO/LTV"
         					@jumbo_rate_adjustment[primary_key] = {}
         				elsif value == "MISCELLANEOUS"
-        					primary_key = "Jumbo/NY/LTV/FICO"
+        					primary_key = "Jumbo/NY/FICO/LTV"
         					@jumbo_other_adjustment[primary_key] = {}
         				end
         				# Purchase Transaction Adjustment
@@ -1574,10 +1802,10 @@ class ObCmgWholesalesController < ApplicationController
         			value = sheet_data.cell(r,cc)
         			if value.present?
         				if value == "Purchase Transaction"
-        					primary_key = "LoanType/LTV/FICO"
+        					primary_key = "LoanType/FICO/LTV"
         					@purchase_adjustment[primary_key] = {}
         				elsif value == "Rate/Term Transaction"
-        					primary_key = "RateType/Term/LTV/FICO"
+        					primary_key = "RateType/Term/FICO/LTV"
         					@rate_adjustment[primary_key] = {}
         				elsif value == "Cash Out Transaction"
         					primary_key = "LoanType/RefinanceOption/LTV"
@@ -1803,10 +2031,10 @@ class ObCmgWholesalesController < ApplicationController
         			value = sheet_data.cell(r,cc)
         			if value.present?
         				if value == "Purchase Transaction"
-        					primary_key = "LoanType/LTV/FICO"
+        					primary_key = "LoanType/FICO/LTV"
         					@purchase_adjustment[primary_key] = {}
         				elsif value == "Rate/Term Transaction"
-        					primary_key = "RateType/Term/LTV/FICO"
+        					primary_key = "RateType/Term/FICO/LTV"
         					@rate_adjustment[primary_key] = {}
         				elsif value == "Cash Out Transaction"
         					primary_key = "LoanType/RefinanceOption/LTV"
@@ -2475,7 +2703,7 @@ class ObCmgWholesalesController < ApplicationController
   		elsif value1.include?("<")
   			value1 = "0"+value1
      	elsif value1.include?("FICO")
-       	value1 = value1.split("FICO ").last
+       	value1 = value1.split("FICO ").last.first(9)
       elsif value1 == "Investment Property"
       	value1 = "Property/Type"
      	else
@@ -2483,4 +2711,17 @@ class ObCmgWholesalesController < ApplicationController
      	end
    	end
  	end
+ 	def get_key value1
+    if value1.present?
+      if value1.include?("Streamline")
+        value1 = "FHA/Refinance"
+      elsif value1.include?("CashOut")
+        value1 = "VA/CashOut"
+      elsif value1.include?("Lock")
+        value1 = "FHA/Refinance"
+      elsif value1.include?("IRRR")
+        value1 = "FHA/Refinance"
+      end
+    end
+  end
 end
