@@ -9,7 +9,6 @@ class ObCmgWholesalesController < ApplicationController
           headers = ["Phone", "General Contacts", "Mortgagee Clause (Wholesale)"]
           @name = "CMG Financial"
           @bank = Bank.find_or_create_by(name: @name)
-          # @bank.update(phone: @phone, address1: @address_a.join, state_code: @state_code, zip: @zip)
         end
         @sheet = @bank.sheets.find_or_create_by(name: sheet)
       end
@@ -53,7 +52,7 @@ class ObCmgWholesalesController < ApplicationController
               end
 
               # streamline
-              if @title.include?("FHA") 
+              if @title.include?("FHA")
                 @streamline = true
                 @fha = true
                 @full_doc = true
@@ -84,11 +83,11 @@ class ObCmgWholesalesController < ApplicationController
               elsif @title.include?("3103")
               	@program_category = "3103"
               elsif @title.include?("3102")
-              	@program_category = "3102"	
+              	@program_category = "3102"
               elsif @title.include?("3101HB & 3125HB")
               	@program_category = "3101HB & 3125HB"
               elsif @title.include?("4101 & 4125")
-              	@program_category = "4101 & 4125"	
+              	@program_category = "4101 & 4125"
               elsif @title.include?("4103")
               	@program_category = "4103"
               elsif @title.include?("4102")
@@ -98,7 +97,7 @@ class ObCmgWholesalesController < ApplicationController
               elsif @title.include?("5101")
               	@program_category = "5101"
               elsif @title.include?("3151")
-              	@program_category = "3151"	
+              	@program_category = "3151"
               elsif @title.include?("4151")
               	@program_category = "4151"
               end
@@ -171,7 +170,7 @@ class ObCmgWholesalesController < ApplicationController
 	              elsif @title.include?("15 Year")
 	                @term = 15
 	              end
-	           
+
 	               	# interest type
 	              if @title.include?("Fixed")
 	                @rate_type = 0
@@ -182,7 +181,7 @@ class ObCmgWholesalesController < ApplicationController
 	              end
 
 	              # streamline
-	              if @title.include?("FHA") 
+	              if @title.include?("FHA")
 	                @streamline = true
 	                @fha = true
 	                @full_doc = true
@@ -296,7 +295,7 @@ class ObCmgWholesalesController < ApplicationController
               elsif @title.include?("15 Year")
                 @term = 15
               end
-              
+
                	# interest type
               if @title.include?("Fixed")
                 @rate_type = 0
@@ -307,7 +306,7 @@ class ObCmgWholesalesController < ApplicationController
               end
 
               # streamline
-              if @title.include?("FHA") 
+              if @title.include?("FHA")
                 @streamline = true
                 @fha = true
                 @full_doc = true
@@ -524,7 +523,7 @@ class ObCmgWholesalesController < ApplicationController
               elsif @title.include?("15 Year")
                 @term = 15
               end
-           
+
                	# interest type
               if @title.include?("Fixed")
                 @rate_type = 0
@@ -535,7 +534,7 @@ class ObCmgWholesalesController < ApplicationController
               end
 
               # streamline
-              if @title.include?("FHA") 
+              if @title.include?("FHA")
                 @streamline = true
                 @fha = true
                 @full_doc = true
@@ -561,7 +560,7 @@ class ObCmgWholesalesController < ApplicationController
               else
               	@jumbo_high_balance = nil
               end
-              
+
               @program = Program.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
@@ -755,7 +754,7 @@ class ObCmgWholesalesController < ApplicationController
               elsif @title.include?("15 Year")
                 @term = 15
               end
-           
+
                	# interest type
               if @title.include?("Fixed")
                 @rate_type = 0
@@ -766,7 +765,7 @@ class ObCmgWholesalesController < ApplicationController
               end
 
               # streamline
-              if @title.include?("FHA") 
+              if @title.include?("FHA")
                 @streamline = true
                 @fha = true
                 @full_doc = true
@@ -792,7 +791,7 @@ class ObCmgWholesalesController < ApplicationController
               else
               	@jumbo_high_balance = nil
               end
-              
+
               @program = Program.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
@@ -943,7 +942,7 @@ class ObCmgWholesalesController < ApplicationController
               elsif @title.include?("15 Year")
                 @term = 15
               end
-           
+
                	# interest type
               if @title.include?("Fixed")
                 @rate_type = 0
@@ -954,7 +953,7 @@ class ObCmgWholesalesController < ApplicationController
               end
 
               # streamline
-              if @title.include?("FHA") 
+              if @title.include?("FHA")
                 @streamline = true
                 @fha = true
                 @full_doc = true
@@ -987,7 +986,7 @@ class ObCmgWholesalesController < ApplicationController
               else
               	@rate_arm = nil
               end
-              
+
               @program = Program.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
@@ -1072,7 +1071,7 @@ class ObCmgWholesalesController < ApplicationController
 	              elsif @title.include?("15 Year")
 	                @term = 15
 	              end
-	           
+
 	               	# interest type
 	              if @title.include?("Fixed")
 	                @rate_type = 0
@@ -1083,7 +1082,7 @@ class ObCmgWholesalesController < ApplicationController
 	              end
 
 	              # streamline
-	              if @title.include?("FHA") 
+	              if @title.include?("FHA")
 	                @streamline = true
 	                @fha = true
 	                @full_doc = true
@@ -1117,12 +1116,12 @@ class ObCmgWholesalesController < ApplicationController
 	              	@rate_arm = nil
 	              end
               end
-              
+
               if cc < 5
 	              @program = Program.find_or_create_by(program_name: @title)
 	              @programs_ids << @program.id
 	             	@program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
-	            
+
 	              # @program.adjustments.destroy_all
 	              @block_hash = {}
 	              key = ''
@@ -1177,7 +1176,7 @@ class ObCmgWholesalesController < ApplicationController
 	              elsif @title.include?("15 Year")
 	                @term = 15
 	              end
-	           
+
 	               	# interest type
 	              if @title.include?("Fixed")
 	                @rate_type = 0
@@ -1188,7 +1187,7 @@ class ObCmgWholesalesController < ApplicationController
 	              end
 
 	              # streamline
-	              if @title.include?("FHA") 
+	              if @title.include?("FHA")
 	                @streamline = true
 	                @fha = true
 	                @full_doc = true
@@ -1222,12 +1221,12 @@ class ObCmgWholesalesController < ApplicationController
 	              	@rate_arm = nil
 	              end
               end
-              
+
               if cc < 5
 	              @program = Program.find_or_create_by(program_name: @title)
 	              @programs_ids << @program.id
 	             	@program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
-	            
+
 	              # @program.adjustments.destroy_all
 	              @block_hash = {}
 	              key = ''
@@ -1484,7 +1483,7 @@ class ObCmgWholesalesController < ApplicationController
               elsif @title.include?("15 Year")
                 @term = 15
               end
-           
+
                	# interest type
               if @title.include?("Fixed")
                 @rate_type = 0
@@ -1495,7 +1494,7 @@ class ObCmgWholesalesController < ApplicationController
               end
 
               # streamline
-              if @title.include?("FHA") 
+              if @title.include?("FHA")
                 @streamline = true
                 @fha = true
                 @full_doc = true
@@ -1528,7 +1527,7 @@ class ObCmgWholesalesController < ApplicationController
               else
               	@rate_arm = nil
               end
-              
+
               @program = Program.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
@@ -1713,7 +1712,7 @@ class ObCmgWholesalesController < ApplicationController
               elsif @title.include?("15 Year")
                 @term = 15
               end
-           
+
                	# interest type
               if @title.include?("Fixed")
                 @rate_type = 0
@@ -1724,7 +1723,7 @@ class ObCmgWholesalesController < ApplicationController
               end
 
               # streamline
-              if @title.include?("FHA") 
+              if @title.include?("FHA")
                 @streamline = true
                 @fha = true
                 @full_doc = true
@@ -1757,7 +1756,7 @@ class ObCmgWholesalesController < ApplicationController
               else
               	@rate_arm = nil
               end
-              
+
               @program = Program.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
@@ -1933,7 +1932,7 @@ class ObCmgWholesalesController < ApplicationController
 	 #              elsif @title.include?("15 Year")
 	 #                @term = 15
 	 #              end
-	           
+
 	 #               	# interest type
 	 #              if @title.include?("Fixed")
 	 #                @rate_type = 0
@@ -1944,7 +1943,7 @@ class ObCmgWholesalesController < ApplicationController
 	 #              end
 
 	 #              # streamline
-	 #              if @title.include?("FHA") 
+	 #              if @title.include?("FHA")
 	 #                @streamline = true
 	 #                @fha = true
 	 #                @full_doc = true
@@ -1983,7 +1982,7 @@ class ObCmgWholesalesController < ApplicationController
 	 #              @programs_ids << @program.id
 	 #              @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
 	 #              # @program.adjustments.destroy_all
-	              
+
 	 #              @block_hash = {}
 	 #              key = ''
 	 #              (1..50).each do |max_row|
@@ -2037,7 +2036,7 @@ class ObCmgWholesalesController < ApplicationController
 	 #              elsif @title.include?("15 Year")
 	 #                @term = 15
 	 #              end
-	           
+
 	 #               	# interest type
 	 #              if @title.include?("Fixed")
 	 #                @rate_type = 0
@@ -2048,7 +2047,7 @@ class ObCmgWholesalesController < ApplicationController
 	 #              end
 
 	 #              # streamline
-	 #              if @title.include?("FHA") 
+	 #              if @title.include?("FHA")
 	 #                @streamline = true
 	 #                @fha = true
 	 #                @full_doc = true
@@ -2092,7 +2091,7 @@ class ObCmgWholesalesController < ApplicationController
 	 #              @programs_ids << @program.id
 	 #              @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
 	 #              # @program.adjustments.destroy_all
-	              
+
 	 #              @block_hash = {}
 	 #              key = ''
 	 #              (1..50).each do |max_row|
@@ -2159,7 +2158,7 @@ class ObCmgWholesalesController < ApplicationController
               elsif @title.include?("15 Year")
                 @term = 15
               end
-           
+
                	# interest type
               if @title.include?("Fixed")
                 @rate_type = 0
@@ -2170,7 +2169,7 @@ class ObCmgWholesalesController < ApplicationController
               end
 
               # streamline
-              if @title.include?("FHA") 
+              if @title.include?("FHA")
                 @streamline = true
                 @fha = true
                 @full_doc = true
@@ -2203,7 +2202,7 @@ class ObCmgWholesalesController < ApplicationController
               else
               	@rate_arm = nil
               end
-              
+
               @program = Program.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
@@ -2271,7 +2270,7 @@ class ObCmgWholesalesController < ApplicationController
 		              elsif @title.include?("15 Year")
 		                @term = 15
 		              end
-		           
+
 		               	# interest type
 		              if @title.include?("Fixed")
 		                @rate_type = 0
@@ -2282,7 +2281,7 @@ class ObCmgWholesalesController < ApplicationController
 		              end
 
 		              # streamline
-		              if @title.include?("FHA") 
+		              if @title.include?("FHA")
 		                @streamline = true
 		                @fha = true
 		                @full_doc = true
@@ -2374,7 +2373,7 @@ class ObCmgWholesalesController < ApplicationController
 		              elsif @title.include?("15 Year")
 		                @term = 15
 		              end
-		           
+
 		               	# interest type
 		              if @title.include?("Fixed")
 		                @rate_type = 0
@@ -2385,7 +2384,7 @@ class ObCmgWholesalesController < ApplicationController
 		              end
 
 		              # streamline
-		              if @title.include?("FHA") 
+		              if @title.include?("FHA")
 		                @streamline = true
 		                @fha = true
 		                @full_doc = true
@@ -2470,7 +2469,7 @@ class ObCmgWholesalesController < ApplicationController
   # end
   def get_value value1
   	if value1.present?
-  		if value1.include?("FICO <") 
+  		if value1.include?("FICO <")
   			value1 = "0"+value1.split("FICO").last
   		elsif value1.include?("<")
   			value1 = "0"+value1
