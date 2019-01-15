@@ -69,7 +69,7 @@
                     <%= select_tag 'lock_period', options_for_select(@lock_period_list, @lock_period), :class=> "form-control" %>
                   </div>
                 </div>
-              </div>            
+              </div>
 
               <div class="col-md-2">
                 <div class="form-group">
@@ -112,28 +112,28 @@
   </table>
 </div>
   <div class="row col-md-6 col-md-offset-2 custyle">
-  <table class="table table-striped custab">
-  <thead>
-  <h2>Banks</h2>
-  <tr>
-    <th>No.</th>
-    <th>Name</th>
-    <th>Phone</th>
-    <th class="text-center">Action</th>
-  </tr>
-  </thead>
-    <% if @banks.present? %>
-      <% @banks.each_with_index do |bank, index|%>
+    <table class="table table-striped custab">
+      <thead>
+      <h2>Banks</h2>
+      <tr>
+        <th>No.</th>
+        <th>Name</th>
+        <th class="text-center">Action</th>
+      </tr>
+      </thead>
+      <tbody>
         <tr>
-          <td><%= index +1 %></td>
-          <td><%= bank.name%></td>
-          <td><%= bank.phone%></td>
+          <td>1</td>
+          <td>New Penn Financial</td>
           <td class="text-center"><a class='btn btn-info btn-xs' href="<%=import_files_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
         </tr>
-      <%end%>
-    <%end%>
-    </tbody>
-  </table>
+        <tr>
+          <td>2</td>
+          <td>CMG Financial </td>
+          <td class="text-center"><a class='btn btn-info btn-xs' href="<%=ob_cmg_wholesales_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
@@ -160,7 +160,7 @@
      $(".term").show()
     }
 
-   $("#rate_type").on('click', function(e){ 
+   $("#rate_type").on('click', function(e){
      if ($(this).val()=="ARM"){
       $(".term").hide()
       $(".term-arm").show()

@@ -1,5 +1,5 @@
 class ObCmgWholesalesController < ApplicationController
-	before_action :get_sheet, only: [:gov, :programs]
+	before_action :get_sheet, only: [:gov, :agency, :durp, :oa, :jumbo_700,:jumbo_7200_6700, :jumbo_6600, :jumbo_7600, :jumbo_6800, :jumbo_6900_7900, :programs]
   before_action :get_program, only: [:single_program]
 
   def index
@@ -105,7 +105,7 @@ class ObCmgWholesalesController < ApplicationController
               	@program_category = "4151"
               end
 
-              @program = @sheet.programs.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc)
               # @program.adjustments.destroy_all
@@ -143,7 +143,7 @@ class ObCmgWholesalesController < ApplicationController
       end
     end
     # redirect_to programs_import_file_path(@bank)
-  	redirect_to programs_ob_cmg_wholesale_path(@sheet)
+  	redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
   end
 
   def agency
@@ -219,7 +219,7 @@ class ObCmgWholesalesController < ApplicationController
 	              	@rate_arm = nil
 	              end
 
-	              @program = Program.find_or_create_by(program_name: @title)
+	              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
 	              @programs_ids << @program.id
 	              @program.update(term: @term,rate_type: @rate_typerate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
 	              # @program.adjustments.destroy_all
@@ -258,7 +258,7 @@ class ObCmgWholesalesController < ApplicationController
       end
     end
     # redirect_to programs_import_file_path(@bank)
-  	redirect_to root_path
+  	redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
   end
 
   def durp
@@ -338,7 +338,7 @@ class ObCmgWholesalesController < ApplicationController
               	@jumbo_high_balance = nil
               end
 
-              @program = Program.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance)
               # @program.adjustments.destroy_all
@@ -486,7 +486,7 @@ class ObCmgWholesalesController < ApplicationController
       end
     end
     # redirect_to programs_import_file_path(@bank)
-  	redirect_to root_path
+  	redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
   end
 
   def oa
@@ -567,7 +567,7 @@ class ObCmgWholesalesController < ApplicationController
               	@jumbo_high_balance = nil
               end
 
-              @program = Program.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
               # @program.adjustments.destroy_all
@@ -715,7 +715,7 @@ class ObCmgWholesalesController < ApplicationController
       end
     end
     # redirect_to programs_import_file_path(@bank)
-  	redirect_to root_path
+  	redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
   end
 
   def jumbo_700
@@ -798,8 +798,8 @@ class ObCmgWholesalesController < ApplicationController
               else
               	@jumbo_high_balance = nil
               end
-
-              @program = Program.find_or_create_by(program_name: @title)
+              debugger
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
               # @program.adjustments.destroy_all
@@ -919,7 +919,7 @@ class ObCmgWholesalesController < ApplicationController
    		end
    	end
     # redirect_to programs_import_file_path(@bank)
-  	redirect_to root_path
+  	redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
   end
 
   def jumbo_6200
@@ -994,7 +994,7 @@ class ObCmgWholesalesController < ApplicationController
               	@rate_arm = nil
               end
 
-              @program = Program.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
               # @program.adjustments.destroy_all
@@ -1032,7 +1032,7 @@ class ObCmgWholesalesController < ApplicationController
       end
     end
     # redirect_to programs_import_file_path(@bank)
-  	redirect_to root_path
+  	redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
   end
 
   def jumbo_7200_6700
@@ -1126,7 +1126,7 @@ class ObCmgWholesalesController < ApplicationController
               end
 
               if cc < 5
-	              @program = Program.find_or_create_by(program_name: @title)
+	              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
 	              @programs_ids << @program.id
 	             	@program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
 
@@ -1231,7 +1231,7 @@ class ObCmgWholesalesController < ApplicationController
               end
 
               if cc < 5
-	              @program = Program.find_or_create_by(program_name: @title)
+	              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
 	              @programs_ids << @program.id
 	             	@program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
 
@@ -1453,7 +1453,7 @@ class ObCmgWholesalesController < ApplicationController
       end
     end
     # redirect_to programs_import_file_path(@bank)
-  	redirect_to root_path
+  	redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
   end
 
   def jumbo_6600
@@ -1537,7 +1537,7 @@ class ObCmgWholesalesController < ApplicationController
               	@rate_arm = nil
               end
 
-              @program = Program.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
               # @program.adjustments.destroy_all
@@ -1683,7 +1683,7 @@ class ObCmgWholesalesController < ApplicationController
       end
     end
     # redirect_to programs_import_file_path(@bank)
-  	redirect_to root_path
+  	redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
   end
 
   def jumbo_7600
@@ -1767,7 +1767,7 @@ class ObCmgWholesalesController < ApplicationController
               	@rate_arm = nil
               end
 
-              @program = Program.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
               # @program.adjustments.destroy_all
@@ -1913,7 +1913,7 @@ class ObCmgWholesalesController < ApplicationController
       end
     end
     # redirect_to programs_import_file_path(@bank)
-  	redirect_to root_path
+  	redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
   end
 
   # def import_jummbo6400_sheet
@@ -1989,7 +1989,7 @@ class ObCmgWholesalesController < ApplicationController
 	 #              end
 	 #            end
   #             if @title.present? && cc < 9
-	 #              @program = Program.find_or_create_by(program_name: @title)
+	 #              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
 	 #              @programs_ids << @program.id
 	 #              @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
 	 #              # @program.adjustments.destroy_all
@@ -2093,12 +2093,12 @@ class ObCmgWholesalesController < ApplicationController
 	 #              end
   #             end
   #             if cc < 5 && @title == "10/1 ARM - 6410"
-	 #              @program = Program.find_or_create_by(program_name: @title)
+	 #              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
 	 #              @programs_ids << @program.id
 	 #              end
 	 #            end
   #             if @title.present? && cc < 9
-	 #              @program = Program.find_or_create_by(program_name: @title)
+	 #              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
 	 #              @programs_ids << @program.id
 	 #              @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
 	 #              # @program.adjustments.destroy_all
@@ -2140,7 +2140,7 @@ class ObCmgWholesalesController < ApplicationController
   #     end
   #   end
   #   # redirect_to programs_import_file_path(@bank)
-  # 	redirect_to root_path
+  # 	redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
   # end
   def jumbo_6800
     @programs_ids = []
@@ -2214,7 +2214,7 @@ class ObCmgWholesalesController < ApplicationController
               	@rate_arm = nil
               end
 
-              @program = Program.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
               # @program.adjustments.destroy_all
@@ -2252,7 +2252,7 @@ class ObCmgWholesalesController < ApplicationController
       end
     end
     # redirect_to programs_import_file_path(@bank)
-  	redirect_to root_path
+  	redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
   end
 
   def jumbo_6900_7900
@@ -2327,7 +2327,7 @@ class ObCmgWholesalesController < ApplicationController
 		              	@rate_arm = nil
 		              end
               	end
-	              @program = Program.find_or_create_by(program_name: @title)
+	              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
 	              @programs_ids << @program.id
 	             	@program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
 	            if @title.present?
@@ -2430,7 +2430,7 @@ class ObCmgWholesalesController < ApplicationController
 		              	@rate_arm = nil
 		              end
               	end
-	              @program = Program.find_or_create_by(program_name: @title)
+	              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
 	              @programs_ids << @program.id
 	             	@program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
 	            if @title.present?
@@ -2472,7 +2472,7 @@ class ObCmgWholesalesController < ApplicationController
       end
     end
     # redirect_to programs_import_file_path(@bank)
-  	redirect_to root_path
+  	redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
   end
 
   def get_value value1
@@ -2492,7 +2492,7 @@ class ObCmgWholesalesController < ApplicationController
  	end
 
   def programs
-    @programs = @sheet.programs
+    @programs = @sheet_obj.programs
   end
 
   def single_program
@@ -2500,7 +2500,7 @@ class ObCmgWholesalesController < ApplicationController
 
   private
     def get_sheet
-      @sheet = Sheet.find(params[:id])
+      @sheet_obj = Sheet.find(params[:id])
     end
 
     def get_program
