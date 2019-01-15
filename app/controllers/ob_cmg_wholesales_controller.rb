@@ -1,5 +1,7 @@
 class ObCmgWholesalesController < ApplicationController
-	# before_action :get_sheet, only: [:import_gov_sheet]
+	before_action :get_sheet, only: [:gov, :programs]
+  before_action :get_program, only: [:single_program]
+
   def index
   	file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -9,7 +11,6 @@ class ObCmgWholesalesController < ApplicationController
           headers = ["Phone", "General Contacts", "Mortgagee Clause (Wholesale)"]
           @name = "CMG Financial"
           @bank = Bank.find_or_create_by(name: @name)
-          # @bank.update(phone: @phone, address1: @address_a.join, state_code: @state_code, zip: @zip)
         end
         @sheet = @bank.sheets.find_or_create_by(name: sheet)
       end
@@ -17,7 +18,8 @@ class ObCmgWholesalesController < ApplicationController
       # the required headers are not all present
     end
   end
-  def import_gov_sheet
+
+  def gov
     @programs_ids = []
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -65,7 +67,7 @@ class ObCmgWholesalesController < ApplicationController
               end
 
               # streamline
-              if @title.include?("FHA") 
+              if @title.include?("FHA")
                 @streamline = true
                 @fha = true
                 @full_doc = true
@@ -96,11 +98,11 @@ class ObCmgWholesalesController < ApplicationController
               elsif @title.include?("3103")
               	@program_category = "3103"
               elsif @title.include?("3102")
-              	@program_category = "3102"	
+              	@program_category = "3102"
               elsif @title.include?("3101HB & 3125HB")
               	@program_category = "3101HB & 3125HB"
               elsif @title.include?("4101 & 4125")
-              	@program_category = "4101 & 4125"	
+              	@program_category = "4101 & 4125"
               elsif @title.include?("4103")
               	@program_category = "4103"
               elsif @title.include?("4102")
@@ -110,12 +112,12 @@ class ObCmgWholesalesController < ApplicationController
               elsif @title.include?("5101")
               	@program_category = "5101"
               elsif @title.include?("3151")
-              	@program_category = "3151"	
+              	@program_category = "3151"
               elsif @title.include?("4151")
               	@program_category = "4151"
               end
 
-              @program = Program.find_or_create_by(program_name: @title)
+              @program = @sheet.programs.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc)
               # @program.adjustments.destroy_all
@@ -231,9 +233,10 @@ class ObCmgWholesalesController < ApplicationController
       end
     end
     # redirect_to programs_import_file_path(@bank)
-  	redirect_to root_path
+  	redirect_to programs_ob_cmg_wholesale_path(@sheet)
   end
-  def import_agency_sheet
+
+  def agency
     @programs_ids = []
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -262,7 +265,7 @@ class ObCmgWholesalesController < ApplicationController
 	              elsif @title.include?("15 Year")
 	                @term = 15
 	              end
-	           
+
 	               	# interest type
 	              if @title.include?("Fixed")
 	                @rate_type = 0
@@ -273,7 +276,7 @@ class ObCmgWholesalesController < ApplicationController
 	              end
 
 	              # streamline
-	              if @title.include?("FHA") 
+	              if @title.include?("FHA")
 	                @streamline = true
 	                @fha = true
 	                @full_doc = true
@@ -393,7 +396,8 @@ class ObCmgWholesalesController < ApplicationController
     # redirect_to programs_import_file_path(@bank)
   	redirect_to root_path
   end
-  def import_durp_sheet
+
+  def durp
     @programs_ids = []
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -432,7 +436,7 @@ class ObCmgWholesalesController < ApplicationController
               elsif @title.include?("15 Year")
                 @term = 15
               end
-              
+
                	# interest type
               if @title.include?("Fixed")
                 @rate_type = 0
@@ -443,7 +447,7 @@ class ObCmgWholesalesController < ApplicationController
               end
 
               # streamline
-              if @title.include?("FHA") 
+              if @title.include?("FHA")
                 @streamline = true
                 @fha = true
                 @full_doc = true
@@ -620,7 +624,8 @@ class ObCmgWholesalesController < ApplicationController
     # redirect_to programs_import_file_path(@bank)
   	redirect_to root_path
   end
-  def import_oa_sheet
+
+  def oa
     @programs_ids = []
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -660,7 +665,7 @@ class ObCmgWholesalesController < ApplicationController
               elsif @title.include?("15 Year")
                 @term = 15
               end
-           
+
                	# interest type
               if @title.include?("Fixed")
                 @rate_type = 0
@@ -671,7 +676,7 @@ class ObCmgWholesalesController < ApplicationController
               end
 
               # streamline
-              if @title.include?("FHA") 
+              if @title.include?("FHA")
                 @streamline = true
                 @fha = true
                 @full_doc = true
@@ -697,7 +702,7 @@ class ObCmgWholesalesController < ApplicationController
               else
               	@jumbo_high_balance = nil
               end
-              
+
               @program = Program.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
@@ -848,7 +853,8 @@ class ObCmgWholesalesController < ApplicationController
     # redirect_to programs_import_file_path(@bank)
   	redirect_to root_path
   end
-  def import_jumbo700_sheet
+
+  def jumbo_700
     @programs_ids = []
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -891,7 +897,7 @@ class ObCmgWholesalesController < ApplicationController
               elsif @title.include?("15 Year")
                 @term = 15
               end
-           
+
                	# interest type
               if @title.include?("Fixed")
                 @rate_type = 0
@@ -902,7 +908,7 @@ class ObCmgWholesalesController < ApplicationController
               end
 
               # streamline
-              if @title.include?("FHA") 
+              if @title.include?("FHA")
                 @streamline = true
                 @fha = true
                 @full_doc = true
@@ -928,7 +934,7 @@ class ObCmgWholesalesController < ApplicationController
               else
               	@jumbo_high_balance = nil
               end
-              
+
               @program = Program.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
@@ -1052,7 +1058,7 @@ class ObCmgWholesalesController < ApplicationController
   	redirect_to root_path
   end
 
-  def import_jumbo6200_sheet
+  def jumbo_6200
     @programs_ids = []
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -1087,7 +1093,7 @@ class ObCmgWholesalesController < ApplicationController
               elsif @title.include?("15 Year")
                 @term = 15
               end
-           
+
                	# interest type
               if @title.include?("Fixed")
                 @rate_type = 0
@@ -1098,7 +1104,7 @@ class ObCmgWholesalesController < ApplicationController
               end
 
               # streamline
-              if @title.include?("FHA") 
+              if @title.include?("FHA")
                 @streamline = true
                 @fha = true
                 @full_doc = true
@@ -1131,7 +1137,7 @@ class ObCmgWholesalesController < ApplicationController
               else
               	@rate_arm = nil
               end
-              
+
               @program = Program.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
@@ -1256,7 +1262,8 @@ class ObCmgWholesalesController < ApplicationController
     # redirect_to programs_import_file_path(@bank)
   	redirect_to root_path
   end
-  def import_jumbo7200_6700_sheet
+
+  def jumbo_7200_6700
     @programs_ids = []
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -1300,7 +1307,7 @@ class ObCmgWholesalesController < ApplicationController
 	              elsif @title.include?("15 Year")
 	                @term = 15
 	              end
-	           
+
 	               	# interest type
 	              if @title.include?("Fixed")
 	                @rate_type = 0
@@ -1311,7 +1318,7 @@ class ObCmgWholesalesController < ApplicationController
 	              end
 
 	              # streamline
-	              if @title.include?("FHA") 
+	              if @title.include?("FHA")
 	                @streamline = true
 	                @fha = true
 	                @full_doc = true
@@ -1345,12 +1352,12 @@ class ObCmgWholesalesController < ApplicationController
 	              	@rate_arm = nil
 	              end
               end
-              
+
               if cc < 5
 	              @program = Program.find_or_create_by(program_name: @title)
 	              @programs_ids << @program.id
 	             	@program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
-	            
+
 	              # @program.adjustments.destroy_all
 	              @block_hash = {}
 	              key = ''
@@ -1405,7 +1412,7 @@ class ObCmgWholesalesController < ApplicationController
 	              elsif @title.include?("15 Year")
 	                @term = 15
 	              end
-	           
+
 	               	# interest type
 	              if @title.include?("Fixed")
 	                @rate_type = 0
@@ -1416,7 +1423,7 @@ class ObCmgWholesalesController < ApplicationController
 	              end
 
 	              # streamline
-	              if @title.include?("FHA") 
+	              if @title.include?("FHA")
 	                @streamline = true
 	                @fha = true
 	                @full_doc = true
@@ -1450,12 +1457,12 @@ class ObCmgWholesalesController < ApplicationController
 	              	@rate_arm = nil
 	              end
               end
-              
+
               if cc < 5
 	              @program = Program.find_or_create_by(program_name: @title)
 	              @programs_ids << @program.id
 	             	@program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
-	            
+
 	              # @program.adjustments.destroy_all
 	              @block_hash = {}
 	              key = ''
@@ -1676,7 +1683,8 @@ class ObCmgWholesalesController < ApplicationController
     # redirect_to programs_import_file_path(@bank)
   	redirect_to root_path
   end
-  def import_jummbo6600_sheet
+
+  def jumbo_6600
     @programs_ids = []
     @purchase_adjustment = {}
     @rate_adjustment = {}
@@ -1712,7 +1720,7 @@ class ObCmgWholesalesController < ApplicationController
               elsif @title.include?("15 Year")
                 @term = 15
               end
-           
+
                	# interest type
               if @title.include?("Fixed")
                 @rate_type = 0
@@ -1723,7 +1731,7 @@ class ObCmgWholesalesController < ApplicationController
               end
 
               # streamline
-              if @title.include?("FHA") 
+              if @title.include?("FHA")
                 @streamline = true
                 @fha = true
                 @full_doc = true
@@ -1756,7 +1764,7 @@ class ObCmgWholesalesController < ApplicationController
               else
               	@rate_arm = nil
               end
-              
+
               @program = Program.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
@@ -1905,7 +1913,8 @@ class ObCmgWholesalesController < ApplicationController
     # redirect_to programs_import_file_path(@bank)
   	redirect_to root_path
   end
-  def import_jummbo7600_sheet
+
+  def jumbo_7600
     @programs_ids = []
     @purchase_adjustment = {}
     @rate_adjustment = {}
@@ -1941,7 +1950,7 @@ class ObCmgWholesalesController < ApplicationController
               elsif @title.include?("15 Year")
                 @term = 15
               end
-           
+
                	# interest type
               if @title.include?("Fixed")
                 @rate_type = 0
@@ -1952,7 +1961,7 @@ class ObCmgWholesalesController < ApplicationController
               end
 
               # streamline
-              if @title.include?("FHA") 
+              if @title.include?("FHA")
                 @streamline = true
                 @fha = true
                 @full_doc = true
@@ -1985,7 +1994,7 @@ class ObCmgWholesalesController < ApplicationController
               else
               	@rate_arm = nil
               end
-              
+
               @program = Program.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
@@ -2134,6 +2143,7 @@ class ObCmgWholesalesController < ApplicationController
     # redirect_to programs_import_file_path(@bank)
   	redirect_to root_path
   end
+
   # def import_jummbo6400_sheet
   #   @programs_ids = []
   #   file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
@@ -2161,7 +2171,7 @@ class ObCmgWholesalesController < ApplicationController
 	 #              elsif @title.include?("15 Year")
 	 #                @term = 15
 	 #              end
-	           
+
 	 #               	# interest type
 	 #              if @title.include?("Fixed")
 	 #                @rate_type = 0
@@ -2172,7 +2182,7 @@ class ObCmgWholesalesController < ApplicationController
 	 #              end
 
 	 #              # streamline
-	 #              if @title.include?("FHA") 
+	 #              if @title.include?("FHA")
 	 #                @streamline = true
 	 #                @fha = true
 	 #                @full_doc = true
@@ -2211,7 +2221,7 @@ class ObCmgWholesalesController < ApplicationController
 	 #              @programs_ids << @program.id
 	 #              @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
 	 #              # @program.adjustments.destroy_all
-	              
+
 	 #              @block_hash = {}
 	 #              key = ''
 	 #              (1..50).each do |max_row|
@@ -2265,7 +2275,7 @@ class ObCmgWholesalesController < ApplicationController
 	 #              elsif @title.include?("15 Year")
 	 #                @term = 15
 	 #              end
-	           
+
 	 #               	# interest type
 	 #              if @title.include?("Fixed")
 	 #                @rate_type = 0
@@ -2276,7 +2286,7 @@ class ObCmgWholesalesController < ApplicationController
 	 #              end
 
 	 #              # streamline
-	 #              if @title.include?("FHA") 
+	 #              if @title.include?("FHA")
 	 #                @streamline = true
 	 #                @fha = true
 	 #                @full_doc = true
@@ -2320,7 +2330,7 @@ class ObCmgWholesalesController < ApplicationController
 	 #              @programs_ids << @program.id
 	 #              @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
 	 #              # @program.adjustments.destroy_all
-	              
+
 	 #              @block_hash = {}
 	 #              key = ''
 	 #              (1..50).each do |max_row|
@@ -2360,7 +2370,7 @@ class ObCmgWholesalesController < ApplicationController
   #   # redirect_to programs_import_file_path(@bank)
   # 	redirect_to root_path
   # end
-  def import_jummbo6800_sheet
+  def jumbo_6800
     @programs_ids = []
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -2387,7 +2397,7 @@ class ObCmgWholesalesController < ApplicationController
               elsif @title.include?("15 Year")
                 @term = 15
               end
-           
+
                	# interest type
               if @title.include?("Fixed")
                 @rate_type = 0
@@ -2398,7 +2408,7 @@ class ObCmgWholesalesController < ApplicationController
               end
 
               # streamline
-              if @title.include?("FHA") 
+              if @title.include?("FHA")
                 @streamline = true
                 @fha = true
                 @full_doc = true
@@ -2431,7 +2441,7 @@ class ObCmgWholesalesController < ApplicationController
               else
               	@rate_arm = nil
               end
-              
+
               @program = Program.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
@@ -2472,7 +2482,8 @@ class ObCmgWholesalesController < ApplicationController
     # redirect_to programs_import_file_path(@bank)
   	redirect_to root_path
   end
-  def import_jumbo6900_7900_sheet
+
+  def jumbo_6900_7900
     @programs_ids = []
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -2499,7 +2510,7 @@ class ObCmgWholesalesController < ApplicationController
 		              elsif @title.include?("15 Year")
 		                @term = 15
 		              end
-		           
+
 		               	# interest type
 		              if @title.include?("Fixed")
 		                @rate_type = 0
@@ -2510,7 +2521,7 @@ class ObCmgWholesalesController < ApplicationController
 		              end
 
 		              # streamline
-		              if @title.include?("FHA") 
+		              if @title.include?("FHA")
 		                @streamline = true
 		                @fha = true
 		                @full_doc = true
@@ -2602,7 +2613,7 @@ class ObCmgWholesalesController < ApplicationController
 		              elsif @title.include?("15 Year")
 		                @term = 15
 		              end
-		           
+
 		               	# interest type
 		              if @title.include?("Fixed")
 		                @rate_type = 0
@@ -2613,7 +2624,7 @@ class ObCmgWholesalesController < ApplicationController
 		              end
 
 		              # streamline
-		              if @title.include?("FHA") 
+		              if @title.include?("FHA")
 		                @streamline = true
 		                @fha = true
 		                @full_doc = true
@@ -2692,13 +2703,9 @@ class ObCmgWholesalesController < ApplicationController
   	redirect_to root_path
   end
 
-  # private
-  # def get_sheet
-  # 	@sheet = Sheet.find(params[:id])
-  # end
   def get_value value1
   	if value1.present?
-  		if value1.include?("FICO <") 
+  		if value1.include?("FICO <")
   			value1 = "0"+value1.split("FICO").last
   		elsif value1.include?("<")
   			value1 = "0"+value1
@@ -2711,6 +2718,7 @@ class ObCmgWholesalesController < ApplicationController
      	end
    	end
  	end
+
  	def get_key value1
     if value1.present?
       if value1.include?("Streamline")
@@ -2724,4 +2732,20 @@ class ObCmgWholesalesController < ApplicationController
       end
     end
   end
+
+  def programs
+    @programs = @sheet.programs
+  end
+
+  def single_program
+  end
+
+  private
+    def get_sheet
+      @sheet = Sheet.find(params[:id])
+    end
+
+    def get_program
+      @program = Program.find(params[:id])
+    end
 end
