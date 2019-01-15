@@ -16,7 +16,7 @@
                 <div class="form-group">
                   <label>Term</label>
                   <div class="input-group">
-                   <% @term_list =[["10 yrs",10], ["15 yrs"], ["20 yrs",20], ["25 yrs",25], ["30 yrs",30]] %>
+                   <% @term_list =[["10 yrs",10], ["15 yrs",15], ["20 yrs",20], ["25 yrs",25], ["30 yrs",30]] %>
                     <%= select_tag 'term', options_for_select(@term_list, (@filter_data[:term] rescue nil)), { prompt: 'Select Term', :class=> "form-control"} %>
                   </div>
                 </div>
@@ -65,7 +65,7 @@
                 <div class="form-group">
                   <label>Lock Period</label>
                   <div class="input-group">
-                    <% @lock_period_list =[["15 days",15], ["30 days",30], ["45 days",45], ["60 days",60]]%>
+                    <% @lock_period_list =[["15 days"], ["30 days",30], ["45 days",45], ["60 days",60]]%>
                     <%= select_tag 'lock_period', options_for_select(@lock_period_list, @lock_period), :class=> "form-control" %>
                   </div>
                 </div>
