@@ -8,7 +8,7 @@
                 <div class="form-group">
                   <label>Rate Type</label>
                   <% @rate_type_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"]]%>
-                  <%= select_tag 'rate_type', options_for_select(@rate_type_list, @rate_type), { prompt: 'Select rate-type', :class=> "form-control"} %>
+                  <%= select_tag 'rate_type', options_for_select(@rate_type_list, @rate_type), { prompt: 'Select rate-type', :class=> "form-control", :required => true} %>
                 </div>
                 <p>Base Rate = <%= @base_rate%></p>
               </div>
@@ -37,7 +37,7 @@
                 <div class="form-group">
                   <label>Loan Limit Type</label>
                   <div class="input-group">
-                    <% @loan_limit_type_list =[["Non-Conforming"], ["Conforming"], ["Jumbo"], ["High-Balance"]]%>
+                    <% @loan_limit_type_list =[["Non-Conforming"], ["Conforming"], ["High-Balance"]]%>
                     <%= select_tag 'loan_limit_type', options_for_select(@loan_limit_type_list), { prompt: 'Select Loan Type', :class=> "form-control" }%>
                   </div>
                 </div>
@@ -86,6 +86,32 @@
       </div>
       <!-- end searching form -->
 
+
+<div class="row col-md-6 col-md-offset-2 custyle">
+  <table class="table table-striped custab">
+    <thead>
+      <h2>Programs</h2>
+      <tr>
+        <th>No.</th>
+        <th>Program Name</th>
+        <th>Base Rate</th>
+        <th>Sheet Name</th>
+      </tr>
+    </thead>
+    <tbody>
+    <% if @programs.present? %>
+      <% @programs.each_with_index do |program, index|%>
+        <tr>
+          <td><%= index +1 %></td>
+          <td><%= program.program_name%></td>
+          <td><%= program.base_rate[program.base_rate.keys.first][@interest.to_f.to_s][@lock_period] %></td>
+          <td><%= program.sheet_name %></td>
+        </tr>
+      <%end%>
+    <%end%>
+    </tbody>
+  </table>
+</div>
   <div class="row col-md-6 col-md-offset-2 custyle">
   <table class="table table-striped custab">
   <thead>

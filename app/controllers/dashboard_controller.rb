@@ -12,7 +12,8 @@ class DashboardController < ApplicationController
   def set_default
     @base_rate = 0.0
     @filter_data = {}
-
+    @interest = "4.375"
+    @lock_period ="30"
   end
 
   def set_variable
@@ -74,20 +75,22 @@ class DashboardController < ApplicationController
   end
 
   def find_base_rate
-      @programs = Program.where(@filter_data)
-      if @programs.present?
-        if @programs.count>=2
-          flash[:error] = "find multiple program"
-        else
-          program = @programs.first
-          if program.base_rate[program.base_rate.keys.first][@interest.to_f.to_s].present?
-            @base_rate = program.base_rate[program.base_rate.keys.first][@interest.to_f.to_s][@lock_period]
-          else
-            flash[:error] = "Not find any interest rate for this situation"
+      @program_list = Program.where(@filter_data)
+      if @program_list.present?
+        @programs =[]
+        @program_list.each do |program|
+          if(program.base_rate[program.base_rate.keys.first].keys.first>=(@interest.to_f.to_s) && program.base_rate[program.base_rate.keys.first].keys.last <=(@interest.to_f.to_s))
+            @programs << program
           end
         end
-      else
-        flash[:error] = "Not find any program for this situation"
+        # if @programs.count>=2
+        #   flash[:error] = "find multiple program"
+        # else
+        #   program = @programs.first
+        #   if program.base_rate[program.base_rate.keys.first][@interest.to_f.to_s].present?
+        #     @base_rate = program.base_rate[program.base_rate.keys.first][@interest.to_f.to_s][@lock_period]
+        #   end
+        # end
       end
     return @base_rate
   end
