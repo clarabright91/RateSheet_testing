@@ -7,27 +7,6 @@ class ObCmgWholesalesController < ApplicationController
       xlsx.sheets.each do |sheet|
         if (sheet == "AGENCY")
           headers = ["Phone", "General Contacts", "Mortgagee Clause (Wholesale)"]
-          # xlsx.sheet(sheet).each_with_index do |row, index|
-          #   current_row = index+1
-          #   if row.include?("Mortgagee Clause (Wholesale)")
-          #     address_index = row.find_index("Mortgagee Clause (Wholesale)")
-          #     @address_a = []
-          #     (1..3).each do |n|
-          #       @address_a << xlsx.sheet(sheet).row(current_row+n)[address_index]
-          #       if n == 3
-          #         @zip = xlsx.sheet(sheet).row(current_row+n)[address_index].split.last
-          #         @state_code = xlsx.sheet(sheet).row(current_row+n)[address_index].split[2]
-          #       end
-          #     end
-          #   end
-          #   if (row.include?("Phone") && row.include?("General Contacts"))
-          #     phone_index = row.find_index(headers[0])
-          #     general_contacts_index = row.find_index(headers[1])
-          #     c_row = xlsx.sheet(sheet).row(current_row+1)
-          #     @name = c_row[general_contacts_index]
-          #     @phone = c_row[phone_index]
-          #   end
-          # end
           @name = "CMG Financial"
           @bank = Bank.find_or_create_by(name: @name)
           # @bank.update(phone: @phone, address1: @address_a.join, state_code: @state_code, zip: @zip)
@@ -1700,6 +1679,15 @@ class ObCmgWholesalesController < ApplicationController
   end
   def import_jummbo7600_sheet
     @programs_ids = []
+    @purchase_adjustment = {}
+    @rate_adjustment = {}
+    @adjustment_hash = {}
+    @other_adjustment = {}
+    primary_key = ''
+    secondary_key = ''
+    cltv_key = ''
+    key = ''
+    adj_key = ''
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
@@ -1805,6 +1793,114 @@ class ObCmgWholesalesController < ApplicationController
             end
           end
         end
+        # adjustments
+        (40..85).each do |r|
+        	row = sheet_data.row(r)
+        	@cltv_data = sheet_data.row(41)
+        	@max_data = sheet_data.row(83)
+        	if row.compact.count >= 1
+        		(0..14).each do |cc|
+        			value = sheet_data.cell(r,cc)
+        			if value.present?
+        				if value == "Purchase Transaction"
+        					primary_key = "LoanType/LTV/FICO"
+        					@purchase_adjustment[primary_key] = {}
+        				elsif value == "Rate/Term Transaction"
+        					primary_key = "RateType/Term/LTV/FICO"
+        					@rate_adjustment[primary_key] = {}
+        				elsif value == "Cash Out Transaction"
+        					primary_key = "LoanType/RefinanceOption/LTV"
+        					@adjustment_hash[primary_key] = {}
+        				elsif value == "MISCELLANEOUS"
+        					primary_key = "Miscellaneous"
+        					@other_adjustment[primary_key] = {}
+        				elsif value == "MAX PRICE AFTER ADJUSTMENTS"
+        					primary_key = "RateType/LA/"
+        					@other_adjustment[primary_key] = {}
+        				end
+        				# Purchase Transaction Adjustment
+        				if r >= 42 && r <= 48 && cc == 1
+        					secondary_key = get_value value
+        					@purchase_adjustment[primary_key][secondary_key] = {}
+        				end
+        				if r >= 42 && r <= 48 && cc >= 6 && cc <= 14
+        					cltv_key = get_value @cltv_data[cc-1]
+        					@purchase_adjustment[primary_key][secondary_key][cltv_key] = {}
+        					@purchase_adjustment[primary_key][secondary_key][cltv_key] = value
+        				end
+
+        				# Rate/Term Transaction Adjustment
+        				if r >= 51 && r <= 57 && cc == 1
+        					secondary_key = get_value value
+        					@rate_adjustment[primary_key][secondary_key] = {}
+        				end
+        				if r >= 51 && r <= 57 && cc >= 6 && cc <= 14
+        					cltv_key = get_value @cltv_data[cc-1]
+        					@rate_adjustment[primary_key][secondary_key][cltv_key] = {}
+        					@rate_adjustment[primary_key][secondary_key][cltv_key] = value
+        				end
+
+        				# Cash Out Transaction Adjustment
+        				if r >= 60 && r <= 75 && cc == 1
+        					if value.include?("Loan Amount")
+        						secondary_key = value.include?("<") ? "0"+value.split("Loan Amount").last : value.split("Loan Amount").last
+        					else
+        						secondary_key = get_value value
+        					end
+        					@adjustment_hash[primary_key][secondary_key] = {}
+        				end
+        				if r >= 60 && r <= 75 && cc >= 6 && cc <= 14
+        					cltv_key = get_value @cltv_data[cc-1]
+        					@adjustment_hash[primary_key][secondary_key][cltv_key] = {}
+        					@adjustment_hash[primary_key][secondary_key][cltv_key] = value
+        				end
+        				if r == 76 && cc == 1
+        					secondary_key = "Escrow-Waiver/NY"
+        					@adjustment_hash[primary_key][secondary_key] = {}
+        				end
+        				if r == 76 && cc >= 6 && cc <= 14
+        					cltv_key = get_value @cltv_data[cc-1]
+        					@adjustment_hash[primary_key][secondary_key][cltv_key] = {}
+        					@adjustment_hash[primary_key][secondary_key][cltv_key] = value
+        				end
+        				if r == 77 && cc == 1
+        					secondary_key = "FL"
+        					adj_key = "NV"
+        					@adjustment_hash[primary_key][secondary_key] = {}
+        					@adjustment_hash[primary_key][adj_key] = {}
+        				end
+        				if r == 77 && cc >= 6 && cc <= 14
+        					cltv_key = get_value @cltv_data[cc-1]
+        					@adjustment_hash[primary_key][secondary_key][cltv_key] = {}
+        					@adjustment_hash[primary_key][adj_key][cltv_key] = {}
+        					@adjustment_hash[primary_key][secondary_key][cltv_key] = value
+        					@adjustment_hash[primary_key][adj_key][cltv_key] = value
+        				end
+
+        				# Other Adjustments
+        				if r == 80 && cc == 1
+        					secondary_key = "NY"
+        					@other_adjustment[primary_key][secondary_key] = {}
+        				end
+        				if r == 80 && cc == 4
+        					@other_adjustment[primary_key][secondary_key] = value
+        				end
+        				if r >= 84 && r <= 85 && cc == 1
+        					key = value.include?("LA <") ? "0" + value.split("LA").last : value.split("LA").last
+        					@other_adjustment[primary_key][key] = {}
+        				end
+        				if r >= 84 && r <= 85 && cc >=2 && cc <= 4
+        					@other_adjustment[primary_key][key][@max_data[cc-1]] = {}
+        					@other_adjustment[primary_key][key][@max_data[cc-1]] = value
+        				end
+        			end
+        		end
+        	end
+        end
+        Adjustment.create(data: @purchase_adjustment, sheet_name: sheet)
+        Adjustment.create(data: @rate_adjustment, sheet_name: sheet)
+        Adjustment.create(data: @adjustment_hash, sheet_name: sheet)
+        Adjustment.create(data: @other_adjustment, sheet_name: sheet)
       end
     end
     # redirect_to programs_import_file_path(@bank)
