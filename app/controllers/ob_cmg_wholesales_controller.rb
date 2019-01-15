@@ -1,5 +1,7 @@
 class ObCmgWholesalesController < ApplicationController
-	# before_action :get_sheet, only: [:import_gov_sheet]
+	before_action :get_sheet, only: [:gov, :programs]
+  before_action :get_program, only: [:single_program]
+
   def index
   	file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -16,7 +18,8 @@ class ObCmgWholesalesController < ApplicationController
       # the required headers are not all present
     end
   end
-  def import_gov_sheet
+
+  def gov
     @programs_ids = []
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -102,7 +105,7 @@ class ObCmgWholesalesController < ApplicationController
               	@program_category = "4151"
               end
 
-              @program = Program.find_or_create_by(program_name: @title)
+              @program = @sheet.programs.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
               @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc)
               # @program.adjustments.destroy_all
@@ -140,9 +143,10 @@ class ObCmgWholesalesController < ApplicationController
       end
     end
     # redirect_to programs_import_file_path(@bank)
-  	redirect_to root_path
+  	redirect_to programs_ob_cmg_wholesale_path(@sheet)
   end
-  def import_agency_sheet
+
+  def agency
     @programs_ids = []
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -256,7 +260,8 @@ class ObCmgWholesalesController < ApplicationController
     # redirect_to programs_import_file_path(@bank)
   	redirect_to root_path
   end
-  def import_durp_sheet
+
+  def durp
     @programs_ids = []
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -483,7 +488,8 @@ class ObCmgWholesalesController < ApplicationController
     # redirect_to programs_import_file_path(@bank)
   	redirect_to root_path
   end
-  def import_oa_sheet
+
+  def oa
     @programs_ids = []
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -711,7 +717,8 @@ class ObCmgWholesalesController < ApplicationController
     # redirect_to programs_import_file_path(@bank)
   	redirect_to root_path
   end
-  def import_jumbo700_sheet
+
+  def jumbo_700
     @programs_ids = []
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -915,7 +922,7 @@ class ObCmgWholesalesController < ApplicationController
   	redirect_to root_path
   end
 
-  def import_jumbo6200_sheet
+  def jumbo_6200
     @programs_ids = []
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -1027,7 +1034,8 @@ class ObCmgWholesalesController < ApplicationController
     # redirect_to programs_import_file_path(@bank)
   	redirect_to root_path
   end
-  def import_jumbo7200_6700_sheet
+
+  def jumbo_7200_6700
     @programs_ids = []
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -1447,7 +1455,8 @@ class ObCmgWholesalesController < ApplicationController
     # redirect_to programs_import_file_path(@bank)
   	redirect_to root_path
   end
-  def import_jummbo6600_sheet
+
+  def jumbo_6600
     @programs_ids = []
     @purchase_adjustment = {}
     @rate_adjustment = {}
@@ -1676,7 +1685,8 @@ class ObCmgWholesalesController < ApplicationController
     # redirect_to programs_import_file_path(@bank)
   	redirect_to root_path
   end
-  def import_jummbo7600_sheet
+
+  def jumbo_7600
     @programs_ids = []
     @purchase_adjustment = {}
     @rate_adjustment = {}
@@ -1905,6 +1915,7 @@ class ObCmgWholesalesController < ApplicationController
     # redirect_to programs_import_file_path(@bank)
   	redirect_to root_path
   end
+
   # def import_jummbo6400_sheet
   #   @programs_ids = []
   #   file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
@@ -2131,7 +2142,7 @@ class ObCmgWholesalesController < ApplicationController
   #   # redirect_to programs_import_file_path(@bank)
   # 	redirect_to root_path
   # end
-  def import_jummbo6800_sheet
+  def jumbo_6800
     @programs_ids = []
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -2243,7 +2254,8 @@ class ObCmgWholesalesController < ApplicationController
     # redirect_to programs_import_file_path(@bank)
   	redirect_to root_path
   end
-  def import_jumbo6900_7900_sheet
+
+  def jumbo_6900_7900
     @programs_ids = []
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -2463,10 +2475,6 @@ class ObCmgWholesalesController < ApplicationController
   	redirect_to root_path
   end
 
-  # private
-  # def get_sheet
-  # 	@sheet = Sheet.find(params[:id])
-  # end
   def get_value value1
   	if value1.present?
   		if value1.include?("FICO <")
@@ -2482,4 +2490,20 @@ class ObCmgWholesalesController < ApplicationController
      	end
    	end
  	end
+
+  def programs
+    @programs = @sheet.programs
+  end
+
+  def single_program
+  end
+
+  private
+    def get_sheet
+      @sheet = Sheet.find(params[:id])
+    end
+
+    def get_program
+      @program = Program.find(params[:id])
+    end
 end
