@@ -79,18 +79,12 @@ class DashboardController < ApplicationController
       if @program_list.present?
         @programs =[]
         @program_list.each do |program|
-          if(program.base_rate[program.base_rate.keys.first].keys.first>=(@interest.to_f.to_s) && program.base_rate[program.base_rate.keys.first].keys.last <=(@interest.to_f.to_s))
-            @programs << program
+          if(program.base_rate[program.base_rate.keys.first].keys.include?(@interest.to_f.to_s))
+            if(program.base_rate[program.base_rate.keys.first][@interest.to_f.to_s].keys.include?(@lock_period))
+                @programs << program
+            end
           end
         end
-        # if @programs.count>=2
-        #   flash[:error] = "find multiple program"
-        # else
-        #   program = @programs.first
-        #   if program.base_rate[program.base_rate.keys.first][@interest.to_f.to_s].present?
-        #     @base_rate = program.base_rate[program.base_rate.keys.first][@interest.to_f.to_s][@lock_period]
-        #   end
-        # end
       end
     return @base_rate
   end

@@ -8,9 +8,8 @@
                 <div class="form-group">
                   <label>Rate Type</label>
                   <% @rate_type_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"]]%>
-                  <%= select_tag 'rate_type', options_for_select(@rate_type_list, @rate_type), { prompt: 'Select rate-type', :class=> "form-control", :required => true} %>
+                  <%= select_tag 'rate_type', options_for_select(@rate_type_list, (@filter_data[:rate_type] rescue nil)), { prompt: 'Select Rate Type', :class=> "form-control", :required => true} %>
                 </div>
-                <p>Base Rate = <%= @base_rate%></p>
               </div>
 
               <div class="col-md-2 term">
@@ -18,7 +17,7 @@
                   <label>Term</label>
                   <div class="input-group">
                    <% @term_list =[["10 yrs",10], ["15 yrs"], ["20 yrs",20], ["25 yrs",25], ["30 yrs",30]] %>
-                    <%= select_tag 'term', options_for_select(@term_list), { prompt: 'Select term', :class=> "form-control"} %>
+                    <%= select_tag 'term', options_for_select(@term_list, (@filter_data[:term] rescue nil)), { prompt: 'Select Term', :class=> "form-control"} %>
                   </div>
                 </div>
               </div>
