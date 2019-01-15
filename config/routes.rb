@@ -52,6 +52,6 @@ Rails.application.routes.draw do
     end
   end
 
-  match "dashboard/index" ,via: [:get, :post]
+  match "dashboard/index", to: 'dashboard#index', via: [:get, :post]
   
   end
