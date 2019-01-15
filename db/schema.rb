@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_08_104919) do
+ActiveRecord::Schema.define(version: 2019_01_10_073034) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -49,17 +49,17 @@ ActiveRecord::Schema.define(version: 2019_01_08_104919) do
   create_table "programs", force: :cascade do |t|
     t.integer "bank_id"
     t.integer "term"
-    t.boolean "jumbo_high_balance"
-    t.boolean "conforming"
-    t.boolean "fannie_mae"
-    t.boolean "fannie_mae_home_ready"
-    t.boolean "freddie_mac"
-    t.boolean "freddie_mac_home_possible"
-    t.boolean "fha"
-    t.boolean "va"
-    t.boolean "usda"
-    t.boolean "streamline"
-    t.boolean "full_doc"
+    t.boolean "jumbo_high_balance", default: false
+    t.boolean "conforming", default: false
+    t.boolean "fannie_mae", default: false
+    t.boolean "fannie_mae_home_ready", default: false
+    t.boolean "freddie_mac", default: false
+    t.boolean "freddie_mac_home_possible", default: false
+    t.boolean "fha", default: false
+    t.boolean "va", default: false
+    t.boolean "usda", default: false
+    t.boolean "streamline", default: false
+    t.boolean "full_doc", default: false
     t.text "adjustments"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -71,6 +71,8 @@ ActiveRecord::Schema.define(version: 2019_01_08_104919) do
     t.string "rate_type"
     t.integer "rate_arm"
     t.string "loan_type"
+    t.integer "lock_period", default: [], array: true
+    t.string "loan_limit_type", default: [], array: true
   end
 
   create_table "sheets", force: :cascade do |t|
