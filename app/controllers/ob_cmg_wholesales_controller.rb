@@ -91,7 +91,7 @@ class ObCmgWholesalesController < ApplicationController
               	@fha = false
               	@va = false
               	@usda = false
-              	@full_doc =
+              	@full_doc = false
               end
 
               # High Balance
@@ -1251,334 +1251,334 @@ class ObCmgWholesalesController < ApplicationController
     # redirect_to programs_import_file_path(@bank)
   	redirect_to root_path
   end
-  def import_jummbo6400_sheet
-    @programs_ids = []
-    file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
-      if (sheet == "JUMBO 6400")
-        sheet_data = xlsx.sheet(sheet)
-        @programs_ids = []
-        (10..41).each do |r|
-          row = sheet_data.row(r)
-          if ((row.compact.count > 1) && (row.compact.count <= 4))
-          	rr = r + 1
-            max_column_section = row.compact.count - 1
-            (0..max_column_section).each do |max_column|
-              cc = 4*max_column + 1
+  # def import_jummbo6400_sheet
+  #   @programs_ids = []
+  #   file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
+  #   xlsx = Roo::Spreadsheet.open(file)
+  #   xlsx.sheets.each do |sheet|
+  #     if (sheet == "JUMBO 6400")
+  #       sheet_data = xlsx.sheet(sheet)
+  #       @programs_ids = []
+  #       (10..41).each do |r|
+  #         row = sheet_data.row(r)
+  #         if ((row.compact.count > 1) && (row.compact.count <= 4))
+  #         	rr = r + 1
+  #           max_column_section = row.compact.count - 1
+  #           (0..max_column_section).each do |max_column|
+  #             cc = 4*max_column + 1
 
-              @title = sheet_data.cell(r,cc)
-              if @title.present? && cc < 9
-	            	# term
-	            	@term = nil
-	              if @title.include?("30 Year") || @title.include?("30Yr") || @title.include?("30 Yr")
-	                @term = 30
-	              elsif @title.include?("20 Year")
-	                @term = 20
-	              elsif @title.include?("15 Year")
-	                @term = 15
-	              end
+  #             @title = sheet_data.cell(r,cc)
+  #             if @title.present? && cc < 9
+	 #            	# term
+	 #            	@term = nil
+	 #              if @title.include?("30 Year") || @title.include?("30Yr") || @title.include?("30 Yr")
+	 #                @term = 30
+	 #              elsif @title.include?("20 Year")
+	 #                @term = 20
+	 #              elsif @title.include?("15 Year")
+	 #                @term = 15
+	 #              end
 	           
-	               	# interest type
-	              if @title.include?("Fixed")
-	                @rate_type = 0
-	              elsif @title.include?("ARM")
-	                @rate_type = 2
-	              else
-	              	@rate_type = nil
-	              end
+	 #               	# interest type
+	 #              if @title.include?("Fixed")
+	 #                @rate_type = 0
+	 #              elsif @title.include?("ARM")
+	 #                @rate_type = 2
+	 #              else
+	 #              	@rate_type = nil
+	 #              end
 
-	              # streamline
-	              if @title.include?("FHA") 
-	                @streamline = true
-	                @fha = true
-	                @full_doc = true
-	              elsif @title.include?("VA")
-	              	@streamline = true
-	              	@va = true
-	              	@full_doc = true
-	              elsif @title.include?("USDA")
-	              	@streamline = true
-	              	@usda = true
-	              	@full_doc = true
-	              else
-	              	@streamline = nil
-	              	@full_doc = nil
-	              	@fha = nil
-	              	@va = nil
-	              	@usda = nil
-	              end
+	 #              # streamline
+	 #              if @title.include?("FHA") 
+	 #                @streamline = true
+	 #                @fha = true
+	 #                @full_doc = true
+	 #              elsif @title.include?("VA")
+	 #              	@streamline = true
+	 #              	@va = true
+	 #              	@full_doc = true
+	 #              elsif @title.include?("USDA")
+	 #              	@streamline = true
+	 #              	@usda = true
+	 #              	@full_doc = true
+	 #              else
+	 #              	@streamline = nil
+	 #              	@full_doc = nil
+	 #              	@fha = nil
+	 #              	@va = nil
+	 #              	@usda = nil
+	 #              end
 
-	              # High Balance
-	              if @title.include?("High Bal")
-	              	@jumbo_high_balance = true
-	              else
-	              	@jumbo_high_balance = nil
-	              end
+	 #              # High Balance
+	 #              if @title.include?("High Bal")
+	 #              	@jumbo_high_balance = true
+	 #              else
+	 #              	@jumbo_high_balance = nil
+	 #              end
 
-	              # interest sub type
-	              if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM")
-	                @rate_arm = @title.scan(/\d+/)[0].to_i
-	              else
-	              	@rate_arm = nil
-	              end
-	            end
-              if @title.present? && cc < 9
-	              @program = Program.find_or_create_by(program_name: @title)
-	              @programs_ids << @program.id
-	              @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
-	              # @program.adjustments.destroy_all
+	 #              # interest sub type
+	 #              if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM")
+	 #                @rate_arm = @title.scan(/\d+/)[0].to_i
+	 #              else
+	 #              	@rate_arm = nil
+	 #              end
+	 #            end
+  #             if @title.present? && cc < 9
+	 #              @program = Program.find_or_create_by(program_name: @title)
+	 #              @programs_ids << @program.id
+	 #              @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
+	 #              # @program.adjustments.destroy_all
 	              
-	              @block_hash = {}
-	              key = ''
-	              (1..50).each do |max_row|
-	                @data = []
-	                (0..3).each_with_index do |index, c_i|
-	                  rrr = rr + max_row -1
-	                  ccc = cc + c_i
-	                  value = sheet_data.cell(rrr,ccc)
-	                  if value.present?
-	                    if (c_i == 0)
-	                      key = value
-	                      @block_hash[key] = {}
-	                    elsif (c_i == 1)
-	                      @block_hash[key][21] = value
-	                    elsif (c_i == 2)
-	                      @block_hash[key][30] = value
-	                    elsif (c_i == 3)
-	                      @block_hash[key][45] = value
-	                    end
-	                    @data << value
-	                  end
-	                end
-	                if @data.compact.reject { |c| c.blank? }.length == 0
-	                  break # terminate the loop
-	                end
-	              end
-	            end
-	            if @block_hash.keys.first == "Rate"
-              	@block_hash.shift
-              end
-              @program.update(base_rate: @block_hash)
-            end
-          end
-        end
-        (44..58).each do |r|
-          row = sheet_data.row(r)
-          if ((row.compact.count > 1) && (row.compact.count <= 4))
-          	rr = r + 1
-            max_column_section = row.compact.count - 1
-            (0..max_column_section).each do |max_column|
-              cc = 4*max_column + 1
+	 #              @block_hash = {}
+	 #              key = ''
+	 #              (1..50).each do |max_row|
+	 #                @data = []
+	 #                (0..3).each_with_index do |index, c_i|
+	 #                  rrr = rr + max_row -1
+	 #                  ccc = cc + c_i
+	 #                  value = sheet_data.cell(rrr,ccc)
+	 #                  if value.present?
+	 #                    if (c_i == 0)
+	 #                      key = value
+	 #                      @block_hash[key] = {}
+	 #                    elsif (c_i == 1)
+	 #                      @block_hash[key][21] = value
+	 #                    elsif (c_i == 2)
+	 #                      @block_hash[key][30] = value
+	 #                    elsif (c_i == 3)
+	 #                      @block_hash[key][45] = value
+	 #                    end
+	 #                    @data << value
+	 #                  end
+	 #                end
+	 #                if @data.compact.reject { |c| c.blank? }.length == 0
+	 #                  break # terminate the loop
+	 #                end
+	 #              end
+	 #            end
+	 #            if @block_hash.keys.first == "Rate"
+  #             	@block_hash.shift
+  #             end
+  #             @program.update(base_rate: @block_hash)
+  #           end
+  #         end
+  #       end
+  #       (44..58).each do |r|
+  #         row = sheet_data.row(r)
+  #         if ((row.compact.count > 1) && (row.compact.count <= 4))
+  #         	rr = r + 1
+  #           max_column_section = row.compact.count - 1
+  #           (0..max_column_section).each do |max_column|
+  #             cc = 4*max_column + 1
 
-              @title = sheet_data.cell(r,cc)
-          		if @title.present? && @title == "10/1 ARM - 6410"
-	            	# term
-	            	@term = nil
-	              if @title.include?("30 Year") || @title.include?("30Yr") || @title.include?("30 Yr")
-	                @term = 30
-	              elsif @title.include?("20 Year")
-	                @term = 20
-	              elsif @title.include?("15 Year")
-	                @term = 15
-	              end
+  #             @title = sheet_data.cell(r,cc)
+  #         		if @title.present? && @title == "10/1 ARM - 6410"
+	 #            	# term
+	 #            	@term = nil
+	 #              if @title.include?("30 Year") || @title.include?("30Yr") || @title.include?("30 Yr")
+	 #                @term = 30
+	 #              elsif @title.include?("20 Year")
+	 #                @term = 20
+	 #              elsif @title.include?("15 Year")
+	 #                @term = 15
+	 #              end
 	           
-	               	# interest type
-	              if @title.include?("Fixed")
-	                @rate_type = 0
-	              elsif @title.include?("ARM")
-	                @rate_type = 2
-	              else
-	              	@rate_type = nil
-	              end
+	 #               	# interest type
+	 #              if @title.include?("Fixed")
+	 #                @rate_type = 0
+	 #              elsif @title.include?("ARM")
+	 #                @rate_type = 2
+	 #              else
+	 #              	@rate_type = nil
+	 #              end
 
-	              # streamline
-	              if @title.include?("FHA") 
-	                @streamline = true
-	                @fha = true
-	                @full_doc = true
-	              elsif @title.include?("VA")
-	              	@streamline = true
-	              	@va = true
-	              	@full_doc = true
-	              elsif @title.include?("USDA")
-	              	@streamline = true
-	              	@usda = true
-	              	@full_doc = true
-	              else
-	              	@streamline = nil
-	              	@full_doc = nil
-	              	@fha = nil
-	              	@va = nil
-	              	@usda = nil
-	              end
+	 #              # streamline
+	 #              if @title.include?("FHA") 
+	 #                @streamline = true
+	 #                @fha = true
+	 #                @full_doc = true
+	 #              elsif @title.include?("VA")
+	 #              	@streamline = true
+	 #              	@va = true
+	 #              	@full_doc = true
+	 #              elsif @title.include?("USDA")
+	 #              	@streamline = true
+	 #              	@usda = true
+	 #              	@full_doc = true
+	 #              else
+	 #              	@streamline = nil
+	 #              	@full_doc = nil
+	 #              	@fha = nil
+	 #              	@va = nil
+	 #              	@usda = nil
+	 #              end
 
-	              # High Balance
-	              if @title.include?("High Bal")
-	              	@jumbo_high_balance = true
-	              else
-	              	@jumbo_high_balance = nil
-	              end
+	 #              # High Balance
+	 #              if @title.include?("High Bal")
+	 #              	@jumbo_high_balance = true
+	 #              else
+	 #              	@jumbo_high_balance = nil
+	 #              end
 
-	              # interest sub type
-	              if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM")
-	                @rate_arm = @title.scan(/\d+/)[0].to_i
-	              else
-	              	@rate_arm = nil
-	              end
-              end
-              if cc < 5 && @title == "10/1 ARM - 6410"
-	              @program = Program.find_or_create_by(program_name: @title)
-	              @programs_ids << @program.id
-	              end
-	            end
-              if @title.present? && cc < 9
-	              @program = Program.find_or_create_by(program_name: @title)
-	              @programs_ids << @program.id
-	              @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
-	              # @program.adjustments.destroy_all
+	 #              # interest sub type
+	 #              if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM")
+	 #                @rate_arm = @title.scan(/\d+/)[0].to_i
+	 #              else
+	 #              	@rate_arm = nil
+	 #              end
+  #             end
+  #             if cc < 5 && @title == "10/1 ARM - 6410"
+	 #              @program = Program.find_or_create_by(program_name: @title)
+	 #              @programs_ids << @program.id
+	 #              end
+	 #            end
+  #             if @title.present? && cc < 9
+	 #              @program = Program.find_or_create_by(program_name: @title)
+	 #              @programs_ids << @program.id
+	 #              @program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
+	 #              # @program.adjustments.destroy_all
 	              
-	              @block_hash = {}
-	              key = ''
-	              (1..50).each do |max_row|
-	                @data = []
-	                (0..3).each_with_index do |index, c_i|
-	                  rrr = rr + max_row -1
-	                  ccc = cc + c_i
-	                  value = sheet_data.cell(rrr,ccc)
-	                  if value.present?
-	                    if (c_i == 0)
-	                      key = value
-	                      @block_hash[key] = {}
-	                    elsif (c_i == 1)
-	                      @block_hash[key][21] = value
-	                    elsif (c_i == 2)
-	                      @block_hash[key][30] = value
-	                    elsif (c_i == 3)
-	                      @block_hash[key][45] = value
-	                    end
-	                    @data << value
-	                  end
-	                end
-	                if @data.compact.reject { |c| c.blank? }.length == 0
-	                  break # terminate the loop
-	                end
-	              end
-	            end
-	            if @block_hash.keys.first == "Rate"
-              	@block_hash.shift
-              end
-              @program.update(base_rate: @block_hash)
-            end
-          end
-        end
-        (44..58).each do |r|
-          row = sheet_data.row(r)
-          if ((row.compact.count > 1) && (row.compact.count <= 4))
-          	rr = r + 1
-            max_column_section = row.compact.count - 1
-            (0..max_column_section).each do |max_column|
-              cc = 4*max_column + 1
+	 #              @block_hash = {}
+	 #              key = ''
+	 #              (1..50).each do |max_row|
+	 #                @data = []
+	 #                (0..3).each_with_index do |index, c_i|
+	 #                  rrr = rr + max_row -1
+	 #                  ccc = cc + c_i
+	 #                  value = sheet_data.cell(rrr,ccc)
+	 #                  if value.present?
+	 #                    if (c_i == 0)
+	 #                      key = value
+	 #                      @block_hash[key] = {}
+	 #                    elsif (c_i == 1)
+	 #                      @block_hash[key][21] = value
+	 #                    elsif (c_i == 2)
+	 #                      @block_hash[key][30] = value
+	 #                    elsif (c_i == 3)
+	 #                      @block_hash[key][45] = value
+	 #                    end
+	 #                    @data << value
+	 #                  end
+	 #                end
+	 #                if @data.compact.reject { |c| c.blank? }.length == 0
+	 #                  break # terminate the loop
+	 #                end
+	 #              end
+	 #            end
+	 #            if @block_hash.keys.first == "Rate"
+  #             	@block_hash.shift
+  #             end
+  #             @program.update(base_rate: @block_hash)
+  #           end
+  #         end
+  #       end
+  #       (44..58).each do |r|
+  #         row = sheet_data.row(r)
+  #         if ((row.compact.count > 1) && (row.compact.count <= 4))
+  #         	rr = r + 1
+  #           max_column_section = row.compact.count - 1
+  #           (0..max_column_section).each do |max_column|
+  #             cc = 4*max_column + 1
 
-              @title = sheet_data.cell(r,cc)
-          		if @title.present? && @title == "10/1 ARM - 6410"
-	            	# term
-	            	@term = nil
-	              if @title.include?("30 Year") || @title.include?("30Yr") || @title.include?("30 Yr")
-	                @term = 30
-	              elsif @title.include?("20 Year")
-	                @term = 20
-	              elsif @title.include?("15 Year")
-	                @term = 15
-	              end
+  #             @title = sheet_data.cell(r,cc)
+  #         		if @title.present? && @title == "10/1 ARM - 6410"
+	 #            	# term
+	 #            	@term = nil
+	 #              if @title.include?("30 Year") || @title.include?("30Yr") || @title.include?("30 Yr")
+	 #                @term = 30
+	 #              elsif @title.include?("20 Year")
+	 #                @term = 20
+	 #              elsif @title.include?("15 Year")
+	 #                @term = 15
+	 #              end
 	           
-	               	# interest type
-	              if @title.include?("Fixed")
-	                @rate_type = 0
-	              elsif @title.include?("ARM")
-	                @rate_type = 2
-	              else
-	              	@rate_type = nil
-	              end
+	 #               	# interest type
+	 #              if @title.include?("Fixed")
+	 #                @rate_type = 0
+	 #              elsif @title.include?("ARM")
+	 #                @rate_type = 2
+	 #              else
+	 #              	@rate_type = nil
+	 #              end
 
-	              # streamline
-	              if @title.include?("FHA") 
-	                @streamline = true
-	                @fha = true
-	                @full_doc = true
-	              elsif @title.include?("VA")
-	              	@streamline = true
-	              	@va = true
-	              	@full_doc = true
-	              elsif @title.include?("USDA")
-	              	@streamline = true
-	              	@usda = true
-	              	@full_doc = true
-	              else
-	              	@streamline = nil
-	              	@full_doc = nil
-	              	@fha = nil
-	              	@va = nil
-	              	@usda = nil
-	              end
+	 #              # streamline
+	 #              if @title.include?("FHA") 
+	 #                @streamline = true
+	 #                @fha = true
+	 #                @full_doc = true
+	 #              elsif @title.include?("VA")
+	 #              	@streamline = true
+	 #              	@va = true
+	 #              	@full_doc = true
+	 #              elsif @title.include?("USDA")
+	 #              	@streamline = true
+	 #              	@usda = true
+	 #              	@full_doc = true
+	 #              else
+	 #              	@streamline = nil
+	 #              	@full_doc = nil
+	 #              	@fha = nil
+	 #              	@va = nil
+	 #              	@usda = nil
+	 #              end
 
-	              # High Balance
-	              if @title.include?("High Bal")
-	              	@jumbo_high_balance = true
-	              else
-	              	@jumbo_high_balance = nil
-	              end
+	 #              # High Balance
+	 #              if @title.include?("High Bal")
+	 #              	@jumbo_high_balance = true
+	 #              else
+	 #              	@jumbo_high_balance = nil
+	 #              end
 
-	              # interest sub type
-	              if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM")
-	                @rate_arm = @title.scan(/\d+/)[0].to_i
-	              else
-	              	@rate_arm = nil
-	              end
-              end
-              if cc < 5 && @title == "10/1 ARM - 6410"
-	              @program = Program.find_or_create_by(program_name: @title)
-	              @programs_ids << @program.id
-	             	@program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
+	 #              # interest sub type
+	 #              if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM")
+	 #                @rate_arm = @title.scan(/\d+/)[0].to_i
+	 #              else
+	 #              	@rate_arm = nil
+	 #              end
+  #             end
+  #             if cc < 5 && @title == "10/1 ARM - 6410"
+	 #              @program = Program.find_or_create_by(program_name: @title)
+	 #              @programs_ids << @program.id
+	 #             	@program.update(term: @term,rate_type: @rate_type,loan_type: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
 	            
-	              # @program.adjustments.destroy_all
-	              @block_hash = {}
-	              key = ''
-	              (1..50).each do |max_row|
-	                @data = []
-	                (0..3).each_with_index do |index, c_i|
-	                  rrr = rr + max_row -1
-	                  ccc = cc + c_i
-	                  value = sheet_data.cell(rrr,ccc)
-	                  if value.present?
-	                    if (c_i == 0)
-	                      key = value
-	                      @block_hash[key] = {}
-	                    elsif (c_i == 1)
-	                      @block_hash[key][21] = value
-	                    elsif (c_i == 2)
-	                      @block_hash[key][30] = value
-	                    elsif (c_i == 3)
-	                      @block_hash[key][45] = value
-	                    end
-	                    @data << value
-	                  end
-	                end
-	                if @data.compact.reject { |c| c.blank? }.length == 0
-	                  break # terminate the loop
-	                end
-	              end
-	            end
-              @block_hash.shift
-              @program.update(base_rate: @block_hash)
-            end
-          end
-        end
-      end
-    end
-    # redirect_to programs_import_file_path(@bank)
-  	redirect_to root_path
-  end
+	 #              # @program.adjustments.destroy_all
+	 #              @block_hash = {}
+	 #              key = ''
+	 #              (1..50).each do |max_row|
+	 #                @data = []
+	 #                (0..3).each_with_index do |index, c_i|
+	 #                  rrr = rr + max_row -1
+	 #                  ccc = cc + c_i
+	 #                  value = sheet_data.cell(rrr,ccc)
+	 #                  if value.present?
+	 #                    if (c_i == 0)
+	 #                      key = value
+	 #                      @block_hash[key] = {}
+	 #                    elsif (c_i == 1)
+	 #                      @block_hash[key][21] = value
+	 #                    elsif (c_i == 2)
+	 #                      @block_hash[key][30] = value
+	 #                    elsif (c_i == 3)
+	 #                      @block_hash[key][45] = value
+	 #                    end
+	 #                    @data << value
+	 #                  end
+	 #                end
+	 #                if @data.compact.reject { |c| c.blank? }.length == 0
+	 #                  break # terminate the loop
+	 #                end
+	 #              end
+	 #            end
+  #             @block_hash.shift
+  #             @program.update(base_rate: @block_hash)
+  #           end
+  #         end
+  #       end
+  #     end
+  #   end
+  #   # redirect_to programs_import_file_path(@bank)
+  # 	redirect_to root_path
+  # end
   def import_jummbo6800_sheet
     @programs_ids = []
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')

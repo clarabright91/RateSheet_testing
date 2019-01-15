@@ -2,24 +2,15 @@
   <!-- searching form -->
       <div class="">
         <br/>
-          <%= form_tag dashboard_index_path do %>
+          <%= form_tag('/dashboard/index', method: :post) do %>
             <div class="row">
-              <!-- <div class="col-md-2"> -->
-                <!-- <div class="form-group">
-                  <label>Sheet Name</label>
-                  <%# @sheet_name_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"]]%>
-                  <%#@sheet_name_list = [["HELOC"], ["SmartSeries"], ["Government"], ["Conforming Fixed Rate"], ["Freddie Fixed Rate"], ["HomeReady"], ["HomeReady HB"], ["Home Possible"], ["Conforming ARMs"], ["Freddie ARMs"], ["High Balance Extra"], ["Jumbo Series_C"], ["Jumbo Series_D"], ["Jumbo Series_F"], ["Jumbo Series_H"], ["Jumbo Series_I"], ["Jumbo Series_JQM"], ["Dream Big"], ["Du Refi Plus Fixed Rate"], ["Du Refi Plus Fixed Rate_105"], ["Du Refi Plus ARMs"], ["LP Open Access"], ["LP Open Access_105"], ["LP Open Acces ARMs"]]%>
-                  <%#= select_tag 'sheet', options_for_select(@sheet_name_list, @sheet), :class=> "form-control" %>
-                </div>
-                
-              </div> -->
-              <p>Base Rate = <%= @base_rate%></p>
               <div class="col-md-2">
                 <div class="form-group">
                   <label>Rate Type</label>
-                  <% @rate_type_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"], ["Any"]]%>
-                  <%= select_tag 'rate_type', options_for_select(@rate_type_list), :class=> "form-control" %>
+                  <% @rate_type_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"]]%>
+                  <%= select_tag 'rate_type', options_for_select(@rate_type_list, @rate_type), { prompt: 'Select rate-type', :class=> "form-control", :required => true} %>
                 </div>
+                <p>Base Rate = <%= @base_rate%></p>
               </div>
 
               <div class="col-md-2 term">
@@ -27,7 +18,7 @@
                   <label>Term</label>
                   <div class="input-group">
                    <% @term_list =[["10 yrs",10], ["15 yrs"], ["20 yrs",20], ["25 yrs",25], ["30 yrs",30]] %>
-                    <%= select_tag 'term', options_for_select(@term_list), :class=> "form-control" %>
+                    <%= select_tag 'term', options_for_select(@term_list), { prompt: 'Select term', :class=> "form-control"} %>
                   </div>
                 </div>
               </div>
@@ -37,7 +28,7 @@
                   <label>Term</label>
                   <div class="input-group">
                    <% @term_list_arm =[["1/1 ARM",1], ["2/1 ARM",2], ["3/1 ARM",3], ["4/1 ARM",4], ["5/1 ARM",5], ["6/1 ARM",6], ["7/1 ARM",7], ["8/1 ARM",8], ["9/1 ARM",9], ["10/1 ARM",10]] %>
-                    <%= select_tag 'term_arm', options_for_select(@term_list_arm),  :id=>"term_arm", :class=> "form-control" %>
+                    <%= select_tag 'term_arm', options_for_select(@term_list_arm), { prompt: 'Select Term', :class=> "form-control", :id=>"term_arm"}%>
                   </div>
                 </div>
               </div>
@@ -46,18 +37,18 @@
                 <div class="form-group">
                   <label>Loan Limit Type</label>
                   <div class="input-group">
-                    <% @loan_limit_type_list =[["Non-Conforming"], ["Conforming"], ["Jumbo"], ["High-Balance"], ["Fannie Mae"], ["Fannie Mae Home Ready"], ["Freddie Mac"], ["Freddie Mac Home Possible"], ["Any"]]%>
-                    <%= select_tag 'loan_limit_type', options_for_select(@loan_limit_type_list), :class=> "form-control" %>
+                    <% @loan_limit_type_list =[["Non-Conforming"], ["Conforming"], ["High-Balance"]]%>
+                    <%= select_tag 'loan_limit_type', options_for_select(@loan_limit_type_list), { prompt: 'Select Loan Type', :class=> "form-control" }%>
                   </div>
                 </div>
               </div>
 
               <div class="col-md-2">
                 <div class="form-group">
-                  <label>Goverment</label>
+                  <label>Gov</label>
                   <div class="input-group">
-                    <% @gov_list =[["FHA"], ["VA"], ["USDA"], ["Any"]]%>
-                    <%= select_tag 'gov', options_for_select(@gov_list), :class=> "form-control" %>
+                    <% @gov_list =[["FHA"], ["VA"], ["USDA"]]%>
+                    <%= select_tag 'gov', options_for_select(@gov_list), { prompt: 'Select Gov', :class=> "form-control" }%>
                   </div>
                 </div>
               </div>
@@ -95,6 +86,32 @@
       </div>
       <!-- end searching form -->
 
+
+<div class="row col-md-6 col-md-offset-2 custyle">
+  <table class="table table-striped custab">
+    <thead>
+      <h2>Programs</h2>
+      <tr>
+        <th>No.</th>
+        <th>Program Name</th>
+        <th>Base Rate</th>
+        <th>Sheet Name</th>
+      </tr>
+    </thead>
+    <tbody>
+    <% if @programs.present? %>
+      <% @programs.each_with_index do |program, index|%>
+        <tr>
+          <td><%= index +1 %></td>
+          <td><%= program.program_name%></td>
+          <td><%= program.base_rate[program.base_rate.keys.first][@interest.to_f.to_s][@lock_period] %></td>
+          <td><%= program.sheet_name %></td>
+        </tr>
+      <%end%>
+    <%end%>
+    </tbody>
+  </table>
+</div>
   <div class="row col-md-6 col-md-offset-2 custyle">
   <table class="table table-striped custab">
   <thead>
@@ -129,14 +146,19 @@
 
 <script type="text/javascript">
   $(document).ready(function(){
+
+    $(".alert-error" ).fadeOut(3000);
+
     $( "#sheet" ).select2({
          theme: "bootstrap"
      });
 
     if ($("#rate_type").val() == "ARM") {
       $(".term-arm").show()
+      $(".term").hide()
     }else{
      $(".term-arm").hide()
+     $(".term").show()
     }
 
    $("#rate_type").on('click', function(e){ 
@@ -148,39 +170,6 @@
       $(".term-arm").hide()
      }
    });
-
-   // $('#sheet').change(function() {
-   //  if ($(this).val() == '')
-   //  {
-   //    debugger
-   //  }
-   //  else {
-   //    debugger
-   //    $.ajax({
-   //      type: "GET",
-   //      url: "/dashboard/fetch_program_list/",
-   //      data: {"sheet_name": $(this).val()},
-   //      success: function(data){
-   //         if (data.content == 'None')  
-   //           {
-   //            debugger
-   //           // $('#profile_state').empty();
-   //           // $('#profile_state').append( $('<option>No state provided for your country</option>'));
-   //           }
-   //          else
-   //           {
-   //            debugger
-   //           $('#profile_state').empty();
-   //           $('#profile_state').append( $('<option>Select your State</option>'));
-   //           jQuery.each(data,function(i, v) {
-   //            debugger
-   //             // $('#profile_state').append( $('<option value="'+ data[i][1] +'">'+data[i][0] +'</option>'));
-   //           });
-   //         }
-   //       }
-   //    });  
-   //  }
-   // });
 
   });
 </script>

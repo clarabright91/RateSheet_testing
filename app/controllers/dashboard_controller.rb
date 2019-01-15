@@ -1,5 +1,5 @@
 class DashboardController < ApplicationController
-  before_action :set_default, :find_base_rate
+  before_action :set_default
 
   def index
     @banks = Bank.all
@@ -9,125 +9,89 @@ class DashboardController < ApplicationController
     end
   end
 
-  def fetch_program_list
-    
-  end
-
   def set_default
-    @rate_type = "Fixed"
-    @interest = "4.375"
-    @term = 30
-    @lock_period = "30"
     @base_rate = 0.0
-    # @program_name = "Fannie Mae 30yr Fixed"
-    # @sheet = "Cover Zone 1"
-
-    @fha = false
-    @va = false
-    @usda = false
-    @conforming = false
-    @Jumbo = false
-    @high_balance = false
-
-    @fannie_mae = false
-    @fannie_mae_home_ready = false
-    @freddie_mac = false
-    @freddie_mac_home_possible = false
-
+    @filter_data = {}
+    @interest = "4.375"
+    @lock_period ="30"
   end
 
   def set_variable
-    @rate_type = params[:rate_type] if params[:rate_type].present?
+    if params[:rate_type].present?
+      @filter_data[:rate_type] = params[:rate_type]
+
+      if params[:rate_type] =="ARM" && params[:term_arm].present?
+        @filter_data[:rate_arm] = params[:term_arm].to_i
+      end
+
+      if params[:rate_type] =="Fixed" && params[:term].present?
+        @filter_data[:term] = params[:term].to_i
+      end
+
+      if params[:rate_type] =="Floating" && params[:term].present?
+        @filter_data[:term] = params[:term].to_i
+      end
+
+      if  params[:rate_type] =="Variable" && params[:term].present?
+        @filter_data[:term] = params[:term].to_i
+      end
+    end
+
     @interest = params[:interest] if params[:interest].present?
     @lock_period = params[:lock_period] if params[:lock_period].present?
-    # @sheet = params[:sheet] if params[:sheet].present?
-    
-    if params[:rate_type] =="ARM" && params[:rate_type].present?
-      @term = params[:term_arm].to_i if params[:term].present?
-    else
-      @term = params[:term].to_i if params[:term].present?
-    end
-    
+        
     @gov_sheet = params[:gov] if params[:gov].present?
     if @gov_sheet.present?
       if @gov_sheet == "FHA"
-        @fha = true
-        @va = false
-        @usda = false
+        @filter_data[:fha] = true
       elsif @gov_sheet == "VA"
-        @va = true
-        @fha = false
-        @usda = false
+        @filter_data[:va] = true
       elsif @gov_sheet == "USDA"
-        @usda = true
-        @va = false
-        @fha = false
+        @filter_data[:usda] = true
       else
-        @usda = false
-        @va = false
-        @fha = false
+         @filter_data[:va] = false
+         @filter_data[:fha] = false
+         @filter_data[:usda] = false
       end
     end
 
     @loan_limit_type = params[:loan_limit_type] if params[:loan_limit_type].present?
     if @loan_limit_type.present?
       if @loan_limit_type == "Non-Conforming"
-        @conforming = false
+        @filter_data[:conforming] = false
       elsif @loan_limit_type == "Conforming"
-        @conforming = true
+        @filter_data[:conforming] = true
       elsif @loan_limit_type == "Jumbo"
-        @Jumbo = true
+        @filter_data[:Jumbo] = true
       elsif @loan_limit_type == "High-Balance"
-        @high_balance = true
-      elsif @loan_limit_type == "Fannie Mae"
-        @fannie_mae = true
-      elsif @loan_limit_type == "Fannie Mae Home Ready"
-        @fannie_mae_home_ready = true
-      elsif @loan_limit_type == "Freddie Mac"
-        @freddie_mac = true
-      elsif @loan_limit_type == "Freddie Mac Home Possible"
-        @freddie_mac_home_possible = true
+        @filter_data[:jumbo_high_balance] = true
       else
-        @conforming = false
-        @Jumbo = false
-        @high_balance = false
-        @fannie_mae = false
-        @fannie_mae_home_ready = false
-        @freddie_mac = false
-        @freddie_mac_home_possible = false
+        @filter_data[:conforming] = false
+        @filter_data[:Jumbo] = false
+        @filter_data[:jumbo_high_balance] = false
       end
     end
+
   end
 
   def find_base_rate
-    # binding.pry
-    
-     programs = Program.where(term: @term, rate_type: @rate_type, va:@va, fha: @fha, usda: @usda, jumbo_high_balance: @high_balance, conforming: @conforming, fannie_mae: @fannie_mae, fannie_mae_home_ready: @fannie_mae_home_ready,freddie_mac: @freddie_mac, freddie_mac_home_possible: @freddie_mac_home_possible)
-
-     if programs.present?
-       program = programs.first
-        @adjustment =  program.adjustments.first
-        @adjustment_data = JSON.parse @adjustment.data
-        if program.base_rate[@interest].present?
-          @base_rate = program.base_rate[@interest][@lock_period]
+      @program_list = Program.where(@filter_data)
+      if @program_list.present?
+        @programs =[]
+        @program_list.each do |program|
+          if(program.base_rate[program.base_rate.keys.first].keys.first>=(@interest.to_f.to_s) && program.base_rate[program.base_rate.keys.first].keys.last <=(@interest.to_f.to_s))
+            @programs << program
+          end
         end
-     end
-
-    # if program.present?
-    #   # Adjustment::MAIN_KEYS.key("FinancingType/LTV/CLTV/FICO")
-    #   @adjustment =  program.adjustments.first
-    #   @adjustment_data = JSON.parse @adjustment.data
-    #   @adjustment_data.keys.each do |adjustment_key|
-    #     if adjustment_key =="Conforming/RateType/Term/LTV/FICO"
-    #         @adjustment_data[adjustment_key]
-    #     end
-    #     @adjustment_data[adjustment_key]
-    #   end
-
-    #   if program.base_rate[@interest].present?
-    #     @base_rate = program.base_rate[@interest][@lock_period]
-    #   end
-    # end
+        # if @programs.count>=2
+        #   flash[:error] = "find multiple program"
+        # else
+        #   program = @programs.first
+        #   if program.base_rate[program.base_rate.keys.first][@interest.to_f.to_s].present?
+        #     @base_rate = program.base_rate[program.base_rate.keys.first][@interest.to_f.to_s][@lock_period]
+        #   end
+        # end
+      end
     return @base_rate
   end
 
