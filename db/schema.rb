@@ -71,6 +71,7 @@ ActiveRecord::Schema.define(version: 2019_01_10_073034) do
     t.string "rate_type"
     t.integer "rate_arm"
     t.string "loan_type"
+    t.integer "sheet_id"
     t.integer "lock_period", default: [], array: true
     t.string "loan_limit_type", default: [], array: true
   end
