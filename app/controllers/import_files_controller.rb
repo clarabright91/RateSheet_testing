@@ -2101,7 +2101,7 @@ class ImportFilesController < ApplicationController
               if @block_hash.values.first.keys.first.nil?
                 @block_hash.values.first.shift
               end
-              @program.update(base_rate: @block_hash.to_json)
+              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -2730,7 +2730,7 @@ class ImportFilesController < ApplicationController
               if @block_hash.values.first.keys.first.nil?
                 @block_hash.values.first.shift
               end
-              @program.update(base_rate: @block_hash.to_json)
+              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -2987,7 +2987,7 @@ class ImportFilesController < ApplicationController
               if @block_hash.values.first.keys.first.nil?
                 @block_hash.values.first.shift
               end
-              @program.update(base_rate: @block_hash.to_json)
+              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -3466,7 +3466,7 @@ class ImportFilesController < ApplicationController
               if @block_hash.values.first.keys.first.nil?
                 @block_hash.values.first.shift
               end
-              @program.update(base_rate: @block_hash.to_json)
+              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -4023,7 +4023,7 @@ class ImportFilesController < ApplicationController
               if @block_hash.values.first.keys.first.nil?
                 @block_hash.values.first.shift
               end
-              @program.update(base_rate: @block_hash.to_json)
+              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -4683,7 +4683,7 @@ class ImportFilesController < ApplicationController
               if @block_hash.values.first.keys.first.nil?
                 @block_hash.values.first.shift
               end
-              @program.update(base_rate: @block_hash.to_json)
+              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -5199,7 +5199,7 @@ class ImportFilesController < ApplicationController
               if @block_hash.values.first.keys.first.nil?
                 @block_hash.values.first.shift
               end
-              @program.update(base_rate: @block_hash.to_json)
+              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -5432,7 +5432,7 @@ class ImportFilesController < ApplicationController
               if @block_hash.values.first.keys.first.nil?
                 @block_hash.values.first.shift
               end
-              @program.update(base_rate: @block_hash.to_json)
+              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -5634,7 +5634,7 @@ class ImportFilesController < ApplicationController
               if @block_hash.values.first.keys.first.nil?
                 @block_hash.values.first.shift
               end
-              @program.update(base_rate: @block_hash.to_json)
+              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -5989,7 +5989,7 @@ class ImportFilesController < ApplicationController
               if @block_hash.values.first.keys.first.nil?
                 @block_hash.values.first.shift
               end
-              @program.update(base_rate: @block_hash.to_json)
+              @program.update(base_rate: @block_hash)
             end
           end
         end
