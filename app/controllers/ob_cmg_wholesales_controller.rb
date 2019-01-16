@@ -351,7 +351,6 @@ class ObCmgWholesalesController < ApplicationController
       if (sheet == "AGENCYLLPAS")
       	sheet_data = xlsx.sheet(sheet)
       	@ltv_data = []
-<<<<<<< HEAD
       	@cltv_data = []
       	@adjustment_hash = {}
       	@cashout_adjustment = {}
@@ -372,22 +371,12 @@ class ObCmgWholesalesController < ApplicationController
       		row = sheet_data.row(r)
       		@ltv_data = sheet_data.row(10)
       		@cltv_data = sheet_data.row(38)
-=======
-      	@adjustment_hash = {}
-      	primary_key = ''
-      	secondary_key = ''
-      	ltv_key = ''
-      	(8..62).each do |r|
-      		row = sheet_data.row(r)
-      		@ltv_data = sheet_data.row(10)
->>>>>>> b67e10691c333fc854a87f6ecd53ab1bc58fb12d
       		(0..16).each do |cc|
       			value = sheet_data.cell(r,cc)
       			if value.present?
       				if value == "AGENCY FIXED AND ARM ADJUSTMENTS"
       					primary_key = "RateType/Term/FICO/LTV"
       					@adjustment_hash[primary_key] = {}
-<<<<<<< HEAD
       					cash_key = "CashOut/FICO/LTV"
       					@cashout_adjustment[cash_key] = {}
       				end
@@ -538,35 +527,6 @@ class ObCmgWholesalesController < ApplicationController
       	Adjustment.create(data: @loan_adjustment, sheet_name: sheet)
       	Adjustment.create(data: @state_adjustments, sheet_name: sheet)
       	Adjustment.create(data: @other_adjustment, sheet_name: sheet)
-=======
-      				end
-      				if value.class == String && value.include?("Cash Out with FICO")
-      					primary_key = "CashOut/FICO/LTV"
-      					@adjustment_hash[primary_key] = {}
-      				end
-      				# AGENCY FIXED AND ARM ADJUSTMENTS
-      				if r >= 11 && r <= 24 && r != 16 && cc == 1
-      					secondary_key = get_value value
-      					@adjustment_hash[primary_key][secondary_key] = {}
-      				end
-      				if r >= 11 && r <= 24 && r != 16 && cc >= 9 && cc <= 16
-      					ltv_key = get_value @ltv_data[cc-1]
-      					@adjustment_hash[primary_key][secondary_key][ltv_key] = {}
-      					@adjustment_hash[primary_key][secondary_key][ltv_key] = value
-      				end
-      				# if r >= 25 && r <= 31 && cc == 1
-      				# 	secondary_key = value
-      				# 	@adjustment_hash[primary_key][secondary_key] = {}
-      				# end
-      				# if r >= 25 && r <= 31 && cc >= 9 && cc <= 16
-      				# 	ltv_key = @ltv_data[cc-1]
-      				# 	@adjustment_hash[primary_key][secondary_key][ltv_key] = {}
-      				# 	@adjustment_hash[primary_key][secondary_key][ltv_key] = value
-      				# end
-      			end
-      		end
-      	end
->>>>>>> b67e10691c333fc854a87f6ecd53ab1bc58fb12d
       end
     end
     # redirect_to programs_import_file_path(@bank)
