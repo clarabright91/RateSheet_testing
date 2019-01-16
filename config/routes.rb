@@ -53,6 +53,12 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :ob_cardinal_financial_wholesale10742, only: [:index] do
+    member do
+      get :ak
+    end
+  end
+
   match "dashboard/index", to: 'dashboard#index', via: [:get, :post]
 
 end
