@@ -26,21 +26,23 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         sheet_data = xlsx.sheet(sheet)
         (71..1260).each do |r|
         	row = sheet_data.row(r)
-        	if row.compact.count > 1 && row.compact.count <= 3
-        		max_column_section = row.compact.count - 1
-        		(0..max_column_section).each do |max_column|
-        			cc = max_column + 1
-        			if value.present?
-	        			if cc == 2 || cc == 13 || cc == 25 || cc == 35
-	        				@title = sheet_data.cell(r,cc)
-	        			end
-	        		end
-        		end
-        		debugger
+          if row.compact.count > 1 && row.compact.count <= 4
+            max_column_section = row.compact.count - 1
+            (0..max_column_section).each do |max_column|
+              cc = max_column + 1
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if cc == 2 || cc == 13 || cc == 25 || cc == 35
+                  @title = value
+                end
+              end
+            end
         	end
         end
+        debugger
       end
     end
+    redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
 	end
 	def programs
     @programs = @sheet_obj.programs

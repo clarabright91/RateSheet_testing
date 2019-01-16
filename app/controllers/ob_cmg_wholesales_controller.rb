@@ -384,7 +384,7 @@ class ObCmgWholesalesController < ApplicationController
       			value = sheet_data.cell(r,cc)
       			if value.present?
       				if value == "AGENCY FIXED AND ARM ADJUSTMENTS"
-      					primary_key = "RateType/Term/FICO/LTV"
+      					primary_key = "LoanType/Term/FICO/LTV"
       					@adjustment_hash[primary_key] = {}
       					cash_key = "CashOut/FICO/LTV"
       					@cashout_adjustment[cash_key] = {}
@@ -394,13 +394,13 @@ class ObCmgWholesalesController < ApplicationController
       					@subordinate_hash[primary_key] = {}
       				end
       				if value == "HOMEREADY ADJUSTMENT CAPS*"
-      					primary_key = "FinancingType/RateType"
+      					primary_key = "FinancingType/LoanType"
       					@adjustment_cap[primary_key] = {}
       				end
       				# AGENCY FIXED AND ARM ADJUSTMENTS
       				if r >= 11 && r <= 24  && cc == 1
       					if value.include?("Condo")
-      						secondary_key = "RateType/Fixed/Condo"
+      						secondary_key = "LoanType/Fixed/Condo"
       					else
       						secondary_key = get_value value
       					end
@@ -489,7 +489,7 @@ class ObCmgWholesalesController < ApplicationController
       			value = sheet_data.cell(r,cc)
       			if value.present?
       				if value == "LOAN AMOUNT "
-      					primary_key1 = "RateType/LoanAmount/CLTV"
+      					primary_key1 = "LoanType/LoanAmount/CLTV"
       					@loan_adjustment[primary_key1] = {}
       				end
       				if value == "STATE ADJUSTMENTS"
@@ -728,7 +728,7 @@ class ObCmgWholesalesController < ApplicationController
         				@adjustment_hash[primary_key1] = {}
         			end
         			if value == "LOAN AMOUNT "
-        				primary_key1 = "RateType/LoanAmount/CLTV"
+        				primary_key1 = "LoanType/LoanAmount/CLTV"
         				@adjustment_hash[primary_key1] = {}
         			end
         			if value == "STATE ADJUSTMENTS"
@@ -962,7 +962,7 @@ class ObCmgWholesalesController < ApplicationController
 	        				@adjustment_hash[primary_key1] = {}
 	        			end
 	        			if value == "LOAN AMOUNT "
-	        				primary_key1 = "RateType/LoanAmount/CLTV"
+	        				primary_key1 = "LoanType/LoanAmount/CLTV"
 	        				@adjustment_hash[primary_key1] = {}
 	        			end
 	        			if value == "STATE ADJUSTMENTS"
@@ -1344,7 +1344,7 @@ class ObCmgWholesalesController < ApplicationController
               value = sheet_data.cell(r,cc)
               if value.present?
                 if value == "PREMIER JUMBO 6200 SERIES ADJUSTMENTS"
-                  first_key = "LoanType/FICO/LTV"
+                  first_key = "LoanPurpose/FICO/LTV"
                   @data_hash[first_key] = {}
                 end
                 if value == "Purchase Transaction"
@@ -1674,13 +1674,13 @@ class ObCmgWholesalesController < ApplicationController
         			value = sheet_data.cell(r,cc)
         			if value.present?
         				if value == "Purchase Transaction"
-        					primary_key = "LoanType/FICO/LTV"
+        					primary_key = "LoanPurpose/FICO/LTV"
         					@purchase_adjustment[primary_key] = {}
         				elsif value == "Rate/Term Transaction"
-        					primary_key = "RateType/Term/FICO/LTV"
+        					primary_key = "LoanType/Term/FICO/LTV"
         					@rate_adjustment[primary_key] = {}
         				elsif value == "Cash Out Transaction"
-        					primary_key = "LoanType/RefinanceOption/LTV"
+        					primary_key = "LoanPurpose/RefinanceOption/LTV"
         					@adjustment_hash[primary_key] = {}
         				end
         				# Purchase Transaction Adjustment
@@ -1725,7 +1725,7 @@ class ObCmgWholesalesController < ApplicationController
         			value = sheet_data.cell(r,cc)
         			if value.present?
         				if value == "MAX PRICE AFTER ADJUSTMENTS"
-        					max_key = "RateType/LA/"
+        					max_key = "LoanType/LA/"
         					@other_adjustment[max_key] = {}
         				end
         				# MISCELLANEOUS
@@ -1760,10 +1760,10 @@ class ObCmgWholesalesController < ApplicationController
         			value = sheet_data.cell(r,cc)
         			if value.present?
         				if value == "Purchase Transaction"
-        					primary_key = "Jumbo/LoanType/FICO/LTV"
+        					primary_key = "Jumbo/LoanPurpose/FICO/LTV"
         					@jumbo_purchase_adjustment[primary_key] = {}
         				elsif value == "Rate/Term Transaction"
-        					primary_key = "Jumbo/RateType/Term/FICO/LTV"
+        					primary_key = "Jumbo/LoanType/Term/FICO/LTV"
         					@jumbo_rate_adjustment[primary_key] = {}
         				elsif value == "MISCELLANEOUS"
         					primary_key = "Jumbo/NY/FICO/LTV"
@@ -1829,7 +1829,7 @@ class ObCmgWholesalesController < ApplicationController
         			value = sheet_data.cell(r,cc)
         			if value.present?
         				if value == "MAX PRICE AFTER ADJUSTMENTS"
-        					max_key = "RateType/LA/"
+        					max_key = "LoanType/LA/"
         					@jumbo_other_adjustment[max_key] = {}
         				end
         				if r >= 71 && r <= 72 && cc == 1
@@ -1982,19 +1982,19 @@ class ObCmgWholesalesController < ApplicationController
         			value = sheet_data.cell(r,cc)
         			if value.present?
         				if value == "Purchase Transaction"
-        					primary_key = "LoanType/FICO/LTV"
+        					primary_key = "LoanPurpose/FICO/LTV"
         					@purchase_adjustment[primary_key] = {}
         				elsif value == "Rate/Term Transaction"
-        					primary_key = "RateType/Term/FICO/LTV"
+        					primary_key = "LoanType/Term/FICO/LTV"
         					@rate_adjustment[primary_key] = {}
         				elsif value == "Cash Out Transaction"
-        					primary_key = "LoanType/RefinanceOption/LTV"
+        					primary_key = "LoanPurpose/RefinanceOption/LTV"
         					@adjustment_hash[primary_key] = {}
         				elsif value == "MISCELLANEOUS"
         					primary_key = "Miscellaneous"
         					@other_adjustment[primary_key] = {}
         				elsif value == "MAX PRICE AFTER ADJUSTMENTS"
-        					primary_key = "RateType/LA/"
+        					primary_key = "LoanType/LA/"
         					@other_adjustment[primary_key] = {}
         				end
         				# Purchase Transaction Adjustment
@@ -2216,19 +2216,19 @@ class ObCmgWholesalesController < ApplicationController
         			value = sheet_data.cell(r,cc)
         			if value.present?
         				if value == "Purchase Transaction"
-        					primary_key = "LoanType/FICO/LTV"
+        					primary_key = "LoanPurpose/FICO/LTV"
         					@purchase_adjustment[primary_key] = {}
         				elsif value == "Rate/Term Transaction"
-        					primary_key = "RateType/Term/FICO/LTV"
+        					primary_key = "LoanType/Term/FICO/LTV"
         					@rate_adjustment[primary_key] = {}
         				elsif value == "Cash Out Transaction"
-        					primary_key = "LoanType/RefinanceOption/LTV"
+        					primary_key = "LoanPurpose/RefinanceOption/LTV"
         					@adjustment_hash[primary_key] = {}
         				elsif value == "MISCELLANEOUS"
         					primary_key = "Miscellaneous"
         					@other_adjustment[primary_key] = {}
         				elsif value == "MAX PRICE AFTER ADJUSTMENTS"
-        					primary_key = "RateType/LA/"
+        					primary_key = "LoanType/LA/"
         					@other_adjustment[primary_key] = {}
         				end
         				# Purchase Transaction Adjustment
@@ -2564,7 +2564,7 @@ class ObCmgWholesalesController < ApplicationController
               value = sheet_data.cell(r,cc)
               if value.present?
                 if value == "FLEX JUMBO 6400 SERIES ADJUSTMENTS"
-                  primary_key = "Jumbo/RateType/FICO/LTV"
+                  primary_key = "Jumbo/LoanType/FICO/LTV"
                   @flex_hash[primary_key] = {}
                 end
                 if r >= 14 && r <= 19 && cc == 10
@@ -2590,7 +2590,7 @@ class ObCmgWholesalesController < ApplicationController
               value = sheet_data.cell(r,cc)
               if value.present?
                 if value == "FLEX JUMBO 6400 SERIES ADJUSTMENTS"
-                  primary_key = "Jumbo/RateType/FICO/LTV"
+                  primary_key = "Jumbo/LoanType/FICO/LTV"
                   @jumbo_flex_hash[primary_key] = {}
                 end
                 if r >= 23 && r <= 38 && cc == 10
@@ -2745,7 +2745,7 @@ class ObCmgWholesalesController < ApplicationController
               value = sheet_data.cell(r,cc)
               if value.present?
                 if value == "PRIME JUMBO 6800 SERIES ADJUSTMENTS"
-                  primary_key = "Jumbo/LoanType/FICO/LTV"
+                  primary_key = "Jumbo/LoanPurpose/FICO/LTV"
                   @block_adjustment[primary_key] = {}
                 end
 
@@ -3020,7 +3020,7 @@ class ObCmgWholesalesController < ApplicationController
               value = sheet_data.cell(r,cc)
               if value.present?
                 if value == "RENEW JUMBO QM 6900 SERIES ADJUSTMENTS"
-                  primary_key = "LoanType/LTV/FICO"
+                  primary_key = "LoanPurpose/LTV/FICO"
                   @adjustment_hash[primary_key] = {}
                 end
 
@@ -3114,3 +3114,6 @@ class ObCmgWholesalesController < ApplicationController
     end
   end
 end
+
+
+

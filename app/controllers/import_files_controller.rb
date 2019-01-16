@@ -164,7 +164,7 @@ class ImportFilesController < ApplicationController
                 loan_type = @program.loan_type
               end
               if @program.term.present? 
-                main_key = "Term/RateType/InterestRate/LockPeriod"
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
               end
@@ -410,7 +410,7 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               if @program.term.present? 
-                main_key = "Term/RateType/InterestRate/LockPeriod"
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
               end
@@ -798,7 +798,7 @@ class ImportFilesController < ApplicationController
               key = ''
               main_key = ''
               if @program.term.present? 
-                main_key = "Term/RateType/InterestRate/LockPeriod"
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
               end
@@ -1163,7 +1163,7 @@ class ImportFilesController < ApplicationController
               key = ''
               main_key = ''
               if @program.term.present? 
-                main_key = "Term/RateType/InterestRate/LockPeriod"
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
               end
@@ -1557,7 +1557,7 @@ class ImportFilesController < ApplicationController
               key = ''
               main_key = ''
               if @program.term.present? 
-                main_key = "Term/RateType/InterestRate/LockPeriod"
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
               end
@@ -1828,7 +1828,7 @@ class ImportFilesController < ApplicationController
               key = ''
               main_key = ''
               if @program.term.present? 
-                main_key = "Term/RateType/InterestRate/LockPeriod"
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
               end
@@ -1879,7 +1879,7 @@ class ImportFilesController < ApplicationController
                   @adjustment_hash[primary_key] = {}
                 end
                 if value == "All Fixed Conforming > 15yr Terms (All Occupancies)"
-                  secondry_key = "Conforming/RateType/Term/LTV/FICO"
+                  secondry_key = "Conforming/LoanType/Term/LTV/FICO"
                   @adjustment_hash[primary_key][secondry_key] = {}
                 end
                 if value == "Subordinate Financing"
@@ -2068,7 +2068,7 @@ class ImportFilesController < ApplicationController
               key = ''
               main_key = ''
               if @program.term.present? 
-                main_key = "Term/RateType/InterestRate/LockPeriod"
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
               end
@@ -2699,7 +2699,7 @@ class ImportFilesController < ApplicationController
               key = ''
               main_key = ''
               if @program.term.present? 
-                main_key = "Term/RateType/InterestRate/LockPeriod"
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
               end
@@ -2752,7 +2752,7 @@ class ImportFilesController < ApplicationController
                   @adjustment_hash[primary_key] = {}
                 end
                 if value == "All Fixed Conforming > 15yr Terms (All Occupancies)"
-                  secondry_key = "Conforming/RateType/Term/LTV/FICO"
+                  secondry_key = "Conforming/LoanType/Term/LTV/FICO"
                   @adjustment_hash[primary_key][secondry_key] = {}
                 end
                 if value == "Subordinate Financing"
@@ -2956,7 +2956,7 @@ class ImportFilesController < ApplicationController
               key = ''
               main_key = ''
               if @program.term.present? 
-                main_key = "Term/RateType/InterestRate/LockPeriod"
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
               end
@@ -3435,7 +3435,7 @@ class ImportFilesController < ApplicationController
               key = ''
               main_key = ''
               if @program.term.present? 
-                main_key = "Term/RateType/InterestRate/LockPeriod"
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
               end
@@ -3696,7 +3696,7 @@ class ImportFilesController < ApplicationController
                 key = ''
                 main_key = ''
               if @program.term.present? 
-                main_key = loan_purpose.to_s + "/" +"Term/RateType/InterestRate/LockPeriod"
+                main_key = loan_purpose.to_s + "/" +"Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
               end
@@ -3868,7 +3868,7 @@ class ImportFilesController < ApplicationController
                     rr = adj_row
                     cc = 15
                     @data_hash = {}
-                    main_key = "LoanType/RefinanceOption/LTV"
+                    main_key = "LoanPurpose/RefinanceOption/LTV"
                     key = "True"
                     key1 = "Cash Out"
                     @data_hash[main_key] = {}
@@ -3992,7 +3992,7 @@ class ImportFilesController < ApplicationController
               key = ''
               main_key = ''
               if @program.term.present? 
-                main_key = "Term/RateType/InterestRate/LockPeriod"
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
               end
@@ -4438,7 +4438,7 @@ class ImportFilesController < ApplicationController
                 key = ''
                 new_key = ''
                 if @program.term.present? 
-                  new_key = "Term/RateType/InterestRate/LockPeriod"
+                  new_key = "Term/LoanType/InterestRate/LockPeriod"
                 else
                   new_key = "InterestRate/LockPeriod"
                 end
@@ -4483,7 +4483,7 @@ class ImportFilesController < ApplicationController
             value = sheet_data.cell(r,cc)
             if value.present?
               if value == "Jumbo Series I Adjustments"
-                main_key = "RateType/FICO/CLTV"
+                main_key = "LoanType/FICO/CLTV"
                 @adjustment_hash[main_key] = {}
               end
               if value == "Fixed Adjustments"
@@ -4652,7 +4652,7 @@ class ImportFilesController < ApplicationController
               key = ''
               main_key = ''
               if @program.term.present? 
-                main_key = "Term/RateType/InterestRate/LockPeriod"
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
               end
@@ -4702,7 +4702,7 @@ class ImportFilesController < ApplicationController
                   @adjustment_hash[primary_key] = {}
                 end
                 if (r == 65 && cc == 3)
-                  secondry_key = "Conforming/RateType/Term/LTV/FICO"
+                  secondry_key = "Conforming/LoanType/Term/LTV/FICO"
                   @adjustment_hash[primary_key][secondry_key] = {}
                 end
                 if value == "Subordinate Financing"
@@ -4901,7 +4901,7 @@ class ImportFilesController < ApplicationController
                 key = ''
                 main_key = ''
                 if @program.term.present? 
-                  main_key = "Term/RateType/InterestRate/LockPeriod"
+                  main_key = "Term/LoanType/InterestRate/LockPeriod"
                 else
                   main_key = "InterestRate/LockPeriod"
                 end
@@ -5168,7 +5168,7 @@ class ImportFilesController < ApplicationController
               key = ''
               main_key = ''
               if @program.term.present? 
-                main_key = "Term/RateType/InterestRate/LockPeriod"
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
               end
@@ -5401,7 +5401,7 @@ class ImportFilesController < ApplicationController
               key = ''
               main_key = ''
               if @program.term.present? 
-                main_key = "Term/RateType/InterestRate/LockPeriod"
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
               end
@@ -5603,7 +5603,7 @@ class ImportFilesController < ApplicationController
               key = ''
               main_key = ''
               if @program.term.present? 
-                main_key = "Term/RateType/InterestRate/LockPeriod"
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
               end
@@ -5958,7 +5958,7 @@ class ImportFilesController < ApplicationController
               key = ''
               main_key = ''
               if @program.term.present? 
-                main_key = "Term/RateType/InterestRate/LockPeriod"
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
               end
@@ -6299,7 +6299,7 @@ class ImportFilesController < ApplicationController
               key = ''
               main_key = ''
               if @program.term.present? 
-                main_key = "Term/RateType/InterestRate/LockPeriod"
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
               end
@@ -6648,7 +6648,7 @@ class ImportFilesController < ApplicationController
               key = ''
               main_key = ''
               if @program.term.present? 
-                main_key = "Term/RateType/InterestRate/LockPeriod"
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
               end
