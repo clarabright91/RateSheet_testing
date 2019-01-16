@@ -44,6 +44,16 @@
 
               <div class="col-md-2">
                 <div class="form-group">
+                  <label>Fannie Options</label>
+                  <div class="input-group">
+                    <% @loan_limit_type_list =[["Fannie Mae"], ["Fannie Mae Home Ready"], ["Fannie Mac"], ["Fannie Mae Home Possible"]]%>
+                    <%= select_tag 'fannie_options', options_for_select(@loan_limit_type_list), { prompt: 'Select Fannie', :class=> "form-control" }%>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <div class="form-group">
                   <label>Gov</label>
                   <div class="input-group">
                     <% @gov_list =[["FHA"], ["VA"], ["USDA"]]%>
