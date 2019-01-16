@@ -2616,7 +2616,6 @@ class ObCmgWholesalesController < ApplicationController
     # redirect_to programs_import_file_path(@bank)
   	redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
   end
->>>>>>> 63f9849d50cb2e93a961e3abcf25166e9b59c2c9
   def jumbo_6800
     @programs_ids = []
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
