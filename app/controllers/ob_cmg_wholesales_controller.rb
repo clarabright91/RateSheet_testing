@@ -351,46 +351,182 @@ class ObCmgWholesalesController < ApplicationController
       if (sheet == "AGENCYLLPAS")
       	sheet_data = xlsx.sheet(sheet)
       	@ltv_data = []
+      	@cltv_data = []
       	@adjustment_hash = {}
+      	@cashout_adjustment = {}
+      	@subordinate_hash = {}
+      	@adjustment_cap = {}
+      	@loan_adjustment = {}
+      	@state_adjustments = {}
+      	@other_adjustment = {}
       	primary_key = ''
+      	primary_key1 = ''
       	secondary_key = ''
+      	secondary_key1 = ''
       	ltv_key = ''
+      	cltv_key = ''
+      	cash_key = ''
+      	key = ''
       	(8..62).each do |r|
       		row = sheet_data.row(r)
       		@ltv_data = sheet_data.row(10)
+      		@cltv_data = sheet_data.row(38)
       		(0..16).each do |cc|
       			value = sheet_data.cell(r,cc)
       			if value.present?
       				if value == "AGENCY FIXED AND ARM ADJUSTMENTS"
       					primary_key = "RateType/Term/FICO/LTV"
       					@adjustment_hash[primary_key] = {}
+      					cash_key = "CashOut/FICO/LTV"
+      					@cashout_adjustment[cash_key] = {}
       				end
-      				if value.class == String && value.include?("Cash Out with FICO")
-      					primary_key = "CashOut/FICO/LTV"
-      					@adjustment_hash[primary_key] = {}
+      				if value == "SUBORDINATE FINANCING"
+      					primary_key = "FinancingType/LTV/CLTV/FICO"
+      					@subordinate_hash[primary_key] = {}
+      				end
+      				if value == "HOMEREADY ADJUSTMENT CAPS*"
+      					primary_key = "FinancingType/RateType"
+      					@adjustment_cap[primary_key] = {}
       				end
       				# AGENCY FIXED AND ARM ADJUSTMENTS
-      				if r >= 11 && r <= 24 && r != 16 && cc == 1
-      					secondary_key = get_value value
+      				if r >= 11 && r <= 24  && cc == 1
+      					if value.include?("Condo")
+      						secondary_key = "RateType/Fixed/Condo"
+      					else
+      						secondary_key = get_value value
+      					end
       					@adjustment_hash[primary_key][secondary_key] = {}
       				end
-      				if r >= 11 && r <= 24 && r != 16 && cc >= 9 && cc <= 16
+      				if r >= 11 && r <= 24 && cc >= 9 && cc <= 16
       					ltv_key = get_value @ltv_data[cc-1]
       					@adjustment_hash[primary_key][secondary_key][ltv_key] = {}
       					@adjustment_hash[primary_key][secondary_key][ltv_key] = value
       				end
-      				# if r >= 25 && r <= 31 && cc == 1
-      				# 	secondary_key = value
-      				# 	@adjustment_hash[primary_key][secondary_key] = {}
-      				# end
-      				# if r >= 25 && r <= 31 && cc >= 9 && cc <= 16
-      				# 	ltv_key = @ltv_data[cc-1]
-      				# 	@adjustment_hash[primary_key][secondary_key][ltv_key] = {}
-      				# 	@adjustment_hash[primary_key][secondary_key][ltv_key] = value
-      				# end
+
+      				# cashout_adjustment
+      				if r >= 25 && r <= 31 && cc == 1
+      					secondary_key = get_value value
+      					@cashout_adjustment[cash_key][secondary_key] = {}
+      				end
+      				if r >= 25 && r <= 31 && cc >= 9 && cc <= 16
+      					ltv_key = @ltv_data[cc-1]
+      					@cashout_adjustment[cash_key][secondary_key][ltv_key] = {}
+      					@cashout_adjustment[cash_key][secondary_key][ltv_key] = value
+      				end
+
+      				# High Balance Adjustments
+      				if r >= 33 && r <= 35 && cc == 1
+      					unless @adjustment_hash[primary_key].has_key?("ARM")
+      						secondary_key = value.split.first 
+      					else
+      						secondary_key = "/" + value.split.first
+      					end
+      					@adjustment_hash[primary_key][secondary_key] = {}
+      				end
+      				if r >= 33 && r <= 35 && cc >= 9 && cc <= 16
+      					ltv_key = @ltv_data[cc-1]
+      					@adjustment_hash[primary_key][secondary_key][ltv_key] = {}
+      					@adjustment_hash[primary_key][secondary_key][ltv_key] = value
+      				end
+
+      				# SUBORDINATE FINANCING
+      				if r >= 39 && r <= 43 && cc == 1
+      					secondary_key = get_value value
+      					@subordinate_hash[primary_key][secondary_key] = {}
+      				end
+      				if r >= 39 && r <= 43 && cc == 3
+      					ltv_key = get_value value
+      					@subordinate_hash[primary_key][secondary_key][ltv_key] = {}
+      				end
+      				if r >= 39 && r <= 43 && cc >= 5 && cc <= 7
+      					cltv_key = get_value @cltv_data[cc-1]
+      					@subordinate_hash[primary_key][secondary_key][ltv_key][cltv_key] = {}
+      					@subordinate_hash[primary_key][secondary_key][ltv_key][cltv_key] = value
+      				end
+      				if r == 44 && cc == 1
+      					secondary_key = "Home Possible"
+      					@subordinate_hash[primary_key][secondary_key] = {}
+      				end
+      				if r == 44 && cc == 5
+      					@subordinate_hash[primary_key][secondary_key] = value
+      				end
+
+      				# HOMEREADY ADJUSTMENT CAPS
+      				if r >= 48 && r <= 49 && cc ==1 
+      					if value == "LTV > 80% AND FICO >= 680"
+      						secondary_key = "FICO/LTV"
+      					else
+      						secondary_key = "All/FICO/LTV"
+      					end 
+      					@adjustment_cap[primary_key][secondary_key] = {}
+      				end
+      				if r >= 48 && r <= 49 && cc == 8
+      					@adjustment_cap[primary_key][secondary_key] = value
+      				end
+      				if r >= 54 && r <= 55 && cc ==1 
+      					if value == "LTV > 80% AND FICO >= 680"
+      						secondary_key = "HOME/FICO/LTV"
+      					else
+      						secondary_key = "All/HOME/FICO/LTV"
+      					end 
+      					@adjustment_cap[primary_key][secondary_key] = {}
+      				end
+      				if r >= 54 && r <= 55 && cc == 8
+      					@adjustment_cap[primary_key][secondary_key] = value
+      				end
+      			end
+      		end
+      		(10..16).each do |cc|
+      			value = sheet_data.cell(r,cc)
+      			if value.present?
+      				if value == "LOAN AMOUNT "
+      					primary_key1 = "RateType/LoanAmount/CLTV"
+      					@loan_adjustment[primary_key1] = {}
+      				end
+      				if value == "STATE ADJUSTMENTS"
+        				primary_key1 = "State"
+        				@state_adjustments[primary_key1] = {}
+        			end
+        			if value == "MISCELLANEOUS"
+        				primary_key1 = "Miscellaneous"
+        				@other_adjustment[primary_key1] = {}
+        			end
+      				# LOAN AMOUNT
+      				if r >= 38 && r <= 42 && cc == 10
+      					secondary_key1 = get_value value
+      					@loan_adjustment[primary_key1][secondary_key1] = {}
+      				end
+      				if r >= 38 && r <= 42 && cc == 16
+      					@loan_adjustment[primary_key1][secondary_key1] = value
+      				end
+      				# STATE ADJUSTMENTS
+      				if r >= 46 && r <= 52 && cc == 11
+      					adj_key = value.split(', ')
+                adj_key.each do |f_key|
+                  key = f_key
+                  ccc = cc + 5
+                  c_val = sheet_data.cell(r,ccc)
+                  @state_adjustments[primary_key1][key] = c_val
+                end
+      				end
+      				# MISCELLANEOUS
+      				if r >= 55 && r <= 62 && cc == 10
+      					secondary_key1 = value
+      					@other_adjustment[primary_key1][secondary_key1] = {}
+      				end
+      				if r >= 55 && r <= 62 && cc == 16
+      					@other_adjustment[primary_key1][secondary_key1] = value
+      				end
       			end
       		end
       	end
+      	Adjustment.create(data: @adjustment_hash, sheet_name: sheet)
+      	Adjustment.create(data: @cashout_adjustment, sheet_name: sheet)
+      	Adjustment.create(data: @subordinate_hash, sheet_name: sheet)
+      	Adjustment.create(data: @adjustment_cap, sheet_name: sheet)
+      	Adjustment.create(data: @loan_adjustment, sheet_name: sheet)
+      	Adjustment.create(data: @state_adjustments, sheet_name: sheet)
+      	Adjustment.create(data: @other_adjustment, sheet_name: sheet)
       end
     end
     # redirect_to programs_import_file_path(@bank)
@@ -2697,6 +2833,44 @@ class ObCmgWholesalesController < ApplicationController
             end
           end
         end
+        # Adjustments
+        (26..44).each do |r|
+          row = sheet_data.row(r)
+          @cltv_data = sheet_data.row(28)
+          if row.compact.count >= 1
+            (1..11).each do |cc|
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "RENEW JUMBO QM 6900 SERIES ADJUSTMENTS"
+                  primary_key = "LoanType/LTV/FICO"
+                  @adjustment_hash[primary_key] = {}
+                end
+
+                # Purchase Transaction Adjustment
+                if r >= 29 && r <= 44 && cc == 1
+                  if value.include?("Loan Amount")
+                    secondary_key = value.include?("<") ? "0"+value.split("Loan Amount").last : value.split("Loan Amount").last
+                  elsif value.include?("Cashout")
+                    secondary_key = "Cashout/Fico/ltv"
+                  elsif value.include?("Condo")
+                    secondary_key = "Condo"
+                  elsif value.include?("Escrow")
+                    secondary_key = "Escrow Waiver/NY"
+                  else
+                    secondary_key = get_value value
+                  end
+                  @adjustment_hash[primary_key][secondary_key] = {}
+                end
+                if r >= 29 && r <= 44 && cc >= 5 && cc <= 11
+                  cltv_key = get_value @cltv_data[cc-1]
+                  @adjustment_hash[primary_key][secondary_key][cltv_key] = {}
+                  @adjustment_hash[primary_key][secondary_key][cltv_key] = value
+                end
+              end
+            end
+          end
+        end
+        debugger
       end
     end
     # redirect_to programs_import_file_path(@bank)
