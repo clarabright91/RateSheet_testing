@@ -2664,8 +2664,8 @@ class ObCmgWholesalesController < ApplicationController
             end
           end
         end
-        # Adjustment.create(data: @misc_adjustment, sheet_name: sheet)
-        # Adjustment.create(data: @block_adjustment, sheet_name: sheet)
+        Adjustment.create(data: @misc_adjustment, sheet_name: sheet)
+        Adjustment.create(data: @block_adjustment, sheet_name: sheet)
       end
 
     end
