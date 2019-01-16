@@ -28,7 +28,11 @@ class ObCmgWholesalesController < ApplicationController
         sheet_data = xlsx.sheet(sheet)
         @programs_ids = []
         first_key = ''
+        first_key1 = ''
+        first_key2 = ''
         second_key = ''
+        second_key1 = ''
+        second_key2 = ''
         state_key = ''
         cc = ''
         ccc = ''
@@ -38,6 +42,8 @@ class ObCmgWholesalesController < ApplicationController
         value1 = ''
         @block_hash = {}
         @data_hash = {}
+        @misc_hash = {}
+        @state_hash = {}
         adj_key = []
         (10..60).each do |r|
           row = sheet_data.row(r)
@@ -171,26 +177,13 @@ class ObCmgWholesalesController < ApplicationController
                   @data_hash[first_key][second_key] = {}
                 end
 
-                if r >= 70 && r <= 76 && cc == 1
+                if r >= 70 && r <= 87 && cc == 1
                   value = get_value value
                   ccc = cc + 6
                   c_val = sheet_data.cell(r,ccc)
                   @data_hash[first_key][second_key][value] = c_val
                 end
 
-                if r >= 78 && r <= 82 && cc == 1
-                  value = get_value value
-                  ccc = cc + 6
-                  c_val = sheet_data.cell(r,ccc)
-                  @data_hash[first_key][second_key][value] = c_val
-                end
-
-                if r >= 83 && r <= 87 && cc == 1
-                  value = get_value value
-                  ccc = cc + 6
-                  c_val = sheet_data.cell(r,ccc)
-                  @data_hash[first_key][second_key][value] = c_val
-                end
               end
             end
 
@@ -199,20 +192,24 @@ class ObCmgWholesalesController < ApplicationController
               value = sheet_data.cell(r,cc)
               if value.present?
                 if value == "MISCELLANEOUS"
-                  second_key = "Miscellaneous"
-                  @data_hash[first_key][second_key] = {}
+                  first_key1 = "GovermentAdjustments"
+                  second_key1 = "Miscellaneous"
+                  @misc_hash[first_key1] = {}
+                  @misc_hash[first_key1][second_key1] = {}
                 end
 
                 if r >= 70 && r <= 77 && cc == 10
                   value1 = get_key value
                   ccc = cc + 6
                   c_val = sheet_data.cell(r,ccc)
-                  @data_hash[first_key][second_key][value] = c_val
+                  @misc_hash[first_key1][second_key1][value] = c_val
                 end
 
                 if value == "STATE ADJUSTMENTS"
-                  second_key = "StateAdjustments"
-                  @data_hash[first_key][second_key] = {}
+                  first_key2 = "GovermentAdjustments"
+                  second_key2 = "StateAdjustments"
+                  @state_hash[first_key2] = {}
+                  @state_hash[first_key2][second_key2] = {}
                 end
 
                 if r >= 80 && r <= 87 && cc == 11
@@ -221,7 +218,7 @@ class ObCmgWholesalesController < ApplicationController
                     key_val = f_key
                     ccc = cc + 5
                     k_val = sheet_data.cell(r,ccc)
-                    @data_hash[first_key][second_key][key_val] = k_val
+                    @state_hash[first_key2][second_key2][key_val] = k_val
                   end
                 end
 
@@ -230,6 +227,8 @@ class ObCmgWholesalesController < ApplicationController
           end
         end
         Adjustment.create(data: @data_hash, sheet_name: sheet)
+        Adjustment.create(data: @misc_hash, sheet_name: sheet)
+        Adjustment.create(data: @state_hash, sheet_name: sheet)
       end
     end
     # redirect_to programs_import_file_path(@bank)
@@ -2378,6 +2377,12 @@ class ObCmgWholesalesController < ApplicationController
       if (sheet == "JUMBO 6800")
         sheet_data = xlsx.sheet(sheet)
         @programs_ids = []
+        primary_key = ''
+        first_key = ''
+        cltv_key = ''
+        c_val = ''
+        @block_adjustment = {}
+        @misc_adjustment = {}
         (10..37).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 4))
@@ -2477,7 +2482,57 @@ class ObCmgWholesalesController < ApplicationController
             end
           end
         end
+
+        #Adjustment
+        (40..50).each do |r|
+          row = sheet_data.row(r)
+          @key_data = sheet_data.row(42)
+          if (row.compact.count >= 1)
+            #Higher of LTV/CLTV Adjustment
+            (0..11).each do |max_column|
+              cc = max_column
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "PRIME JUMBO 6800 SERIES ADJUSTMENTS"
+                  primary_key = "Jumbo/LoanType/FICO/LTV"
+                  @block_adjustment[primary_key] = {}
+                end
+
+                if r >= 43 && r <= 50 && cc == 1
+                  cltv_key = get_value value
+                  @block_adjustment[primary_key][cltv_key] = {}
+                end
+
+                if r >= 43 && r <= 50 && cc >= 4 && cc <= 11
+                  key_val = get_value @key_data[cc-1]
+                  @block_adjustment[primary_key][cltv_key][key_val] = value
+                end
+              end
+            end
+
+            #MISCELLANEOUS Adjustment
+            (13..16).each do |max_column|
+              cc = max_column
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "MISCELLANEOUS"
+                  first_key = "Miscellaneous"
+                  @misc_adjustment[first_key] = {}
+                end
+
+                if r >= 43 && r <= 44 && cc == 13
+                  ccc = cc + 3
+                  c_val = sheet_data.cell(r,ccc)
+                  @misc_adjustment[first_key][value] = c_val
+                end
+              end
+            end
+          end
+        end
+        # Adjustment.create(data: @misc_adjustment, sheet_name: sheet)
+        # Adjustment.create(data: @block_adjustment, sheet_name: sheet)
       end
+
     end
     # redirect_to programs_import_file_path(@bank)
   	redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
