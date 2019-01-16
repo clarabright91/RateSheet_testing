@@ -81,15 +81,15 @@ class ImportFilesController < ApplicationController
 
                # rate arm
               if @title.include?("Fixed")
-                rate_type = "Fixed"
+                loan_type = "Fixed"
               elsif @title.include?("ARM")
-                rate_type = "ARM"
+                loan_type = "ARM"
               elsif @title.include?("Floating")
-                rate_type = "Floating"
+                loan_type = "Floating"
               elsif @title.include?("Variable")
-                rate_type = "Variable"
+                loan_type = "Variable"
               else
-                rate_type = nil
+                loan_type = nil
               end
 
               # streamline && fha, Va , Usda
@@ -145,7 +145,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,rate_type: rate_type,loan_type: "Purchase",streamline: streamline, fha: fha, va: va, usda: usda, full_doc: full_doc, jumbo_high_balance: jumbo_high_balance,sheet_name: sheet, rate_arm: rate_arm)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",streamline: streamline, fha: fha, va: va, usda: usda, full_doc: full_doc, jumbo_high_balance: jumbo_high_balance,sheet_name: sheet, rate_arm: rate_arm)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -160,8 +160,8 @@ class ImportFilesController < ApplicationController
               if @program.term.present?
                 term = @program.term
               end
-              if @program.rate_type.present?
-                rate_type = @program.rate_type
+              if @program.loan_type.present?
+                loan_type = @program.loan_type
               end
               if @program.term.present? 
                 main_key = "Term/RateType/InterestRate/LockPeriod"
@@ -360,15 +360,15 @@ class ImportFilesController < ApplicationController
 
               # interest type
               if @title.include?("Fixed")
-                rate_type = "Fixed"
+                loan_type = "Fixed"
               elsif @title.include?("ARM")
-                rate_type = "ARM"
+                loan_type = "ARM"
               elsif @title.include?("Floating")
-                rate_type = "Floating"
+                loan_type = "Floating"
               elsif @title.include?("Variable")
-                rate_type = "Variable"
+                loan_type = "Variable"
               else
-                rate_type = nil
+                loan_type = nil
               end
 
               # conforming
@@ -405,7 +405,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,rate_type: rate_type,loan_type: "Purchase",conforming: conforming,freddie_mac: freddie_mac, sheet_name: sheet, fannie_mae: fannie_mae)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, sheet_name: sheet, fannie_mae: fannie_mae)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -741,15 +741,15 @@ class ImportFilesController < ApplicationController
 
               # interest type
               if @title.include?("Fixed")
-                rate_type = "Fixed"
+                loan_type = "Fixed"
               elsif @title.include?("ARM")
-                rate_type = "ARM"
+                loan_type = "ARM"
               elsif @title.include?("Floating")
-                rate_type = "Floating"
+                loan_type = "Floating"
               elsif @title.include?("Variable")
-                rate_type = "Variable"
+                loan_type = "Variable"
               else
-                rate_type = nil
+                loan_type = nil
               end
 
               # conforming
@@ -792,7 +792,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,rate_type: rate_type,loan_type: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, sheet_name: sheet,jumbo_high_balance: jumbo_high_balance)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, sheet_name: sheet,jumbo_high_balance: jumbo_high_balance)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -1106,15 +1106,15 @@ class ImportFilesController < ApplicationController
 
               # rate type
               if @title.include?("Fixed")
-                rate_type = "Fixed"
+                loan_type = "Fixed"
               elsif @title.include?("ARM")
-                rate_type = "ARM"
+                loan_type = "ARM"
               elsif @title.include?("Floating")
-                rate_type = "Floating"
+                loan_type = "Floating"
               elsif @title.include?("Variable")
-                rate_type = "Variable"
+                loan_type = "Variable"
               else
-                rate_type = nil
+                loan_type = nil
               end
 
               # rate arm
@@ -1157,7 +1157,7 @@ class ImportFilesController < ApplicationController
               end
               @program.save
               @program.adjustments.destroy_all
-              @program.update(term: term,rate_type: rate_type,loan_type: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, sheet_name: sheet,rate_arm: rate_arm)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, sheet_name: sheet,rate_arm: rate_arm)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -1501,15 +1501,15 @@ class ImportFilesController < ApplicationController
 
               # interest type
               if @title.include?("Fixed")
-                rate_type = "Fixed"
+                loan_type = "Fixed"
               elsif @title.include?("ARM")
-                rate_type = "ARM"
+                loan_type = "ARM"
               elsif @title.include?("Floating")
-                rate_type = "Floating"
+                loan_type = "Floating"
               elsif @title.include?("Variable")
-                rate_type = "Variable"
+                loan_type = "Variable"
               else
-                rate_type = nil
+                loan_type = nil
               end
 
               # rate arm
@@ -1551,7 +1551,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,rate_type: rate_type,loan_type: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -1772,15 +1772,15 @@ class ImportFilesController < ApplicationController
 
               # interest type
               if @title.include?("Fixed")
-                rate_type = "Fixed"
+                loan_type = "Fixed"
               elsif @title.include?("ARM")
-                rate_type = "ARM"
+                loan_type = "ARM"
               elsif @title.include?("Floating")
-                rate_type = "Floating"
+                loan_type = "Floating"
               elsif @title.include?("Variable")
-                rate_type = "Variable"
+                loan_type = "Variable"
               else
-                rate_type = nil
+                loan_type = nil
               end
 
               # interest sub type
@@ -1822,7 +1822,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,rate_type: rate_type,loan_type: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -2045,7 +2045,7 @@ class ImportFilesController < ApplicationController
               @title = sheet_data.cell(r,cc)
                 program_heading = @title.split
                 term =  program_heading[3]
-                rate_type = program_heading[5]
+                loan_type = program_heading[5]
                 @program = @bank.programs.find_or_create_by(program_name: @title)
                 @programs_ids  << @program.id
                  # Loan Limit Type
@@ -2062,7 +2062,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-                @program.update(term: term,rate_type: rate_type,loan_type: "Purchase", sheet_name: sheet)
+                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase", sheet_name: sheet)
                 @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -2642,15 +2642,15 @@ class ImportFilesController < ApplicationController
 
               # rate type
               if @title.include?("Fixed")
-                rate_type = "Fixed"
+                loan_type = "Fixed"
               elsif @title.include?("ARM")
-                rate_type = "ARM"
+                loan_type = "ARM"
               elsif @title.include?("Floating")
-                rate_type = "Floating"
+                loan_type = "Floating"
               elsif @title.include?("Variable")
-                rate_type = "Variable"
+                loan_type = "Variable"
               else
-                rate_type = nil
+                loan_type = nil
               end
 
               # rate arm
@@ -2693,7 +2693,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,rate_type: rate_type,loan_type: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -2919,15 +2919,15 @@ class ImportFilesController < ApplicationController
 
               # rate type
               if @title.include?("Fixed")
-                rate_type = "Fixed"
+                loan_type = "Fixed"
               elsif @title.include?("ARM")
-                rate_type = "ARM"
+                loan_type = "ARM"
               elsif @title.include?("Floating")
-                rate_type = "Floating"
+                loan_type = "Floating"
               elsif @title.include?("Variable")
-                rate_type = "Variable"
+                loan_type = "Variable"
               else
-                rate_type = nil
+                loan_type = nil
               end
 
               # rate arm
@@ -2951,7 +2951,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,rate_type: @rate_type,loan_type: "Purchase",rate_arm: rate_arm)
+              @program.update(term: term,loan_type: @loan_type,loan_purpose: "Purchase",rate_arm: rate_arm)
               @block_hash = {}
               key = ''
               main_key = ''
@@ -3373,15 +3373,15 @@ class ImportFilesController < ApplicationController
 
               # rate type
               if @title.include?("Fixed")
-                rate_type = "Fixed"
+                loan_type = "Fixed"
               elsif @title.include?("ARM")
-                rate_type = "ARM"
+                loan_type = "ARM"
               elsif @title.include?("Floating")
-                rate_type = "Floating"
+                loan_type = "Floating"
               elsif @title.include?("Variable")
-                rate_type = "Variable"
+                loan_type = "Variable"
               else
-                rate_type = nil
+                loan_type = nil
               end
 
               # rate arm
@@ -3429,7 +3429,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,rate_type: rate_type,loan_type: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet, jumbo_high_balance: jumbo_high_balance)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet, jumbo_high_balance: jumbo_high_balance)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -3626,15 +3626,15 @@ class ImportFilesController < ApplicationController
 
                   # rate type
                   if @title.include?("Fixed")
-                    rate_type = "Fixed"
+                    loan_type = "Fixed"
                   elsif @title.include?("ARM")
-                    rate_type = "ARM"
+                    loan_type = "ARM"
                   elsif @title.include?("Floating")
-                    rate_type = "Floating"
+                    loan_type = "Floating"
                   elsif @title.include?("Variable")
-                    rate_type = "Variable"
+                    loan_type = "Variable"
                   else
-                    rate_type = nil
+                    loan_type = nil
                   end
 
                   # rate arm
@@ -3668,9 +3668,9 @@ class ImportFilesController < ApplicationController
 
                   # Purchase & Refinance
                   if @title.include?("Purchase")
-                    loan_type = "Purchase"
+                    loan_purpose = "Purchase"
                   elsif @title.include?("Refinance")
-                    loan_type = "Refinance"
+                    loan_purpose = "Refinance"
                   end
 
                 @program = @bank.programs.find_or_create_by(program_name: @title)
@@ -3689,14 +3689,14 @@ class ImportFilesController < ApplicationController
                   @program.loan_limit_type << "High Balance"
                 end
                 @program.save
-                @program.update(term: term,rate_type: rate_type,loan_type: loan_type ,rate_arm: rate_arm )
+                @program.update(term: term,loan_type: loan_type,loan_purpose: loan_purpose ,rate_arm: rate_arm )
                 @program.adjustments.destroy_all
 
                 @block_hash = {}
                 key = ''
                 main_key = ''
               if @program.term.present? 
-                main_key = loan_type.to_s + "/" +"Term/RateType/InterestRate/LockPeriod"
+                main_key = loan_purpose.to_s + "/" +"Term/RateType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
               end
@@ -3936,15 +3936,15 @@ class ImportFilesController < ApplicationController
 
               # rate type
               if @title.include?("Fixed")
-                rate_type = "Fixed"
+                loan_type = "Fixed"
               elsif @title.include?("ARM")
-                rate_type = "ARM"
+                loan_type = "ARM"
               elsif @title.include?("Floating")
-                rate_type = "Floating"
+                loan_type = "Floating"
               elsif @title.include?("Variable")
-                rate_type = "Variable"
+                loan_type = "Variable"
               else
-                rate_type = nil
+                loan_type = nil
               end
 
               # rate arm
@@ -3986,7 +3986,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,rate_type: rate_type,loan_type: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -4399,15 +4399,15 @@ class ImportFilesController < ApplicationController
 
                   # rate type
                   if @title.include?("Fixed")
-                    rate_type = "Fixed"
+                    loan_type = "Fixed"
                   elsif @title.include?("ARM")
-                    rate_type = "ARM"
+                    loan_type = "ARM"
                   elsif @title.include?("Floating")
-                    rate_type = "Floating"
+                    loan_type = "Floating"
                   elsif @title.include?("Variable")
-                    rate_type = "Variable"
+                    loan_type = "Variable"
                   else
-                    rate_type = nil
+                    loan_type = nil
                   end
 
                   # rate arm
@@ -4432,7 +4432,7 @@ class ImportFilesController < ApplicationController
                   @program.loan_limit_type << "High Balance"
                 end
                 @program.save
-                @program.update(term: term,rate_type: rate_type,loan_type: "Purchase" ,rate_arm: rate_arm, sheet_name: sheet )
+                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase" ,rate_arm: rate_arm, sheet_name: sheet )
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -4602,15 +4602,15 @@ class ImportFilesController < ApplicationController
 
               # rate type
               if @title.include?("Fixed")
-                rate_type = "Fixed"
+                loan_type = "Fixed"
               elsif @title.include?("ARM")
-                rate_type = "ARM"
+                loan_type = "ARM"
               elsif @title.include?("Floating")
-                rate_type = "Floating"
+                loan_type = "Floating"
               elsif @title.include?("Variable")
-                rate_type = "Variable"
+                loan_type = "Variable"
               else
-                rate_type = nil
+                loan_type = nil
               end
 
               # rate arm
@@ -4646,7 +4646,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,rate_type: rate_type,loan_type: "Purchase",conforming: conforming, rate_arm: rate_arm, sheet_name: sheet, jumbo_high_balance: jumbo_high_balance)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming, rate_arm: rate_arm, sheet_name: sheet, jumbo_high_balance: jumbo_high_balance)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -4863,15 +4863,15 @@ class ImportFilesController < ApplicationController
                 end
                 # rate type
                 if @title.include?("Fixed")
-                  rate_type = "Fixed"
+                  loan_type = "Fixed"
                 elsif @title.include?("ARM")
-                  rate_type = "ARM"
+                  loan_type = "ARM"
                 elsif @title.include?("Floating")
-                  rate_type = "Floating"
+                  loan_type = "Floating"
                 elsif @title.include?("Variable")
-                  rate_type = "Variable"
+                  loan_type = "Variable"
                 else
-                  rate_type = nil
+                  loan_type = nil
                 end
 
                 # rate arm
@@ -4895,7 +4895,7 @@ class ImportFilesController < ApplicationController
                   @program.loan_limit_type << "High Balance"
                 end
                 @program.save
-                @program.update(term: term,rate_type: rate_type,loan_type: "Purchase" ,rate_arm: rate_arm, sheet_name: sheet )
+                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase" ,rate_arm: rate_arm, sheet_name: sheet )
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -5089,7 +5089,7 @@ class ImportFilesController < ApplicationController
         @ltv_data = []
         @ltv_arm_data = []
         term_key = ''
-        rate_type_key = ''
+        loan_type_key = ''
         jumbo_key = ''
         primary_key = ''
         fixed_key = ''
@@ -5126,15 +5126,15 @@ class ImportFilesController < ApplicationController
 
               # interest type
               if @title.include?("Fixed")
-                rate_type = "Fixed"
+                loan_type = "Fixed"
               elsif @title.include?("ARM")
-                rate_type = "ARM"
+                loan_type = "ARM"
               elsif @title.include?("Floating")
-                rate_type = "Floating"
+                loan_type = "Floating"
               elsif @title.include?("Variable")
-                rate_type = "Variable"
+                loan_type = "Variable"
               else
-                rate_type = nil
+                loan_type = nil
               end
 
               # interest sub type
@@ -5162,7 +5162,7 @@ class ImportFilesController < ApplicationController
 
               @program = @bank.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
-              @program.update(term: term,rate_type: rate_type,loan_type: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -5220,43 +5220,43 @@ class ImportFilesController < ApplicationController
                   elsif value.include?("15")
                     term_key = "15"
                   end
-                  rate_type_key = "Fixed"
+                  loan_type_key = "Fixed"
                   jumbo_key = "Jumbo"
                   @adjustment_hash[term_key] = {}
-                  @adjustment_hash[term_key][rate_type_key] = {}
-                  @adjustment_hash[term_key][rate_type_key][jumbo_key] = {}
+                  @adjustment_hash[term_key][loan_type_key] = {}
+                  @adjustment_hash[term_key][loan_type_key][jumbo_key] = {}
                 end
 
                 # LTV Based Adjustments for 20/25/30 Yr Fixed Jumbo Products
                 if (r >= 40 && r <= 45 && cc == 3) || (r >= 55 && r <= 60 && cc == 3)
                   ltv_key = get_value value
-                  @adjustment_hash[term_key][rate_type_key][jumbo_key][ltv_key] = {}
+                  @adjustment_hash[term_key][loan_type_key][jumbo_key][ltv_key] = {}
                 end
                 if (r >= 46 && r <= 51 && cc == 2) || (r >= 55 && r <= 60 && cc > 3 && cc == 2)
                   ltv_key = value
-                  @adjustment_hash[term_key][rate_type_key][jumbo_key][ltv_key] = {}
+                  @adjustment_hash[term_key][loan_type_key][jumbo_key][ltv_key] = {}
                 end
                 if r >= 40 && r <= 45 && cc > 3 && cc <= 14
                   fixed_key = get_value @ltv_data[cc-2]
-                  @adjustment_hash[term_key][rate_type_key][jumbo_key][ltv_key][fixed_key] = {}
-                  @adjustment_hash[term_key][rate_type_key][jumbo_key][ltv_key][fixed_key] = value
+                  @adjustment_hash[term_key][loan_type_key][jumbo_key][ltv_key][fixed_key] = {}
+                  @adjustment_hash[term_key][loan_type_key][jumbo_key][ltv_key][fixed_key] = value
                 end
                 if r >= 46 && r <= 51 && cc > 2 && cc <= 14
                   fixed_key = get_value @ltv_data[cc-2]
-                  @adjustment_hash[term_key][rate_type_key][jumbo_key][ltv_key][fixed_key] = {}
-                  @adjustment_hash[term_key][rate_type_key][jumbo_key][ltv_key][fixed_key] =value
+                  @adjustment_hash[term_key][loan_type_key][jumbo_key][ltv_key][fixed_key] = {}
+                  @adjustment_hash[term_key][loan_type_key][jumbo_key][ltv_key][fixed_key] =value
                 end
 
                 # LTV Based Adjustments for 15 Yr Fixed and All ARM Jumbo Products
                 if r >= 55 && r <= 60 && cc > 3 && cc <= 14
                   fixed_key1 = get_value @ltv_arm_data[cc-2]
-                  @adjustment_hash[term_key][rate_type_key][jumbo_key][ltv_key][fixed_key1] = {}
-                  @adjustment_hash[term_key][rate_type_key][jumbo_key][ltv_key][fixed_key1] = value
+                  @adjustment_hash[term_key][loan_type_key][jumbo_key][ltv_key][fixed_key1] = {}
+                  @adjustment_hash[term_key][loan_type_key][jumbo_key][ltv_key][fixed_key1] = value
                 end
                 if r >= 60 && r <= 61 && cc > 3 && cc <= 14
                   fixed_key1 = get_value @ltv_arm_data[cc-2]
-                  @adjustment_hash[term_key][rate_type_key][jumbo_key][ltv_key][fixed_key1] = {}
-                  @adjustment_hash[term_key][rate_type_key][jumbo_key][ltv_key][fixed_key1] = value
+                  @adjustment_hash[term_key][loan_type_key][jumbo_key][ltv_key][fixed_key1] = {}
+                  @adjustment_hash[term_key][loan_type_key][jumbo_key][ltv_key][fixed_key1] = value
                 end
               end
             end
@@ -5358,15 +5358,15 @@ class ImportFilesController < ApplicationController
 
               # rate type
               if @title.include?("Fixed")
-                rate_type = "Fixed"
+                loan_type = "Fixed"
               elsif @title.include?("ARM")
-                rate_type = "ARM"
+                loan_type = "ARM"
               elsif @title.include?("Floating")
-                rate_type = "Floating"
+                loan_type = "Floating"
               elsif @title.include?("Variable")
-                rate_type = "Variable"
+                loan_type = "Variable"
               else
-                rate_type = nil
+                loan_type = nil
               end
 
               # rate arm
@@ -5395,7 +5395,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,rate_type: rate_type,loan_type: "Purchase", rate_arm: rate_arm, sheet_name: sheet, jumbo_high_balance: jumbo_high_balance)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase", rate_arm: rate_arm, sheet_name: sheet, jumbo_high_balance: jumbo_high_balance)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -5547,15 +5547,15 @@ class ImportFilesController < ApplicationController
 
               # rate type
               if @title.include?("Fixed")
-                rate_type = "Fixed"
+                loan_type = "Fixed"
               elsif @title.include?("ARM")
-                rate_type = "ARM"
+                loan_type = "ARM"
               elsif @title.include?("Floating")
-                rate_type = "Floating"
+                loan_type = "Floating"
               elsif @title.include?("Variable")
-                rate_type = "Variable"
+                loan_type = "Variable"
               else
-                rate_type = nil
+                loan_type = nil
               end
 
               # rate arm
@@ -5597,7 +5597,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,rate_type: rate_type,loan_type: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -5899,15 +5899,15 @@ class ImportFilesController < ApplicationController
               end
 
               if @title.include?("Fixed")
-                rate_type = "Fixed"
+                loan_type = "Fixed"
               elsif @title.include?("ARM")
-                rate_type = "ARM"
+                loan_type = "ARM"
               elsif @title.include?("Floating")
-                rate_type = "Floating"
+                loan_type = "Floating"
               elsif @title.include?("Variable")
-                rate_type = "Variable"
+                loan_type = "Variable"
               else
-                rate_type = nil
+                loan_type = nil
               end
 
               # rate arm
@@ -5952,7 +5952,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,rate_type: rate_type,loan_type: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, jumbo_high_balance: jumbo_high_balance, sheet_name: sheet, rate_arm: rate_arm)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, jumbo_high_balance: jumbo_high_balance, sheet_name: sheet, rate_arm: rate_arm)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -6250,15 +6250,15 @@ class ImportFilesController < ApplicationController
 
               # rate type
               if @title.include?("Fixed")
-                rate_type = "Fixed"
+                loan_type = "Fixed"
               elsif @title.include?("ARM")
-                rate_type = "ARM"
+                loan_type = "ARM"
               elsif @title.include?("Floating")
-                rate_type = "Floating"
+                loan_type = "Floating"
               elsif @title.include?("Variable")
-                rate_type = "Variable"
+                loan_type = "Variable"
               else
-                rate_type = nil
+                loan_type = nil
               end
 
               # rate arm
@@ -6293,7 +6293,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,rate_type: rate_type, rate_arm: rate_arm, loan_type: "Purchase", fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, conforming: conforming, sheet_name: sheet)
+              @program.update(term: term,loan_type: loan_type, rate_arm: rate_arm, loan_purpose: "Purchase", fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, conforming: conforming, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -6614,15 +6614,15 @@ class ImportFilesController < ApplicationController
 
               # rate type
               if @title.include?("Fixed")
-                rate_type = "Fixed"
+                loan_type = "Fixed"
               elsif @title.include?("ARM")
-                rate_type = "ARM"
+                loan_type = "ARM"
               elsif @title.include?("Floating")
-                rate_type = "Floating"
+                loan_type = "Floating"
               elsif @title.include?("Variable")
-                rate_type = "Variable"
+                loan_type = "Variable"
               else
-                rate_type = nil
+                loan_type = nil
               end
 
               # rate arm
@@ -6642,7 +6642,7 @@ class ImportFilesController < ApplicationController
               end
               @program = @bank.programs.find_or_create_by(program_name: @title)
               program_ids << @program.id
-              @program.update(term: term,rate_type: rate_type, rate_arm: rate_arm, loan_type: "Purchase", fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, conforming: conforming, sheet_name: sheet)
+              @program.update(term: term,loan_type: loan_type, rate_arm: rate_arm, loan_purpose: "Purchase", fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, conforming: conforming, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
