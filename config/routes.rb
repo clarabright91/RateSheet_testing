@@ -68,6 +68,18 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :ob_newfi_wholesale7019, only: [:index] do
+    member do
+      get :programs
+      get :biscayne_delegated_jumbo
+      get :sequoia_portfolio_plus_products
+      get :sequoia_expanded_products
+      get :sequoia_investor_pro
+      get :fha_buydown_fixed_rate_products
+      get :fha_fixed_arm_products
+    end
+  end
+
   match "dashboard/index", to: 'dashboard#index', via: [:get, :post]
 
 end
