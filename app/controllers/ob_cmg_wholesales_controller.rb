@@ -2797,6 +2797,19 @@ class ObCmgWholesalesController < ApplicationController
       if (sheet == "JUMBO 6900 & 7900")
         sheet_data = xlsx.sheet(sheet)
         @programs_ids = []
+        @cltv_data = []
+        @other_data = []
+        @jumbo_data = []
+        @jumbo_other_data = []
+        @adjustment_hash = {}
+        @other_adjustment = {}
+        @jumbo_adjustment_hash = {}
+        @jumbo_other_adjustment = {}
+        primary_key = ''
+        secondary_key = ''
+        max_key = ''
+        key = ''
+        cltv_key = ''
         (10..23).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 4))
@@ -3011,7 +3024,7 @@ class ObCmgWholesalesController < ApplicationController
             end
           end
         end
-        # Adjustments
+        # Adjustment
         (26..44).each do |r|
           row = sheet_data.row(r)
           @cltv_data = sheet_data.row(28)
@@ -3020,7 +3033,7 @@ class ObCmgWholesalesController < ApplicationController
               value = sheet_data.cell(r,cc)
               if value.present?
                 if value == "RENEW JUMBO QM 6900 SERIES ADJUSTMENTS"
-                  primary_key = "LoanPurpose/LTV/FICO"
+                  primary_key = "RateType/LTV/FICO"
                   @adjustment_hash[primary_key] = {}
                 end
 
@@ -3046,8 +3059,94 @@ class ObCmgWholesalesController < ApplicationController
                 end
               end
             end
+
+            #other adjustment
+            (13..16).each do |cc|
+              value = sheet_data.cell(r,cc)
+              @other_data = sheet_data.row(r) if r == 32
+              if value.present?
+                if value == "MAX PRICE AFTER ADJUSTMENTS"
+                  max_key = "RateType/LA/"
+                  @other_adjustment[max_key] = {}
+                end
+                if r >= 33 && r <= 34 && cc == 13
+                  key = value.include?("LA <") ? "0" + value.split("LA").last : value.split("LA").last
+                  @other_adjustment[max_key][key] = {}
+                end
+                if r >= 33 && r <= 34 && cc >= 14 && cc <= 16
+                  other_key = get_value @other_data[cc-1]
+                  @other_adjustment[max_key][key][other_key] = {}
+                  @other_adjustment[max_key][key][other_key] = value
+                end
+              end
+            end
+
           end
         end
+        Adjustment.create(data: @adjustment_hash, sheet_name: sheet)
+        Adjustment.create(data: @other_adjustment, sheet_name: sheet)
+
+        #second adjustment
+        (67..85).each do |r|
+          row = sheet_data.row(r)
+          @jumbo_data = sheet_data.row(69)
+          if row.compact.count >= 1
+            (1..11).each do |cc|
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "RENEW JUMBO NON-QM 7900 SERIES ADJUSTMENTS"
+                  primary_key = "RateType/LTV/FICO"
+                  @jumbo_adjustment_hash[primary_key] = {}
+                end
+
+                # Purchase Transaction Adjustment
+                if r >= 70 && r <= 85 && cc == 1
+                  if value.include?("Loan Amount")
+                    secondary_key = value.include?("<") ? "0"+value.split("Loan Amount").last : value.split("Loan Amount").last
+                  elsif value.include?("Cashout")
+                    secondary_key = "Cashout/Fico/ltv"
+                  elsif value.include?("Condo")
+                    secondary_key = "Condo"
+                  elsif value.include?("Escrow")
+                    secondary_key = "Escrow Waiver/NY"
+                  else
+                    secondary_key = get_value value
+                  end
+                  @jumbo_adjustment_hash[primary_key][secondary_key] = {}
+                end
+                if r >= 70 && r <= 85 && cc >= 5 && cc <= 11
+                  cltv_key = get_value @jumbo_data[cc-1]
+                  @jumbo_adjustment_hash[primary_key][secondary_key][cltv_key] = {}
+                  @jumbo_adjustment_hash[primary_key][secondary_key][cltv_key] = value
+                end
+              end
+            end
+
+            #other adjustment
+            (13..16).each do |cc|
+              value = sheet_data.cell(r,cc)
+              @jumbo_other_data = sheet_data.row(r) if r == 73
+              if value.present?
+                if value == "MAX PRICE AFTER ADJUSTMENTS"
+                  max_key = "RateType/LA/"
+                  @jumbo_other_adjustment[max_key] = {}
+                end
+                if r >=74 && r <= 75 && cc == 13
+                  key = value.include?("LA <") ? "0" + value.split("LA").last : value.split("LA").last
+                  @jumbo_other_adjustment[max_key][key] = {}
+                end
+                if r >= 74 && r <= 75 && cc >= 14 && cc <= 16
+                  other_key = get_value @jumbo_other_data[cc-1]
+                  @jumbo_other_adjustment[max_key][key][other_key] = {}
+                  @jumbo_other_adjustment[max_key][key][other_key] = value
+                end
+              end
+            end
+
+          end
+        end
+        Adjustment.create(data: @jumbo_adjustment_hash, sheet_name: sheet)
+        Adjustment.create(data: @jumbo_other_adjustment, sheet_name: sheet)
       end
     end
     # redirect_to programs_import_file_path(@bank)
