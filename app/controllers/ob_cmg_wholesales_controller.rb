@@ -1,5 +1,5 @@
 class ObCmgWholesalesController < ApplicationController
-	before_action :get_sheet, only: [:gov, :agency, :durp, :oa, :jumbo_700,:jumbo_7200_6700, :jumbo_6600, :jumbo_7600, :jumbo_6800, :jumbo_6900_7900, :programs, :jumbo_6400]
+	before_action :get_sheet, only: [:gov, :agency, :durp, :oa, :jumbo_700,:jumbo_7200_6700, :jumbo_6600, :jumbo_6200, :jumbo_7600, :jumbo_6800, :jumbo_6900_7900, :programs, :jumbo_6400]
   before_action :get_program, only: [:single_program]
 
   def index
@@ -1666,364 +1666,364 @@ class ObCmgWholesalesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-	             	@program.update(term: @term,loan_type: loan_type,loan_purpose: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
+	            @program.update(term: @term,loan_type: loan_type,loan_purpose: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
 
 	              # @program.adjustments.destroy_all
 	              @block_hash = {}
 	              key = ''
 	              if @program.term.present? 
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
-	              (1..50).each do |max_row|
-	                @data = []
-	                (0..3).each_with_index do |index, c_i|
-	                  rrr = rr + max_row -1
-	                  ccc = cc + c_i
-	                  value = sheet_data.cell(rrr,ccc)
-	                  if value.present?
-	                    if (c_i == 0)
-	                      key = value
-	                      @block_hash[main_key][key] = {}
-	                    elsif (c_i == 1)
-	                      @block_hash[main_key][key][21] = value
-	                    elsif (c_i == 2)
-	                      @block_hash[main_key][key][30] = value
-	                    elsif (c_i == 3)
-	                      @block_hash[main_key][key][45] = value
-	                    end
-	                    @data << value
-	                  end
-	                end
-	                if @data.compact.reject { |c| c.blank? }.length == 0
-	                  break # terminate the loop
-	                end
+	                main_key = "Term/LoanType/InterestRate/LockPeriod"
+	              else
+	                main_key = "InterestRate/LockPeriod"
 	              end
+	              @block_hash[main_key] = {}
+		              (1..50).each do |max_row|
+		                @data = []
+		                (0..3).each_with_index do |index, c_i|
+		                  rrr = rr + max_row -1
+		                  ccc = cc + c_i
+		                  value = sheet_data.cell(rrr,ccc)
+		                  if value.present?
+		                    if (c_i == 0)
+		                      key = value
+		                      @block_hash[main_key][key] = {}
+		                    elsif (c_i == 1)
+		                      @block_hash[main_key][key][21] = value
+		                    elsif (c_i == 2)
+		                      @block_hash[main_key][key][30] = value
+		                    elsif (c_i == 3)
+		                      @block_hash[main_key][key][45] = value
+		                    end
+		                    @data << value
+		                  end
+		                end
+		                if @data.compact.reject { |c| c.blank? }.length == 0
+		                  break # terminate the loop
+		                end
+		              end
+		            end
+		            if  @block_hash.values.first.values.first == "21 Day"
+	              	if @block_hash.values.first.keys.first.nil?
+	                @block_hash.values.first.shift
+	              end
+	            	end
+	              @program.update(base_rate: @block_hash)
 	            end
-	            if  @block_hash.values.first.values.first == "21 Day"
-              	if @block_hash.values.first.keys.first.nil?
-                @block_hash.values.first.shift
-              end
-            	end
-              @program.update(base_rate: @block_hash)
-            end
-          end
-        end
-        (56..64).each do |r|
-          row = sheet_data.row(r)
-          if ((row.compact.count > 1) && (row.compact.count <= 4))
-          	rr = r + 1
-            max_column_section = row.compact.count - 1
-            (0..max_column_section).each do |max_column|
-              cc = 4*max_column + 1
+	          end
+	        end
+	        (56..64).each do |r|
+	          row = sheet_data.row(r)
+	          if ((row.compact.count > 1) && (row.compact.count <= 4))
+	          	rr = r + 1
+	            max_column_section = row.compact.count - 1
+	            (0..max_column_section).each do |max_column|
+	              cc = 4*max_column + 1
 
-              @title = sheet_data.cell(r,cc)
-          		if @title.present? && @title.include?("30 Year Fixed - 7230")
-	            	# term
-	            	@term = nil
-	              if @title.include?("30 Year") || @title.include?("30Yr") || @title.include?("30 Yr")
-	                @term = 30
-	              elsif @title.include?("20 Year")
-	                @term = 20
-	              elsif @title.include?("15 Year")
-	                @term = 15
+	              @title = sheet_data.cell(r,cc)
+	          		if @title.present? && @title.include?("30 Year Fixed - 7230")
+		            	# term
+		            	@term = nil
+		              if @title.include?("30 Year") || @title.include?("30Yr") || @title.include?("30 Yr")
+		                @term = 30
+		              elsif @title.include?("20 Year")
+		                @term = 20
+		              elsif @title.include?("15 Year")
+		                @term = 15
+		              end
+
+		               	# interest type
+		              if @title.include?("Fixed")
+		                loan_type = "Fixed"
+		              elsif @title.include?("ARM")
+		                loan_type = "ARM"
+		              elsif @title.include?("Floating")
+		                loan_type = "Floating"
+		              elsif @title.include?("Variable")
+		                loan_type = "Variable"
+		              else
+		                loan_type = nil
+		              end
+
+		              # streamline
+		              if @title.include?("FHA")
+		                @streamline = true
+		                @fha = true
+		                @full_doc = true
+		              elsif @title.include?("VA")
+		              	@streamline = true
+		              	@va = true
+		              	@full_doc = true
+		              elsif @title.include?("USDA")
+		              	@streamline = true
+		              	@usda = true
+		              	@full_doc = true
+		              else
+		              	@streamline = nil
+		              	@full_doc = nil
+		              	@fha = nil
+		              	@va = nil
+		              	@usda = nil
+		              end
+
+		              # High Balance
+		              if @title.include?("High Bal")
+		              	@jumbo_high_balance = true
+		              else
+		              	@jumbo_high_balance = nil
+		              end
+
+		              # interest sub type
+		              if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM")
+		                @rate_arm = @title.scan(/\d+/)[0].to_i
+		              else
+		              	@rate_arm = nil
+		              end
 	              end
 
-	               	# interest type
-	              if @title.include?("Fixed")
-	                loan_type = "Fixed"
-	              elsif @title.include?("ARM")
-	                loan_type = "ARM"
-	              elsif @title.include?("Floating")
-	                loan_type = "Floating"
-	              elsif @title.include?("Variable")
-	                loan_type = "Variable"
+	              if cc < 5
+		              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+		              @programs_ids << @program.id
+		                # Loan Limit Type
+	              if @title.include?("Non-Conforming")
+	                @program.loan_limit_type << "Non-Conforming"
+	              end
+	              if @title.include?("Conforming")
+	                @program.loan_limit_type << "Conforming"
+	              end
+	              if @title.include?("Jumbo")
+	                @program.loan_limit_type << "Jumbo"
+	              end
+	              if @title.include?("High Balance")
+	                @program.loan_limit_type << "High Balance"
+	              end
+	              @program.save
+		             	@program.update(term: @term,loan_type: loan_type,loan_purpose: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
+
+		              # @program.adjustments.destroy_all
+		              @block_hash = {}
+		              key = ''
+		              if @program.term.present? 
+	                main_key = "Term/LoanType/InterestRate/LockPeriod"
 	              else
-	                loan_type = nil
+	                main_key = "InterestRate/LockPeriod"
 	              end
-
-	              # streamline
-	              if @title.include?("FHA")
-	                @streamline = true
-	                @fha = true
-	                @full_doc = true
-	              elsif @title.include?("VA")
-	              	@streamline = true
-	              	@va = true
-	              	@full_doc = true
-	              elsif @title.include?("USDA")
-	              	@streamline = true
-	              	@usda = true
-	              	@full_doc = true
-	              else
-	              	@streamline = nil
-	              	@full_doc = nil
-	              	@fha = nil
-	              	@va = nil
-	              	@usda = nil
+	              @block_hash[main_key] = {}
+		              (1..50).each do |max_row|
+		                @data = []
+		                (0..3).each_with_index do |index, c_i|
+		                  rrr = rr + max_row -1
+		                  ccc = cc + c_i
+		                  value = sheet_data.cell(rrr,ccc)
+		                  if value.present?
+		                    if (c_i == 0)
+		                      key = value
+		                      @block_hash[main_key][key] = {}
+		                    elsif (c_i == 1)
+		                      @block_hash[main_key][key][21] = value
+		                    elsif (c_i == 2)
+		                      @block_hash[main_key][key][30] = value
+		                    elsif (c_i == 3)
+		                      @block_hash[main_key][key][45] = value
+		                    end
+		                    @data << value
+		                  end
+		                end
+		                if @data.compact.reject { |c| c.blank? }.length == 0
+		                  break # terminate the loop
+		                end
+		              end
+		            end
+		            if  @block_hash.values.first.values.first == "21 Day"
+	              	if @block_hash.values.first.keys.first.nil?
+	                @block_hash.values.first.shift
 	              end
-
-	              # High Balance
-	              if @title.include?("High Bal")
-	              	@jumbo_high_balance = true
-	              else
-	              	@jumbo_high_balance = nil
-	              end
-
-	              # interest sub type
-	              if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM")
-	                @rate_arm = @title.scan(/\d+/)[0].to_i
-	              else
-	              	@rate_arm = nil
-	              end
-              end
-
-              if cc < 5
-	              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-	              @programs_ids << @program.id
-	                # Loan Limit Type
-              if @title.include?("Non-Conforming")
-                @program.loan_limit_type << "Non-Conforming"
-              end
-              if @title.include?("Conforming")
-                @program.loan_limit_type << "Conforming"
-              end
-              if @title.include?("Jumbo")
-                @program.loan_limit_type << "Jumbo"
-              end
-              if @title.include?("High Balance")
-                @program.loan_limit_type << "High Balance"
-              end
-              @program.save
-	             	@program.update(term: @term,loan_type: loan_type,loan_purpose: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
-
-	              # @program.adjustments.destroy_all
-	              @block_hash = {}
-	              key = ''
-	              if @program.term.present? 
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
-	              (1..50).each do |max_row|
-	                @data = []
-	                (0..3).each_with_index do |index, c_i|
-	                  rrr = rr + max_row -1
-	                  ccc = cc + c_i
-	                  value = sheet_data.cell(rrr,ccc)
-	                  if value.present?
-	                    if (c_i == 0)
-	                      key = value
-	                      @block_hash[main_key][key] = {}
-	                    elsif (c_i == 1)
-	                      @block_hash[main_key][key][21] = value
-	                    elsif (c_i == 2)
-	                      @block_hash[main_key][key][30] = value
-	                    elsif (c_i == 3)
-	                      @block_hash[main_key][key][45] = value
-	                    end
-	                    @data << value
-	                  end
-	                end
-	                if @data.compact.reject { |c| c.blank? }.length == 0
-	                  break # terminate the loop
-	                end
-	              end
+	            	end
+	              @program.update(base_rate: @block_hash)
 	            end
-	            if  @block_hash.values.first.values.first == "21 Day"
-              	if @block_hash.values.first.keys.first.nil?
-                @block_hash.values.first.shift
-              end
-            	end
-              @program.update(base_rate: @block_hash)
-            end
-          end
-        end
-        (12..46).each do |r|
-        	row = sheet_data.row(r)
-        	@cltv_data = sheet_data.row(13)
-        	if row.compact.count >= 1
-        		(6..16).each do |cc|
-        			value = sheet_data.cell(r,cc)
-        			if value.present?
-        				if value == "Purchase Transaction"
-        					primary_key = "LoanPurpose/FICO/LTV"
-        					@purchase_adjustment[primary_key] = {}
-        				elsif value == "Rate/Term Transaction"
-        					primary_key = "LoanType/Term/FICO/LTV"
-        					@rate_adjustment[primary_key] = {}
-        				elsif value == "Cash Out Transaction"
-        					primary_key = "LoanPurpose/RefinanceOption/LTV"
-        					@adjustment_hash[primary_key] = {}
-        				end
-        				# Purchase Transaction Adjustment
-        				if r >= 14 && r <= 19 && cc == 6
-        					secondary_key = get_value value
-        					@purchase_adjustment[primary_key][secondary_key] = {}
-        				end
-        				if r >= 14 && r <= 19 && cc >= 10 && cc <= 16
-        					cltv_key = get_value @cltv_data[cc-1]
-        					@purchase_adjustment[primary_key][secondary_key][cltv_key] = {}
-        					@purchase_adjustment[primary_key][secondary_key][cltv_key] = value
-        				end
+	          end
+	        end
+	        (12..46).each do |r|
+	        	row = sheet_data.row(r)
+	        	@cltv_data = sheet_data.row(13)
+	        	if row.compact.count >= 1
+	        		(6..16).each do |cc|
+	        			value = sheet_data.cell(r,cc)
+	        			if value.present?
+	        				if value == "Purchase Transaction"
+	        					primary_key = "LoanPurpose/FICO/LTV"
+	        					@purchase_adjustment[primary_key] = {}
+	        				elsif value == "Rate/Term Transaction"
+	        					primary_key = "LoanType/Term/FICO/LTV"
+	        					@rate_adjustment[primary_key] = {}
+	        				elsif value == "Cash Out Transaction"
+	        					primary_key = "LoanPurpose/RefinanceOption/LTV"
+	        					@adjustment_hash[primary_key] = {}
+	        				end
+	        				# Purchase Transaction Adjustment
+	        				if r >= 14 && r <= 19 && cc == 6
+	        					secondary_key = get_value value
+	        					@purchase_adjustment[primary_key][secondary_key] = {}
+	        				end
+	        				if r >= 14 && r <= 19 && cc >= 10 && cc <= 16
+	        					cltv_key = get_value @cltv_data[cc-1]
+	        					@purchase_adjustment[primary_key][secondary_key][cltv_key] = {}
+	        					@purchase_adjustment[primary_key][secondary_key][cltv_key] = value
+	        				end
 
-        				# Rate/Term Transaction Adjustment
-        				if r >= 22 && r <= 27 && cc == 6
-        					secondary_key = get_value value
-        					@rate_adjustment[primary_key][secondary_key] = {}
-        				end
-        				if r >= 22 && r <= 27 && cc >= 10 && cc <= 16
-        					cltv_key = get_value @cltv_data[cc-1]
-        					@rate_adjustment[primary_key][secondary_key][cltv_key] = {}
-        					@rate_adjustment[primary_key][secondary_key][cltv_key] = value
-        				end
+	        				# Rate/Term Transaction Adjustment
+	        				if r >= 22 && r <= 27 && cc == 6
+	        					secondary_key = get_value value
+	        					@rate_adjustment[primary_key][secondary_key] = {}
+	        				end
+	        				if r >= 22 && r <= 27 && cc >= 10 && cc <= 16
+	        					cltv_key = get_value @cltv_data[cc-1]
+	        					@rate_adjustment[primary_key][secondary_key][cltv_key] = {}
+	        					@rate_adjustment[primary_key][secondary_key][cltv_key] = value
+	        				end
 
-        				# Cash Out Transaction Adjustment
-        				if r >= 30 && r <= 46 && cc == 6
-        					if value.include?("Loan Amount")
-        						secondary_key = value.include?("<") ? "0"+value.split("Loan Amount").last : value.split("Loan Amount").last
-        					else
-        						secondary_key = get_value value
-        					end
-        					@adjustment_hash[primary_key][secondary_key] = {}
-        				end
-        				if r >= 30 && r <= 48 && cc >= 10 && cc <= 16
-        					cltv_key = get_value @cltv_data[cc-1]
-        					@adjustment_hash[primary_key][secondary_key][cltv_key] = {}
-        					@adjustment_hash[primary_key][secondary_key][cltv_key] = value
-        				end
-        			end
-        		end
-        		(1..4).each do |cc|
-        			value = sheet_data.cell(r,cc)
-        			if value.present?
-        				if value == "MAX PRICE AFTER ADJUSTMENTS"
-        					max_key = "LoanType/LA/"
-        					@other_adjustment[max_key] = {}
-        				end
-        				# MISCELLANEOUS
-	        			if r == 25 && cc == 1
-	        				m_key = "Miscellaneous/NY"
-	        				@other_adjustment[m_key] = {}
-	        			end
-	        			if r == 25 && cc == 4
-	        				@other_adjustment[m_key] = value
-	        			end
-	        			# MAX PRICE AFTER ADJUSTMENTS
-	        			if r >= 29 && r <= 30 && cc == 1
-	        				key = value.include?("LA <") ? "0" + value.split("LA").last : value.split("LA").last
-        					@other_adjustment[max_key][key] = {}
-	        			end
-	        			if r >= 29 && r <= 30 && cc == 4
-	        				@other_adjustment[max_key][key] = value
+	        				# Cash Out Transaction Adjustment
+	        				if r >= 30 && r <= 46 && cc == 6
+	        					if value.include?("Loan Amount")
+	        						secondary_key = value.include?("<") ? "0"+value.split("Loan Amount").last : value.split("Loan Amount").last
+	        					else
+	        						secondary_key = get_value value
+	        					end
+	        					@adjustment_hash[primary_key][secondary_key] = {}
+	        				end
+	        				if r >= 30 && r <= 48 && cc >= 10 && cc <= 16
+	        					cltv_key = get_value @cltv_data[cc-1]
+	        					@adjustment_hash[primary_key][secondary_key][cltv_key] = {}
+	        					@adjustment_hash[primary_key][secondary_key][cltv_key] = value
+	        				end
 	        			end
 	        		end
-        		end
-        	end
-        end
-        Adjustment.create(data: @purchase_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @rate_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @adjustment_hash, sheet_name: sheet)
-        Adjustment.create(data: @other_adjustment, sheet_name: sheet)
-        (56..77).each do |r|
-        	row = sheet_data.row(r)
-        	@ltv_data = sheet_data.row(59)
-        	if row.compact.count >= 1
-        		(10..16).each do |cc|
-        			value = sheet_data.cell(r,cc)
-        			if value.present?
-        				if value == "Purchase Transaction"
-        					primary_key = "Jumbo/LoanPurpose/FICO/LTV"
-        					@jumbo_purchase_adjustment[primary_key] = {}
-        				elsif value == "Rate/Term Transaction"
-        					primary_key = "Jumbo/LoanType/Term/FICO/LTV"
-        					@jumbo_rate_adjustment[primary_key] = {}
-        				elsif value == "MISCELLANEOUS"
-        					primary_key = "Jumbo/NY/FICO/LTV"
-        					@jumbo_other_adjustment[primary_key] = {}
-        				end
-        				# Purchase Transaction Adjustment
-        				if r >= 60 && r <= 63 && cc == 10
-        					secondary_key = get_value value
-        					@jumbo_purchase_adjustment[primary_key][secondary_key] = {}
-        				end
-        				if r >= 60 && r <= 63 && cc >= 15 && cc <= 16
-        					ltv_key = get_value @ltv_data[cc-1]
-        					@jumbo_purchase_adjustment[primary_key][secondary_key][ltv_key] = {}
-        					@jumbo_purchase_adjustment[primary_key][secondary_key][ltv_key] = value
-        				end
+	        		(1..4).each do |cc|
+	        			value = sheet_data.cell(r,cc)
+	        			if value.present?
+	        				if value == "MAX PRICE AFTER ADJUSTMENTS"
+	        					max_key = "LoanType/LA/"
+	        					@other_adjustment[max_key] = {}
+	        				end
+	        				# MISCELLANEOUS
+		        			if r == 25 && cc == 1
+		        				m_key = "Miscellaneous/NY"
+		        				@other_adjustment[m_key] = {}
+		        			end
+		        			if r == 25 && cc == 4
+		        				@other_adjustment[m_key] = value
+		        			end
+		        			# MAX PRICE AFTER ADJUSTMENTS
+		        			if r >= 29 && r <= 30 && cc == 1
+		        				key = value.include?("LA <") ? "0" + value.split("LA").last : value.split("LA").last
+	        					@other_adjustment[max_key][key] = {}
+		        			end
+		        			if r >= 29 && r <= 30 && cc == 4
+		        				@other_adjustment[max_key][key] = value
+		        			end
+		        		end
+	        		end
+	        	end
+	        end
+	        Adjustment.create(data: @purchase_adjustment, sheet_name: sheet)
+	        Adjustment.create(data: @rate_adjustment, sheet_name: sheet)
+	        Adjustment.create(data: @adjustment_hash, sheet_name: sheet)
+	        Adjustment.create(data: @other_adjustment, sheet_name: sheet)
+	        (56..77).each do |r|
+	        	row = sheet_data.row(r)
+	        	@ltv_data = sheet_data.row(59)
+	        	if row.compact.count >= 1
+	        		(10..16).each do |cc|
+	        			value = sheet_data.cell(r,cc)
+	        			if value.present?
+	        				if value == "Purchase Transaction"
+	        					primary_key = "Jumbo/LoanPurpose/FICO/LTV"
+	        					@jumbo_purchase_adjustment[primary_key] = {}
+	        				elsif value == "Rate/Term Transaction"
+	        					primary_key = "Jumbo/LoanType/Term/FICO/LTV"
+	        					@jumbo_rate_adjustment[primary_key] = {}
+	        				elsif value == "MISCELLANEOUS"
+	        					primary_key = "Jumbo/NY/FICO/LTV"
+	        					@jumbo_other_adjustment[primary_key] = {}
+	        				end
+	        				# Purchase Transaction Adjustment
+	        				if r >= 60 && r <= 63 && cc == 10
+	        					secondary_key = get_value value
+	        					@jumbo_purchase_adjustment[primary_key][secondary_key] = {}
+	        				end
+	        				if r >= 60 && r <= 63 && cc >= 15 && cc <= 16
+	        					ltv_key = get_value @ltv_data[cc-1]
+	        					@jumbo_purchase_adjustment[primary_key][secondary_key][ltv_key] = {}
+	        					@jumbo_purchase_adjustment[primary_key][secondary_key][ltv_key] = value
+	        				end
 
-        				# Rate/Term Transaction Adjustment
-        				if r >= 66 && r <= 71 && cc == 10
-        					if value.include?("Loan Amount")
-        						secondary_key = value.include?("<") ? "0"+value.split("Loan Amount").last : value.split("Loan Amount").last
-        					else
-        						secondary_key = get_value value
-        					end
-        					@jumbo_rate_adjustment[primary_key][secondary_key] = {}
-        				end
-        				if r >= 66 && r <= 71 && cc >= 15 && cc <= 16
-        					ltv_key = get_value @ltv_data[cc-1]
-        					@jumbo_rate_adjustment[primary_key][secondary_key][ltv_key] = {}
-        					@jumbo_rate_adjustment[primary_key][secondary_key][ltv_key] = value
-        				end
+	        				# Rate/Term Transaction Adjustment
+	        				if r >= 66 && r <= 71 && cc == 10
+	        					if value.include?("Loan Amount")
+	        						secondary_key = value.include?("<") ? "0"+value.split("Loan Amount").last : value.split("Loan Amount").last
+	        					else
+	        						secondary_key = get_value value
+	        					end
+	        					@jumbo_rate_adjustment[primary_key][secondary_key] = {}
+	        				end
+	        				if r >= 66 && r <= 71 && cc >= 15 && cc <= 16
+	        					ltv_key = get_value @ltv_data[cc-1]
+	        					@jumbo_rate_adjustment[primary_key][secondary_key][ltv_key] = {}
+	        					@jumbo_rate_adjustment[primary_key][secondary_key][ltv_key] = value
+	        				end
 
-        				if r == 72 && cc == 10
-        					key = "FL"
-        					adj_key = "NV"
-        					@jumbo_rate_adjustment[primary_key][key] = {}
-        					@jumbo_rate_adjustment[primary_key][adj_key] = {}
-        				end
-        				if r == 72 && cc >= 15 && cc <= 16
-        					@jumbo_rate_adjustment[primary_key][key][@ltv_data[cc-1]] = {}
-        					@jumbo_rate_adjustment[primary_key][adj_key][@ltv_data[cc-1]] = {}
-        					@jumbo_rate_adjustment[primary_key][key][@ltv_data[cc-1]] = value
-        					@jumbo_rate_adjustment[primary_key][adj_key][@ltv_data[cc-1]] = value
-        				end
-        				if r >= 73 && r <= 74 && cc == 10
-        					secondary_key = get_value value
-        					@jumbo_rate_adjustment[primary_key][secondary_key] = {}
-        				end
-        				if r >= 73 && r <= 74 && cc >= 15 && cc <= 16
-        					@jumbo_rate_adjustment[primary_key][secondary_key][@ltv_data[cc-1]] = {}
-        					@jumbo_rate_adjustment[primary_key][secondary_key][@ltv_data[cc-1]] =  value
-        				end
-        				# MISCELLANEOUS
-        				if r == 77 && cc == 10
-        					m_key = value
-        					@jumbo_other_adjustment[primary_key][m_key] = {}
-        				end
-        				if r == 77 && cc == 16
-        					@jumbo_other_adjustment[primary_key][m_key] = value
-        				end
-        			end
-        		end
-        		(0..3).each do |cc|
-        			value = sheet_data.cell(r,cc)
-        			if value.present?
-        				if value == "MAX PRICE AFTER ADJUSTMENTS"
-        					max_key = "LoanType/LA/"
-        					@jumbo_other_adjustment[max_key] = {}
-        				end
-        				if r >= 71 && r <= 72 && cc == 1
-        					key = value.include?("LA <") ? "0" + value.split("LA").last : value.split("LA").last
-        					@jumbo_other_adjustment[max_key][key] = {}
-        				end
-        				if r >= 71 && r <= 72 && cc == 3
-        					@jumbo_other_adjustment[max_key][key] = value
-        				end
-        			end
-        		end
-        	end
-        end
-        Adjustment.create(data: @jumbo_purchase_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @jumbo_rate_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @jumbo_other_adjustment, sheet_name: sheet)
-      end
-    end
+	        				if r == 72 && cc == 10
+	        					key = "FL"
+	        					adj_key = "NV"
+	        					@jumbo_rate_adjustment[primary_key][key] = {}
+	        					@jumbo_rate_adjustment[primary_key][adj_key] = {}
+	        				end
+	        				if r == 72 && cc >= 15 && cc <= 16
+	        					@jumbo_rate_adjustment[primary_key][key][@ltv_data[cc-1]] = {}
+	        					@jumbo_rate_adjustment[primary_key][adj_key][@ltv_data[cc-1]] = {}
+	        					@jumbo_rate_adjustment[primary_key][key][@ltv_data[cc-1]] = value
+	        					@jumbo_rate_adjustment[primary_key][adj_key][@ltv_data[cc-1]] = value
+	        				end
+	        				if r >= 73 && r <= 74 && cc == 10
+	        					secondary_key = get_value value
+	        					@jumbo_rate_adjustment[primary_key][secondary_key] = {}
+	        				end
+	        				if r >= 73 && r <= 74 && cc >= 15 && cc <= 16
+	        					@jumbo_rate_adjustment[primary_key][secondary_key][@ltv_data[cc-1]] = {}
+	        					@jumbo_rate_adjustment[primary_key][secondary_key][@ltv_data[cc-1]] =  value
+	        				end
+	        				# MISCELLANEOUS
+	        				if r == 77 && cc == 10
+	        					m_key = value
+	        					@jumbo_other_adjustment[primary_key][m_key] = {}
+	        				end
+	        				if r == 77 && cc == 16
+	        					@jumbo_other_adjustment[primary_key][m_key] = value
+	        				end
+	        			end
+	        		end
+	        		(0..3).each do |cc|
+	        			value = sheet_data.cell(r,cc)
+	        			if value.present?
+	        				if value == "MAX PRICE AFTER ADJUSTMENTS"
+	        					max_key = "LoanType/LA/"
+	        					@jumbo_other_adjustment[max_key] = {}
+	        				end
+	        				if r >= 71 && r <= 72 && cc == 1
+	        					key = value.include?("LA <") ? "0" + value.split("LA").last : value.split("LA").last
+	        					@jumbo_other_adjustment[max_key][key] = {}
+	        				end
+	        				if r >= 71 && r <= 72 && cc == 3
+	        					@jumbo_other_adjustment[max_key][key] = value
+	        				end
+	        			end
+	        		end
+	        	end
+	        end
+	        Adjustment.create(data: @jumbo_purchase_adjustment, sheet_name: sheet)
+	        Adjustment.create(data: @jumbo_rate_adjustment, sheet_name: sheet)
+	        Adjustment.create(data: @jumbo_other_adjustment, sheet_name: sheet)
+	      end
+	    end
     # redirect_to programs_import_file_path(@bank)
   	redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
   end
@@ -2770,63 +2770,63 @@ class ObCmgWholesalesController < ApplicationController
               end
               @program.save
 	            end
-              if @title.present? && cc < 9
+              if @title.present? && cc < 9 && @title == "10/1 ARM - 6410"
 	              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
 	              @programs_ids << @program.id
 	                # Loan Limit Type
-              if @title.include?("Non-Conforming")
-                @program.loan_limit_type << "Non-Conforming"
-              end
-              if @title.include?("Conforming")
-                @program.loan_limit_type << "Conforming"
-              end
-              if @title.include?("Jumbo")
-                @program.loan_limit_type << "Jumbo"
-              end
-              if @title.include?("High Balance")
-                @program.loan_limit_type << "High Balance"
-              end
-              @program.save
+              	if @program.program_name.include?("Non-Conforming")
+                  @program.loan_limit_type << "Non-Conforming"
+                end
+                if @program.program_name.include?("Conforming")
+                  @program.loan_limit_type << "Conforming"
+                end
+                if @program.program_name.include?("Jumbo")
+                  @program.loan_limit_type << "Jumbo"
+                end
+                if @program.program_name.include?("High Balance")
+                  @program.loan_limit_type << "High Balance"
+                end
+                @program.save
 	              @program.update(term: @term,loan_type: @loan_type,loan_purpose: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, jumbo_high_balance: @jumbo_high_balance, rate_arm: @rate_arm)
 	              # @program.adjustments.destroy_all
 
 	              @block_hash = {}
 	              key = ''
 	              if @program.term.present? 
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
-	              (1..50).each do |max_row|
-	                @data = []
-	                (0..3).each_with_index do |index, c_i|
-	                  rrr = rr + max_row -1
-	                  ccc = cc + c_i
-	                  value = sheet_data.cell(rrr,ccc)
-	                  if value.present?
-	                    if (c_i == 0)
-	                      key = value
-	                      @block_hash[main_key][key] = {}
-	                    elsif (c_i == 1)
-	                      @block_hash[main_key][key][21] = value
-	                    elsif (c_i == 2)
-	                      @block_hash[main_key][key][30] = value
-	                    elsif (c_i == 3)
-	                      @block_hash[main_key][key][45] = value
-	                    end
-	                    @data << value
-	                  end
-	                end
-	                if @data.compact.reject { |c| c.blank? }.length == 0
-	                  break # terminate the loop
-	                end
+	                main_key = "Term/LoanType/InterestRate/LockPeriod"
+	              else
+	                main_key = "InterestRate/LockPeriod"
 	              end
-	            end
-	            if @block_hash.keys.first == "Rate"
-              	if @block_hash.values.first.keys.first.nil?
-                @block_hash.values.first.shift
-              end
+	              @block_hash[main_key] = {}
+		              (1..50).each do |max_row|
+		                @data = []
+		                (0..3).each_with_index do |index, c_i|
+		                  rrr = rr + max_row -1
+		                  ccc = cc + c_i
+		                  value = sheet_data.cell(rrr,ccc)
+		                  if value.present?
+		                    if (c_i == 0)
+		                      key = value
+		                      @block_hash[main_key][key] = {}
+		                    elsif (c_i == 1)
+		                      @block_hash[main_key][key][21] = value
+		                    elsif (c_i == 2)
+		                      @block_hash[main_key][key][30] = value
+		                    elsif (c_i == 3)
+		                      @block_hash[main_key][key][45] = value
+		                    end
+		                    @data << value
+		                  end
+		                end
+		                if @data.compact.reject { |c| c.blank? }.length == 0
+		                  break # terminate the loop
+		                end
+		              end
+		            end
+		            if @block_hash.keys.first == "Rate"
+	              	if @block_hash.values.first.keys.first.nil?
+	                @block_hash.values.first.shift
+	              end
               end
               @program.update(base_rate: @block_hash)
             end
