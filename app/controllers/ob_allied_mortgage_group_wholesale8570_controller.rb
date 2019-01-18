@@ -261,8 +261,6 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         #Adjustments Avrage Price
         (88..90).each do |r|
           row = sheet_data.row(r)
-          @key_data = sheet_data.row(93)
-          @key_data2 = sheet_data.row(93)
           if (row.compact.count >= 1)
             (2..9).each do |max_column|
               cc = max_column
@@ -325,10 +323,25 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         @valn_adjustment = {}
         @avrg_adjustment = {}
         @lock_adjustment = {}
+        @ltv_fico_hash = {}
+        @sub_adjustment = {}
+        @subordinate_hash = {}
+        @home_hash = {}
+        @ltv_co_hash = {}
+        @occp_hash = {}
+        @pro_hash ={}
+        @key_data = []
+        @cltv_data = []
         primary_key = ''
         second_key = ''
+        ltv_key = ''
+        cltv_key = ''
+        k_value = ''
         c_val = ''
         f_key = ''
+        value1 = ''
+        value2 = ''
+        value3 = ''
 
         # VA loan level adjustment
         (88..102).each do |r|
@@ -340,6 +353,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
               if value.present?
                 if value == "Allied Wholesale Loan Amt Adj"
                   primary_key = "AlliedWholesale/LoanAmount/"
+
                   @valn_adjustment[primary_key] = {}
                 end
 
@@ -364,8 +378,6 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         #Adjustments Avrage Price
         (109..111).each do |r|
           row = sheet_data.row(r)
-          @key_data = sheet_data.row(93)
-          @key_data2 = sheet_data.row(93)
           if (row.compact.count >= 1)
             (7..14).each do |max_column|
               cc = max_column
@@ -386,11 +398,9 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
           end
         end
 
-        # #Adjustment lock Expiration
+        #Adjustment lock Expiration
         (109..112).each do |r|
           row = sheet_data.row(r)
-          @key_data = sheet_data.row(93)
-          @key_data2 = sheet_data.row(93)
           if (row.compact.count >= 1)
             (2..5).each do |max_column|
               cc = max_column
@@ -410,6 +420,152 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
             end
           end
         end
+
+        #Adjustment LTV/FICO
+        (63..83).each do |r|
+          row = sheet_data.row(r)
+          @key_data = sheet_data.row(63)
+          if (row.compact.count >= 1)
+            (2..12).each do |max_column|
+              cc = max_column
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "LTV"
+                  f_key = "LoanType/Term/FICO/LTV"
+                  @ltv_fico_hash[f_key] = {}
+                end
+
+                if r >=65 && r <= 71 && cc == 4
+                  value1 = get_value value
+                  @ltv_fico_hash[f_key][value1] = {}
+                end
+
+                if r >=65 && r <= 71 && cc >= 5 && cc<= 12
+                  k_value = get_value @key_data[cc-2]
+                  @ltv_fico_hash[f_key][value1][k_value] = value
+                end
+
+                if value == "Cash-Out"
+                  primary_key = "LoanType/Term/FICO/LTV"
+                  @ltv_co_hash[primary_key] ={}
+                end
+
+                if r >=72 && r <= 78 && cc == 4
+                  value2 = get_value value
+                  @ltv_co_hash[primary_key][value2] = {}
+                end
+
+                if r >=72 && r <= 78 && cc >= 5 && cc<= 12
+                  k_value = get_value @key_data[cc-2]
+                  @ltv_co_hash[primary_key][value2][k_value] = value
+                end
+
+                if value == "OCCUPANCY"
+                  primary_key = "LoanType/Term/FICO/LTV"
+                  @occp_hash[primary_key] ={}
+                end
+
+                if r >=79 && r <= 80 && cc == 4
+                  value3 = get_value value
+                  @occp_hash[primary_key][value3] = {}
+                end
+
+                if r >=79 && r <= 80 && cc >= 5 && cc<= 12
+                  k_value = get_value @key_data[cc-2]
+                  @occp_hash[primary_key][value3][k_value] = value
+                end
+
+                if value == "Property Type"
+                  primary_key = "LoanType/Term/FICO/LTV"
+                  @pro_hash[primary_key] ={}
+                end
+
+                if r >=81 && r <= 83 && cc == 4
+                  value3 = get_value value
+                  @pro_hash[primary_key][value3] = {}
+                end
+
+                if r >=81 && r <= 83 && cc >= 5 && cc<= 12
+                  k_value = get_value @key_data[cc-2]
+                  @pro_hash[primary_key][value3][k_value] = value
+                end
+
+              end
+            end
+          end
+        end
+
+        #Adjustment Subordinate Finance
+        (63..77).each do |r|
+          row = sheet_data.row(r)
+          @cltv_data = sheet_data.row(64)
+          if (row.compact.count >= 1)
+            (13..20).each do |max_column|
+              cc = max_column
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "SUBORDINATE FINANCING"
+                  f_key = "LTV/CLTV/FICO"
+                  primary_key = "LTV/CLTV/FICO"
+                  @sub_adjustment[f_key] = {}
+                  @subordinate_hash[primary_key] = {}
+                end
+
+                if r >=70 && r <= 77 && cc == 13
+                  value1 = get_value value
+                  ccc = cc + 7
+                  c_val = sheet_data.cell(r,ccc)
+                  @sub_adjustment[f_key][value] = c_val
+                end
+
+                # SUBORDINATE FINANCING
+                if r >= 65 && r <= 69 && cc == 13
+                  second_key = get_value value
+                  @subordinate_hash[primary_key][second_key] = {}
+                end
+                if r >= 65 && r <= 69 && cc == 15
+                  ltv_key = get_value value
+                  @subordinate_hash[primary_key][second_key][ltv_key] = {}
+                end
+                if r >= 65 && r <= 69 && cc >= 17 && cc <= 20
+                  cltv_key = @cltv_data[cc-2]
+                  @subordinate_hash[primary_key][second_key][ltv_key] = {}
+                  @subordinate_hash[primary_key][second_key][ltv_key][cltv_key] = value
+                end
+              end
+            end
+          end
+        end
+
+        #Adjustment HomeReady
+        (82..84).each do |r|
+          row = sheet_data.row(r)
+          if (row.compact.count >= 1)
+            (13..20).each do |max_column|
+              cc = max_column
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "HomeReady/Home Possible LLPA Caps"
+                  f_key = "LoanType/Term/FICO/LTV"
+                  @home_hash[f_key] = {}
+                end
+
+                if r >=83 && r <= 84 && cc == 13
+                  ccc = cc + 7
+                  c_val = sheet_data.cell(r,ccc)
+                  @home_hash[f_key][value] = c_val
+                end
+
+              end
+            end
+          end
+        end
+        Adjustment.create(data: @home_hash, sheet_name: sheet)
+        Adjustment.create(data: @subordinate_hash, sheet_name: sheet)
+        Adjustment.create(data: @sub_adjustment, sheet_name: sheet)
+        Adjustment.create(data: @occp_hash, sheet_name: sheet)
+        Adjustment.create(data: @ltv_co_hash, sheet_name: sheet)
+        Adjustment.create(data: @ltv_fico_hash, sheet_name: sheet)
         Adjustment.create(data: @valn_adjustment, sheet_name: sheet)
         Adjustment.create(data: @avrg_adjustment, sheet_name: sheet)
         Adjustment.create(data: @lock_adjustment, sheet_name: sheet)
@@ -431,7 +587,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
       if value1.present?
         if value1.include?("FICO <")
           value1 = "0"+value1.split("FICO").last
-        elsif value1.include?("<")
+        elsif value1.include?("<=") || value1.include?(">=")
           value1 = "0"+value1
         elsif value1.include?("FICO")
           value1 = value1.split("FICO ").last.first(9)
