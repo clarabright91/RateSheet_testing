@@ -595,6 +595,10 @@ class ObCmgWholesalesController < ApplicationController
         sheet_data = xlsx.sheet(sheet)
         @programs_ids = []
         @adjustment_hash = {}
+        @subordinate_hash = {}
+        @adjustment_cap = {}
+        @misc_adjustment = {}
+        @state_adjustment = {}
         primary_key = ''
         primary_key1 = ''
         secondary_key = ''
@@ -740,12 +744,10 @@ class ObCmgWholesalesController < ApplicationController
         					@adjustment_hash[primary_key] = {}
         				elsif value == "SUBORDINATE FINANCING"
         					primary_key = "FinancingType/FICO/LTV/CLTV"
-        					sub_key = "Subordinate Financing"
-        					@adjustment_hash[primary_key] = {}
-        					@adjustment_hash[primary_key][sub_key] = {}
+        					@subordinate_hash[primary_key] = {}
         				elsif value == "DU REFI PLUS ADJUSTMENT CAP (MAX ADJ) *"
 									primary_key = value
-									@adjustment_hash[primary_key] = {}
+									@adjustment_cap[primary_key] = {}
         				end
         				if r >= 58 && r <= 70 && cc == 1
         					secondary_key = get_value value
@@ -760,30 +762,30 @@ class ObCmgWholesalesController < ApplicationController
         				# subordinate adjustment
         				if r >= 74 && r <= 78 && cc == 1
         					secondary_key = get_value value
-        					@adjustment_hash[primary_key][sub_key][secondary_key] = {}
+        					@subordinate_hash[primary_key][secondary_key] = {}
         				end
         				if r >= 74 && r <= 78 && cc == 3
         					cltv_key = get_value value
-        					@adjustment_hash[primary_key][sub_key][secondary_key][cltv_key] = {}
+        					@subordinate_hash[primary_key][secondary_key][cltv_key] = {}
         				end
         				if r >= 74 && r <= 78 && cc >= 5 && cc <= 7
         					sub_data = get_value @sub_data[cc-1]
-        					@adjustment_hash[primary_key][sub_key][secondary_key][cltv_key][sub_data] = {}
-        					@adjustment_hash[primary_key][sub_key][secondary_key][cltv_key][sub_data] = value
+        					@subordinate_hash[primary_key][secondary_key][cltv_key][sub_data] = {}
+        					@subordinate_hash[primary_key][secondary_key][cltv_key][sub_data] = value
         				end
         				# Adjustment Cap
         				if r >= 81 && r <= 83 && cc == 1
         					secondary_key = value
-        					@adjustment_hash[primary_key][secondary_key] = {}
+        					@adjustment_cap[primary_key][secondary_key] = {}
         				end
         				if r >= 81 && r <= 83 && cc == 4
         					cltv_key = get_value value
-        					@adjustment_hash[primary_key][secondary_key][cltv_key] = {}
+        					@adjustment_cap[primary_key][secondary_key][cltv_key] = {}
         				end
         				if r >= 81 && r <= 83 && cc >= 5 && cc <= 7
         					cap_key = get_value @cap_data[cc-1]
-        					@adjustment_hash[primary_key][secondary_key][cltv_key][cap_key] = {}
-        					@adjustment_hash[primary_key][secondary_key][cltv_key][cap_key] = value
+        					@adjustment_cap[primary_key][secondary_key][cltv_key][cap_key] = {}
+        					@adjustment_cap[primary_key][secondary_key][cltv_key][cap_key] = value
         				end
         			end
         		end
@@ -791,33 +793,33 @@ class ObCmgWholesalesController < ApplicationController
         			value = sheet_data.cell(r,cc)
         			if value == "MISCELLANEOUS"
         				primary_key1 = "Miscellaneous"
-        				@adjustment_hash[primary_key1] = {}
+        				@misc_adjustment[primary_key1] = {}
         			end
         			if value == "LOAN AMOUNT "
         				primary_key1 = "LoanType/LoanAmount/CLTV"
-        				@adjustment_hash[primary_key1] = {}
+        				@misc_adjustment[primary_key1] = {}
         			end
         			if value == "STATE ADJUSTMENTS"
         				primary_key1 = "State"
-        				@adjustment_hash[primary_key1] = {}
+        				@state_adjustment[primary_key1] = {}
         			end
         			if value.present?
         				# MISCELLANEOUS
         				if r >= 73 && r <= 74 && cc == 10
         					m_key = value
-        					@adjustment_hash[primary_key1][m_key] = {}
+        					@misc_adjustment[primary_key1][m_key] = {}
         				end
         				if r >= 73 && r <= 74 && cc == 16
-        					@adjustment_hash[primary_key1][m_key] = value
+        					@misc_adjustment[primary_key1][m_key] = value
         				end
         				# LOAN AMOUNT ADJUSTMENT
         				if r >= 76 && r <= 80 && cc == 10
         					# m_key = value
         					m_key =  value.include?("<") ? "0"+value.split("Loan Amount").last : value.split("Loan Amount").last
-        					@adjustment_hash[primary_key1][m_key] = {}
+        					@misc_adjustment[primary_key1][m_key] = {}
         				end
         				if r >= 76 && r <= 80 && cc == 16
-        					@adjustment_hash[primary_key1][m_key] = value
+        					@misc_adjustment[primary_key1][m_key] = value
         				end
         				# STATE ADJUSTMENTS
         				if r >= 83 && r <= 88 && cc == 11
@@ -826,7 +828,7 @@ class ObCmgWholesalesController < ApplicationController
                     key = f_key
                     ccc = cc + 5
                     c_val = sheet_data.cell(r,ccc)
-                    @adjustment_hash[primary_key1][key] = c_val
+                    @state_adjustment[primary_key1][key] = c_val
                   end
         				end
         			end
@@ -834,6 +836,10 @@ class ObCmgWholesalesController < ApplicationController
         	end
         end
         Adjustment.create(data: @adjustment_hash, sheet_name: sheet)
+        Adjustment.create(data: @subordinate_hash, sheet_name: sheet)
+        Adjustment.create(data: @adjustment_cap, sheet_name: sheet)
+        Adjustment.create(data: @misc_adjustment, sheet_name: sheet)
+        Adjustment.create(data: @state_adjustment, sheet_name: sheet)
       end
     end
     # redirect_to programs_import_file_path(@bank)
@@ -849,6 +855,10 @@ class ObCmgWholesalesController < ApplicationController
         sheet_data = xlsx.sheet(sheet)
         @programs_ids = []
         @adjustment_hash = {}
+        @subordinate_hash = {}
+        @adjustment_cap = {}
+        @misc_adjustment = {}
+        @state_adjustment = {}
         primary_key = ''
         primary_key1 = ''
         secondary_key = ''
@@ -995,12 +1005,10 @@ class ObCmgWholesalesController < ApplicationController
         					@adjustment_hash[primary_key] = {}
         				elsif value == "SUBORDINATE FINANCING"
         					primary_key = "FinancingType/FICO/LTV/CLTV"
-        					sub_key = "Subordinate Financing"
-        					@adjustment_hash[primary_key] = {}
-        					@adjustment_hash[primary_key][sub_key] = {}
+        					@subordinate_hash[primary_key] = {}
         				elsif value == "OPEN ACCESS ADJUSTMENT CAP (MAX ADJ) *"
 									primary_key = value
-									@adjustment_hash[primary_key] = {}
+									@adjustment_cap[primary_key] = {}
         				end
         				if r >= 57 && r <= 70 && cc == 1
         					secondary_key = get_value value
@@ -1015,30 +1023,30 @@ class ObCmgWholesalesController < ApplicationController
         				# subordinate adjustment
         				if r >= 74 && r <= 80 && cc == 1
         					secondary_key = get_value value
-        					@adjustment_hash[primary_key][sub_key][secondary_key] = {}
+        					@subordinate_hash[primary_key][secondary_key] = {}
         				end
         				if r >= 74 && r <= 80 && cc == 3
         					cltv_key = get_value value
-        					@adjustment_hash[primary_key][sub_key][secondary_key][cltv_key] = {}
+        					@subordinate_hash[primary_key][secondary_key][cltv_key] = {}
         				end
         				if r >= 74 && r <= 80 && cc >= 5 && cc <= 7
         					sub_data = get_value @sub_data[cc-1]
-        					@adjustment_hash[primary_key][sub_key][secondary_key][cltv_key][sub_data] = {}
-        					@adjustment_hash[primary_key][sub_key][secondary_key][cltv_key][sub_data] = value
+        					@subordinate_hash[primary_key][secondary_key][cltv_key][sub_data] = {}
+        					@subordinate_hash[primary_key][secondary_key][cltv_key][sub_data] = value
         				end
         				# Adjustment Cap
         				if r >= 83 && r <= 85 && cc == 1
         					secondary_key = value
-        					@adjustment_hash[primary_key][secondary_key] = {}
+        					@adjustment_cap[primary_key][secondary_key] = {}
         				end
         				if r >= 83 && r <= 85 && cc == 4
         					cltv_key = get_value value
-        					@adjustment_hash[primary_key][secondary_key][cltv_key] = {}
+        					@adjustment_cap[primary_key][secondary_key][cltv_key] = {}
         				end
         				if r >= 83 && r <= 85 && cc >= 5 && cc <= 7
         					cap_key = get_value @cap_data[cc-1]
-        					@adjustment_hash[primary_key][secondary_key][cltv_key][cap_key] = {}
-        					@adjustment_hash[primary_key][secondary_key][cltv_key][cap_key] = value
+        					@adjustment_cap[primary_key][secondary_key][cltv_key][cap_key] = {}
+        					@adjustment_cap[primary_key][secondary_key][cltv_key][cap_key] = value
         				end
         			end
         		end
@@ -1047,32 +1055,32 @@ class ObCmgWholesalesController < ApplicationController
         			if value.present?
         				if value == "MISCELLANEOUS"
 	        				primary_key1 = "Miscellaneous"
-	        				@adjustment_hash[primary_key1] = {}
+	        				@misc_adjustment[primary_key1] = {}
 	        			end
 	        			if value == "LOAN AMOUNT "
 	        				primary_key1 = "LoanType/LoanAmount/CLTV"
-	        				@adjustment_hash[primary_key1] = {}
+	        				@misc_adjustment[primary_key1] = {}
 	        			end
 	        			if value == "STATE ADJUSTMENTS"
 	        				primary_key1 = "State"
-	        				@adjustment_hash[primary_key1] = {}
+	        				@state_adjustment[primary_key1] = {}
 	        			end
 
         				# MISCELLANEOUS
         				if r >= 73 && r <= 74 && cc == 10
         					m_key = value
-        					@adjustment_hash[primary_key1][m_key] = {}
+        					@misc_adjustment[primary_key1][m_key] = {}
         				end
         				if r >= 73 && r <= 74 && cc == 16
-        					@adjustment_hash[primary_key1][m_key] = value
+        					@misc_adjustment[primary_key1][m_key] = value
         				end
         				# LOAN AMOUNT ADJUSTMENT
         				if r >= 76 && r <= 80 && cc == 10
         					m_key =  value.include?("<") ? "0"+value.split("Loan Amount").last : value.split("Loan Amount").last
-        					@adjustment_hash[primary_key1][m_key] = {}
+        					@misc_adjustment[primary_key1][m_key] = {}
         				end
         				if r >= 76 && r <= 80 && cc == 16
-        					@adjustment_hash[primary_key1][m_key] = value
+        					@misc_adjustment[primary_key1][m_key] = value
         				end
         				# STATE ADJUSTMENTS
         				if r >= 83 && r <= 88 && cc == 11
@@ -1081,7 +1089,7 @@ class ObCmgWholesalesController < ApplicationController
                     key = f_key
                     ccc = cc + 5
                     c_val = sheet_data.cell(r,ccc)
-                    @adjustment_hash[primary_key1][key] = c_val
+                    @state_adjustment[primary_key1][key] = c_val
                   end
         				end
         			end
@@ -1089,6 +1097,10 @@ class ObCmgWholesalesController < ApplicationController
         	end
         end
         Adjustment.create(data: @adjustment_hash, sheet_name: sheet)
+        Adjustment.create(data: @subordinate_hash, sheet_name: sheet)
+        Adjustment.create(data: @adjustment_cap, sheet_name: sheet)
+        Adjustment.create(data: @misc_adjustment, sheet_name: sheet)
+        Adjustment.create(data: @state_adjustment, sheet_name: sheet)
       end
     end
     # redirect_to programs_import_file_path(@bank)
@@ -1105,6 +1117,7 @@ class ObCmgWholesalesController < ApplicationController
         @programs_ids = []
         first_key = ''
         @adjustment_hash = {}
+        @state_adjustment = {}
         @data_hash = {}
         @sheet = sheet
         @ltv_data = []
@@ -1284,8 +1297,8 @@ class ObCmgWholesalesController < ApplicationController
               value = sheet_data.cell(r,cc)
               if value.present?
                 if value == "STATE ADJUSTMENTS"
-                  state_key = "StateAdjustments"
-                  @adjustment_hash[state_key] = {}
+                  state_key = "State"
+                  @state_adjustment[state_key] = {}
                 end
                 if r >= 24 && r < 28 && cc == 12
                   adj_key = value.split(', ')
@@ -1293,7 +1306,7 @@ class ObCmgWholesalesController < ApplicationController
                     key3 = f_key
                     ccc = cc + 4
                     c_val = sheet_data.cell(r,ccc)
-                    @adjustment_hash[state_key][key3] = c_val
+                    @state_adjustment[state_key][key3] = c_val
                   end
                 end
               end
@@ -1318,6 +1331,7 @@ class ObCmgWholesalesController < ApplicationController
       		end
     		end
     		Adjustment.create(data: @adjustment_hash, sheet_name: sheet)
+        Adjustment.create(data: @state_adjustment, sheet_name: sheet)
    		end
    	end
     # redirect_to programs_import_file_path(@bank)
