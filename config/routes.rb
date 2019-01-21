@@ -61,6 +61,7 @@ Rails.application.routes.draw do
 
   resources :ob_allied_mortgage_group_wholesale8570, only: [:index] do
     member do
+      get :programs
       get :fha
       get :va
       get :conf_fixed

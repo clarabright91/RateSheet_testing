@@ -47,7 +47,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
             (0..max_column_section).each do |max_column|
               cc = 4*max_column + (2+max_column) # 2, 7, 12, 17
               @title = sheet_data.cell(r,cc)
-              if @title.present?
+              if @title.present? && @title != 3.125
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_property @program
                 @programs_ids << @program.id
@@ -268,7 +268,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
               @block_hash[main_key] = {}
               (1..50).each do |max_row|
                 @data = []
-                (0..8).each_with_index do |index, c_i|
+                (0..4).each_with_index do |index, c_i|
                   rrr = rr + max_row +1
                   ccc = cc + c_i
                   value = sheet_data.cell(rrr,ccc)
@@ -278,10 +278,10 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                       @block_hash[main_key][key] = {}
                     else
                       if @program.lock_period.length <= 3
-                        @program.lock_period << 15*(c_i/2)
+                        @program.lock_period << 15*(c_i)
                         @program.save
                       end
-                      @block_hash[main_key][key][15*(c_i/2)] = value unless @block_hash[main_key][key].nil?
+                      @block_hash[main_key][key][15*(c_i)] = value unless @block_hash[main_key][key].nil?
                     end
                     @data << value
                   end
@@ -931,8 +931,8 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         @program_category = "F5YT"
       elsif @program.program_name.include?("F5YTS")
         @program_category = "F5YTS"
-      elsif @program.program_name.include?("F5YTj")
-        @program_category = "F5YTj"
+      elsif @program.program_name.include?("F5YTJ")
+        @program_category = "F5YTJ"
       end
 
       # Loan Limit Type
