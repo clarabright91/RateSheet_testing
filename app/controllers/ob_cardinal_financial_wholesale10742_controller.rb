@@ -16,7 +16,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
     rescue
       # the required headers are not all present
     end
-	end
+  end
 
   def ak
     file = File.join(Rails.root,  'OB_Cardinal_Financial_Wholesale10742.xls')
@@ -522,7 +522,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
     redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
   end
 
-	def programs
+  def programs
     @programs = @sheet_obj.programs
   end
 
