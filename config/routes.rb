@@ -65,6 +65,7 @@ Rails.application.routes.draw do
       get :fha
       get :va
       get :conf_fixed
+      get :single_program
     end
   end
 

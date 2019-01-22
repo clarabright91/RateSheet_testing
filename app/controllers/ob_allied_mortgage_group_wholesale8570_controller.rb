@@ -217,7 +217,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         Adjustment.create(data: @alhs_adjustment, sheet_name: sheet)
       end
     end
-    redirect_to dashboard_index_path
+    redirect_to programs_ob_allied_mortgage_group_wholesale8570_path(@sheet_obj)
   end
 
   def va
@@ -429,7 +429,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         Adjustment.create(data: @lock_adjustment, sheet_name: sheet)
       end
     end
-    redirect_to dashboard_index_path
+    redirect_to programs_ob_allied_mortgage_group_wholesale8570_path(@sheet_obj)
   end
 
   def conf_fixed
@@ -828,7 +828,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         Adjustment.create(data: @lock_adjustment, sheet_name: sheet)
       end
     end
-    redirect_to dashboard_index_path
+    redirect_to programs_ob_allied_mortgage_group_wholesale8570_path(@sheet_obj)
   end
 
   def programs
@@ -952,4 +952,3 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
       @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline)
     end
 end
-
