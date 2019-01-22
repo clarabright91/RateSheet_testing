@@ -1,8 +1,8 @@
 class ObCardinalFinancialWholesale10742Controller < ApplicationController
-	before_action :get_sheet, only: [:programs, :ak]
-	before_action :get_program, only: [:single_program, :program_property]
-	def index
-		file = File.join(Rails.root,  'OB_Cardinal_Financial_Wholesale10742.xls')
+  before_action :get_sheet, only: [:programs, :ak]
+  before_action :get_program, only: [:single_program, :program_property]
+  def index
+    file = File.join(Rails.root,  'OB_Cardinal_Financial_Wholesale10742.xls')
     xlsx = Roo::Spreadsheet.open(file)
     begin
       xlsx.sheets.each do |sheet|
@@ -41,6 +41,8 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         @subordinate_hash = {}
         @additional_hash = {}
         @lpmi_hash = {}
+        @freddie_adjustment_hash = {}
+        @relief_cashout_adjustment = {}
         # Fannie Mae Programs
         (71..298).each do |r|
           row = sheet_data.row(r)
@@ -300,7 +302,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
             end
           end
         end
-        # debugger
+        
         # Freddie programs
         (458..684).each do |r|
           row = sheet_data.row(r)
@@ -352,6 +354,229 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                 end
               end
               @program.update(base_rate: @block_hash)
+            end
+          end
+        end
+        # Freddie Adjustments
+        (740..835).each do |r|
+          row = sheet_data.row(r)
+          @ltv_data = sheet_data.row(743)
+          @sub_data = sheet_data.row(785)
+          @lpmi_data = sheet_data.row(816)
+          if row.compact.count >= 1
+            (2..42).each do |max_column|
+              cc = max_column
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "Freddie Mac Loan Level Price Adjustments"
+                  primary_key = "FreddieMac"
+                elsif value == "Lender Paid Mortgage Insurance"
+                  primary_key = "LPMI"
+                end
+                if value == "All Eligible Mortgages - Other Than Relief Refinance Mortgages - LLPAs for Terms > 15 Years"
+                  secondary_key = "RateType/Term/FICO/LTV"
+                  main_key = primary_key + "/" + secondary_key
+                  @freddie_adjustment_hash[main_key] = {}
+                elsif value == "All Eligible Mortgages - Relief Refinance Mortgages - LLPAs for Terms > 15 Years"
+                  secondary_key = "Relief/Cashout/FICO/LTV"
+                  main_key = primary_key + "/" + secondary_key
+                  @relief_cashout_adjustment[main_key] = {}
+                elsif value == "All Eligible Mortgages  Cash-Out Refinance  LLPAs"
+                  secondary_key = "Cashout/FICO/LTV"
+                  main_key = primary_key + "/" + secondary_key
+                  @cashout_adjustment[main_key] = {}
+                elsif value == "All Eligible Mortgages Product Feature  LLPAs"
+                  secondary_key = "Cashput/Feature/LTV"
+                  main_key = primary_key + "/" + secondary_key
+                  @product_hash[main_key] = {}
+                elsif value == "Mortgages with Subordinate Financing5 - Other Than Relief Refinance Mortgages"
+                  secondary_key = "FinancingType/FICO/LTV/CLTV"
+                  main_key = primary_key + "/" + secondary_key
+                  @subordinate_hash[main_key] = {}
+                elsif value == "Mortgages with Subordinate Financing5 - Other Than Relief Refinance Mortgages"
+                  secondary_key = "Relief/FinancingType/FICO/LTV/CLTV"
+                  main_key = primary_key + "/" + secondary_key
+                  @additional_hash[main_key] = {}
+                elsif value == "State Adjustment"
+                  secondary_key = "State"
+                  main_key = primary_key + "/" + secondary_key
+                  @additional_hash[main_key] = {}
+                elsif value == "LPMI Adj. >20yr Term"
+                  secondary_key = "Term/LTV"
+                  term_key = ">20"
+                  main_key = primary_key + "/" + secondary_key
+                  @lpmi_hash[main_key] = {}
+                  @lpmi_hash[main_key][term_key] = {}
+                elsif value == "LPMI Adj. ≤ 20yr Term"
+                  secondary_key = "Term/LTV"
+                  term_key = "≤ 20"
+                  main_key = primary_key + "/" + secondary_key
+                  @lpmi_hash[main_key] = {}
+                  @lpmi_hash[main_key][term_key] = {}
+                end
+
+                # All Eligible Mortgages - Other Than Relief Refinance Mortgages - LLPAs for Terms > 15 Years
+                if r >= 744 && r <= 750 && cc == 10
+                  ltv_key = get_value value
+                  @freddie_adjustment_hash[main_key][ltv_key] = {}
+                end
+                if r >= 744 && r <= 750 && cc >= 21 && cc <= 42
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @freddie_adjustment_hash[main_key][ltv_key][ltv_data] = {}
+                  @freddie_adjustment_hash[main_key][ltv_key][ltv_data] = value
+                end
+
+                # All Eligible Mortgages - Relief Refinance Mortgages - LLPAs for Terms > 15 Years
+                if r >= 752 && r <= 760 && cc == 10
+                  ltv_key = get_value value
+                  @relief_cashout_adjustment[main_key][ltv_key] = {}
+                end
+                if r >= 752 && r <= 760 && cc >= 21 && cc <= 42
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @relief_cashout_adjustment[main_key][ltv_key][ltv_data] = {}
+                  @relief_cashout_adjustment[main_key][ltv_key][ltv_data] = value
+                end
+
+                # All Eligible Mortgages  Cash-Out Refinance  LLPAs
+                if r >= 762 && r <= 768 && cc == 10
+                  ltv_key = get_value value
+                  @cashout_adjustment[main_key][ltv_key] = {}
+                end
+                if r >= 762 && r <= 768 && cc >= 21 && cc <= 42
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @cashout_adjustment[main_key][ltv_key][ltv_data] = {}
+                  @cashout_adjustment[main_key][ltv_key][ltv_data] = value
+                end
+
+                # # All Eligible Mortgages Product Feature  LLPAs
+                # if r >= 375 && r <= 382 && cc == 9
+                #   if value == "High Balance Purchase or Rate/Term Refi"
+                #     secondary_key = "HighBalance/LoanPurpose/Feature/LTV"
+                #     main_key = primary_key + "/" + secondary_key
+                #     ltv_key = get_value value
+                #     @product_hash[main_key] = {}  
+                #     @product_hash[main_key][ltv_key] = {}
+                #   elsif value == "High Balance Cash-Out Refi"
+                #     secondary_key = "HighBalance/Cashout/Feature/LTV"
+                #     main_key = primary_key + "/" + secondary_key
+                #     ltv_key = get_value value
+                #     @product_hash[main_key] = {}  
+                #     @product_hash[main_key][ltv_key] = {}
+                #   elsif value == "High Balance ARM2"
+                #     secondary_key = "HighBalance/LoanType"    
+                #     main_key = primary_key + "/" + secondary_key
+                #     ltv_key = get_value value
+                #     @product_hash[main_key] = {}  
+                #     @product_hash[main_key][ltv_key] = {}
+                #   else
+                #     ltv_key = get_value value
+                #     @product_hash[main_key][ltv_key] = {}
+                #   end
+                # end
+                # if r >= 375 && r <= 382 && cc >= 18 && cc <= 44
+                #   ltv_data =  get_value @ltv_data[cc-2]
+                #   @product_hash[main_key][ltv_key][ltv_data] = {}
+                #   @product_hash[main_key][ltv_key][ltv_data] = value
+                # end
+
+                # # subordinate adjustment
+                # if r == 387 && cc == 6
+                #   new_key = value
+                #   @subordinate_hash[main_key][new_key] = {}
+                # end
+                # if r == 387 && cc == 12
+                #   @subordinate_hash[main_key][new_key] = value
+                # end
+                # if r >= 388 && r <= 392 && cc == 6
+                #   ltv_key = get_value value
+                #   @subordinate_hash[main_key][ltv_key] = {}
+                # end
+                # if r >= 388 && r <= 392 && cc == 9
+                #   cltv_key = get_value value
+                #   @subordinate_hash[main_key][ltv_key][cltv_key] = {}
+                # end
+                # if r >= 388 && r <= 392 && cc >= 12 && cc <= 15
+                #   sub_data = get_value @sub_data[cc-2]
+                #   @subordinate_hash[main_key][ltv_key][cltv_key][sub_data] = {}
+                #   @subordinate_hash[main_key][ltv_key][cltv_key][sub_data] = value
+                # end
+
+                # # Additional Adjustments5
+                # if r >= 394 && r <= 398 && cc == 6
+                #   if value == "R/T or CO Refinance"
+                #     secondary_key = "LoanType/RefinanceOption/LTV"
+                #     main_key = primary_key + "/" + secondary_key
+                #     @additional_hash[main_key] = {}
+                #   elsif value == "Escrow Waiver FICO < 700"
+                #     secondary_key = "EscrowWaiver/FICO"
+                #     main_key = primary_key + "/" + secondary_key
+                #     @additional_hash[main_key] = {}
+                #   elsif value == "Escrow Waiver CA FICO < 700"
+                #     secondary_key = "CA/EscrowWaiver/FICO"
+                #     main_key = primary_key + "/" + secondary_key
+                #     @additional_hash[main_key] = {}
+                #   elsif value == "ARM > 90 LTV"
+                #     secondary_key = "LoanType/LTV"     
+                #     main_key = primary_key + "/" + secondary_key
+                #     @additional_hash[main_key] = {}
+                #   elsif value == "90 Day (Add to 60 Day)"
+                #     secondary_key = "LockPeriod"
+                #     main_key = primary_key + "/" + secondary_key
+                #     @additional_hash[main_key] = {}
+                #   end
+                # end
+                # if r >= 394 && r <= 398 && cc == 14
+                #   @additional_hash[main_key] = value
+                # end
+                # if r == 400 && cc == 2
+                #   if value == "Max Net Rebate"
+                #     secondary_key = "Max/Net/Rebate"
+                #     main_key = primary_key + "/" + secondary_key
+                #     @additional_hash[main_key] = {}
+                #   end
+                # end
+                # if r == 401 && cc == 2
+                #   @additional_hash[main_key] = value
+                # end
+                # if r == 404 && cc == 2
+                #   ltv_key = value
+                #   @additional_hash[main_key][ltv_key] = {}
+                # end
+                # if r == 404 && cc == 10
+                #   @additional_hash[main_key][ltv_key] = value
+                # end
+
+                # # Lender Paid Mortgage Insurance
+                # if r >= 411 && r <= 416 && cc == 7
+                #   ltv_key = get_value value
+                #   # @lpmi_hash[main_key][term_key] = {}
+                #   @lpmi_hash[main_key][term_key][ltv_key] = {}
+                # end
+                # if r >= 411 && r <= 416 && cc == 11
+                #   cltv_key = get_value value.to_s
+                #   @lpmi_hash[main_key][term_key][ltv_key][cltv_key] = {}
+                # end
+                # if r >= 411 && r <= 416 && cc >= 15 && cc <= 33
+                #   lpmi_key = get_value @lpmi_data[cc-2]
+                #   @lpmi_hash[main_key][term_key][ltv_key][cltv_key][lpmi_key] = {}
+                #   @lpmi_hash[main_key][term_key][ltv_key][cltv_key][lpmi_key] = value
+                # end
+                # # if r >= 418 && r <= 422 && cc == 7
+                # #   term_key = "≤20" 
+                # #   ltv_key = get_value value
+                # #   @lpmi_hash[main_key][term_key] = {}
+                # #   @lpmi_hash[main_key][term_key][ltv_key] = {}
+                # # end
+                # # if r >= 418 && r <= 422 && cc == 11
+                # #   cltv_key = get_value value.to_s
+                # #   @lpmi_hash[main_key][term_key][ltv_key][cltv_key] = {}
+                # # end
+                # # if r >= 418 && r <= 422 && cc >= 15 && cc <= 33
+                # #   lpmi_key = get_value @lpmi_data[cc-2]
+                # #   @lpmi_hash[main_key][term_key][ltv_key][cltv_key][lpmi_key] = {}
+                # #   @lpmi_hash[main_key][term_key][ltv_key][cltv_key][lpmi_key] = value
+                # # end
+              end
             end
           end
         end

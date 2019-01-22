@@ -120,7 +120,7 @@ class ImportFilesController < ApplicationController
 
                # rate arm
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM")
-                rate_arm = @title.scan(/\d+/)[0].to_i
+                arm_basic = @title.scan(/\d+/)[0].to_i
               end
 
               # High Balance
@@ -145,7 +145,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",streamline: streamline, fha: fha, va: va, usda: usda, full_doc: full_doc, jumbo_high_balance: jumbo_high_balance,sheet_name: sheet, rate_arm: rate_arm)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",streamline: streamline, fha: fha, va: va, usda: usda, full_doc: full_doc, jumbo_high_balance: jumbo_high_balance,sheet_name: sheet, arm_basic: arm_basic)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -1119,7 +1119,7 @@ class ImportFilesController < ApplicationController
 
               # rate arm
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM")
-                rate_arm = @title.scan(/\d+/)[0].to_i
+                arm_basic = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -1157,7 +1157,7 @@ class ImportFilesController < ApplicationController
               end
               @program.save
               @program.adjustments.destroy_all
-              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, sheet_name: sheet,rate_arm: rate_arm)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, sheet_name: sheet,arm_basic: arm_basic)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -1514,7 +1514,7 @@ class ImportFilesController < ApplicationController
 
               # rate arm
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                rate_arm = @title.scan(/\d+/)[0].to_i
+                arm_basic = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -1551,7 +1551,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -1785,7 +1785,7 @@ class ImportFilesController < ApplicationController
 
               # interest sub type
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                rate_arm = @title.scan(/\d+/)[0].to_i
+                arm_basic = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -1822,7 +1822,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -2654,9 +2654,9 @@ class ImportFilesController < ApplicationController
               end
 
               # rate arm
-              rate_arm = false
+              arm_basic = false
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                rate_arm = @title.scan(/\d+/)[0].to_i
+                arm_basic = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -2693,7 +2693,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -2931,9 +2931,9 @@ class ImportFilesController < ApplicationController
               end
 
               # rate arm
-              rate_arm = false
+              arm_basic = false
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 LIBOR ARM") || @title.include?("7/1 LIBOR ARM") || @title.include?("10/1 LIBOR ARM")
-                rate_arm = @title.scan(/\d+/)[0].to_i
+                arm_basic = @title.scan(/\d+/)[0].to_i
               end
 
               @program = @bank.programs.find_or_create_by(program_name: @title)
@@ -2951,7 +2951,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,loan_type: @loan_type,loan_purpose: "Purchase",rate_arm: rate_arm)
+              @program.update(term: term,loan_type: @loan_type,loan_purpose: "Purchase",arm_basic: arm_basic)
               @block_hash = {}
               key = ''
               main_key = ''
@@ -3385,9 +3385,9 @@ class ImportFilesController < ApplicationController
               end
 
               # rate arm
-              rate_arm = false
+              arm_basic = false
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                rate_arm = @title.scan(/\d+/)[0].to_i
+                arm_basic = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -3429,7 +3429,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet, jumbo_high_balance: jumbo_high_balance)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: sheet, jumbo_high_balance: jumbo_high_balance)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -3638,9 +3638,9 @@ class ImportFilesController < ApplicationController
                   end
 
                   # rate arm
-                  rate_arm = false
+                  arm_basic = false
                   if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 Yr ARM") || @title.include?("7/1 Yr ARM") || @title.include?("10/1 Yr ARM") 
-                    rate_arm = @title.scan(/\d+/)[0].to_i
+                    arm_basic = @title.scan(/\d+/)[0].to_i
                   end
 
                   # conforming
@@ -3689,7 +3689,7 @@ class ImportFilesController < ApplicationController
                   @program.loan_limit_type << "High Balance"
                 end
                 @program.save
-                @program.update(term: term,loan_type: loan_type,loan_purpose: loan_purpose ,rate_arm: rate_arm )
+                @program.update(term: term,loan_type: loan_type,loan_purpose: loan_purpose ,arm_basic: arm_basic )
                 @program.adjustments.destroy_all
 
                 @block_hash = {}
@@ -3949,7 +3949,7 @@ class ImportFilesController < ApplicationController
 
               # rate arm
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                rate_arm = @title.scan(/\d+/)[0].to_i
+                arm_basic = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -3986,7 +3986,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -4412,7 +4412,7 @@ class ImportFilesController < ApplicationController
 
                   # rate arm
                   if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                    rate_arm = @title.scan(/\d+/)[0].to_i
+                    arm_basic = @title.scan(/\d+/)[0].to_i
                   end
 
 
@@ -4432,7 +4432,7 @@ class ImportFilesController < ApplicationController
                   @program.loan_limit_type << "High Balance"
                 end
                 @program.save
-                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase" ,rate_arm: rate_arm, sheet_name: sheet )
+                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase" ,arm_basic: arm_basic, sheet_name: sheet )
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -4615,7 +4615,7 @@ class ImportFilesController < ApplicationController
 
               # rate arm
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                rate_arm = @title.scan(/\d+/)[0].to_i
+                arm_basic = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -4646,7 +4646,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming, rate_arm: rate_arm, sheet_name: sheet, jumbo_high_balance: jumbo_high_balance)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming, arm_basic: arm_basic, sheet_name: sheet, jumbo_high_balance: jumbo_high_balance)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -4875,9 +4875,9 @@ class ImportFilesController < ApplicationController
                 end
 
                 # rate arm
-                rate_arm = false
+                arm_basic = false
                 if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 LIBOR ARM") || @title.include?("7/1 LIBOR ARM") || @title.include?("10/1 LIBOR ARM")
-                  rate_arm = @title.scan(/\d+/)[0].to_i
+                  arm_basic = @title.scan(/\d+/)[0].to_i
                 end
                 @program = @bank.programs.find_or_create_by(program_name: @title)
                 @program_ids << @program.id
@@ -4895,7 +4895,7 @@ class ImportFilesController < ApplicationController
                   @program.loan_limit_type << "High Balance"
                 end
                 @program.save
-                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase" ,rate_arm: rate_arm, sheet_name: sheet )
+                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase" ,arm_basic: arm_basic, sheet_name: sheet )
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -5139,7 +5139,7 @@ class ImportFilesController < ApplicationController
 
               # interest sub type
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                rate_arm = @title.scan(/\d+/)[0].to_i
+                arm_basic = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -5162,7 +5162,7 @@ class ImportFilesController < ApplicationController
 
               @program = @bank.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
-              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -5371,7 +5371,7 @@ class ImportFilesController < ApplicationController
 
               # rate arm
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                rate_arm = @title.scan(/\d+/)[0].to_i
+                arm_basic = @title.scan(/\d+/)[0].to_i
               end
               # High Balance
               jumbo_high_balance = false
@@ -5395,7 +5395,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase", rate_arm: rate_arm, sheet_name: sheet, jumbo_high_balance: jumbo_high_balance)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase", arm_basic: arm_basic, sheet_name: sheet, jumbo_high_balance: jumbo_high_balance)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -5560,7 +5560,7 @@ class ImportFilesController < ApplicationController
 
               # rate arm
               if @title.include?("3-1 ARM") || @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM")
-                rate_arm = @title.scan(/\d+/)[0].to_i
+                arm_basic = @title.scan(/\d+/)[0].to_i
               end
 
               # conforming
@@ -5597,7 +5597,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, rate_arm: rate_arm, sheet_name: sheet)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -5912,7 +5912,7 @@ class ImportFilesController < ApplicationController
 
               # rate arm
               if @title.include?("3-1 ARM") || @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM")
-                rate_arm = @title.scan(/\d+/)[0].to_i
+                arm_basic = @title.scan(/\d+/)[0].to_i
               end
 
               freddie_mac = false
@@ -5952,7 +5952,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, jumbo_high_balance: jumbo_high_balance, sheet_name: sheet, rate_arm: rate_arm)
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, jumbo_high_balance: jumbo_high_balance, sheet_name: sheet, arm_basic: arm_basic)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -6263,7 +6263,7 @@ class ImportFilesController < ApplicationController
 
               # rate arm
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                rate_arm = @title.scan(/\d+/)[0].to_i
+                arm_basic = @title.scan(/\d+/)[0].to_i
               end
 
               conforming = false
@@ -6293,7 +6293,7 @@ class ImportFilesController < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: term,loan_type: loan_type, rate_arm: rate_arm, loan_purpose: "Purchase", fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, conforming: conforming, sheet_name: sheet)
+              @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, loan_purpose: "Purchase", fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, conforming: conforming, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -6627,7 +6627,7 @@ class ImportFilesController < ApplicationController
 
               # rate arm
               if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                rate_arm = @title.scan(/\d+/)[0].to_i
+                arm_basic = @title.scan(/\d+/)[0].to_i
               end
 
               conforming = false
@@ -6642,7 +6642,7 @@ class ImportFilesController < ApplicationController
               end
               @program = @bank.programs.find_or_create_by(program_name: @title)
               program_ids << @program.id
-              @program.update(term: term,loan_type: loan_type, rate_arm: rate_arm, loan_purpose: "Purchase", fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, conforming: conforming, sheet_name: sheet)
+              @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, loan_purpose: "Purchase", fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, conforming: conforming, sheet_name: sheet)
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
