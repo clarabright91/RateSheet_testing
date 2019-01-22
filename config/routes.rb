@@ -80,6 +80,13 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :ob_home_point_financial_wholesale11098, only: [:index] do
+    member do
+      get :programs
+      get :conforming_standard
+    end
+  end
+
   match "dashboard/index", to: 'dashboard#index', via: [:get, :post]
 
 end
