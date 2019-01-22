@@ -129,7 +129,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
         # Adjustment.create(data: @fha_adjustment, sheet_name: sheet)
       end
     end
-    redirect_to dashboard_index_path
+    redirect_to programs_ob_newfi_wholesale7019(@sheet_obj)
   end
 
   def sequoia_portfolio_plus_products

@@ -77,6 +77,7 @@ Rails.application.routes.draw do
       get :sequoia_investor_pro
       get :fha_buydown_fixed_rate_products
       get :fha_fixed_arm_products
+      get :single_program
     end
   end
 
@@ -84,6 +85,7 @@ Rails.application.routes.draw do
     member do
       get :programs
       get :conforming_standard
+      get :single_program
     end
   end
 

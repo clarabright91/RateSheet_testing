@@ -158,7 +158,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
       end
     end
     # redirect_to programs_import_file_path(@bank)
-    redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
+    redirect_to programs_ob_home_point_financial_wholesale11098_path(@sheet_obj)
   end
   
 
