@@ -32,9 +32,9 @@ class ObNewfiWholesale7019Controller < ApplicationController
         c_val = ''
 
         #program
-        (53..92).each do |r|
+        (51..92).each do |r|
           row = sheet_data.row(r)
-          if ((row.compact.count >= 1) && (row.compact.count < 4)) || row.include?("7/1 LIBOR ARM BISCAYNE JUMBO") || row.include?("10/1 LIBOR ARM BISCAYNE JUMBO")
+          if ((row.compact.count > 1) && (row.compact.count < 4)) || row.include?("7/1 LIBOR ARM BISCAYNE JUMBO") || row.include?("10/1 LIBOR ARM BISCAYNE JUMBO")
             rr = r + 1
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
@@ -70,6 +70,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
                     if (c_i == 0)
                       key = value
                       @block_hash[main_key][key] = {}
+                    elsif (c_i == 1)
+                      @block_hash[main_key][key][30] = value
+                    elsif (c_i == 2)
+                      @block_hash[main_key][key][45] = value
+                    elsif (c_i == 3)
+                      @block_hash[main_key][key][60] = value
                     else
                       if @program.lock_period.length <= 3
                         @program.lock_period << 15*c_i
