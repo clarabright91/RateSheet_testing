@@ -147,6 +147,14 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :ob_sun_west_wholesale_demo5907, only: [:index] do
+    member do
+      get :programs
+      get :ratesheet
+      get :single_program
+    end
+  end
+
   match "dashboard/index", to: 'dashboard#index', via: [:get, :post]
   mount Sidekiq::Web => '/sidekiq'
 end
