@@ -82,8 +82,12 @@ GEM
     concurrent-ruby (1.1.4)
     connection_pool (2.2.2)
     crass (1.0.4)
+<<<<<<< 15dc2e2dabc02ed4b6e6602a7d65db58cb718e00
     declarative (0.0.10)
     declarative-option (0.1.0)
+=======
+    csv (1.0.0)
+>>>>>>> add gemfile and gemfile.lock
     erubi (1.8.0)
     execjs (2.7.0)
     faraday (0.15.4)
@@ -308,7 +312,11 @@ DEPENDENCIES
   capybara (>= 2.15)
   chromedriver-helper
   coffee-rails (~> 4.2)
+<<<<<<< 15dc2e2dabc02ed4b6e6602a7d65db58cb718e00
   google_drive
+=======
+  csv
+>>>>>>> add gemfile and gemfile.lock
   jbuilder (~> 2.5)
   jquery-datatables
   jquery-rails
