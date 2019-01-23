@@ -254,9 +254,8 @@ class ObCmgWholesalesController < ApplicationController
             end
           end
         end
-        Adjustment.create(data: @data_hash, sheet_name: sheet)
-        Adjustment.create(data: @misc_hash, sheet_name: sheet)
-        Adjustment.create(data: @state_hash, sheet_name: sheet)
+        adjustment = [@data_hash,@misc_hash,@state_hash]
+        make_adjust(adjustment,sheet)
       end
     end
     # redirect_to programs_import_file_path(@bank)
@@ -573,13 +572,8 @@ class ObCmgWholesalesController < ApplicationController
             end
           end
         end
-        Adjustment.create(data: @adjustment_hash, sheet_name: sheet)
-        Adjustment.create(data: @cashout_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @subordinate_hash, sheet_name: sheet)
-        Adjustment.create(data: @adjustment_cap, sheet_name: sheet)
-        Adjustment.create(data: @loan_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @state_adjustments, sheet_name: sheet)
-        Adjustment.create(data: @other_adjustment, sheet_name: sheet)
+        adjustment = [@adjustment_hash,@cashout_adjustment,@subordinate_hash,@adjustment_cap,@loan_adjustment,@state_adjustments,@other_adjustment]
+        make_adjust(adjustment,sheet)
       end
     end
     # redirect_to programs_import_file_path(@bank)
@@ -835,11 +829,8 @@ class ObCmgWholesalesController < ApplicationController
             end
           end
         end
-        Adjustment.create(data: @adjustment_hash, sheet_name: sheet)
-        Adjustment.create(data: @subordinate_hash, sheet_name: sheet)
-        Adjustment.create(data: @adjustment_cap, sheet_name: sheet)
-        Adjustment.create(data: @misc_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @state_adjustment, sheet_name: sheet)
+        adjustment = [@adjustment_hash,@subordinate_hash,@adjustment_cap,@misc_adjustment,@state_adjustment]
+        make_adjust(adjustment,sheet)
       end
     end
     # redirect_to programs_import_file_path(@bank)
@@ -1096,11 +1087,8 @@ class ObCmgWholesalesController < ApplicationController
             end
           end
         end
-        Adjustment.create(data: @adjustment_hash, sheet_name: sheet)
-        Adjustment.create(data: @subordinate_hash, sheet_name: sheet)
-        Adjustment.create(data: @adjustment_cap, sheet_name: sheet)
-        Adjustment.create(data: @misc_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @state_adjustment, sheet_name: sheet)
+        adjustment = [@adjustment_hash,@subordinate_hash,@adjustment_cap,@misc_adjustment,@state_adjustment]
+        make_adjust(adjustment,sheet)
       end
     end
     # redirect_to programs_import_file_path(@bank)
@@ -1141,7 +1129,6 @@ class ObCmgWholesalesController < ApplicationController
               cc = 4*max_column + 1
 
               @title = sheet_data.cell(r,cc)
-
               # term
               @term = nil
               if @title.include?("30 Year") || @title.include?("30Yr") || @title.include?("30 Yr")
@@ -1330,8 +1317,8 @@ class ObCmgWholesalesController < ApplicationController
             end
           end
         end
-        Adjustment.create(data: @adjustment_hash, sheet_name: sheet)
-        Adjustment.create(data: @state_adjustment, sheet_name: sheet)
+        adjustment = [@adjustment_hash,@state_adjustment]
+        make_adjust(adjustment,sheet)
       end
     end
     # redirect_to programs_import_file_path(@bank)
@@ -1562,7 +1549,8 @@ class ObCmgWholesalesController < ApplicationController
             end
           end
         end
-        Adjustment.create(data: @data_hash, sheet_name: sheet)
+        adjustment = [@data_hash]
+        make_adjust(adjustment,sheet)
       end
     end
     # redirect_to programs_import_file_path(@bank)
@@ -1938,10 +1926,8 @@ class ObCmgWholesalesController < ApplicationController
               end
             end
           end
-          Adjustment.create(data: @purchase_adjustment, sheet_name: sheet)
-          Adjustment.create(data: @rate_adjustment, sheet_name: sheet)
-          Adjustment.create(data: @adjustment_hash, sheet_name: sheet)
-          Adjustment.create(data: @other_adjustment, sheet_name: sheet)
+          adjustment = [@purchase_adjustment,@rate_adjustment,@adjustment_hash,@other_adjustment]
+          make_adjust(adjustment,sheet)
           (56..77).each do |r|
             row = sheet_data.row(r)
             @ltv_data = sheet_data.row(59)
@@ -2033,9 +2019,8 @@ class ObCmgWholesalesController < ApplicationController
               end
             end
           end
-          Adjustment.create(data: @jumbo_purchase_adjustment, sheet_name: sheet)
-          Adjustment.create(data: @jumbo_rate_adjustment, sheet_name: sheet)
-          Adjustment.create(data: @jumbo_other_adjustment, sheet_name: sheet)
+          adjustment = [@jumbo_purchase_adjustment,@jumbo_rate_adjustment,@jumbo_other_adjustment]
+          make_adjust(adjustment,sheet)
         end
       end
     # redirect_to programs_import_file_path(@bank)
@@ -2288,10 +2273,8 @@ class ObCmgWholesalesController < ApplicationController
             end
           end
         end
-        Adjustment.create(data: @purchase_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @rate_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @adjustment_hash, sheet_name: sheet)
-        Adjustment.create(data: @other_adjustment, sheet_name: sheet)
+        adjustment = [@purchase_adjustment,@rate_adjustment,@adjustment_hash,@other_adjustment]
+        make_adjust(adjustment,sheet)
       end
     end
     # redirect_to programs_import_file_path(@bank)
@@ -2544,10 +2527,8 @@ class ObCmgWholesalesController < ApplicationController
             end
           end
         end
-        Adjustment.create(data: @purchase_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @rate_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @adjustment_hash, sheet_name: sheet)
-        Adjustment.create(data: @other_adjustment, sheet_name: sheet)
+        adjustment = [@purchase_adjustment,@rate_adjustment,@adjustment_hash,@other_adjustment]
+        make_adjust(adjustment,sheet)
       end
     end
     # redirect_to programs_import_file_path(@bank)
@@ -2872,7 +2853,8 @@ class ObCmgWholesalesController < ApplicationController
             end
           end
         end
-        Adjustment.create(data: @flex_hash, sheet_name: sheet)
+        adjustment = [@flex_hash]
+        make_adjust(adjustment,sheet)
 
         (21..38).each do |r|
           row = sheet_data.row(r)
@@ -2902,7 +2884,8 @@ class ObCmgWholesalesController < ApplicationController
             end
           end
         end
-        Adjustment.create(data: @jumbo_flex_hash, sheet_name: sheet)
+        adjustment = [@jumbo_flex_hash]
+        make_adjust(adjustment,sheet)
       end
     end
     # redirect_to programs_import_file_path(@bank)
@@ -3094,8 +3077,8 @@ class ObCmgWholesalesController < ApplicationController
             end
           end
         end
-        Adjustment.create(data: @misc_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @block_adjustment, sheet_name: sheet)
+        adjustment = [@misc_adjustment,@block_adjustment]
+        make_adjust(adjustment,sheet)
       end
 
     end
@@ -3441,8 +3424,8 @@ class ObCmgWholesalesController < ApplicationController
 
           end
         end
-        Adjustment.create(data: @adjustment_hash, sheet_name: sheet)
-        Adjustment.create(data: @other_adjustment, sheet_name: sheet)
+        adjustment = [@adjustment_hash,@other_adjustment]
+        make_adjust(adjustment,sheet)
 
         #second adjustment
         (67..85).each do |r|
@@ -3503,8 +3486,8 @@ class ObCmgWholesalesController < ApplicationController
 
           end
         end
-        Adjustment.create(data: @jumbo_adjustment_hash, sheet_name: sheet)
-        Adjustment.create(data: @jumbo_other_adjustment, sheet_name: sheet)
+        adjustment = [@jumbo_adjustment_hash,@jumbo_other_adjustment]
+        make_adjust(adjustment,sheet)
       end
     end
     # redirect_to programs_import_file_path(@bank)
@@ -3568,6 +3551,12 @@ class ObCmgWholesalesController < ApplicationController
       elsif value1.include?("IRRR")
         value1 = "FHA/Refinance"
       end
+    end
+  end
+
+  def make_adjust(block_hash, sheet)
+    block_hash.each do |hash|
+      Adjustment.create(data: hash.to_json,sheet_name: sheet)
     end
   end
 end

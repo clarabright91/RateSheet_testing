@@ -25,11 +25,14 @@ class ObNewfiWholesale7019Controller < ApplicationController
       if (sheet == "BISCAYNE DELEGATED JUMBO")
         sheet_data = xlsx.sheet(sheet)
         @programs_ids = []
-        f_key = ''
-        first_key = ''
-        cc = ''
-        ccc = ''
-        c_val = ''
+        @ltv_data = []
+        @cltv_data = []
+        @adjustment_hash = {}
+        @purpose_adjustment = {}
+        @highAdjustment = {}
+        ltv_key = ''
+        cltv_key = ''
+        primary_key = ''
 
         #program
         (53..92).each do |r|
@@ -91,6 +94,74 @@ class ObNewfiWholesale7019Controller < ApplicationController
             end
           end
         end
+        # adjustments
+        (108..153).each do |r|
+          row = sheet_data.row(r)
+          @ltv_data = sheet_data.row(109)
+          @cltv_data = sheet_data.row(136)
+          (0..13).each do |cc|
+            value = sheet_data.cell(r,cc)
+            if value.present?
+              if value == "Biscayne High Balance Price Adjustments"
+                primary_key = "HighBalance/FICO/CLTV" 
+                @highAdjustment[primary_key] = {}
+              end
+              if r == 108 && value == "CLTV"
+                primary_key = "FICO/CLTV"
+                @adjustment_hash[primary_key] = {}
+              end
+              # CLTV
+              if r >= 110 && r <= 115 && cc == 4
+                ltv_key = value
+                @adjustment_hash[primary_key][ltv_key] = {}
+              end
+              if r >= 110 && r <= 115 && cc >= 5 && cc <= 12
+                cltv_key = get_value @ltv_data[cc-3]
+                @adjustment_hash[primary_key][ltv_key][cltv_key] = {}
+                @adjustment_hash[primary_key][ltv_key][cltv_key] = value
+              end
+              if r >= 119 && r <= 125 && cc == 4
+                if value == "Cash-out Refinance"
+                  primary_key = "RefinanceOption/LTV"
+                elsif value == "Purchase"
+                  primary_key = "LoanPurpose/LTV"
+                else
+                  primary_key = get_value value  
+                end
+                @purpose_adjustment[primary_key] = {}
+              end
+              if r >= 119 && r <= 125 && cc >= 5 && cc <= 12
+                cltv_key = get_value @ltv_data[cc-3]
+                @purpose_adjustment[primary_key][cltv_key] = {}
+                @purpose_adjustment[primary_key][cltv_key] = value
+              end
+              # Biscayne High Balance Price Adjustments
+              if r >= 137 && r <= 147 && r != 144 && r != 145 && cc == 4
+                if value == "Cash-Out Refi"
+                  primary_key = "RefinanceOption/LTV"
+                  @highAdjustment[primary_key] = {}
+                  ltv_key = get_value value
+                  @highAdjustment[primary_key][ltv_key] = {}
+                elsif value == "Purchase"
+                  primary_key = "LoanPurpose/LTV"
+                  @highAdjustment[primary_key] = {}
+                  ltv_key = get_value value
+                  @highAdjustment[primary_key][ltv_key] = {}  
+                else
+                  ltv_key = get_value value
+                  @highAdjustment[primary_key][ltv_key] = {}
+                end
+              end
+              if r >= 137 && r <= 147 && r != 144 && r != 145 && cc >= 5 && cc <= 13
+                cltv_key = get_value @cltv_data[cc-3]
+                @highAdjustment[primary_key][ltv_key][cltv_key] = {}
+                @highAdjustment[primary_key][ltv_key][cltv_key] = value
+              end
+            end
+          end
+        end
+        adjustment = [@adjustment_hash,@purpose_adjustment,@highAdjustment]
+        make_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_ob_newfi_wholesale7019_path(@sheet_obj)
@@ -1163,5 +1234,10 @@ class ObNewfiWholesale7019Controller < ApplicationController
       end
       @program.save
       @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline)
+    end
+    def make_adjust(block_hash, sheet)
+      block_hash.each do |hash|
+        Adjustment.create(data: hash.to_json,sheet_name: sheet)
+      end
     end
 end
