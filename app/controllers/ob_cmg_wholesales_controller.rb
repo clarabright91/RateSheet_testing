@@ -149,7 +149,7 @@ class ObCmgWholesalesController < ApplicationController
               # @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -363,7 +363,7 @@ class ObCmgWholesalesController < ApplicationController
                 # @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
-                if @program.term.present? 
+                if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -577,6 +577,7 @@ class ObCmgWholesalesController < ApplicationController
         end
         adjustment = [@adjustment_hash,@cashout_adjustment,@subordinate_hash,@adjustment_cap,@loan_adjustment,@state_adjustments,@other_adjustment]
         make_adjust(adjustment,sheet)
+
         create_program_association_with_adjustment(sheet)
       end
     end
@@ -689,7 +690,7 @@ class ObCmgWholesalesController < ApplicationController
               # @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -835,6 +836,7 @@ class ObCmgWholesalesController < ApplicationController
         end
         adjustment = [@adjustment_hash,@subordinate_hash,@adjustment_cap,@misc_adjustment,@state_adjustment]
         make_adjust(adjustment,sheet)
+
         create_program_association_with_adjustment(sheet)
       end
     end
@@ -948,7 +950,7 @@ class ObCmgWholesalesController < ApplicationController
               # @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -1094,6 +1096,7 @@ class ObCmgWholesalesController < ApplicationController
         end
         adjustment = [@adjustment_hash,@subordinate_hash,@adjustment_cap,@misc_adjustment,@state_adjustment]
         make_adjust(adjustment,sheet)
+<<<<<<<
         create_program_association_with_adjustment(sheet)
       end
     end
@@ -1205,7 +1208,7 @@ class ObCmgWholesalesController < ApplicationController
               # @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -1325,6 +1328,7 @@ class ObCmgWholesalesController < ApplicationController
         end
         adjustment = [@adjustment_hash,@state_adjustment]
         make_adjust(adjustment,sheet)
+
         create_program_association_with_adjustment(sheet)
       end
     end
@@ -1436,7 +1440,7 @@ class ObCmgWholesalesController < ApplicationController
               # @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -1558,6 +1562,7 @@ class ObCmgWholesalesController < ApplicationController
         end
         adjustment = [@data_hash]
         make_adjust(adjustment,sheet)
+
         create_program_association_with_adjustment(sheet)
       end
     end
@@ -1681,7 +1686,7 @@ class ObCmgWholesalesController < ApplicationController
                 # @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
-                if @program.term.present? 
+                if @program.term.present?
                   main_key = "Term/LoanType/InterestRate/LockPeriod"
                 else
                   main_key = "InterestRate/LockPeriod"
@@ -1812,7 +1817,7 @@ class ObCmgWholesalesController < ApplicationController
                   # @program.adjustments.destroy_all
                   @block_hash = {}
                   key = ''
-                  if @program.term.present? 
+                  if @program.term.present?
                   main_key = "Term/LoanType/InterestRate/LockPeriod"
                 else
                   main_key = "InterestRate/LockPeriod"
@@ -2029,6 +2034,7 @@ class ObCmgWholesalesController < ApplicationController
           end
           adjustment = [@jumbo_purchase_adjustment,@jumbo_rate_adjustment,@jumbo_other_adjustment]
           make_adjust(adjustment,sheet)
+
           create_program_association_with_adjustment(sheet)
         end
       end
@@ -2141,7 +2147,7 @@ class ObCmgWholesalesController < ApplicationController
               # @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -2284,6 +2290,7 @@ class ObCmgWholesalesController < ApplicationController
         end
         adjustment = [@purchase_adjustment,@rate_adjustment,@adjustment_hash,@other_adjustment]
         make_adjust(adjustment,sheet)
+
         create_program_association_with_adjustment(sheet)
       end
     end
@@ -2396,7 +2403,7 @@ class ObCmgWholesalesController < ApplicationController
               # @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -2539,6 +2546,7 @@ class ObCmgWholesalesController < ApplicationController
         end
         adjustment = [@purchase_adjustment,@rate_adjustment,@adjustment_hash,@other_adjustment]
         make_adjust(adjustment,sheet)
+
         create_program_association_with_adjustment(sheet)
       end
     end
@@ -2650,7 +2658,7 @@ class ObCmgWholesalesController < ApplicationController
 
                 @block_hash = {}
                 key = ''
-                if @program.term.present? 
+                if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -2798,7 +2806,7 @@ class ObCmgWholesalesController < ApplicationController
 
                 @block_hash = {}
                 key = ''
-                if @program.term.present? 
+                if @program.term.present?
                   main_key = "Term/LoanType/InterestRate/LockPeriod"
                 else
                   main_key = "InterestRate/LockPeriod"
@@ -2897,6 +2905,7 @@ class ObCmgWholesalesController < ApplicationController
         end
         adjustment = [@jumbo_flex_hash]
         make_adjust(adjustment,sheet)
+
         create_program_association_with_adjustment(sheet)
       end
     end
@@ -3005,7 +3014,7 @@ class ObCmgWholesalesController < ApplicationController
               # @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -3091,6 +3100,7 @@ class ObCmgWholesalesController < ApplicationController
         end
         adjustment = [@misc_adjustment,@block_adjustment]
         make_adjust(adjustment,sheet)
+
         create_program_association_with_adjustment(sheet)
       end
 
@@ -3209,7 +3219,7 @@ class ObCmgWholesalesController < ApplicationController
                 # @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
-                if @program.term.present? 
+                if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -3338,7 +3348,7 @@ class ObCmgWholesalesController < ApplicationController
                 # @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
-                if @program.term.present? 
+                if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -3501,6 +3511,7 @@ class ObCmgWholesalesController < ApplicationController
         end
         adjustment = [@jumbo_adjustment_hash,@jumbo_other_adjustment]
         make_adjust(adjustment,sheet)
+
         create_program_association_with_adjustment(sheet)
       end
     end

@@ -26,7 +26,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         sheet_data = xlsx.sheet(sheet)
         @programs_ids = []
 
-        #program
+        # Agency Conforming Programs
         (156..320).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count >= 1) && (row.compact.count <= 4))
@@ -62,10 +62,10 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                       @block_hash[main_key][key] = {}
                     else
                       if @program.lock_period.length <= 3
-                        @program.lock_period << 15*c_i
+                        @program.lock_period << 15*(c_i+1)
                         @program.save
                       end
-                      @block_hash[main_key][key][15*c_i] = value
+                      @block_hash[main_key][key][15*(c_i+1)] = value
                     end
                     @data << value
                   end
@@ -81,6 +81,456 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
             end
           end
         end
+
+        # FHLMC HOME Programs
+        (708..760).each do |r|
+          row = sheet_data.row(r)
+          if ((row.compact.count >= 1) && (row.compact.count <= 4))
+            rr = r + 1
+            max_column_section = row.compact.count - 1
+            (0..max_column_section).each do |max_column|
+              cc = 5*max_column + 2 # 2 / 7 / 12 / 17
+              @title = sheet_data.cell(r,cc)
+              if @title.present? && @title != "Rate"
+                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                program_property @program
+                @programs_ids << @program.id
+              end
+
+              @program.adjustments.destroy_all
+              @block_hash = {}
+              key = ''
+              if @program.term.present?
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
+              @block_hash[main_key] = {}
+              (1..50).each do |max_row|
+                @data = []
+                (0..4).each_with_index do |index, c_i|
+                  rrr = rr + max_row
+                  ccc = cc + c_i
+                  value = sheet_data.cell(rrr,ccc)
+                  if value.present?
+                    if (c_i == 0)
+                      key = value
+                      @block_hash[main_key][key] = {}
+                    else
+                      if @program.lock_period.length <= 3
+                        @program.lock_period << 15*(c_i+1)
+                        @program.save
+                      end
+                      @block_hash[main_key][key][15*(c_i+1)] = value
+                    end
+                    @data << value
+                  end
+                end
+                if @data.compact.reject { |c| c.blank? }.length == 0
+                  break # terminate the loop
+                end
+              end
+              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
+                @block_hash.values.first.shift
+              end
+              @program.update(base_rate: @block_hash)
+            end
+          end
+        end
+
+        #Non-Confirming: Sigma Programs
+        (1101..1179).each do |r|
+          row = sheet_data.row(r)
+          if ((row.compact.count >= 1) && (row.compact.count <= 4))
+            rr = r + 1
+            max_column_section = row.compact.count - 1
+            (0..max_column_section).each do |max_column|
+              cc = 5*max_column + 2 # 2 / 7 / 12 / 17
+              @title = sheet_data.cell(r,cc)
+              if @title.present? && @title != "ARM INFORMATION"
+                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                program_property @program
+                @programs_ids << @program.id
+              end
+
+              @program.adjustments.destroy_all
+              @block_hash = {}
+              key = ''
+              if @program.term.present?
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
+              @block_hash[main_key] = {}
+              (1..50).each do |max_row|
+                @data = []
+                (0..4).each_with_index do |index, c_i|
+                  rrr = rr + max_row
+                  ccc = cc + c_i
+                  value = sheet_data.cell(rrr,ccc)
+                  if value.present?
+                    if (c_i == 0)
+                      key = value
+                      @block_hash[main_key][key] = {}
+                    else
+                      if @program.lock_period.length <= 3
+                        @program.lock_period << 15*(c_i+1)
+                        @program.save
+                      end
+                      @block_hash[main_key][key][15*(c_i+1)] = value
+                    end
+                    @data << value
+                  end
+                end
+                if @data.compact.reject { |c| c.blank? }.length == 0
+                  break # terminate the loop
+                end
+              end
+              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
+                @block_hash.values.first.shift
+              end
+              @program.update(base_rate: @block_hash)
+            end
+          end
+        end
+
+        #Non-Confirming: JW
+        (1386..1547).each do |r|
+          row = sheet_data.row(r)
+          if ((row.compact.count >= 1) && (row.compact.count <= 4))
+            rr = r + 1
+            max_column_section = row.compact.count - 1
+            (0..max_column_section).each do |max_column|
+              cc = 5*max_column + 2 # 2 / 7 / 12 / 17
+              @title = sheet_data.cell(r,cc)
+              if @title.present? && @title != "Rate"
+                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                program_property @program
+                @programs_ids << @program.id
+              end
+
+              @program.adjustments.destroy_all
+              @block_hash = {}
+              key = ''
+              if @program.term.present?
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
+              @block_hash[main_key] = {}
+              (1..50).each do |max_row|
+                @data = []
+                (0..4).each_with_index do |index, c_i|
+                  rrr = rr + max_row
+                  ccc = cc + c_i
+                  value = sheet_data.cell(rrr,ccc)
+                  if value.present?
+                    if (c_i == 0)
+                      key = value
+                      @block_hash[main_key][key] = {}
+                    else
+                      if @program.lock_period.length <= 3
+                        @program.lock_period << 15*(c_i+1)
+                        @program.save
+                      end
+                      @block_hash[main_key][key][15*(c_i+1)] = value
+                    end
+                    @data << value
+                  end
+                end
+                if @data.compact.reject { |c| c.blank? }.length == 0
+                  break # terminate the loop
+                end
+              end
+              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
+                @block_hash.values.first.shift
+              end
+              @program.update(base_rate: @block_hash)
+            end
+          end
+        end
+
+        # #Non-Confirming: Government Not Completed
+        # (2180..2278).each do |r|
+        #   row = sheet_data.row(r)
+        #   if ((row.compact.count >= 1) && (row.compact.count <= 4))
+        #     rr = r + 1
+        #     max_column_section = row.compact.count - 1
+        #     (0..max_column_section).each do |max_column|
+        #       cc = 5*max_column + 2 # 2 / 7 / 12 / 17
+        #       @title = sheet_data.cell(r,cc)
+        #       if @title.present? #&& @title != "PROGRAM SPECIFIC PRICE ADJUSTMENTS"
+        #         @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+        #         program_property @program
+        #         @programs_ids << @program.id
+        #       end
+
+        #       @program.adjustments.destroy_all
+        #       @block_hash = {}
+        #       key = ''
+        #       if @program.term.present?
+        #         main_key = "Term/LoanType/InterestRate/LockPeriod"
+        #       else
+        #         main_key = "InterestRate/LockPeriod"
+        #       end
+        #       @block_hash[main_key] = {}
+        #       (1..50).each do |max_row|
+        #         @data = []
+        #         (0..4).each_with_index do |index, c_i|
+        #           rrr = rr + max_row
+        #           ccc = cc + c_i
+        #           value = sheet_data.cell(rrr,ccc)
+        #           if value.present?
+        #             if (c_i == 0)
+        #               key = value
+        #               @block_hash[main_key][key] = {}
+        #             else
+        #               if @program.lock_period.length <= 3
+        #                 @program.lock_period << 15*c_i
+        #                 @program.save
+        #               end
+        #               # debugger if r > 2254 && cc > 7
+        #               @block_hash[main_key][key][15*c_i] = value
+        #             end
+        #             @data << value
+        #           end
+        #         end
+        #         if @data.compact.reject { |c| c.blank? }.length == 0
+        #           break # terminate the loop
+        #         end
+        #       end
+        #       if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
+        #         @block_hash.values.first.shift
+        #       end
+        #       @program.update(base_rate: @block_hash)
+        #     end
+        #   end
+        # end
+
+        #NON-QM: R.E.A.L CREDIT ADVANTAGE - B, B-, C Program 15 Year Fixed error
+        (3089..3101).each do |r|
+          row = sheet_data.row(r)
+          if ((row.compact.count >= 1) && (row.compact.count <= 7))
+            rr = r + 1
+            max_column_section = row.compact.count - 1
+            (0..max_column_section).each do |max_column|
+              cc = 3*max_column + 2 # 2 / 5 / 8 / 11 / 14
+              @title = sheet_data.cell(r,cc)
+              if @title.present? && @title != "Rate" && @title != "MAXIMUM PRICE" && @title != "LOAN AMOUNT"
+                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                program_property @program
+                @programs_ids << @program.id
+              end
+
+              @program.adjustments.destroy_all
+              @block_hash = {}
+              key = ''
+              if @program.term.present?
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
+              @block_hash[main_key] = {}
+              (1..50).each do |max_row|
+                @data = []
+                (0..2).each_with_index do |index, c_i|
+                  rrr = rr + max_row
+                  ccc = cc + c_i
+                  value = sheet_data.cell(rrr,ccc)
+                  if value.present?
+                    if (c_i == 0)
+                      key = value
+                      @block_hash[main_key][key] = {}
+                    else
+                      if @program.lock_period.length <= 3
+                        @program.lock_period << 15*(c_i+1)
+                        @program.save
+                      end
+                      @block_hash[main_key][key][15*(c_i+1)] = value
+                    end
+                    @data << value
+                  end
+                end
+                if @data.compact.reject { |c| c.blank? }.length == 0
+                  break # terminate the loop
+                end
+              end
+              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
+                @block_hash.values.first.shift
+              end
+              @program.update(base_rate: @block_hash)
+            end
+          end
+        end
+
+        #NNON-QM: R.E.A.L INVESTOR INCOME - A Program
+        (3237..3249).each do |r|
+          row = sheet_data.row(r)
+          if ((row.compact.count >= 1) && (row.compact.count <= 4))
+            rr = r + 1
+            max_column_section = row.compact.count - 1
+            (0..max_column_section).each do |max_column|
+              cc = 3*max_column + 2 # 2 / 5 / 8 / 11 / 14
+              @title = sheet_data.cell(r,cc)
+              if @title.present? && @title != "MAXIMUM PRICE"
+                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                program_property @program
+                @programs_ids << @program.id
+              end
+
+              @program.adjustments.destroy_all
+              @block_hash = {}
+              key = ''
+              if @program.term.present?
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
+              @block_hash[main_key] = {}
+              (1..50).each do |max_row|
+                @data = []
+                (0..2).each_with_index do |index, c_i|
+                  rrr = rr + max_row
+                  ccc = cc + c_i
+                  value = sheet_data.cell(rrr,ccc)
+                  if value.present?
+                    if (c_i == 0)
+                      key = value
+                      @block_hash[main_key][key] = {}
+                    else
+                      if @program.lock_period.length <= 3
+                        @program.lock_period << 15*(c_i+1)
+                        @program.save
+                      end
+                      @block_hash[main_key][key][15*(c_i+1)] = value
+                    end
+                    @data << value
+                  end
+                end
+                if @data.compact.reject { |c| c.blank? }.length == 0
+                  break # terminate the loop
+                end
+              end
+              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
+                @block_hash.values.first.shift
+              end
+              @program.update(base_rate: @block_hash)
+            end
+          end
+        end
+
+        #NON-QM: R.E.A.L INVESTOR INCOME - B, B- Program
+        (3334..3346).each do |r|
+          row = sheet_data.row(r)
+          if ((row.compact.count >= 1) && (row.compact.count <= 7))
+            rr = r + 1
+            max_column_section = row.compact.count - 1
+            (0..max_column_section).each do |max_column|
+              cc = 3*max_column + 2 # 2 / 5 / 8 / 11 / 14
+              @title = sheet_data.cell(r,cc)
+              if @title.present? && @title != "MAXIMUM PRICE"
+                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                program_property @program
+                @programs_ids << @program.id
+              end
+
+              @program.adjustments.destroy_all
+              @block_hash = {}
+              key = ''
+              if @program.term.present?
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
+              @block_hash[main_key] = {}
+              (1..50).each do |max_row|
+                @data = []
+                (0..2).each_with_index do |index, c_i|
+                  rrr = rr + max_row
+                  ccc = cc + c_i
+                  value = sheet_data.cell(rrr,ccc)
+                  if value.present?
+                    if (c_i == 0)
+                      key = value
+                      @block_hash[main_key][key] = {}
+                    else
+                      if @program.lock_period.length <= 3
+                        @program.lock_period << 15*(c_i+1)
+                        @program.save
+                      end
+                      @block_hash[main_key][key][15*(c_i+1)] = value
+                    end
+                    @data << value
+                  end
+                end
+                if @data.compact.reject { |c| c.blank? }.length == 0
+                  break # terminate the loop
+                end
+              end
+              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
+                @block_hash.values.first.shift
+              end
+              @program.update(base_rate: @block_hash)
+            end
+          end
+        end
+
+         # NON-QM: R.E.A.L DSC RATIO Programs
+        (3433..3445).each do |r|
+          row = sheet_data.row(r)
+          if ((row.compact.count >= 1) && (row.compact.count <= 7))
+            rr = r + 1
+            max_column_section = row.compact.count - 1
+            (0..max_column_section).each do |max_column|
+              cc = 3*max_column + 2 # 2 / 5 / 8 / 11 / 14
+              @title = sheet_data.cell(r,cc)
+              if @title.present? && @title != "LOAN AMOUNT"
+                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                program_property @program
+                @programs_ids << @program.id
+              end
+
+              @program.adjustments.destroy_all
+              @block_hash = {}
+              key = ''
+              if @program.term.present?
+                main_key = "Term/LoanType/InterestRate/LockPeriod"
+              else
+                main_key = "InterestRate/LockPeriod"
+              end
+              @block_hash[main_key] = {}
+              (1..50).each do |max_row|
+                @data = []
+                (0..2).each_with_index do |index, c_i|
+                  rrr = rr + max_row
+                  ccc = cc + c_i
+                  value = sheet_data.cell(rrr,ccc)
+                  if value.present?
+                    if (c_i == 0)
+                      key = value
+                      @block_hash[main_key][key] = {}
+                    else
+                      if @program.lock_period.length <= 3
+                        @program.lock_period << 15*(c_i+1)
+                        @program.save
+                      end
+                      @block_hash[main_key][key][15*(c_i+1)] = value
+                    end
+                    @data << value
+                  end
+                end
+                if @data.compact.reject { |c| c.blank? }.length == 0
+                  break # terminate the loop
+                end
+              end
+              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
+                @block_hash.values.first.shift
+              end
+              @program.update(base_rate: @block_hash)
+            end
+          end
+        end
+
       end
     end
     redirect_to programs_ob_sun_west_wholesale_demo5907_path(@sheet_obj)

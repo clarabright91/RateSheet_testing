@@ -109,7 +109,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
             value = sheet_data.cell(r,cc)
             if value.present?
               if value == "Biscayne High Balance Price Adjustments"
-                primary_key = "HighBalance/FICO/CLTV" 
+                primary_key = "HighBalance/FICO/CLTV"
                 @highAdjustment[primary_key] = {}
               end
               if r == 108 && value == "CLTV"
@@ -132,7 +132,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 elsif value == "Purchase"
                   primary_key = "LoanPurpose/LTV"
                 else
-                  primary_key = get_value value  
+                  primary_key = get_value value
                 end
                 @purpose_adjustment[primary_key] = {}
               end
@@ -152,7 +152,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   primary_key = "LoanPurpose/LTV"
                   @highAdjustment[primary_key] = {}
                   ltv_key = get_value value
-                  @highAdjustment[primary_key][ltv_key] = {}  
+                  @highAdjustment[primary_key][ltv_key] = {}
                 else
                   ltv_key = get_value value
                   @highAdjustment[primary_key][ltv_key] = {}
@@ -168,7 +168,9 @@ class ObNewfiWholesale7019Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@purpose_adjustment,@highAdjustment]
         make_adjust(adjustment,sheet)
+
         create_program_association_with_adjustment(sheet)
+         # Update programs for Ob_SunWest sheet
       end
     end
     redirect_to programs_ob_newfi_wholesale7019_path(@sheet_obj)
@@ -315,7 +317,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
             (0..19).each do |cc|
               value = sheet_data.cell(r,cc)
               if value.present?
-                
+
               end
             end
           end
@@ -414,7 +416,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @adjustment_hash[primary_key][secondary_key][ltv_key] = {}
                   @adjustment_hash[primary_key][secondary_key][ltv_key] = value
                 end
-                # Other 
+                # Other
                 if r == 93 && cc == 5
                   primary_key = "LoanType"
                   @other_adjustment[primary_key] = {}
@@ -446,13 +448,13 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @other_adjustment[primary_key][ltv_key] = {}
                   @other_adjustment[primary_key][ltv_key] = value
                 end
-                if r >= 110 && r <= 113 && cc == 4 
+                if r >= 110 && r <= 113 && cc == 4
                   primary_key = value
                   @other_adjustment[primary_key] = {}
                 end
                 if r >= 110 && r <= 113 && cc == 5
                   @other_adjustment[primary_key] = value
-                end 
+                end
               end
             end
           end
@@ -547,7 +549,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   primary_key = "LoanAmount/LTV/FICO"
                   @adjustment_hash[primary_key] = {}
                 end
-                # FICO - Loan Amount 
+                # FICO - Loan Amount
                 if r >= 105 && r <= 110 && cc == 5
                   secondary_key = value
                   @adjustment_hash[primary_key][secondary_key] = {}
@@ -1845,7 +1847,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 cc = cc +2
                 new_value = sheet_data.cell(r,cc)
                 @cashout_hash[primary_key][secondary_key] = new_value
-              end              
+              end
             end
             # Other Adjustments
             if r == 146 && cc == 14
@@ -2028,7 +2030,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 cc = cc +2
                 new_value = sheet_data.cell(r,cc)
                 @cashout_hash[primary_key][secondary_key] = new_value
-              end              
+              end
             end
             # Other Adjustments
             if r == 145 && cc == 14
@@ -2211,7 +2213,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 cc = cc +2
                 new_value = sheet_data.cell(r,cc)
                 @cashout_hash[primary_key][secondary_key] = new_value
-              end              
+              end
             end
             # Other Adjustments
             if r == 146 && cc == 14
@@ -2437,11 +2439,11 @@ class ObNewfiWholesale7019Controller < ApplicationController
             value = sheet_data.cell(r,cc)
             if value.present?
               if value == "LTV / FICO (Terms > 15 years only)"
-                primary_key = "LoanType/Term/LTV/FICO" 
+                primary_key = "LoanType/Term/LTV/FICO"
                 @adjustment_hash[primary_key] = {}
               end
               if value == "Cash Out Refinance"
-                primary_key = "RefinanceOption/FICO/LTV" 
+                primary_key = "RefinanceOption/FICO/LTV"
                 @adjustment_hash[primary_key] = {}
               end
               if r >= first_row && r <= end_row && cc == first_column
@@ -2467,45 +2469,6 @@ class ObNewfiWholesale7019Controller < ApplicationController
       make_adjust(adjustment,sheet)
       create_program_association_with_adjustment(sheet)
     end
-
-    # def subordinate_adjustment range1, range2, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, cltv_column
-    #   @subordinate_hash = {}
-    #   primary_key = ''
-    #   ltv_key = ''
-    #   cltv_key = ''
-    #   (range1..range2).each do |r|
-    #     row = sheet_data.row(r)
-    #     @ltv_data = sheet_data.row(ltv_row)
-    #     if row.compact.count >= 1
-    #       (0..last_column).each do |cc|
-    #         value = sheet_data.cell(r,cc)
-    #         if value.present?
-    #           primary_key = "LTV/CLTV/FICO" 
-    #           @subordinate_hash[primary_key] = {}
-    #           if r >= first_row && r <= end_row && cc == first_column
-    #             ltv_key = get_value value
-    #             @subordinate_hash[primary_key][ltv_key] = {}
-    #             if @subordinate_hash[primary_key][ltv_key] = {}
-    #               new_value = sheet_data.cell(r,cltv_column)
-    #               @subordinate_hash[primary_key][ltv_key][new_value] = {}
-    #             end
-    #           end
-    #           # if r >= first_row && r <= end_row && cc == cltv_column
-    #           #   cltv_key = get_value value
-    #           #   debugger
-    #           #   @subordinate_hash[primary_key][ltv_key][cltv_key] = {}
-    #           # end
-    #           # if r >= first_row && r <= end_row && cc > cltv_column && cc <= last_column
-    #           #   debugger
-    #           #   cltv_data = get_value @ltv_data[cc-1]
-    #           #   @subordinate_hash[primary_key][ltv_key][cltv_key] = {}
-    #           #   @subordinate_hash[primary_key][ltv_key][cltv_key] = value
-    #           # end
-    #         end
-    #       end
-    #     end
-    #   end 
-    # end
 
     def create_program_association_with_adjustment(sheet)
       adjustment_list = Adjustment.where(sheet_name: sheet)
