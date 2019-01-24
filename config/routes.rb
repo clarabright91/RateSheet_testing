@@ -1,17 +1,5 @@
 Rails.application.routes.draw do
-  get 'ob_cmg_wholesales/index'
-  get 'ob_cmg_wholesales/import_gov_sheet'
-  get 'ob_cmg_wholesales/import_agency_sheet'
-  get 'ob_cmg_wholesales/import_durp_sheet'
-  get 'ob_cmg_wholesales/import_oa_sheet'
-  get 'ob_cmg_wholesales/import_jumbo700_sheet'
-  get 'ob_cmg_wholesales/import_jumbo6200_sheet'
-  get 'ob_cmg_wholesales/import_jumbo7200_6700_sheet'
-  get 'ob_cmg_wholesales/import_jummbo6600_sheet'
-  get 'ob_cmg_wholesales/import_jummbo7600_sheet'
-  get 'ob_cmg_wholesales/import_jummbo6400_sheet'
-  get 'ob_cmg_wholesales/import_jummbo6800_sheet'
-  get 'ob_cmg_wholesales/import_jumbo6900_7900_sheet'
+
   root :to => "dashboard#index"
   # root :to => "import_files#index"
   resources :import_files, only: [:index] do
@@ -46,12 +34,70 @@ Rails.application.routes.draw do
   #   end
   # end
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
-  resources :ob_cmg_wholesales do
+  resources :ob_cmg_wholesales, only: [:index] do
     member do
       get :programs
+      get :gov
+      get :agency
+      get :durp
+      get :oa
+      get :jumbo_700
+      get :jumbo_6200
+      get :jumbo_7200_6700
+      get :jumbo_6600
+      get :jumbo_7600
+      get :jumbo_6400
+      get :jumbo_6800
+      get :jumbo_6900_7900
+      get :single_program
+    end
+  end
+
+  resources :ob_cardinal_financial_wholesale10742, only: [:index] do
+    member do
+      get :ak
+    end
+  end
+
+  resources :ob_allied_mortgage_group_wholesale8570, only: [:index] do
+    member do
+      get :programs
+      get :fha
+      get :va
+      get :conf_fixed
+      get :single_program
+    end
+  end
+
+  resources :ob_newfi_wholesale7019, only: [:index] do
+    member do
+      get :programs
+      get :biscayne_delegated_jumbo
+      get :sequoia_portfolio_plus_products
+      get :sequoia_expanded_products
+      get :sequoia_investor_pro
+      get :fha_buydown_fixed_rate_products
+      get :fha_fixed_arm_products
+      get :fannie_mae_homeready_products
+      get :fnma_buydown_products
+      get :fnma_conventional_fixed_rate
+      get :fnma_conventional_high_balance
+      get :fnma_conventional_arm
+      get :olympic_piggyback_fixed
+      get :olympic_piggyback_high_balance
+      get :olympic_piggyback_arm
+      get :single_program
+    end
+  end
+
+
+  resources :ob_home_point_financial_wholesale11098, only: [:index] do
+    member do
+      get :programs
+      get :conforming_standard
+      get :single_program
     end
   end
 
   match "dashboard/index", to: 'dashboard#index', via: [:get, :post]
-  
-  end
+end

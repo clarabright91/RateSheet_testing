@@ -39,7 +39,7 @@ class DashboardController < ApplicationController
 
     @interest = params[:interest] if params[:interest].present?
     @lock_period = params[:lock_period] if params[:lock_period].present?
-        
+
     @gov_sheet = params[:gov] if params[:gov].present?
     if @gov_sheet.present?
       if @gov_sheet == "FHA"
@@ -71,22 +71,21 @@ class DashboardController < ApplicationController
         @filter_data[:jumbo_high_balance] = false
       end
     end
-
   end
 
   def find_base_rate
-      @program_list = Program.where(@filter_data)
-      if @program_list.present?
-        @programs =[]
-        @program_list.each do |program|
-          if(program.base_rate[program.base_rate.keys.first].keys.include?(@interest.to_f.to_s))
-            if(program.base_rate[program.base_rate.keys.first][@interest.to_f.to_s].keys.include?(@lock_period))
-                @programs << program
-            end
+    @program_list = Program.where(@filter_data)
+    if @program_list.present?
+      @programs =[]
+      @program_list.each do |program|
+        if(program.base_rate[program.base_rate.keys.first].keys.include?(@interest.to_f.to_s))
+          if(program.base_rate[program.base_rate.keys.first][@interest.to_f.to_s].keys.include?(@lock_period))
+              @programs << program
           end
         end
       end
-    return @base_rate
+    end
+    return @programs
   end
 
   render :index

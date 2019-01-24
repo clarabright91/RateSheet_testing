@@ -44,6 +44,16 @@
 
               <div class="col-md-2">
                 <div class="form-group">
+                  <label>Fannie Options</label>
+                  <div class="input-group">
+                    <% @loan_limit_type_list =[["Fannie Mae"], ["Fannie Mae Home Ready"], ["Fannie Mac"], ["Fannie Mae Home Possible"]]%>
+                    <%= select_tag 'fannie_options', options_for_select(@loan_limit_type_list), { prompt: 'Select Fannie', :class=> "form-control" }%>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <div class="form-group">
                   <label>Gov</label>
                   <div class="input-group">
                     <% @gov_list =[["FHA"], ["VA"], ["USDA"]]%>
@@ -69,7 +79,7 @@
                     <%= select_tag 'lock_period', options_for_select(@lock_period_list, @lock_period), :class=> "form-control" %>
                   </div>
                 </div>
-              </div>            
+              </div>
 
               <div class="col-md-2">
                 <div class="form-group">
@@ -112,28 +122,48 @@
   </table>
 </div>
   <div class="row col-md-6 col-md-offset-2 custyle">
-  <table class="table table-striped custab">
-  <thead>
-  <h2>Banks</h2>
-  <tr>
-    <th>No.</th>
-    <th>Name</th>
-    <th>Phone</th>
-    <th class="text-center">Action</th>
-  </tr>
-  </thead>
-    <% if @banks.present? %>
-      <% @banks.each_with_index do |bank, index|%>
+    <table class="table table-striped custab">
+      <thead>
+      <h2>Banks</h2>
+      <tr>
+        <th>No.</th>
+        <th>Name</th>
+        <th class="text-center">Action</th>
+      </tr>
+      </thead>
+      <tbody>
         <tr>
-          <td><%= index +1 %></td>
-          <td><%= bank.name%></td>
-          <td><%= bank.phone%></td>
+          <td>1</td>
+          <td>New Penn Financial</td>
           <td class="text-center"><a class='btn btn-info btn-xs' href="<%=import_files_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
         </tr>
-      <%end%>
-    <%end%>
-    </tbody>
-  </table>
+        <tr>
+          <td>2</td>
+          <td>CMG Financial </td>
+          <td class="text-center"><a class='btn btn-info btn-xs' href="<%=ob_cmg_wholesales_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Cardinal Financial </td>
+          <td class="text-center"><a class='btn btn-info btn-xs' href="<%=ob_cardinal_financial_wholesale10742_index_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Allied Mortgage </td>
+          <td class="text-center"><a class='btn btn-info btn-xs' href="<%=ob_allied_mortgage_group_wholesale8570_index_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Newfi Wholesale </td>
+          <td class="text-center"><a class='btn btn-info btn-xs' href="<%=ob_newfi_wholesale7019_index_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>Home Point Financial Corporation </td>
+          <td class="text-center"><a class='btn btn-info btn-xs' href="<%=ob_home_point_financial_wholesale11098_index_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
@@ -160,7 +190,7 @@
      $(".term").show()
     }
 
-   $("#rate_type").on('click', function(e){ 
+   $("#rate_type").on('click', function(e){
      if ($(this).val()=="ARM"){
       $(".term").hide()
       $(".term-arm").show()
