@@ -99,11 +99,21 @@ Rails.application.routes.draw do
     end
   end
 
+
+
   resources :ob_united_wholesale_mortgage4892, only: [:index] do
     member do
       get :programs
       get :single_program
       get :conv
+    end
+  end
+
+  resources :ob_union_home_mortgage_wholesale1711, only: [:index] do
+    member do
+      get :programs
+      get :single_program
+      get :conventional
     end
   end
 
