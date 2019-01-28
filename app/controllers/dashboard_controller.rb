@@ -3,7 +3,7 @@ class DashboardController < ApplicationController
 
   def index
     @banks = Bank.all
-    if request.post?
+    if params["commit"].present?
       set_variable
       find_base_rate
     end
@@ -21,7 +21,7 @@ class DashboardController < ApplicationController
       @filter_data[:rate_type] = params[:rate_type]
 
       if params[:rate_type] =="ARM" && params[:term_arm].present?
-        @filter_data[:rate_arm] = params[:term_arm].to_i
+        @filter_data[:arm_basic] = params[:term_arm].to_i
       end
 
       if params[:rate_type] =="Fixed" && params[:term].present?

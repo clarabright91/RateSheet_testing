@@ -2,13 +2,14 @@
   <!-- searching form -->
       <div class="">
         <br/>
-          <%= form_tag('/dashboard/index', method: :post) do %>
+          <%= form_tag('/dashboard/index', method: :get) do %>
             <div class="row">
               <div class="col-md-2">
                 <div class="form-group">
                   <label>Rate Type</label>
                   <% @rate_type_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"]]%>
-                  <%= select_tag 'rate_type', options_for_select(@rate_type_list, (@filter_data[:rate_type] rescue nil)), { prompt: 'Select Rate Type', :class=> "form-control", :required => true} %>
+                  <%#debugger%>
+                  <%= select_tag 'rate_type', options_for_select(@rate_type_list, (params[:rate_type] rescue nil)), { prompt: 'Select Rate Type', :class=> "form-control", :required => true} %>
                 </div>
               </div>
 
@@ -17,7 +18,7 @@
                   <label>Term</label>
                   <div class="input-group">
                    <% @term_list =[["10 yrs",10], ["15 yrs",15], ["20 yrs",20], ["25 yrs",25], ["30 yrs",30]] %>
-                    <%= select_tag 'term', options_for_select(@term_list, (@filter_data[:term] rescue nil)), { prompt: 'Select Term', :class=> "form-control"} %>
+                    <%= select_tag 'term', options_for_select(@term_list, (params[:term] rescue nil)), { prompt: 'Select Term', :class=> "form-control"} %>
                   </div>
                 </div>
               </div>
@@ -27,7 +28,7 @@
                   <label>Term</label>
                   <div class="input-group">
                    <% @term_list_arm =[["1/1 ARM",1], ["2/1 ARM",2], ["3/1 ARM",3], ["4/1 ARM",4], ["5/1 ARM",5], ["6/1 ARM",6], ["7/1 ARM",7], ["8/1 ARM",8], ["9/1 ARM",9], ["10/1 ARM",10]] %>
-                    <%= select_tag 'term_arm', options_for_select(@term_list_arm), { prompt: 'Select Term', :class=> "form-control", :id=>"term_arm"}%>
+                    <%= select_tag 'term_arm', options_for_select(@term_list_arm, (params[:term_arm] rescue nil)), { prompt: 'Select Term', :class=> "form-control", :id=>"term_arm"}%>
                   </div>
                 </div>
               </div>
@@ -37,7 +38,7 @@
                   <label>Loan Limit Type</label>
                   <div class="input-group">
                     <% @loan_limit_type_list =[["Non-Conforming"], ["Conforming"], ["High-Balance"]]%>
-                    <%= select_tag 'loan_limit_type', options_for_select(@loan_limit_type_list), { prompt: 'Select Loan Type', :class=> "form-control" }%>
+                    <%= select_tag 'loan_limit_type', options_for_select(@loan_limit_type_list, (params[:loan_limit_type] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control" }%>
                   </div>
                 </div>
               </div>
@@ -47,7 +48,7 @@
                   <label>Fannie Options</label>
                   <div class="input-group">
                     <% @loan_limit_type_list =[["Fannie Mae"], ["Fannie Mae Home Ready"], ["Fannie Mac"], ["Fannie Mae Home Possible"]]%>
-                    <%= select_tag 'fannie_options', options_for_select(@loan_limit_type_list), { prompt: 'Select Fannie', :class=> "form-control" }%>
+                    <%= select_tag 'fannie_options', options_for_select(@loan_limit_type_list, (params[:fannie_options] rescue nil)), { prompt: 'Select Fannie', :class=> "form-control" }%>
                   </div>
                 </div>
               </div>
@@ -57,7 +58,7 @@
                   <label>Gov</label>
                   <div class="input-group">
                     <% @gov_list =[["FHA"], ["VA"], ["USDA"]]%>
-                    <%= select_tag 'gov', options_for_select(@gov_list), { prompt: 'Select Gov', :class=> "form-control" }%>
+                    <%= select_tag 'gov', options_for_select(@gov_list, (params[:gov] rescue nil)), { prompt: 'Select Gov', :class=> "form-control" }%>
                   </div>
                 </div>
               </div>
