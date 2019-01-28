@@ -17,7 +17,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
       # the required headers are not all present
     end
   end
-
+reprograms_ob_newfi_wholesale7019_path
   def biscayne_delegated_jumbo
     file = File.join(Rails.root,  'OB_Newfi_Wholesale7019.xls')
     xlsx = Roo::Spreadsheet.open(file)

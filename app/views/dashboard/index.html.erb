@@ -75,7 +75,7 @@
                 <div class="form-group">
                   <label>Lock Period</label>
                   <div class="input-group">
-                    <% @lock_period_list =[["15 days"], ["30 days",30], ["45 days",45], ["60 days",60]]%>
+                    <% @lock_period_list =[["15 days", 15], ["30 days",30], ["45 days",45], ["60 days",60]]%>
                     <%= select_tag 'lock_period', options_for_select(@lock_period_list, @lock_period), :class=> "form-control" %>
                   </div>
                 </div>
@@ -161,6 +161,12 @@
           <td>6</td>
           <td>Home Point Financial Corporation </td>
           <td class="text-center"><a class='btn btn-info btn-xs' href="<%=ob_home_point_financial_wholesale11098_index_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>UWM United Wholesale Mortgage</td>
+         
+          <td class="text-center"><a class='btn btn-info btn-xs' href="<%=ob_united_wholesale_mortgage4892_index_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
         </tr>
       </tbody>
     </table>

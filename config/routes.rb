@@ -99,5 +99,13 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :ob_united_wholesale_mortgage4892, only: [:index] do
+    member do
+      get :programs
+      get :single_program
+      get :conv
+    end
+  end
+
   match "dashboard/index", to: 'dashboard#index', via: [:get, :post]
 end
