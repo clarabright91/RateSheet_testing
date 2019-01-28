@@ -238,29 +238,6 @@ class ObNewfiWholesale7019Controller < ApplicationController
         end
         # Adjustments
 
-        range1 = 102
-        range2 = 172
-        first_row = ''
-        end_row = ''
-        (range1..range2).each do |r|
-          (1..sheet_data.last_column).each do |cc|
-            value = sheet_data.cell(r,cc)
-            if value == "Rate Adjustments"
-              first_row = 105
-              end_row = 110
-              adjustment range1, range2, sheet_data, first_row, end_row,sheet
-            elsif value == "Cashout Rate Adjustments"
-              first_row = 113
-              end_row = 118
-              adjustment range1, range2, sheet_data, first_row, end_row,sheet
-            elsif value == "Additional Rate Adjustments"
-              first_row = 121
-              end_row = 128
-              adjustment range1, range2, sheet_data, first_row, end_row,sheet 
-            end
-          end
-        end
-        # adjustment range1, range2, sheet_data, first_row, end_row
       end
     end
     redirect_to programs_ob_newfi_wholesale7019_path(@sheet_obj)
@@ -329,6 +306,19 @@ class ObNewfiWholesale7019Controller < ApplicationController
             end
           end
         end
+
+        # Adjustments
+        (100..183).each do |r|
+          row = sheet_data.row(r)
+          if row.compact.count > 0
+            (0..19).each do |cc|
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                
+              end
+            end
+          end
+        end
       end
     end
     redirect_to programs_ob_newfi_wholesale7019_path(@sheet_obj)
@@ -341,6 +331,10 @@ class ObNewfiWholesale7019Controller < ApplicationController
       if (sheet == "SEQUOIA INVESTOR PRO")
         sheet_data = xlsx.sheet(sheet)
         @programs_ids = []
+        @adjustment_hash = {}
+        @other_adjustment = {}
+        primary_key = ''
+        secondary_key = ''
 
         #program
         (51..92).each do |r|
@@ -398,6 +392,72 @@ class ObNewfiWholesale7019Controller < ApplicationController
             end
           end
         end
+        (77..113).each do |r|
+          row = sheet_data.row(r)
+          @ltv_data = sheet_data.row(81)
+          if row.compact.count > 0
+            (0..12).each do |cc|
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "FICO x LTV"
+                  primary_key = "LoanType/FICO/LTV"
+                  @adjustment_hash[primary_key] = {}
+                end
+                # FICO x LTV
+                if r >= 82 && r <= 89 && cc == 5
+                  secondary_key = value
+                  @adjustment_hash[primary_key][secondary_key] = {}
+                end
+                if r >= 82 && r <= 89 && cc > 5 && cc <= 12
+                  ltv_key = "#{(@ltv_data[cc-3]*100)}%"
+                  @adjustment_hash[primary_key][secondary_key][ltv_key] = {}
+                  @adjustment_hash[primary_key][secondary_key][ltv_key] = value
+                end
+                # Other 
+                if r == 93 && cc == 5
+                  primary_key = "LoanType"
+                  @other_adjustment[primary_key] = {}
+                end
+                if r == 93 && cc > 5 && cc <= 12
+                  ltv_key = "#{(@ltv_data[cc-3]*100)}%"
+                  @other_adjustment[primary_key][ltv_key] = {}
+                  @other_adjustment[primary_key][ltv_key] = value
+                end
+                if r >=94 && r <= 98 && cc == 4
+                  primary_key = "LoanAmount"
+                  @other_adjustment[primary_key] = {}
+                end
+                if r >=94 && r <= 98 && cc == 5
+                  secondary_key = get_value value
+                  @other_adjustment[primary_key][secondary_key] = {}
+                end
+                if r >= 94 && r <= 98 && cc > 5 && cc <= 12
+                  ltv_key = "#{(@ltv_data[cc-3]*100)}%"
+                  @other_adjustment[primary_key][secondary_key][ltv_key] = {}
+                  @other_adjustment[primary_key][secondary_key][ltv_key] = value
+                end
+                if r >= 99 && r <= 105 && cc == 5
+                  primary_key = value
+                  @other_adjustment[primary_key] = {}
+                end
+                if r >= 99 && r <= 105 && cc > 5 && cc <= 12
+                  ltv_key = "#{(@ltv_data[cc-3]*100)}%"
+                  @other_adjustment[primary_key][ltv_key] = {}
+                  @other_adjustment[primary_key][ltv_key] = value
+                end
+                if r >= 110 && r <= 113 && cc == 4 
+                  primary_key = value
+                  @other_adjustment[primary_key] = {}
+                end
+                if r >= 110 && r <= 113 && cc == 5
+                  @other_adjustment[primary_key] = value
+                end 
+              end
+            end
+          end
+        end
+        adjustment = [@adjustment_hash,@other_adjustment]
+        make_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_ob_newfi_wholesale7019_path(@sheet_obj)
@@ -410,6 +470,11 @@ class ObNewfiWholesale7019Controller < ApplicationController
       if (sheet == "FHA BUYDOWN FIXED RATE PRODUCTS")
         sheet_data = xlsx.sheet(sheet)
         @programs_ids = []
+        @adjustment_hash = {}
+        @other_adjustment = {}
+        primary_key = ''
+        secondary_key = ''
+        ltv_key = ''
 
         #program
         (51..93).each do |r|
@@ -467,6 +532,56 @@ class ObNewfiWholesale7019Controller < ApplicationController
             end
           end
         end
+
+        # Adjustments
+        (101..120).each do |r|
+          row = sheet_data.row(r)
+          @ltv_data = sheet_data.row(104)
+          if row.compact.count >= 1
+            (0..19).each do |cc|
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "FICO - Loan Amount "
+                  primary_key = "LoanAmount/LTV/FICO"
+                  @adjustment_hash[primary_key] = {}
+                end
+                # FICO - Loan Amount 
+                if r >= 105 && r <= 110 && cc == 5
+                  secondary_key = value
+                  @adjustment_hash[primary_key][secondary_key] = {}
+                end
+                if r >= 105 && r <= 110 && cc > 5 && cc <= 8
+                  ltv_key = get_value @ltv_data[cc-1]
+                  @adjustment_hash[primary_key][secondary_key][ltv_key] = {}
+                  @adjustment_hash[primary_key][secondary_key][ltv_key] = value
+                end
+                # Other Adjustments
+                if r == 115 && cc == 14
+                  primary_key = "Escrow Waiver Fee"
+                  @other_adjustment[primary_key] = {}
+                  if @other_adjustment[primary_key] = {}
+                    cc = cc + 4
+                    new_value = sheet_data.cell(r,cc)
+                    @other_adjustment[primary_key] = new_value
+                  end
+                end
+                if r == 116 && cc == 14
+                  primary_key = "LoanAmount"
+                  secondary_key = "0<$150,000"
+                  @other_adjustment[primary_key] = {}
+                  @other_adjustment[primary_key][secondary_key] = {}
+                  if @other_adjustment[primary_key][secondary_key] = {}
+                    cc = cc + 4
+                    new_value = sheet_data.cell(r,cc)
+                    @other_adjustment[primary_key][secondary_key] = new_value
+                  end
+                end
+              end
+            end
+          end
+        end
+        adjustment = [@adjustment_hash,@other_adjustment]
+        make_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_ob_newfi_wholesale7019_path(@sheet_obj)
@@ -548,7 +663,16 @@ class ObNewfiWholesale7019Controller < ApplicationController
       if (sheet == "FANNIE MAE HOMEREADY PRODUCTS")
         sheet_data = xlsx.sheet(sheet)
         @programs_ids = []
-
+        @price_adjustment = {}
+        @family_adjustment = {}
+        @condo_adjustment = {}
+        @high_adjustment = {}
+        ltv_key = ''
+        secondary_key = ''
+        primary_key = ''
+        ltv_key1 = ''
+        secondary_key1 = ''
+        primary_key1 = ''
         #program
         (51..92).each do |r|
           row = sheet_data.row(r)
@@ -605,6 +729,73 @@ class ObNewfiWholesale7019Controller < ApplicationController
             end
           end
         end
+
+        # Adjustments
+        (101..128).each do |r|
+          row = sheet_data.row(r)
+          @ltv_data = sheet_data.row(104)
+          @cltv_data = sheet_data.row(114)
+          (0..16).each do |cc|
+            value = sheet_data.cell(r,cc)
+            if value.present?
+              if value == " Price Adjustments"
+                primary_key = "LoanType/LTV/FICO"
+                @price_adjustment[primary_key] = {}
+              end
+              if value == "Multi Family 2- 4 Unit LTV/FICO Adjusters"
+                primary_key = "2-4 Unit"
+                secondary_key = "FICO/LTV"
+                @family_adjustment[primary_key] = {}
+                @family_adjustment[primary_key][secondary_key] = {}
+              end
+              if value == "Condo LTV/FICO Adjusters"
+                primary_key1 = "Condo"
+                secondary_key1 = "LTV/FICO"
+                @condo_adjustment[primary_key1] = {}
+                @condo_adjustment[primary_key1][secondary_key1] = {}
+              end
+              if value == "HIGH BALANCE"
+                primary_key = "HighBalance"
+                secondary_key = "LTV/FICO"
+                @high_adjustment[primary_key] = {}
+              end
+              if r >= 105 && r <= 112 && cc == 7
+                secondary_key = value
+                @price_adjustment[primary_key][secondary_key] = {}
+              end
+              if r >= 105 && r <= 112 && cc > 7 && cc <= 112
+                ltv_key = @ltv_data[cc-1]
+                @price_adjustment[primary_key][secondary_key][ltv_key] = {}
+                @price_adjustment[primary_key][secondary_key][ltv_key] = value
+              end
+              # Multi Family 2- 4 Unit LTV/FICO Adjusters
+              if r >= 115 && r <= 122 && cc == 6
+                ltv_key = value
+                @family_adjustment[primary_key][secondary_key][ltv_key] = {}
+              end
+              if r >= 115 && r <= 122 && cc > 6 && cc <= 10
+                cltv_key = get_value @cltv_data[cc-1]
+                @family_adjustment[primary_key][secondary_key][ltv_key][cltv_key] = {}
+                @family_adjustment[primary_key][secondary_key][ltv_key][cltv_key] = value
+              end
+              # Condo LTV/FICO Adjusters
+              if r >= 115 && r <= 122 && cc == 12
+                ltv_key1 = value
+                @condo_adjustment[primary_key1][secondary_key1][ltv_key1] = {}
+              end
+              if r >= 115 && r <= 122 && cc > 12 && cc <= 16
+                cltv_key1 = get_value @cltv_data[cc-1]
+                @condo_adjustment[primary_key1][secondary_key1][ltv_key1][cltv_key1] = {}
+                @condo_adjustment[primary_key1][secondary_key1][ltv_key1][cltv_key1] = value
+              end
+              # HIGH BALANCE
+              if r >= 124 && r <= 126 && cc == 9
+              end
+            end
+          end
+        end
+        adjustment = [@price_adjustment,@family_adjustment,condo_adjustment]
+        make_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_ob_newfi_wholesale7019_path(@sheet_obj)
@@ -617,6 +808,14 @@ class ObNewfiWholesale7019Controller < ApplicationController
       if (sheet == "FNMA BUYDOWN PRODUCTS")
         sheet_data = xlsx.sheet(sheet)
         @programs_ids = []
+        range1 = 101
+        range2 = 131
+        @other_adjustment = {}
+        @secondary_hash = {}
+        primary_key = ''
+        ltv_key = ''
+        cltv_key = ''
+        ltv_data = ''
 
         #program
         (51..93).each do |r|
@@ -674,6 +873,81 @@ class ObNewfiWholesale7019Controller < ApplicationController
             end
           end
         end
+
+        # Adjustments
+        (range1..range2).each do |r|
+          @ltv_data = sheet_data.row(117)
+          (0..sheet_data.last_column).each do |cc|
+            value = sheet_data.cell(r,cc)
+            if value == "LTV / FICO (Terms > 15 years only)"
+              first_row = 105
+              end_row = 108
+              last_column = 13
+              first_column = 5
+              ltv_row = 104
+              ltv_adjustment range1, range2, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row
+            end
+            # Loans With Secondary Financing
+            if value == "Loans With Secondary Financing"
+              primary_key = "LTV/CLTV/FICO"
+              @secondary_hash[primary_key] = {}
+            end
+            if r >= 118 && r <= 122 && cc == 4
+              ltv_key = get_value value
+              @secondary_hash[primary_key][ltv_key] = {}
+            end
+            if r >= 118 && r <= 122 && cc == 5
+              cltv_key = get_value value
+              @secondary_hash[primary_key][ltv_key][cltv_key] = {}
+            end
+            if r >= 118 && r <= 122 && cc > 5 && cc <= 7
+              ltv_data = get_value @ltv_data[cc-1]
+              @secondary_hash[primary_key][ltv_key][cltv_key][ltv_data] = {}
+              @secondary_hash[primary_key][ltv_key][cltv_key][ltv_data] = value
+            end
+            # Other Adjustments
+            if r == 108 && cc == 15
+              primary_key = value
+              @other_adjustment[primary_key] = {}
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key] = new_value
+              end
+            end
+            if r == 109 && cc == 15
+              primary_key = "PropertyType/LTV/Term"
+              @other_adjustment[primary_key] = {}
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key] = new_value
+              end
+            end
+            if r == 110 && cc == 15
+              primary_key = "RefinanceOption/HighBalance"
+              @other_adjustment[primary_key] = {}
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key] = new_value
+              end
+            end
+            if r == 111 && cc == 15
+              primary_key = "PropertyType/HighBalance"
+              secondary_key = "0 < 75%"
+              @other_adjustment[primary_key] = {}
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = {}
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+          end
+        end
+        adjustment = [@secondary_hash,@other_adjustment]
+        make_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_ob_newfi_wholesale7019_path(@sheet_obj)
@@ -686,6 +960,15 @@ class ObNewfiWholesale7019Controller < ApplicationController
       if (sheet == "FNMA Conventional Fixed Rate")
         sheet_data = xlsx.sheet(sheet)
         @programs_ids = []
+        range1 = 137
+        range2 = 178
+        @cashout_hash = {}
+        @other_adjustment = {}
+        @secondary_hash = {}
+        primary_key = ''
+        ltv_key = ''
+        cltv_key = ''
+        ltv_data = ''
 
         #program
         (51..93).each do |r|
@@ -743,6 +1026,184 @@ class ObNewfiWholesale7019Controller < ApplicationController
             end
           end
         end
+
+        # Adjustments
+        (range1..range2).each do |r|
+          @ltv_data = sheet_data.row(153)
+          (0..sheet_data.last_column).each do |cc|
+            value = sheet_data.cell(r,cc)
+            if value == "LTV / FICO (Terms > 15 years only)"
+              first_row = 141
+              end_row = 147
+              last_column = 12
+              first_column = 4
+              ltv_row = 140
+              ltv_adjustment range1, range2, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row
+            end
+            if value == "Cash Out Refinance"
+              first_row = 154
+              end_row = 160
+              first_column = 4
+              last_column = 8
+              ltv_row = 153
+              ltv_adjustment range1, range2, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row
+            end
+
+            # Other Adjustments
+            if r == 141 && cc == 14
+              primary_key = "PropertyType/LTV"
+              secondary_key = "0<= 75"
+              @other_adjustment[primary_key] = {}
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = {}
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+
+            if r == 142 && cc == 14
+              secondary_key = "> 75 and <=80"
+              if @other_adjustment[primary_key].present?
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = {}
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+            if r == 143 && cc == 14
+              secondary_key = ">80"
+              if @other_adjustment[primary_key].present?
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = {}
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+            if r == 144 && cc == 14
+              primary_key = value
+              @other_adjustment[primary_key] = {}
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key] = new_value
+              end
+            end
+            if r == 145 && cc == 14
+              primary_key = "PropertyType/LTV/Term"
+              @other_adjustment[primary_key] = {}
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key] = new_value
+              end
+            end
+            if r == 146 && cc == 14
+              primary_key = "RefinanceOption/HighBalance"
+              @other_adjustment[primary_key] = {}
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key] = new_value
+              end
+            end
+            if r == 147 && cc == 14
+              primary_key = "PropertyType/HighBalance/LTV/CLTV"
+              secondary_key = "0 < 75%"
+              @other_adjustment[primary_key] = {}
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = {}
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+            if r == 166 && cc == 13
+              primary_key = "Escrow Waiver Fee"
+              @other_adjustment[primary_key] = {}
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 4
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key] = new_value
+              end
+            end
+            if r == 167 && cc == 13
+              primary_key = "Loan Amount"
+              secondary_key = "0< $150,000"
+              @other_adjustment[primary_key] = {}
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 4
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+            if r == 168 && cc == 13
+              secondary_key = "Non CA Conforming >= $250k "
+              if @other_adjustment[primary_key].present?
+                cc = cc + 4
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = {}
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+            if r == 169 && cc == 13
+              secondary_key = "Non CA Conforming >= $200k < $250k"
+              if @other_adjustment[primary_key].present?
+                cc = cc + 4
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = {}
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+            if r == 170 && cc == 13
+              primary_key = "FICO"
+              secondary_key =  "0 < 680"
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 4
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+            if r == 170 && cc == 13
+              primary_key = "Loan Amount"
+              secondary_key =  ">= $275k"
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 4
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+            if r == 170 && cc == 13
+              secondary_key =  ">= $200k < $275k"
+              if @other_adjustment[primary_key].present?
+                cc = cc + 4
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = {}
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+            # Loans With Secondary Financing
+            if value == "Loans With Secondary Financing"
+              primary_key = "LTV/CLTV/FICO"
+              @secondary_hash[primary_key] = {}
+            end
+            if r >= 154 && r <= 158 && cc == 12
+              ltv_key = get_value value
+              @secondary_hash[primary_key][ltv_key] = {}
+            end
+            if r >= 154 && r <= 158 && cc == 13
+              cltv_key = get_value value
+              @secondary_hash[primary_key][ltv_key][cltv_key] = {}
+            end
+            if r >= 154 && r <= 158 && cc > 13 && cc <= 15
+              ltv_data = get_value @ltv_data[cc-1]
+              @secondary_hash[primary_key][ltv_key][cltv_key][ltv_data] = {}
+              @secondary_hash[primary_key][ltv_key][cltv_key][ltv_data] = value
+            end
+          end
+        end
+        adjustment = [@secondary_hash,@other_adjustment]
+        make_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_ob_newfi_wholesale7019_path(@sheet_obj)
@@ -755,6 +1216,15 @@ class ObNewfiWholesale7019Controller < ApplicationController
       if (sheet == "FNMA Conventional High Balance")
         sheet_data = xlsx.sheet(sheet)
         @programs_ids = []
+        range1 = 137
+        range2 = 184
+        @cashout_hash = {}
+        @other_adjustment = {}
+        @secondary_hash = {}
+        primary_key = ''
+        ltv_key = ''
+        cltv_key = ''
+        ltv_data = ''
 
         #program
         (51..93).each do |r|
@@ -812,6 +1282,166 @@ class ObNewfiWholesale7019Controller < ApplicationController
             end
           end
         end
+
+        # Adjustments
+        (range1..range2).each do |r|
+          @ltv_data = sheet_data.row(153)
+          (0..sheet_data.last_column).each do |cc|
+            value = sheet_data.cell(r,cc)
+            if value == "LTV / FICO (Terms > 15 years only)"
+              first_row = 141
+              end_row = 147
+              last_column = 12
+              first_column = 4
+              ltv_row = 140
+              ltv_adjustment range1, range2, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row
+            end
+            if value == "Cash Out Refinance"
+              first_row = 154
+              end_row = 160
+              first_column = 4
+              last_column = 8
+              ltv_row = 153
+              ltv_adjustment range1, range2, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row
+            end
+
+            # Other Adjustments
+            if r == 141 && cc == 14
+              primary_key = "PropertyType/LTV"
+              secondary_key = "0<= 75"
+              @other_adjustment[primary_key] = {}
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = {}
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+
+            if r == 142 && cc == 14
+              secondary_key = "> 75 and <=80"
+              if @other_adjustment[primary_key].present?
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = {}
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+            if r == 143 && cc == 14
+              secondary_key = ">80"
+              if @other_adjustment[primary_key].present?
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = {}
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+            if r == 144 && cc == 14
+              primary_key = value
+              @other_adjustment[primary_key] = {}
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key] = new_value
+              end
+            end
+            if r == 145 && cc == 14
+              primary_key = "PropertyType/LTV/Term"
+              @other_adjustment[primary_key] = {}
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key] = new_value
+              end
+            end
+            if r == 146 && cc == 14
+              primary_key = "RefinanceOption/HighBalance"
+              @other_adjustment[primary_key] = {}
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key] = new_value
+              end
+            end
+            if r == 147 && cc == 14
+              primary_key = "PropertyType/HighBalance/LTV/CLTV"
+              secondary_key = "0 < 75%"
+              @other_adjustment[primary_key] = {}
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = {}
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+            if r == 166 && cc == 14
+              primary_key = "Escrow Waiver Fee"
+              @other_adjustment[primary_key] = {}
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key] = new_value
+              end
+            end
+            if r == 167 && cc == 14
+              primary_key = "Loan Amount"
+              secondary_key = "0< $150k"
+              @other_adjustment[primary_key] = {}
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+            if r == 168 && cc == 14
+              secondary_key = "Standard Conforming >= $300k "
+              if @other_adjustment[primary_key].present?
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = {}
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+            if r == 169 && cc == 14
+              secondary_key = "Non CA Conforming >= $200k < $300k"
+              if @other_adjustment[primary_key].present?
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = {}
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+            if r == 170 && cc == 14
+              primary_key = "FICO"
+              secondary_key =  "640-679"
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+            # Loans With Secondary Financing
+            if value == "Loans With Secondary Financing"
+              primary_key = "LTV/CLTV/FICO"
+              @secondary_hash[primary_key] = {}
+            end
+            if r >= 154 && r <= 158 && cc == 12
+              ltv_key = get_value value
+              @secondary_hash[primary_key][ltv_key] = {}
+            end
+            if r >= 154 && r <= 158 && cc == 13
+              cltv_key = get_value value
+              @secondary_hash[primary_key][ltv_key][cltv_key] = {}
+            end
+            if r >= 154 && r <= 158 && cc > 13 && cc <= 15
+              ltv_data = get_value @ltv_data[cc-1]
+              @secondary_hash[primary_key][ltv_key][cltv_key][ltv_data] = {}
+              @secondary_hash[primary_key][ltv_key][cltv_key][ltv_data] = value
+            end
+          end
+        end
+        adjustment = [@secondary_hash,@other_adjustment]
+        make_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_ob_newfi_wholesale7019_path(@sheet_obj)
@@ -924,8 +1554,8 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @other_adjustment[primary_key][secondary_key] = new_value
               end
             end
-            
-            if r = 142 && cc == 14
+
+            if r == 142 && cc == 14
               secondary_key = "> 75 and <=80"
               if @other_adjustment[primary_key].present?
                 cc = cc + 1
@@ -934,7 +1564,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @other_adjustment[primary_key][secondary_key] = new_value
               end
             end
-            if r = 143 && cc == 14
+            if r == 143 && cc == 14
               secondary_key = ">80"
               if @other_adjustment[primary_key].present?
                 cc = cc + 1
@@ -1010,21 +1640,66 @@ class ObNewfiWholesale7019Controller < ApplicationController
               end
             end
             if r == 165 && cc == 12
-              primary_key1 = "Escrow Waiver Fee"
-              @other_adjustment[primary_key1] = {}
-              if @other_adjustment[primary_key1] = {}
-                cc = cc + 1
+              primary_key = "Escrow Waiver Fee"
+              @other_adjustment[primary_key] = {}
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 4
                 new_value = sheet_data.cell(r,cc)
-                @other_adjustment[primary_key1] = new_value
+                @other_adjustment[primary_key] = new_value
               end
             end
             if r == 166 && cc == 12
-              primary_key1 = "Loan Amount 0< $150,000"
-              @other_adjustment[primary_key1] = {}
-              if @other_adjustment[primary_key1] = {}
-                cc = cc + 1
+              primary_key = "Loan Amount"
+              secondary_key = "0< $150,000"
+              @other_adjustment[primary_key] = {}
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 4
                 new_value = sheet_data.cell(r,cc)
-                @other_adjustment[primary_key1] = new_value
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+            if r == 167 && cc == 12
+              secondary_key = "CA Conforming >= $250k "
+              @other_adjustment[primary_key] = {}
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 4
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+            if r == 168 && cc == 12
+              secondary_key = "Non CA Conforming >= $200k < $250k"
+              @other_adjustment[primary_key] = {}
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 4
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+            if r == 169 && cc == 12
+              primary_key = "FICO"
+              secondary_key =  "0<680"
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 4
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+            if r == 170 && cc == 12
+              primary_key = "Loan Amount"
+              secondary_key =  ">= $275k"
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 4
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = new_value
+              end
+            end
+            if r == 170 && cc == 12
+              secondary_key =  ">= $275k"
+              if @other_adjustment[primary_key] = {}
+                cc = cc + 4
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment[primary_key][secondary_key] = new_value
               end
             end
 
@@ -1033,7 +1708,6 @@ class ObNewfiWholesale7019Controller < ApplicationController
               primary_key = "LTV/CLTV/FICO"
               @secondary_hash[primary_key] = {}
             end
-
             if r >= 155 && r <= 159 && cc == 12
               ltv_key = value
               @secondary_hash[primary_key][ltv_key] = {}
@@ -1049,7 +1723,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
             end
           end
         end
-        adjustment = [@secondary_hash,@other_adjustment,@other_adjustment]
+        adjustment = [@secondary_hash,@cashout_hash,@other_adjustment]
         make_adjust(adjustment,sheet)
       end
     end
@@ -1570,7 +2244,6 @@ class ObNewfiWholesale7019Controller < ApplicationController
             end
             if r == 150 && cc == 14
               secondary_key = "90.01% - 95%"
-              # debugger
               if @other_adjustment[primary_key].present?
                 cc = cc + 1
                 new_value = sheet_data.cell(r,cc)
@@ -1739,65 +2412,6 @@ class ObNewfiWholesale7019Controller < ApplicationController
         Adjustment.create(data: hash,sheet_name: sheet)
       end
     end
-
-    # def adjustment range1, range2, sheet_data, first_row, end_row, sheet
-    #   @adjustment_hash = {}
-    #   @cashout_adjustment = {}
-    #   @additional_adjustment = {}
-    #   primary_key = ''
-    #   primary_key1 = ''
-    #   primary_key2 = ''
-    #   ltv_key = ''
-    #   cltv_key = ''
-    #   (range1..range2).each do |r|
-    #     row = sheet_data.row(r)
-    #     @cltv_data = sheet_data.row(104)
-    #     (1..sheet_data.last_column).each do |cc|
-    #       value = sheet_data.cell(r,cc)
-    #       if value.present?
-    #         if value == "Rate Adjustments"
-    #           primary_key = "LoanType/FICO/CLTV"
-    #           @adjustment_hash[primary_key] = {}
-    #         end
-    #         if value == "Cashout Rate Adjustments"
-    #           primary_key1 = "RefinanceOption/FICO/LTV"
-    #           @cashout_adjustment[primary_key1] = {}
-    #         end
-    #         if value == "Additional Rate Adjustments"
-    #           primary_key2 = "Additional/FICO/LTV"
-    #           @additional_adjustment[primary_key2] = {}
-    #         end
-            
-    #         if r >= first_row && r <= end_row && cc == sheet_data.first_column
-    #           ltv_key = get_value value
-    #           @adjustment_hash[primary_key][ltv_key] = {}
-    #           if primary_key1.present?
-    #             @cashout_adjustment[primary_key1][ltv_key] = {}
-    #           end
-    #           if primary_key2.present?
-    #             @additional_adjustment[primary_key2][ltv_key] = {}
-    #           end
-    #         end
-    #         if r >= first_row && r <= end_row && cc > sheet_data.first_column && cc <= sheet_data.last_column
-    #           cltv_key = get_value @cltv_data[cc-3]
-    #           @adjustment_hash[primary_key][ltv_key][cltv_key] = {}
-    #           @adjustment_hash[primary_key][ltv_key][cltv_key] = value
-    #           if primary_key1.present?
-    #             @cashout_adjustment[primary_key1][ltv_key][cltv_key] = {}
-    #             @cashout_adjustment[primary_key1][ltv_key][cltv_key] = value
-    #           end
-    #           if primary_key2.present?
-    #             @additional_adjustment[primary_key2][ltv_key][cltv_key] = {}
-    #             @additional_adjustment[primary_key2][ltv_key][cltv_key] = value
-    #           end  
-    #         end
-    #       end
-    #     end
-    #   end
-    #   adjustment = [@adjustment_hash,@cashout_adjustment,@additional_adjustment]
-    #   make_adjust(adjustment,sheet)
-    #   # debugger
-    # end
 
     def ltv_adjustment range1, range2, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row
       @adjustment_hash = {}
