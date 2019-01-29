@@ -24,6 +24,23 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
     xlsx.sheets.each do |sheet|
       if (sheet == "RATESHEET")
         sheet_data = xlsx.sheet(sheet)
+        @cred_adjustment = {}
+        @spec_adjustment = {}
+        @spec_adjustment1 = {}
+        @spec_adjustment2 = {}
+        @home_adjustment = {}
+        @sub_ord_hash = {}
+        @sub_ord_hash1 = {}
+        @caps_adjustment = {}
+        @maximum_interest = {}
+        primary_key = ''
+        ltv_key = ''
+        cltv_key = ''
+        first_key = ''
+        secone_key = ''
+        c_val = ''
+        @ltv_data = []
+
         @programs_ids = []
         first_key = []
         @key_data = []
@@ -33,7 +50,11 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         range1 = 374
         range2 = 404
         range1_a = 782
-        range2_b = 799
+        range2_a = 799
+        range1_b = 1100
+        range2_b = 1199
+        range1_c = 1599
+        range2_c = 1614
 
         # # Agency Conforming Programs
         # (156..320).each do |r|
@@ -91,67 +112,110 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #   end
         # end
 
-        #PRICE ADJUSTMENTS: CONFORMING PROGRAMS //adjustment
+        # # PRICE ADJUSTMENTS: CONFORMING PROGRAMS //adjustment
         # (range1..range2).each do |r|
         #   (0..sheet_data.last_column).each do |cc|
         #     value = sheet_data.cell(r,cc)
-        #     # if value == "LOAN TERM > 15 YEARS"
-        #     #   first_row = 377
-        #     #   end_row = 384
-        #     #   last_column = 10
-        #     #   first_column = 2
-        #     #   ltv_row = 375
-        #     #   ltv_adjustment range1, range2, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row
-        #     # end
+        #     if value == "LOAN TERM > 15 YEARS"
+        #       primary_key = "LoanType/Term/LTV/FICO"
+        #       first_row = 377
+        #       end_row = 384
+        #       last_column = 10
+        #       first_column = 2
+        #       ltv_row = 375
+        #       ltv_adjustment range1, range2, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
+        #     end
 
-        #     # if value == "CASH OUT REFINANCE "
-        #     #   first_row = 389
-        #     #   end_row = 396
-        #     #   first_column = 2
-        #     #   last_column = 6
-        #     #   ltv_row = 387
-        #     #   ltv_adjustment range1, range2, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row
-        #     # end
+        #     if value == "CASH OUT REFINANCE "
+        #       primary_key = "LoanType/RefinanceOption/LTV"
+        #       first_row = 389
+        #       end_row = 396
+        #       first_column = 2
+        #       last_column = 6
+        #       ltv_row = 387
+        #       ltv_adjustment range1, range2, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row, primary_key
+        #     end
 
-        #     # if value == "ADDITIONAL LPMI ADJUSTMENTS"
-        #     #   first_row = 390
-        #     #   end_row = 393
-        #     #   first_column = 9
-        #     #   last_column = 12
-        #     #   ltv_row = 388
-        #     #   ltv_adjustment range1, range2, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row
-        #     # end
+        #     if value == "ADDITIONAL LPMI ADJUSTMENTS"
+        #       primary_key = "LPMI/RefinanceOption/FICO"
+        #       first_row = 390
+        #       end_row = 393
+        #       first_column = 9
+        #       last_column = 12
+        #       ltv_row = 388
+        #       ltv_adjustment range1, range2, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row, primary_key
+        #     end
 
-        #     # if value == "LPMI COVERAGE BASED ADJUSTMENTS"
-        #     #   first_row = 399
-        #     #   end_row = 404
-        #     #   first_column = 9
-        #     #   last_column = 12
-        #     #   ltv_row = 397
-        #     #   ltv_adjustment range1, range2, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row
-        #     # end
+        #     if value == "LPMI COVERAGE BASED ADJUSTMENTS"
+        #       primary_key = "LPMI/RefinanceOption/FICO"
+        #       first_row = 399
+        #       end_row = 404
+        #       first_column = 9
+        #       last_column = 12
+        #       ltv_row = 397
+        #       ltv_adjustment range1, range2, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row, primary_key
+        #     end
 
-        #     # if value == "LPMI COVERAGE BASED ADJUSTMENTS"
-        #     #   first_row = 399
-        #     #   end_row = 404
-        #     #   first_column = 9
-        #     #   last_column = 12
-        #     #   ltv_row = 397
-        #     #   ltv_adjustment range1, range2, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row
-        #     # end
 
-        #     # if value == "SUBORDINATE FINANCING" #not completed 2 more remaining adjustmest
-        #     #   first_row = 400
-        #     #   end_row = 404
-        #     #   first_column = 2
-        #     #   last_column = 7
-        #     #   ltv_row = 399
-        #     #   ltv_adjustment range1, range2, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row
-        #     # end
+        #     # # SUBORDINATE FINANCING
+        #       if value == "SUBORDINATE FINANCING"
+        #         @ltv_data = sheet_data.row(399)
+        #         first_key = "FinancingType/LTV/CLTV/FICO"
+        #         secone_key = "Subordinate Financing"
+        #         @sub_ord_hash[first_key] = {}
+        #         @sub_ord_hash[first_key][secone_key] = {}
+        #       end
+        #       if r >= 400 && r <= 404 && cc == 2
+        #         ltv_key = get_value value
+        #         cltv_key = sheet_data.cell(r,cc+2)
+        #         @sub_ord_hash[first_key][secone_key][ltv_key] = {}
+        #         @sub_ord_hash[first_key][secone_key][ltv_key][cltv_key] = {}
+        #       end
+        #       if r >= 400 && r <= 404 && cc >= 6 && cc <= 7
+        #         c_val = get_value @ltv_data[cc-2]
+        #         @sub_ord_hash[first_key][secone_key][ltv_key][cltv_key][c_val] = value
+        #       end
+        #     # # SUBORDINATE FINANCING end
+
+        #     # PROGRAM SPECIFIC ADJUSTMENTS
+        #     if value == "PROGRAM SPECIFIC ADJUSTMENTS"
+        #       primary_key = "LPMI/RefinanceOption/FICO"
+        #       @spec_adjustment[primary_key] = {}
+        #     end
+
+        #     if r >= 375 && r <= 391 && cc == 15
+        #       # if value.include?("Loan Amount")
+        #       #   value = value.include?("<") ? "0"+value.split("Loan Amount").last : value.split("Loan Amount").last
+        #       # elsif value.include?("Cashout")
+        #       #   value = "Cashout/Fico/ltv"
+        #       # elsif value.include?("Condo")
+        #       #   value = "Condo"
+        #       # else
+        #       #   value = get_value value
+        #       # end
+        #       c_val = sheet_data.cell(r,cc+5)
+        #       @spec_adjustment[primary_key][value] = c_val
+        #     end
+
+        #     if value == "FNMA HomeReady - Adjustment Caps"
+        #       primary_key = "LoanType/Term/LTV/FICO"
+        #       @home_adjustment[primary_key] = {}
+        #     end
+
+        #     if r >= 397 && r <= 398 && cc == 15
+        #       c_val = sheet_data.cell(r,cc+5)
+        #       @home_adjustment[primary_key] = {}
+        #       @home_adjustment[primary_key][value] = c_val
+        #     end
         #   end
         # end
 
-        # # FHLMC HOME Programs
+
+        # # NON-QM: R.E.A.L CREDIT ADVANTAGE - A adjustment
+        # range1_c = 2936
+        # range2_c = 3036
+
+        # # FHLMC HOME POSSIBLE / HOMEONE / SUPER CONFORMING Programs
         # (708..760).each do |r|
         #   row = sheet_data.row(r)
         #   if ((row.compact.count >= 1) && (row.compact.count <= 4))
@@ -207,21 +271,60 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #   end
         # end
 
-        ## PRICE ADJUSTMENTS: FHLMC HOME POSSIBLE / HOMEONE / SUPER CONFORMING //adjustment
-        (range1_a..range2_b).each do |r|
-          (0..sheet_data.last_column).each do |cc|
-            value = sheet_data.cell(r,cc)
+        # # PRICE ADJUSTMENTS: FHLMC HOME POSSIBLE / HOMEONE / SUPER CONFORMING //adjustment // 3 more adjustment remaining for this programs
+        # (range1_a..range2_a).each do |r|
+        #   (0..sheet_data.last_column).each do |cc|
+        #     value = sheet_data.cell(r,cc)
 
-            if value == "LOAN TERM > 15 YEARS"
-              first_row = 400
-              end_row = 404
-              first_column = 2
-              last_column = 7
-              ltv_row = 399
-              ltv_adjustment range1, range2, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row
-            end
-          end
-        end
+        #     if value == "LOAN TERM > 15 YEARS"
+        #       primary_key = "LoanType/Term/LTV/FICO"
+        #       first_row = 785
+        #       end_row = 791
+        #       first_column = 2
+        #       last_column = 11
+        #       ltv_row = 783
+        #       ltv_adjustment range1_a, range2_a, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row, primary_key
+        #     end
+
+        #     if value == "PROGRAM SPECIFIC ADJUSTMENTS"
+        #       primary_key = "LPMI/RefinanceOption/FICO"
+        #       @spec_adjustment1[primary_key] = {}
+        #     end
+
+        #     if r >= 783 && r <= 791 && cc == 15
+        #       c_val = sheet_data.cell(r,cc+5)
+        #       @spec_adjustment1[primary_key][value] = c_val
+        #     end
+
+        #     # # SUBORDINATE FINANCING
+        #     if value == "SUBORDINATE FINANCING  (Applicable to HomeOne)"
+        #       @ltv_data = sheet_data.row(794)
+        #       first_key = "FinancingType/LTV/CLTV/FICO"
+        #       secone_key = "Subordinate Financing"
+        #       @sub_ord_hash1[first_key] = {}
+        #       @sub_ord_hash1[first_key][secone_key] = {}
+        #     end
+        #     if r >= 795 && r <= 799 && cc == 15
+        #       ltv_key = get_value value
+        #       cltv_key = sheet_data.cell(r,cc+2)
+        #       @sub_ord_hash1[first_key][secone_key][ltv_key] = {}
+        #       @sub_ord_hash1[first_key][secone_key][ltv_key][cltv_key] = {}
+        #     end
+        #     if r >= 795 && r <= 799 && cc >= 19 && cc <= 20
+        #       c_val = get_value @ltv_data[cc-2]
+        #       @sub_ord_hash1[first_key][secone_key][ltv_key][cltv_key][c_val] = value
+        #     end
+        #     # # SUBORDINATE FINANCING end
+
+        #     #ADJUSTMENT CAPS (Applicable to Home Possible products) Not completed
+        #     if value == "ADJUSTMENT CAPS (Applicable to Home Possible products)"
+        #       primary_key = "LoanType/Term/LTV/FICO"
+        #       @caps_adjustment[primary_key] = {}
+        #     end
+        #     # ADJUSTMENT CAPS end
+
+        #   end
+        # end
 
         # #Non-Confirming: Sigma Programs
         # (1101..1179).each do |r|
@@ -279,7 +382,63 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #   end
         # end
 
-        # #Non-Confirming: JW
+        # #NON-CONFORMING: SIGMA QM PRIME JUMBO //adjustment
+        # (range1_b..range2_b).each do |r|
+        #   (0..sheet_data.last_column).each do |cc|
+        #     value = sheet_data.cell(r,cc)
+
+        #     # if value == "PRICE ADJUSTMENTS: <= $1,000,000"
+        #     #   primary_key = "0 <= $1,000,000"
+        #     #   first_row = 1185
+        #     #   end_row = 1189
+        #     #   first_column = 2
+        #     #   last_column = 7
+        #     #   ltv_row = 1183
+        #     #   ltv_adjustment range1_b, range2_b, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row, primary_key
+        #     # end
+        #     # if value == "PRICE ADJUSTMENTS: > $1,000,000 & <= $1,500,000"
+        #     #   primary_key = "$1,000,000"
+        #     #   first_row = 1185
+        #     #   end_row = 1189
+        #     #   first_column = 2
+        #     #   last_column = 12
+        #     #   ltv_row = 1183
+        #     #   ltv_adjustment range1_b, range2_b, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row, primary_key
+        #     # end
+
+        #     # if value == "PRICE ADJUSTMENTS: > $1,500,000 & <= $2,000,000"
+        #     #   primary_key = "$1,500,000"
+        #     #   first_row = 1195
+        #     #   end_row = 1198
+        #     #   first_column = 2
+        #     #   last_column = 7
+        #     #   ltv_row = 1193
+        #     #   ltv_adjustment range1_b, range2_b, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row, primary_key
+        #     # end
+        #     # if value == "PRICE ADJUSTMENTS: > $2,000,000 & <= $2,500,000"
+        #     #   primary_key = "$2,000,000"
+        #     #   first_row = 1195
+        #     #   end_row = 1198
+        #     #   first_column = 2
+        #     #   last_column = 12
+        #     #   ltv_row = 1193
+        #     #   ltv_adjustment range1_b, range2_b, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row, primary_key
+        #     # end
+
+
+        #     # if value == "PROGRAM SPECIFIC PRICE ADJUSTMENTS"
+        #     #   primary_key = "$1,000,000"
+        #     #   first_row = 1169
+        #     #   end_row = 1182
+        #     #   first_column = 14
+        #     #   last_column = 20
+        #     #   ltv_row = 1167
+        #     #   ltv_adjustment range1_b, range2_b, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row, primary_key
+        #     # end
+        #   end
+        # end
+
+        # #NON-CONFORMING: JW /Programs
         # (1386..1547).each do |r|
         #   row = sheet_data.row(r)
         #   if ((row.compact.count >= 1) && (row.compact.count <= 4))
@@ -335,8 +494,44 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #   end
         # end
 
-        # #Non-Confirming: Government Not Completed
-        # (2180..2278).each do |r|
+        # #NON-CONFORMING: JW /adjustment
+        # (range1_c..range2_c).each do |r|
+        #   (0..sheet_data.last_column).each do |cc|
+        #     value = sheet_data.cell(r,cc)
+        #     # if value == "ARM INFORMATION"  #Not done
+        #     #   primary_key = "LoanType/Term/LTV/FICO"
+        #     #   first_row = 377
+        #     #   end_row = 384
+        #     #   last_column = 10
+        #     #   first_column = 2
+        #     #   ltv_row = 375
+        #     #   ltv_adjustment range1, range2, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
+        #     # end
+
+        #     # if value == "PRICE ADJUSTMENTS"
+        #     #   primary_key = "LoanType/Term/LTV/FICO"
+        #     #   first_row = 1602
+        #     #   end_row = 1607
+        #     #   first_column = 7
+        #     #   last_column = 11
+        #     #   ltv_row = 1600
+        #     #   ltv_adjustment range1_c, range2_c, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row, primary_key
+        #     # end
+
+        #     # if value == "STATE SPECEFIC PRICE ADJUSTMENTS"
+        #     #   primary_key = "State"
+        #     #   first_row = 1601
+        #     #   end_row = 1610
+        #     #   first_column = 13
+        #     #   last_column = 20
+        #     #   ltv_row = 1600
+        #     #   ltv_adjustment range1_c, range2_c, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row, primary_key
+        #     # end
+        #   end
+        # end
+
+        # #GOVERNMENT PROGRAMS /programs
+        # (2180..2203).each do |r|
         #   row = sheet_data.row(r)
         #   if ((row.compact.count >= 1) && (row.compact.count <= 4))
         #     rr = r + 1
@@ -344,7 +539,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #     (0..max_column_section).each do |max_column|
         #       cc = 5*max_column + 2 # 2 / 7 / 12 / 17
         #       @title = sheet_data.cell(r,cc)
-        #       if @title.present? #&& @title != "PROGRAM SPECIFIC PRICE ADJUSTMENTS"
+        #       if @title.present? && @title != "Rate"
         #         @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
         #         program_property @program
         #         @programs_ids << @program.id
@@ -371,11 +566,10 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #               @block_hash[main_key][key] = {}
         #             else
         #               if @program.lock_period.length <= 3
-        #                 @program.lock_period << 15*c_i
+        #                 @program.lock_period << 15*(c_i+1)
         #                 @program.save
         #               end
-        #               # debugger if r > 2254 && cc > 7
-        #               @block_hash[main_key][key][15*c_i] = value
+        #               @block_hash[main_key][key][15*(c_i+1)] = value
         #             end
         #             @data << value
         #           end
@@ -391,6 +585,37 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #     end
         #   end
         # end
+
+        # #GOVERNMENT PROGRAMS /adjustment
+        (2255..2278).each do |r|
+          (0..sheet_data.last_column).each do |cc|
+            value = sheet_data.cell(r,cc)
+            if value == "PROGRAM SPECIFIC PRICE ADJUSTMENTS"
+              primary_key = "LPMI/RefinanceOption/FICO"
+              @spec_adjustment2[primary_key] = {}
+            end
+
+            if r >= 2256 && r <= 2271 && cc == 14
+              c_val = sheet_data.cell(r,cc+6)
+              @spec_adjustment2[primary_key][value] = c_val
+            end
+
+            if value == "Maximum Interest Rate allowed on USDA Product"
+              primary_key = "MaximumInterest"
+              @maximum_interest[primary_key] = {}
+            end
+
+            if r >= 2274 && cc == 12
+              c_val = sheet_data.cell(r,cc+2)
+              @maximum_interest[primary_key][value] = c_val
+            end
+
+            if value == "Program"
+
+            end
+          end
+        end
+
 
         # #NON-QM: SIGMA NO CREDIT EVENT PLUS Program // issue not done
         # (2624..2675).each do |r|
@@ -504,7 +729,6 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #   end
         # end
 
-
         # # NON-QM: R.E.A.L PRIME ADVANTAGE Programs done
         # (3237..3249).each do |r|
         #   row = sheet_data.row(r)
@@ -609,7 +833,6 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #           break # terminate the loop
         #         end
         #       end
-        #       debugger
         #       if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
         #         @block_hash.values.first.shift
         #       end
@@ -617,6 +840,41 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #     end
         #   end
         # end
+
+        # # NON-QM: R.E.A.L CREDIT ADVANTAGE - A //Adjustment
+        # (2936..3036).each do |r|
+          # row = sheet_data.row(r)
+          # @ltv_data = sheet_data.row(3004)
+          # if (row.compact.count >= 1)
+          #   (2..12).each do |max_column|
+          #     cc = max_column
+          #     value = sheet_data.cell(r,cc)
+          #     if value.present?
+          #       if value == "RATE ADJUSTMENTS"
+          #         first_key = "LTV/FICO"
+          #         @cred_adjustment[first_key] = {}
+          #       end
+
+          #       if r >=3004 && r <= 3013 && cc == 2
+          #         value = get_value value
+          #         @cred_adjustment[first_key][value] = {}
+          #         # ccc = cc + 3
+          #         # c_val = sheet_data.cell(r,ccc)
+          #         # @cred_adjustment[first_key][value] = c_val
+          #       end
+
+          #       if r >= 3004 && r <= 3013 && cc >= 5 && cc <= 12
+          #         cltv_key = @ltv_data[cc-2]
+          #         # cltv_key = get_value @ltv_data[cc-3]
+          #         # @cred_adjustment[first_key][ltv_key][cltv_key] = {}
+          #         # @conf_adjustment[first_key][ltv_key][cltv_key] = value
+          #       end
+
+          #     end
+          #   end
+          # end
+        # end
+
 
         # #NON-QM: R.E.A.L CREDIT ADVANTAGE - B, B-, C Program 15 Year Fixed error
         # (3089..3101).each do |r|
@@ -857,7 +1115,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
 
     def get_value value1
       if value1.present?
-        if value1.include?("FICO <")
+        if value1.include?("FICO <") || value1.include?("FICO >=")
           value1 = "0"+value1.split("FICO").last
         elsif value1.include?("<=") || value1.include?(">=")
           value1 = "0"+value1
@@ -967,37 +1225,34 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
       @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline)
     end
 
-    def ltv_adjustment range1, range2, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row
-     @adjustment_hash = {}
-     primary_key = ''
-     ltv_key = ''
-     cltv_key = ''
-     (range1..range2).each do |r|
-       row = sheet_data.row(r)
-       @ltv_data = sheet_data.row(ltv_row)
-       if row.compact.count >= 1
-         (0..last_column).each do |cc|
-           value = sheet_data.cell(r,cc)
-           if value.present?
-             if value == "LOAN TERM > 15 YEARS" #"CASH OUT REFINANCE " "ADDITIONAL LPMI ADJUSTMENTS" "LPMI COVERAGE BASED ADJUSTMENTS"
-               primary_key = "LoanType/Term/LTV/FICO"
-               @adjustment_hash[primary_key] = {}
-             end
-             if r >= first_row && r <= end_row && cc == first_column
-               ltv_key = value
-               @adjustment_hash[primary_key][ltv_key] = {}
-             end
-             if r >= first_row && r <= end_row && cc > first_column && cc <= last_column
-               cltv_key = get_value @ltv_data[cc-2]
-               @adjustment_hash[primary_key][ltv_key][cltv_key] = {}
-               @adjustment_hash[primary_key][ltv_key][cltv_key] = value
-             end
-           end
-         end
-       end
-     end
-     adjustment = [@adjustment_hash]
-     make_adjust(adjustment,sheet)
+    def ltv_adjustment range1, range2, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row, primary_key
+      @adjustment_hash = {}
+      @adjustment_hash[primary_key] = {}
+      # primary_key = ''
+      ltv_key = ''
+      cltv_key = ''
+      (range1..range2).each do |r|
+        row = sheet_data.row(r)
+        @ltv_data = sheet_data.row(ltv_row)
+        if row.compact.count >= 1
+          (0..last_column).each do |cc|
+            value = sheet_data.cell(r,cc)
+            if value.present?
+              if r >= first_row && r <= end_row && cc == first_column
+                ltv_key = value
+                @adjustment_hash[primary_key][ltv_key] = {}
+              end
+              if r >= first_row && r <= end_row && cc > first_column && cc <= last_column
+                cltv_key = get_value @ltv_data[cc-2]
+                @adjustment_hash[primary_key][ltv_key][cltv_key] = {}
+                @adjustment_hash[primary_key][ltv_key][cltv_key] = value
+              end
+            end
+          end
+        end
+      end
+      adjustment = [@adjustment_hash]
+      make_adjust(adjustment,sheet)
     end
 
     def make_adjust(block_hash, sheet)
