@@ -104,6 +104,9 @@ Rails.application.routes.draw do
       get :programs
       get :single_program
       get :conv
+      get :govt
+      get :govt_arms
+      get '/non-conf' => 'ob_united_wholesale_mortgage4892#non_conf'
     end
   end
 
