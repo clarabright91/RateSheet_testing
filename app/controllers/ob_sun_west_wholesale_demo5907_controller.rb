@@ -28,16 +28,23 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         @spec_adjustment = {}
         @spec_adjustment1 = {}
         @spec_adjustment2 = {}
+        @spec_adjustment3 = {}
+        @spec_adjustment4 = {}
+        @spec_adjustment5 = {}
+        @spec_adjustment6 = {}
+        @spec_adjustment7 = {}
         @home_adjustment = {}
         @sub_ord_hash = {}
         @sub_ord_hash1 = {}
         @caps_adjustment = {}
         @maximum_interest = {}
+        @gov_adustment = {}
+        @day_adjustment = {}
         primary_key = ''
         ltv_key = ''
         cltv_key = ''
         first_key = ''
-        secone_key = ''
+        second_key = ''
         c_val = ''
         @ltv_data = []
 
@@ -55,6 +62,14 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         range2_b = 1199
         range1_c = 1599
         range2_c = 1614
+        range1_d = 2434
+        range2_d = 2544
+        range1_e = 2624
+        range2_e = 2738
+        range1_f = 2791
+        range2_f = 2885
+        range1_g = 2936
+        range2_g = 3036
 
         # # Agency Conforming Programs
         # (156..320).each do |r|
@@ -161,19 +176,19 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #       if value == "SUBORDINATE FINANCING"
         #         @ltv_data = sheet_data.row(399)
         #         first_key = "FinancingType/LTV/CLTV/FICO"
-        #         secone_key = "Subordinate Financing"
+        #         second_key = "Subordinate Financing"
         #         @sub_ord_hash[first_key] = {}
-        #         @sub_ord_hash[first_key][secone_key] = {}
+        #         @sub_ord_hash[first_key][second_key] = {}
         #       end
         #       if r >= 400 && r <= 404 && cc == 2
         #         ltv_key = get_value value
         #         cltv_key = sheet_data.cell(r,cc+2)
-        #         @sub_ord_hash[first_key][secone_key][ltv_key] = {}
-        #         @sub_ord_hash[first_key][secone_key][ltv_key][cltv_key] = {}
+        #         @sub_ord_hash[first_key][second_key][ltv_key] = {}
+        #         @sub_ord_hash[first_key][second_key][ltv_key][cltv_key] = {}
         #       end
         #       if r >= 400 && r <= 404 && cc >= 6 && cc <= 7
         #         c_val = get_value @ltv_data[cc-2]
-        #         @sub_ord_hash[first_key][secone_key][ltv_key][cltv_key][c_val] = value
+        #         @sub_ord_hash[first_key][second_key][ltv_key][cltv_key][c_val] = value
         #       end
         #     # # SUBORDINATE FINANCING end
 
@@ -209,11 +224,6 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #     end
         #   end
         # end
-
-
-        # # NON-QM: R.E.A.L CREDIT ADVANTAGE - A adjustment
-        # range1_c = 2936
-        # range2_c = 3036
 
         # # FHLMC HOME POSSIBLE / HOMEONE / SUPER CONFORMING Programs
         # (708..760).each do |r|
@@ -300,19 +310,19 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #     if value == "SUBORDINATE FINANCING  (Applicable to HomeOne)"
         #       @ltv_data = sheet_data.row(794)
         #       first_key = "FinancingType/LTV/CLTV/FICO"
-        #       secone_key = "Subordinate Financing"
+        #       second_key = "Subordinate Financing"
         #       @sub_ord_hash1[first_key] = {}
-        #       @sub_ord_hash1[first_key][secone_key] = {}
+        #       @sub_ord_hash1[first_key][second_key] = {}
         #     end
         #     if r >= 795 && r <= 799 && cc == 15
         #       ltv_key = get_value value
         #       cltv_key = sheet_data.cell(r,cc+2)
-        #       @sub_ord_hash1[first_key][secone_key][ltv_key] = {}
-        #       @sub_ord_hash1[first_key][secone_key][ltv_key][cltv_key] = {}
+        #       @sub_ord_hash1[first_key][second_key][ltv_key] = {}
+        #       @sub_ord_hash1[first_key][second_key][ltv_key][cltv_key] = {}
         #     end
         #     if r >= 795 && r <= 799 && cc >= 19 && cc <= 20
         #       c_val = get_value @ltv_data[cc-2]
-        #       @sub_ord_hash1[first_key][secone_key][ltv_key][cltv_key][c_val] = value
+        #       @sub_ord_hash1[first_key][second_key][ltv_key][cltv_key][c_val] = value
         #     end
         #     # # SUBORDINATE FINANCING end
 
@@ -586,295 +596,418 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #   end
         # end
 
-        # #GOVERNMENT PROGRAMS /adjustment
-        (2255..2278).each do |r|
-          (0..sheet_data.last_column).each do |cc|
-            value = sheet_data.cell(r,cc)
-            if value == "PROGRAM SPECIFIC PRICE ADJUSTMENTS"
-              primary_key = "LPMI/RefinanceOption/FICO"
-              @spec_adjustment2[primary_key] = {}
-            end
+        # # #GOVERNMENT PROGRAMS /adjustments
+        # (2255..2278).each do |r|
+        #   @ltv_data = sheet_data.row(2274)
+        #   (0..sheet_data.last_column).each do |cc|
+        #     value = sheet_data.cell(r,cc)
+        #     if value == "PROGRAM SPECIFIC PRICE ADJUSTMENTS"
+        #       primary_key = "LPMI/RefinanceOption/FICO"
+        #       @spec_adjustment2[primary_key] = {}
+        #     end
 
-            if r >= 2256 && r <= 2271 && cc == 14
-              c_val = sheet_data.cell(r,cc+6)
-              @spec_adjustment2[primary_key][value] = c_val
-            end
+        #     if r >= 2256 && r <= 2271 && cc == 14
+        #       c_val = sheet_data.cell(r,cc+6)
+        #       @spec_adjustment2[primary_key][value] = c_val
+        #     end
 
-            if value == "Maximum Interest Rate allowed on USDA Product"
-              primary_key = "MaximumInterest"
-              @maximum_interest[primary_key] = {}
-            end
+        #     if value == "Maximum Interest Rate allowed on USDA Product"
+        #       primary_key = "MaximumInterest"
+        #       @maximum_interest[primary_key] = {}
+        #     end
 
-            if r >= 2274 && cc == 12
-              c_val = sheet_data.cell(r,cc+2)
-              @maximum_interest[primary_key][value] = c_val
-            end
+        #     if r >= 2274 && cc == 12
+        #       c_val = sheet_data.cell(r,cc+2)
+        #       @maximum_interest[primary_key][value] = c_val
+        #     end
 
-            if value == "Program"
+        #     if value == "Program"
+        #       primary_key = "RateType/LoanType"
+        #       @gov_adustment[primary_key] = {}
+        #     end
 
-            end
-          end
-        end
+        #     if r >= 2275 && r <= 2278 && cc == 16
+        #       ltv_key = get_value value
+        #       @gov_adustment[primary_key][ltv_key] = {}
+        #     end
 
+        #     if r >= 2275 && r <= 2278 && cc >= 19 && cc <= 20
+        #       c_val = get_value @ltv_data[cc-2]
+        #       @gov_adustment[primary_key][ltv_key][c_val] = value
+        #     end
+        #   end
+        # end
 
-        # #NON-QM: SIGMA NO CREDIT EVENT PLUS Program // issue not done
+        #HECM / REVERSE MORTGAGE Not done
+
+        # #NON-QM: SIGMA SEASONED CREDIT EVENT, SIGMA RECENT CREDIT EVENT /program done
+        # (2434..2477).each do |r|
+        #   row = sheet_data.row(r)
+        #   if ((row.compact.count >= 1) && (row.compact.count <= 7))
+        #     rr = r + 1
+        #     max_column_section = row.compact.count - 1
+        #     (0..max_column_section).each do |max_column|
+        #       cc = 3*max_column + 2 # 2 / 5 / 8 / 11 / 14
+        #       @title = sheet_data.cell(r,cc)
+        #       if @title.present? && (cc <= 8) && @title.class == String && @title != "N/A"
+        #         @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+        #         program_property @program
+        #         @programs_ids << @program.id
+        #         @program.adjustments.destroy_all
+        #         @block_hash = {}
+        #         key = ''
+        #         (1..50).each do |max_row|
+        #           @data = []
+        #           (0..2).each_with_index do |index, c_i|
+        #             rrr = rr + max_row
+        #             ccc = cc + c_i
+        #             value = sheet_data.cell(rrr,ccc)
+        #             if value.present?
+        #               if (c_i == 0)
+        #                 key = value
+        #                 @block_hash[key] = {}
+        #               else
+        #                 @block_hash[key][30] = value
+        #               end
+        #               @data << value
+        #             end
+        #           end
+        #           if @data.compact.reject { |c| c.blank? }.length == 0
+        #             break # terminate the loop
+        #           end
+        #         end
+        #         @program.update(base_rate: @block_hash)
+        #       end
+        #     end
+        #   end
+        # end
+
+        # #NON-QM: SIGMA SEASONED CREDIT EVENT, SIGMA RECENT CREDIT EVENT /adjustments
+        # (range1_d..range2_d).each do |r|
+        #   @ltv_data = sheet_data.row(2535)
+        #   (0..sheet_data.last_column).each do |cc|
+        #     value = sheet_data.cell(r,cc)
+        #     # if value == "ARM INFORMATION"
+        #     #   primary_key = "LoanType/Term/LTV/FICO"
+        #     #   first_row = 2436
+        #     #   end_row = 2439
+        #     #   first_column = 11
+        #     #   last_column = 13
+        #     #   ltv_row = 2435
+        #     #   ltv_adjustment range1_d, range2_d, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
+        #     # end
+
+        #     # if value == "PROGRAM SPECIFIC PRICE ADJUSTMENTS"
+        #     #   primary_key = "LoanType/Term/LTV/FICO"
+        #     #   first_row = 2448
+        #     #   end_row = 2464
+        #     #   first_column = 11
+        #     #   last_column = 20
+        #     #   ltv_row = 2446
+        #     #   ltv_adjustment range1_d, range2_d, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
+        #     # end
+
+        #     # if value == "SEASONED CREDIT EVENT"
+        #     #   primary_key = "LoanType/Term/LTV/FICO"
+        #     #   @spec_adjustment3[primary_key] = {}
+        #     # end
+
+        #     # if r >= 2537 && r <= 2544 && cc == 4
+        #     #   ltv_key = get_value value
+        #     #   @spec_adjustment3[primary_key][ltv_key] = {}
+        #     # end
+
+        #     # if r >= 2537 && r <= 2544 && cc >= 5 && cc <= 11
+        #     #   c_val = get_value @ltv_data[cc-2]
+        #     #   @spec_adjustment3[primary_key][ltv_key][c_val] = value
+        #     # end
+
+        #     # if value == " RECENT CREDIT EVENT"
+        #     #   primary_key = "LoanType/Term/LTV/FICO"
+        #     #   @spec_adjustment4[primary_key] = {}
+        #     # end
+
+        #     # if r >= 2537 && r <= 2544 && cc == 4
+        #     #   ltv_key = get_value value
+        #     #   @spec_adjustment4[primary_key][ltv_key] = {}
+        #     # end
+
+        #     # if r >= 2537 && r <= 2544 && cc >= 12 && cc <= 18
+        #     #   c_val = get_value @ltv_data[cc-2]
+        #     #   @spec_adjustment4[primary_key][ltv_key][c_val] = value
+        #     # end
+        #   end
+        # end
+
+        # #NON-QM: SIGMA NO CREDIT EVENT PLUS /Program done
         # (2624..2675).each do |r|
         #   row = sheet_data.row(r)
         #   if ((row.compact.count >= 1) && (row.compact.count <= 7))
         #     rr = r + 1
         #     max_column_section = row.compact.count - 1
         #     (0..max_column_section).each do |max_column|
-        #       cc = 3*max_column + 2 # 2 / 5 / 8 / 11 / 14
+        #       cc = 3*max_column + 2 # 2 / 5 / 8
         #       @title = sheet_data.cell(r,cc)
-        #       if @title.present? && @title != "ARM INFORMATION"
+        #       if @title.present? && (cc <= 8) && @title.class == String && @title != "N/A"
         #         @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
         #         program_property @program
         #         @programs_ids << @program.id
-        #       end
-
-        #       @program.adjustments.destroy_all
-        #       @block_hash = {}
-        #       key = ''
-        #       if @program.term.present?
-        #         main_key = "Term/LoanType/InterestRate/LockPeriod"
-        #       else
-        #         main_key = "InterestRate/LockPeriod"
-        #       end
-        #       @block_hash[main_key] = {}
-        #       (1..50).each do |max_row|
-        #         @data = []
-        #         (0..2).each_with_index do |index, c_i|
-        #           rrr = rr + max_row
-        #           ccc = cc + c_i
-        #           value = sheet_data.cell(rrr,ccc)
-        #           if value.present?
-        #             if (c_i == 0)
-        #               key = value
-        #               @block_hash[main_key][key] = {}
-        #             else
-        #               if @program.lock_period.length <= 3
-        #                 @program.lock_period << 15*(c_i+1)
-        #                 @program.save
+        #         @program.adjustments.destroy_all
+        #         @block_hash = {}
+        #         key = ''
+        #         (1..50).each do |max_row|
+        #           @data = []
+        #           (0..2).each_with_index do |index, c_i|
+        #             rrr = rr + max_row
+        #             ccc = cc + c_i
+        #             value = sheet_data.cell(rrr,ccc)
+        #             if value.present?
+        #               if (c_i == 0)
+        #                 key = value
+        #                 @block_hash[key] = {}
+        #               else
+        #                 @block_hash[key][30] = value
         #               end
-        #               @block_hash[main_key][key][15*(c_i+1)] = value
+        #               @data << value
         #             end
-        #             @data << value
+        #           end
+        #           if @data.compact.reject { |c| c.blank? }.length == 0
+        #             break # terminate the loop
         #           end
         #         end
-        #         if @data.compact.reject { |c| c.blank? }.length == 0
-        #           break # terminate the loop
-        #         end
+        #         @program.update(base_rate: @block_hash)
         #       end
-        #       if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-        #         @block_hash.values.first.shift
-        #       end
-        #       @program.update(base_rate: @block_hash)
         #     end
         #   end
         # end
 
-        # # NON-QM: SIGMA SEASONED CREDIT EVENT, SIGMA RECENT CREDIT EVENT Programs ankit
-        # (2434..2477).each do |r|
-        #   row = sheet_data.row(r)
-        #   if ((row.compact.count >= 1))
-        #     rr = r + 1
-        #     (0..9).each do |max_column|
-        #       cc = 3*max_column + 2 # 2 / 5 / 8 / 11 / 14
-        #       @title = sheet_data.cell(r,cc)
+        # #NON-QM: SIGMA NO CREDIT EVENT PLUS /Adjustments 3 adjustments skip
+        # (range1_e..range2_e).each do |r|
+        #   @ltv_data = sheet_data.row(2730)
+        #   (0..sheet_data.last_column).each do |cc|
+        #     value = sheet_data.cell(r,cc)
+        #     if value == "ARM INFORMATION"
+        #       primary_key = "LoanType/Term/LTV/FICO"
+        #       first_row = 2626
+        #       end_row = 2629
+        #       first_column = 11
+        #       last_column = 13
+        #       ltv_row = 2625
+        #       ltv_adjustment range1_e, range2_e, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
+        #     end
 
-        #       if @title.present? && @title != "Rate" && cc <= 8 && @title.class != Float
-        #         @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-        #         program_property @program
-        #         @programs_ids << @program.id
-        #       end
+        #     if value == "PROGRAM SPECIFIC PRICE ADJUSTMENTS "
+        #       primary_key = "LoanType/Term/LTV/FICO"
+        #       first_row = 2638
+        #       end_row = 2652
+        #       first_column = 13
+        #       last_column = 20
+        #       ltv_row = 2636
+        #       ltv_adjustment range1_e, range2_e, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
+        #     end
 
-        #       @program.adjustments.destroy_all
-        #       @block_hash = {}
-        #       key = ''
-        #       if @program.term.present?
-        #         main_key = "Term/LoanType/InterestRate/LockPeriod"
-        #       else
-        #         main_key = "InterestRate/LockPeriod"
-        #       end
-        #       @block_hash[main_key] = {}
-        #       (1..50).each do |max_row|
-        #         @data = []
-        #         (0..2).each_with_index do |index, c_i|
-        #           rrr = rr + max_row
-        #           ccc = cc + c_i
-        #           value = sheet_data.cell(rrr,ccc)
-        #           if value.present?
-        #             if (c_i == 0)
-        #               key = value
-        #               @block_hash[main_key][key] = {}
-        #             else
-        #               if @program.lock_period.length <= 3
-        #                 @program.lock_period << 15*(c_i+1)
-        #                 @program.save
-        #               end
-        #               @block_hash[main_key][key][15*(c_i+1)] = value
-        #             end
-        #             @data << value
-        #           end
-        #         end
-        #         if @data.compact.reject { |c| c.blank? }.length == 0
-        #           break # terminate the loop
-        #         end
-        #       end
-        #       if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-        #         @block_hash.values.first.shift
-        #       end
-        #       @program.update(base_rate: @block_hash)
+        #     if value == "FULL DOCUMENTATION / ASSET UTILIZATION"
+        #       primary_key = "LoanType/Term/LTV/FICO"
+        #       @spec_adjustment5[primary_key] = {}
+        #     end
+
+        #     if r >= 2732 && r <= 2738 && cc == 2
+        #       ltv_key = get_value value
+        #       @spec_adjustment5[primary_key][ltv_key] = {}
+        #     end
+
+        #     if r >= 2732 && r <= 2738 && cc >= 3 && cc <= 11
+        #       c_val = get_value @ltv_data[cc-2]
+        #       @spec_adjustment5[primary_key][ltv_key][c_val] = value
+        #     end
+
+        #     if value == "BANK STATEMENT DOCUMENTION / EXPRESS DOCUMENTION"
+        #       primary_key = "LoanType/Term/LTV/FICO"
+        #       @spec_adjustment6[primary_key] = {}
+        #     end
+
+        #     if r >= 2732 && r <= 2738 && cc == 2
+        #       ltv_key = get_value value
+        #       @spec_adjustment6[primary_key][ltv_key] = {}
+        #     end
+
+        #     if r >= 2732 && r <= 2738 && cc >= 12 && cc <= 20
+        #       c_val = get_value @ltv_data[cc-2]
+        #       @spec_adjustment6[primary_key][ltv_key][c_val] = value
         #     end
         #   end
         # end
 
         # # NON-QM: R.E.A.L PRIME ADVANTAGE Programs done
-        # (3237..3249).each do |r|
+        # (2791..2803).each do |r|
         #   row = sheet_data.row(r)
-        #   if ((row.compact.count >= 1) && (row.compact.count <= 4))
+        #   if ((row.compact.count >= 1) && (row.compact.count <= 7))
         #     rr = r + 1
         #     max_column_section = row.compact.count - 1
         #     (0..max_column_section).each do |max_column|
-        #       cc = 3*max_column + 2 # 2 / 5 / 8 / 11 / 14
+        #       cc = 3*max_column + 2 # 2 / 5 / 8
         #       @title = sheet_data.cell(r,cc)
-        #       if @title.present? && @title != "MAXIMUM PRICE"
+        #       if @title.present? && (cc <= 12) && @title.class == String #&& @title != "N/A"
         #         @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
         #         program_property @program
         #         @programs_ids << @program.id
-        #       end
-
-        #       @program.adjustments.destroy_all
-        #       @block_hash = {}
-        #       key = ''
-        #       if @program.term.present?
-        #         main_key = "Term/LoanType/InterestRate/LockPeriod"
-        #       else
-        #         main_key = "InterestRate/LockPeriod"
-        #       end
-        #       @block_hash[main_key] = {}
-        #       (1..50).each do |max_row|
-        #         @data = []
-        #         (0..2).each_with_index do |index, c_i|
-        #           rrr = rr + max_row
-        #           ccc = cc + c_i
-        #           value = sheet_data.cell(rrr,ccc)
-        #           if value.present?
-        #             if (c_i == 0)
-        #               key = value
-        #               @block_hash[main_key][key] = {}
-        #             else
-        #               if @program.lock_period.length <= 3
-        #                 @program.lock_period << 15*(c_i+1)
-        #                 @program.save
+        #         @program.adjustments.destroy_all
+        #         @block_hash = {}
+        #         key = ''
+        #         (1..50).each do |max_row|
+        #           @data = []
+        #           (0..2).each_with_index do |index, c_i|
+        #             rrr = rr + max_row
+        #             ccc = cc + c_i
+        #             value = sheet_data.cell(rrr,ccc)
+        #             if value.present?
+        #               if (c_i == 0)
+        #                 key = value
+        #                 @block_hash[key] = {}
+        #               else
+        #                 @block_hash[key][30] = value
         #               end
-        #               @block_hash[main_key][key][15*(c_i+1)] = value
+        #               @data << value
         #             end
-        #             @data << value
+        #           end
+        #           if @data.compact.reject { |c| c.blank? }.length == 0
+        #             break # terminate the loop
         #           end
         #         end
-        #         if @data.compact.reject { |c| c.blank? }.length == 0
-        #           break # terminate the loop
-        #         end
+        #         @program.update(base_rate: @block_hash)
         #       end
-        #       if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-        #         @block_hash.values.first.shift
-        #       end
-        #       @program.update(base_rate: @block_hash)
         #     end
         #   end
         # end
 
-        # #NON-QM: R.E.A.L CREDIT ADVANTAGE - A Program // issue not done
+        # #NON-QM: R.E.A.L PRIME ADVANTAGE /Adjustment Done
+        # (range1_f..range2_f).each do |r|
+        #   @ltv_data = sheet_data.row(2730)
+        #   (0..sheet_data.last_column).each do |cc|
+        #     value = sheet_data.cell(r,cc)
+        #     # if value == "ARM INFORMATION"
+        #     #   primary_key = "LoanType/Term/LTV/FICO"
+        #     #   first_row = 2799
+        #     #   end_row = 2802
+        #     #   first_column = 18
+        #     #   last_column = 20
+        #     #   ltv_row = 2798
+        #     #   ltv_adjustment range1_f, range2_f, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
+        #     # end
+
+        #     # if value == "PROGRAM SPECIFIC RATE ADJUSTMENTS"
+        #     #   primary_key = "LoanType / RateLock"
+        #     #   @spec_adjustment7[primary_key] = {}
+        #     # end
+
+        #     # if r >= 2858 && r <= 2884 && cc == 16
+        #     #   c_val = sheet_data.cell(r,cc+4)
+        #     #   @spec_adjustment7[primary_key][value] = c_val
+        #     # end
+
+        #     # if value == "FICO"
+        #     #   primary_key = "LoanType/LTV/FICO"
+        #     #   first_row = 2859
+        #     #   end_row = 2865
+        #     #   first_column = 2
+        #     #   last_column = 12
+        #     #   ltv_row = 2856
+        #     #   ltv_adjustment range1_f, range2_f, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
+        #     # end
+
+        #     # if value == "LOAN AMOUNT"
+        #     #   primary_key = "LoanType/LoanAmount/FICO"
+        #     #   first_row = 2867
+        #     #   end_row = 2874
+        #     #   first_column = 2
+        #     #   last_column = 12
+        #     #   ltv_row = 2856
+        #     #   ltv_adjustment range1_f, range2_f, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
+        #     # end
+
+        #     # if value == "DOC TYPE" skip
+        #     #   remaining
+        #     # end
+
+        #     # if value == "45 Day Lock (Price Adjustment)"
+        #     #   primary_key = "RateType/LoanType/RateLock"
+        #     #   c_val = sheet_data.cell(2855,20)
+        #     #   @day_adjustment[primary_key] = {}
+        #     #   @day_adjustment[primary_key][value] = c_val
+        #     #   debugger
+        #     # end
+        #   end
+        # end
+
+        # # NON-QM: R.E.A.L CREDIT ADVANTAGE - A /Program Done
         # (2936..2948).each do |r|
         #   row = sheet_data.row(r)
         #   if ((row.compact.count >= 1) && (row.compact.count <= 7))
         #     rr = r + 1
         #     max_column_section = row.compact.count - 1
         #     (0..max_column_section).each do |max_column|
-        #       cc = 3*max_column + 2 # 2 / 5 / 8 / 11 / 14
+        #       cc = 3*max_column + 2 # 2 / 5 / 8
         #       @title = sheet_data.cell(r,cc)
-        #       if @title.present? && @title != "Rate" && @title != "MAXIMUM PRICE" && @title != "LOAN AMOUNT"
+        #       if @title.present? && (cc <= 12) && @title.class == String #&& @title != "N/A"
         #         @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
         #         program_property @program
         #         @programs_ids << @program.id
-        #       end
-
-        #       @program.adjustments.destroy_all
-        #       @block_hash = {}
-        #       key = ''
-        #       if @program.term.present?
-        #         main_key = "Term/LoanType/InterestRate/LockPeriod"
-        #       else
-        #         main_key = "InterestRate/LockPeriod"
-        #       end
-        #       @block_hash[main_key] = {}
-        #       (1..50).each do |max_row|
-        #         @data = []
-        #         (0..2).each_with_index do |index, c_i|
-        #           rrr = rr + max_row
-        #           ccc = cc + c_i
-        #           value = sheet_data.cell(rrr,ccc)
-        #           if value.present?
-        #             if (c_i == 0)
-        #               key = value
-        #               @block_hash[main_key][key] = {}
-        #             else
-        #               if @program.lock_period.length <= 3
-        #                 @program.lock_period << 15*(c_i+1)
-        #                 @program.save
+        #         @program.adjustments.destroy_all
+        #         @block_hash = {}
+        #         key = ''
+        #         (1..50).each do |max_row|
+        #           @data = []
+        #           (0..2).each_with_index do |index, c_i|
+        #             rrr = rr + max_row
+        #             ccc = cc + c_i
+        #             value = sheet_data.cell(rrr,ccc)
+        #             if value.present?
+        #               if (c_i == 0)
+        #                 key = value
+        #                 @block_hash[key] = {}
+        #               else
+        #                 @block_hash[key][30] = value
         #               end
-        #               @block_hash[main_key][key][15*(c_i+1)] = value
+        #               @data << value
         #             end
-        #             @data << value
+        #           end
+        #           if @data.compact.reject { |c| c.blank? }.length == 0
+        #             break # terminate the loop
         #           end
         #         end
-        #         if @data.compact.reject { |c| c.blank? }.length == 0
-        #           break # terminate the loop
-        #         end
+        #         @program.update(base_rate: @block_hash)
         #       end
-        #       if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-        #         @block_hash.values.first.shift
-        #       end
-        #       @program.update(base_rate: @block_hash)
         #     end
         #   end
         # end
 
-        # # NON-QM: R.E.A.L CREDIT ADVANTAGE - A //Adjustment
-        # (2936..3036).each do |r|
-          # row = sheet_data.row(r)
-          # @ltv_data = sheet_data.row(3004)
-          # if (row.compact.count >= 1)
-          #   (2..12).each do |max_column|
-          #     cc = max_column
-          #     value = sheet_data.cell(r,cc)
-          #     if value.present?
-          #       if value == "RATE ADJUSTMENTS"
-          #         first_key = "LTV/FICO"
-          #         @cred_adjustment[first_key] = {}
-          #       end
 
-          #       if r >=3004 && r <= 3013 && cc == 2
-          #         value = get_value value
-          #         @cred_adjustment[first_key][value] = {}
-          #         # ccc = cc + 3
-          #         # c_val = sheet_data.cell(r,ccc)
-          #         # @cred_adjustment[first_key][value] = c_val
-          #       end
+        # NON-QM: R.E.A.L CREDIT ADVANTAGE - A //Adjustment/ not finished
+        (range1_g..range2_g).each do |r|
+          # @ltv_data = sheet_data.row(2943)
+          (0..sheet_data.last_column).each do |cc|
+            value = sheet_data.cell(r,cc)
+            if value == "ARM INFORMATION"
+              primary_key = "LoanType/Term/LTV/FICO"
+              first_row = 2944
+              end_row = 2947
+              first_column = 18
+              last_column = 20
+              ltv_row = 2947
+              ltv_adjustment range1_g, range2_g, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
+            end
 
-          #       if r >= 3004 && r <= 3013 && cc >= 5 && cc <= 12
-          #         cltv_key = @ltv_data[cc-2]
-          #         # cltv_key = get_value @ltv_data[cc-3]
-          #         # @cred_adjustment[first_key][ltv_key][cltv_key] = {}
-          #         # @conf_adjustment[first_key][ltv_key][cltv_key] = value
-          #       end
-
-          #     end
-          #   end
-          # end
-        # end
-
+            if value == "FICO"
+              primary_key = "LoanType/LTV/FICO"
+              first_row = 3004
+              end_row = 3013
+              first_column = 2
+              last_column = 12
+              ltv_row = 3001
+              ltv_adjustment range1_g, range2_g, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
+            end
+          end
+        end
 
         # #NON-QM: R.E.A.L CREDIT ADVANTAGE - B, B-, C Program 15 Year Fixed error
         # (3089..3101).each do |r|
@@ -1044,7 +1177,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #   end
         # end
 
-        #  # NON-QM: R.E.A.L DSC RATIO Programs
+        # # NON-QM: R.E.A.L DSC RATIO Programs
         # (3433..3445).each do |r|
         #   row = sheet_data.row(r)
         #   if ((row.compact.count >= 1) && (row.compact.count <= 7))
