@@ -150,7 +150,6 @@ class ImportFilesController < ApplicationController
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              main_key = ''
               if @program.fha
                 gov_key = "FHA"
               elsif @program.va
@@ -164,12 +163,7 @@ class ImportFilesController < ApplicationController
               if @program.loan_type.present?
                 loan_type = @program.loan_type
               end
-              if @program.term.present?
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
+              
               (1..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -179,13 +173,13 @@ class ImportFilesController < ApplicationController
                   if value.present?
                     if (c_i == 0)
                       key = value
-                      @block_hash[main_key][key] = {}
+                      @block_hash[key] = {}
                     else
                       if @program.lock_period.length <= 3
                         @program.lock_period << 15*c_i
                         @program.save
                       end
-                      @block_hash[main_key][key][15*c_i] = value
+                      @block_hash[key][15*c_i] = value
                     end
                     @data << value
                   end
@@ -210,7 +204,7 @@ class ImportFilesController < ApplicationController
                   rr = adj_row
                   cc = 5
                   @credit_hash = {}
-                  main_key = "Credit Score"
+                  main_key = "LoanType/FICO/LTV"
                   @credit_hash[main_key] = {}
                   @right_adj = {}
                   (0..9).each do |max_row|
@@ -235,7 +229,6 @@ class ImportFilesController < ApplicationController
                       @credit_hash[main_key][key] = value
                       @right_adj[right_adj_key] = right_adj_value
                     end
-
                   end
                   make_adjust(@credit_hash, @programs_ids)
                   make_adjust(@right_adj, @programs_ids)
@@ -248,7 +241,7 @@ class ImportFilesController < ApplicationController
                   rr = adj_row
                   cc = 5
                   @loan_size = {}
-                  main_key = "Loan Size / Loan Type"
+                  main_key = "LoanPurpose/LoanAmount/LTV"
                   @loan_size[main_key] = {}
                   @loan_size[main_key]["Purchase"] = {}
                   @loan_size[main_key]["Refinance"] = {}
@@ -282,7 +275,7 @@ class ImportFilesController < ApplicationController
                   rr = adj_row
                   cc = 5
                   @loan_size_va_bpc = {}
-                  main_key = "Loan Size / Loan Type / VA BPC"
+                  main_key = "VA/LoanPurpose/LoanAmount/LTV"
                   @loan_size_va_bpc[main_key] = {}
                   @loan_size_va_bpc[main_key]["Purchase"] = {}
                   @loan_size_va_bpc[main_key]["Refinance"] = {}
@@ -6961,7 +6954,7 @@ class ImportFilesController < ApplicationController
 
   def make_adjust(block_hash, p_ids)
     begin
-      adjustment = Adjustment.create(data: block_hash.to_json)
+      adjustment = Adjustment.create(data: block_hash)
 
       # assign for all projects
       p_ids.each do |id|
