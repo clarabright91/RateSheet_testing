@@ -1,10 +1,23 @@
 # require "google_drive"
 
+# setup drive access
+# drive = GoogleDrive::Session.from_config("config.json")
+# check folder exists or not 
+# folder_exist = false
+# drive.folders.each do |folder|
+# 	folder_exist = true if folder.title.eql?("Uploaded files")
+# end
+
+# create folder on drive
+# unless folder_exist
+# 	drive.root_collection.create_subcollection("Uploaded files")
+# end
+
 # Creates a session. This will prompt the credential via command line for the
 # first time and save it to config.json file for later usages.
 # See this document to learn how to create config.json:
 # https://github.com/gimite/google-drive-ruby/blob/master/doc/authorization.md
-# new_session = GoogleDrive::Session.from_config("config.json")
+
 # session = GoogleDrive::Session.from_config("config.json")
 # create folder
 # folder  = session.root_collection.create_subcollection("Uploaded files")
