@@ -12,6 +12,7 @@
 # unless folder_exist
 # 	drive.root_collection.create_subcollection("Uploaded files")
 # end
+
 # require "google_drive"
 
 # Creates a session. This will prompt the credential via command line for the
