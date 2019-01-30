@@ -14,7 +14,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
         end
         @sheet = @bank.sheets.find_or_create_by(name: sheet)
       end
-    rescue
+    rescue  
       # the required headers are not all present
     end
   end
@@ -256,6 +256,51 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
       end
       @program.save
       @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline)
+    end
+
+    def create_program_association_with_adjustment(sheet)
+      adjustment_list = Adjustment.where(sheet_name: sheet)
+      adjustment_list.each_with_index do |adj_ment, index|
+        key_list = adj_ment.data.keys.first.split("/")
+        program_filter1={}
+        program_filter2={}
+
+        if key_list.present?
+          key_list.each_with_index do |key_name, key_index|
+            if key_name == "LoanType" || key_name == "Term"
+              program_filter1[key_name.underscore] = nil
+            end
+
+            if key_name == "FICO"
+            end
+
+            if key_name == "LTV"
+            end
+
+            if key_name == "LoanAmount"
+            end
+
+            if key_name == "FinancingType"
+            end
+
+            if key_name == "CashOut"
+            end
+          end
+
+          program_list1 = Program.where.not(program_filter1)
+          program_list2 = program_list1.where(program_filter2)
+
+          if program_list2.present?
+            program_list2.each do |program|
+              program.adjustments.destroy_all
+            end
+
+            program_list2.each do |program|
+              program.adjustments << adj_ment
+            end
+          end
+        end
+      end
     end
 end
 
