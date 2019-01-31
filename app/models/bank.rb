@@ -1,5 +1,6 @@
 class Bank < ApplicationRecord
   has_many :programs
+  has_many :sheets
 
   SHEET_LINKS = []
 	SHEET_LINKS << "https://www.loansifter.com/DownloadFile.aspx?RateSheetID=8570"
