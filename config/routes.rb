@@ -96,6 +96,18 @@ Rails.application.routes.draw do
     member do
       get :programs
       get :conforming_standard
+      get :conforming_high_balance
+      get '/fha-va-usda' => 'ob_home_point_financial_wholesale11098#fha_va_usda'
+      get :fha_203k
+      get :homestyle
+      get :durp
+      get :lpoa
+      get :err
+      get :hlr
+      get :homeready
+      get :homepossible
+      get :jumbo_select
+      get :jumbo_choice
       get :single_program
     end
   end
