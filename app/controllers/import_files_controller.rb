@@ -5,7 +5,7 @@ class ImportFilesController < ApplicationController
 
   def index
     @banks = Bank.all
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     @sheetlist =[]
     begin
@@ -46,7 +46,7 @@ class ImportFilesController < ApplicationController
 
   def import_government_sheet
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Government")
@@ -315,7 +315,7 @@ class ImportFilesController < ApplicationController
   def import_freddie_fixed_rate
     @program_ids = []
     @allAdjustments = {}
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Freddie Fixed Rate")
@@ -697,7 +697,7 @@ class ImportFilesController < ApplicationController
   def import_conforming_fixed_rate
     program_ids = []
     @allAdjustments = {}
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Conforming Fixed Rate")
@@ -1063,7 +1063,7 @@ class ImportFilesController < ApplicationController
   def home_possible
     @program_ids = []
     @allAdjustments = {}
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Home Possible")
@@ -1444,7 +1444,7 @@ class ImportFilesController < ApplicationController
   end
 
   def lp_open_acces_arms
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     @programs_ids = []
     xlsx.sheets.each do |sheet|
@@ -1718,7 +1718,7 @@ class ImportFilesController < ApplicationController
   end
 
   def lp_open_access_105
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     @programs_ids = []
     xlsx.sheets.each do |sheet|
@@ -2020,7 +2020,7 @@ class ImportFilesController < ApplicationController
     previous_key = nil
     previous_element = nil
     @all_data = {}
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     @programs_ids =[]
     xlsx.sheets.each do |sheet|
@@ -2585,7 +2585,7 @@ class ImportFilesController < ApplicationController
   end
 
   def lp_open_access
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     @programs_ids = []
     xlsx.sheets.each do |sheet|
@@ -2874,7 +2874,7 @@ class ImportFilesController < ApplicationController
   end
 
   def jumbo_series_f
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Jumbo Series_F")
@@ -3318,7 +3318,7 @@ class ImportFilesController < ApplicationController
   end
 
   def du_refi_plus_arms
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     @programs_ids = []
     xlsx.sheets.each do |sheet|
@@ -3584,7 +3584,7 @@ class ImportFilesController < ApplicationController
 
   def jumbo_series_h
     @program_ids = []
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Jumbo Series_H")
@@ -3895,7 +3895,7 @@ class ImportFilesController < ApplicationController
 
   def du_refi_plus_fixed_rate_105
     @program_ids = []
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Du Refi Plus Fixed Rate_105")
@@ -4346,7 +4346,7 @@ class ImportFilesController < ApplicationController
   end
 
   def jumbo_series_i
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     @programs_ids = []
     xlsx.sheets.each do |sheet|
@@ -4547,7 +4547,7 @@ class ImportFilesController < ApplicationController
   end
 
   def du_refi_plus_fixed_rate
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     @programs_ids = []
     xlsx.sheets.each do |sheet|
@@ -4808,7 +4808,7 @@ class ImportFilesController < ApplicationController
   end
 
   def jumbo_series_jqm
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     @programs_ids = []
     xlsx.sheets.each do |sheet|
@@ -5070,7 +5070,7 @@ class ImportFilesController < ApplicationController
   end
 
   def dream_big
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     @programs_ids = []
     xlsx.sheets.each do |sheet|
@@ -5305,7 +5305,7 @@ class ImportFilesController < ApplicationController
   end
 
   def high_balance_extra
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     @programs_ids = []
     xlsx.sheets.each do |sheet|
@@ -5505,7 +5505,7 @@ class ImportFilesController < ApplicationController
   def freddie_arms
     @program_ids = []
     @allAdjustments = {}
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Freddie ARMs")
@@ -5859,7 +5859,7 @@ class ImportFilesController < ApplicationController
   def conforming_arms
     @program_ids = []
     @allAdjustments = {}
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Conforming ARMs")
@@ -5868,7 +5868,7 @@ class ImportFilesController < ApplicationController
 
         (1..47).each do |r|
           row = sheet_data.row(r)
-          if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet"))
+          if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet")) || row.compact.include?("Fannie Mae 10-1 ARM (5-2-5) High Balance")
             # r == 7 / 35 / 55
             rr = r + 1 # (r == 8) / (r == 36) / (r == 56)
             max_column_section = row.compact.count - 1
@@ -6204,8 +6204,8 @@ class ImportFilesController < ApplicationController
   def import_homereddy_sheet
     program_ids = []
     @allAdjustments = {}
-    # xlsx = Roo::Spreadsheet.open("/home/yuva/Desktop/ratesheet/RateSheetExtractor/OB_New_Penn_Financial_Wholesale5806 (1).xls")
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    # xlsx = Roo::Spreadsheet.open("/home/yuva/Desktop/ratesheet/RateSheetExtractor/OB_NewRez_Wholesale5806 (1).xls")
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "HomeReady")
@@ -6569,7 +6569,7 @@ class ImportFilesController < ApplicationController
   def import_HomeReadyhb_sheet
     program_ids = []
     @allAdjustments = {}
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "HomeReady HB")
