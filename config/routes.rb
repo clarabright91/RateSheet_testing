@@ -126,6 +126,7 @@ Rails.application.routes.draw do
       get :va_irrrl_pricing_govy_llpas
       get :na_jumbo_pricing_llpas
       get :du_lp_llpas
+      get :durp_lp_relief_llpas
     end
   end
 
@@ -134,6 +135,16 @@ Rails.application.routes.draw do
       get :programs
       get :single_program
       get :conventional
+      get :conven_highbalance_30
+      get :gov_highbalance_30
+      get :government_30_15_yr
+      get :arm_programs
+      get '/fnma_du-refi_plus' => 'ob_union_home_mortgage_wholesale1711#fnma_du_refi_plus'
+      get :fhlmc_open_access
+      get :fnma_home_ready
+      get :fhlmc_home_possible
+      get :simple_access
+      get :jumbo_fixed
     end
   end
 

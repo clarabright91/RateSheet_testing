@@ -1,6 +1,6 @@
 class ObQuickenLoans3571Controller < ApplicationController
-	before_action :get_sheet, only: [:programs, :ws_du_lp_pricing, :durp_lp_relief_pricing, :fha_usda_full_doc_pricing, :fha_streamline_pricing, :va_full_doc_pricing, :va_irrrl_pricing_govy_llpas, :na_jumbo_pricing_llpas, :du_lp_llpas]
-  before_action :read_sheet, only: [:index,:ws_du_lp_pricing, :durp_lp_relief_pricing, :fha_usda_full_doc_pricing, :fha_streamline_pricing, :va_full_doc_pricing, :va_irrrl_pricing_govy_llpas, :na_jumbo_pricing_llpas, :du_lp_llpas]
+	before_action :get_sheet, only: [:programs, :ws_du_lp_pricing, :durp_lp_relief_pricing, :fha_usda_full_doc_pricing, :fha_streamline_pricing, :va_full_doc_pricing, :va_irrrl_pricing_govy_llpas, :na_jumbo_pricing_llpas, :du_lp_llpas, :durp_lp_relief_llpas]
+  before_action :read_sheet, only: [:index,:ws_du_lp_pricing, :durp_lp_relief_pricing, :fha_usda_full_doc_pricing, :fha_streamline_pricing, :va_full_doc_pricing, :va_irrrl_pricing_govy_llpas, :na_jumbo_pricing_llpas, :du_lp_llpas, :durp_lp_relief_llpas]
   before_action :get_program, only: [:single_program, :program_property]
 
 	def index
@@ -277,6 +277,10 @@ class ObQuickenLoans3571Controller < ApplicationController
       if (sheet == "VA IRRRL Pricing & Govy LLPAs")
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
+        @adjustment_hash = {}
+        @government_hash = {}
+        primary_key1 = ''
+        secondary_key = ''
         # programs
         (13..66).each do |r|
           row = sheet_data.row(r)
@@ -318,6 +322,104 @@ class ObQuickenLoans3571Controller < ApplicationController
             end
           end
         end
+        (75..93).each do |r|
+        	row = sheet_data.row(r)
+        	(0..29).each do |cc|
+        		value = sheet_data.cell(r,cc)
+        		if value.present?
+        			if value == "Government FICO Adjusters"
+        				primary_key1 = "LoanType/FICO"
+        				@government_hash[primary_key1] = {}
+        			end
+        			if r == 76 && cc == 5
+        				primary_key = "LockDay"
+        				@adjustment_hash[primary_key] = {}
+        				if @adjustment_hash[primary_key] = {}
+        					cc = cc +10
+        					new_value = sheet_data.cell(r,cc)
+        					@adjustment_hash[primary_key] = new_value
+        				end
+        			end
+        			# Loan Ladder
+        			if r >= 88 && r <= 91 && cc == 5
+        				primary_key = get_value value
+        				@adjustment_hash[primary_key] = {}
+        				if @adjustment_hash[primary_key] = {}
+        					cc = cc + 10
+        					new_value = sheet_data.cell(r,cc)
+        					@adjustment_hash[primary_key] = new_value
+        				end
+        			end
+        			# Government FICO Adjusters
+        			if r >= 76 && r <= 79 && cc == 19
+        				secondary_key = get_value value
+        				@government_hash[primary_key1][secondary_key] = {}
+        				if @government_hash[primary_key1][secondary_key] = {}
+        					cc = cc + 10
+        					new_value = sheet_data.cell(r,cc)
+        					@government_hash[primary_key1][secondary_key] = new_value
+        				end
+        			end
+        			# Geography
+        			if r == 82 && cc == 19
+        				primary_key1 = "NJ"
+        				@government_hash[primary_key1] = {}
+        				if @government_hash[primary_key1] = {}
+        					cc = cc + 10
+        					new_value = sheet_data.cell(r,cc)
+        					@government_hash[primary_key1] = new_value
+        				end
+        			end
+        			if r == 83 && cc == 19
+        				primary_key1 = "NY"
+        				@government_hash[primary_key1] = {}
+        				if @government_hash[primary_key1] = {}
+        					cc = cc + 10
+        					new_value = sheet_data.cell(r,cc)
+        					@government_hash[primary_key1] = new_value
+        				end
+        			end
+        			if r == 86 && cc == 19
+        				primary_key1 = "VA/LoanPurpose/>=95%"
+        				@government_hash[primary_key1] = {}
+        				if @government_hash[primary_key1] = {}
+        					cc = cc + 10
+        					new_value = sheet_data.cell(r,cc)
+        					@government_hash[primary_key1] = new_value
+        				end
+        			end
+        			if r == 87 && cc == 19
+        				primary_key1 = "VA/RefinanceOption/>90%"
+        				@government_hash[primary_key1] = {}
+        				if @government_hash[primary_key1] = {}
+        					cc = cc + 10
+        					new_value = sheet_data.cell(r,cc)
+        					@government_hash[primary_key1] = new_value
+        				end
+        			end
+        			if r == 88 && cc == 19
+        				primary_key1 = "19 for 19 through 19th"
+        				@government_hash[primary_key1] = {}
+        				if @government_hash[primary_key1] = {}
+        					cc = cc + 10
+        					new_value = sheet_data.cell(r,cc)
+        					@government_hash[primary_key1] = new_value
+        				end
+        			end
+        			if r == 88 && cc == 19
+        				primary_key1 = "VA/>100%"
+        				@government_hash[primary_key1] = {}
+        				if @government_hash[primary_key1] = {}
+        					cc = cc + 10
+        					new_value = sheet_data.cell(r,cc)
+        					@government_hash[primary_key1] = new_value
+        				end
+        			end
+        		end
+        	end
+        end
+        adjustment = [@adjustment_hash,@government_hash]
+        make_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_ob_quicken_loans3571_path(@sheet_obj)
@@ -373,6 +475,7 @@ class ObQuickenLoans3571Controller < ApplicationController
     end
     redirect_to programs_ob_quicken_loans3571_path(@sheet_obj)
   end
+
   def du_lp_llpas
   	@xlsx.sheets.each do |sheet|
       if (sheet == "DU & LP LLPAs")
@@ -380,9 +483,13 @@ class ObQuickenLoans3571Controller < ApplicationController
         @adjustment_hash = {}
         @subordinate_hash = {}
         @property_hash = {}
+        @cashout_hash = {}
         primary_key = ''
+        primary_key1 = ''
+        secondary_key1 = ''
         secondary_key = ''
         ltv_key = ''
+        ltv_key1 = ''
         cltv_key = ''
         new_key = ''
         # Adjustments
@@ -409,6 +516,10 @@ class ObQuickenLoans3571Controller < ApplicationController
         				if value == "Home Possible & Home Ready Adjustment Caps"
         					primary_key = "Caps/FICO/LTV"
         					@property_hash[primary_key] = {}
+        				end
+        				if value == "Cash Out"
+        					primary_key1 = "RefinanceOption/FICO/LTV"
+        					@cashout_hash[primary_key1] = {}
         				end
         				
         				# DU & LP LTV/FICO; Terms > 15 Years, Including ARMs
@@ -451,6 +562,16 @@ class ObQuickenLoans3571Controller < ApplicationController
         					ltv_key = get_value @cltv_data[cc-1]
         					@subordinate_hash[primary_key][secondary_key][ltv_key] = {}
         					@subordinate_hash[primary_key][secondary_key][ltv_key] = value
+        				end
+        				# Cash Out
+        				if r >= 39 && r <= 45 && cc == 13
+        					secondary_key1 = get_value value
+        					@cashout_hash[primary_key1][secondary_key1] = {}
+        				end
+        				if r >= 39 && r <= 45 && cc >= 15 && cc <= 21
+        					ltv_key1 = get_value @cltv_data[cc-1]
+        					@cashout_hash[primary_key1][secondary_key1][ltv_key1] = {}
+        					@cashout_hash[primary_key1][secondary_key1][ltv_key1] = value
         				end
         				if r >= 50 && r <= 51 && cc == 3
         					secondary_key = value.split("Property").first
@@ -525,6 +646,200 @@ class ObQuickenLoans3571Controller < ApplicationController
         		end
         	end
         end
+        adjustment = [@adjustment_hash,@subordinate_hash,@property_hash,@cashout_hash]
+        make_adjust(adjustment,sheet)
+      end
+    end
+    redirect_to programs_ob_quicken_loans3571_path(@sheet_obj)
+  end
+
+  def durp_lp_relief_llpas
+  	@xlsx.sheets.each do |sheet|
+      if (sheet == "DURP & LP Relief LLPAs")
+        sheet_data = @xlsx.sheet(sheet)
+        @adjustment_hash = {}
+        @subordinate_hash = {}
+        @property_hash = {}
+        @cashout_hash = {}
+        primary_key = ''
+        primary_key1 = ''
+        secondary_key1 = ''
+        secondary_key = ''
+        ltv_key = ''
+        ltv_key1 = ''
+        cltv_key = ''
+        new_key = ''
+        # Adjustments
+        (29..79).each do |r|
+        	row = sheet_data.row(r)
+        	@ltv_data = sheet_data.row(30)
+        	@cltv_data = sheet_data.row(50)
+        	if row.compact.count
+        		(0..25).each do |cc|
+        			value = sheet_data.cell(r,cc)
+        			if value.present?
+        				if value == "DURP LTV/FICO; Terms > 15 Years, Including ARMs"
+									primary_key = "Durp/LoanType/Term/FICO/LTV"
+									@adjustment_hash[primary_key] = {}
+        				end
+        				if value == "LP Relief LTV/FICO; Terms > 15 Years, Including ARMs"
+									primary_key = "LP/LoanType/Term/FICO/LTV"
+									@adjustment_hash[primary_key] = {}
+        				end
+        				if value == "Subordinate Financing"
+        					primary_key = "FinancingType/LTV/CLTV/FICO"
+        					@subordinate_hash[primary_key] = {}
+        				end
+        				if value == "Multiple Unit Property"
+        					primary_key = "PropertyType/LTV"
+        					@property_hash[primary_key] = {}
+        				end
+        				# if value == "Home Possible & Home Ready Adjustment Caps"
+        				# 	primary_key = "Caps/FICO/LTV"
+        				# 	@property_hash[primary_key] = {}
+        				# end
+        				# if value == "Cash Out"
+        				# 	primary_key1 = "RefinanceOption/FICO/LTV"
+        				# 	@cashout_hash[primary_key1] = {}
+        				# end
+        				
+        				# DURP LTV/FICO; Terms > 15 Years, Including ARMs
+        				if r >= 31 && r <= 37 && cc == 3
+        					secondary_key = get_value value
+        					@adjustment_hash[primary_key][secondary_key] = {}
+        				end
+        				if r >= 31 && r <= 37 && cc >= 5 && cc <= 25
+        					ltv_key = get_value @ltv_data[cc-1]
+        					@adjustment_hash[primary_key][secondary_key][ltv_key] = {}
+        					@adjustment_hash[primary_key][secondary_key][ltv_key] = value
+        				end
+        				# LP Relief LTV/FICO; Terms > 15 Years, Including ARMs
+        				if r >= 41 && r <= 47 && cc == 3
+        					secondary_key = get_value value
+        					@adjustment_hash[primary_key][secondary_key] = {}
+        				end
+        				if r >= 41 && r <= 47 && cc >= 5 && cc <= 25
+        					ltv_key = get_value @ltv_data[cc-1]
+        					@adjustment_hash[primary_key][secondary_key][ltv_key] = {}
+        					@adjustment_hash[primary_key][secondary_key][ltv_key] = value
+        				end
+        				# Subordinate Financing
+        				if r >= 51 && r <= 53 && cc == 3
+        					new_key = "DU"
+        					@subordinate_hash[primary_key][new_key] = {}
+        				end
+        				if r >= 54 && r <= 59 && cc == 3
+        					new_key = "LP"
+        					@subordinate_hash[primary_key][new_key] = {}
+        				end
+        				if r >= 51 && r <= 53 && cc == 5 || r >= 54 && r <= 59 && cc == 5
+        					secondary_key = get_value value
+        					@subordinate_hash[primary_key][new_key][secondary_key]  = {}
+        				end
+        				if r >= 51 && r <= 53 && cc == 7 || r >= 54 && r <= 59 && cc == 7
+        					cltv_key = get_value value
+        					@subordinate_hash[primary_key][new_key][secondary_key][cltv_key] = {}
+        				end
+        				if r >= 51 && r <= 53 && cc >= 10 && cc <= 12 || r >= 54 && r <= 59 && cc >= 10 && cc <= 12
+        					ltv_key = get_value @cltv_data[cc-1]
+        					@subordinate_hash[primary_key][new_key][secondary_key][cltv_key][ltv_key] = {}
+        					@subordinate_hash[primary_key][new_key][secondary_key][cltv_key][ltv_key] = value
+        				end
+        				if r == 60 && cc == 5
+        					secondary_key = get_value value
+        					@subordinate_hash[primary_key][secondary_key] = {}
+        				end
+        				if r == 60 && cc >= 7 && cc <= 12
+        					ltv_key = get_value @cltv_data[cc-1]
+        					@subordinate_hash[primary_key][secondary_key][ltv_key] = {}
+        					@subordinate_hash[primary_key][secondary_key][ltv_key] = value
+        				end
+        				# # Cash Out
+        				# if r >= 39 && r <= 45 && cc == 13
+        				# 	secondary_key1 = get_value value
+        				# 	@cashout_hash[primary_key1][secondary_key1] = {}
+        				# end
+        				# if r >= 39 && r <= 45 && cc >= 15 && cc <= 21
+        				# 	ltv_key1 = get_value @cltv_data[cc-1]
+        				# 	@cashout_hash[primary_key1][secondary_key1][ltv_key1] = {}
+        				# 	@cashout_hash[primary_key1][secondary_key1][ltv_key1] = value
+        				# end
+        				# Multiple Unit Property
+        				if r >= 63 && r <= 64 && cc == 3
+        					secondary_key = value.split("Property").first
+        					@property_hash[primary_key][secondary_key] = {}
+        					if @property_hash[primary_key][secondary_key] = {}
+        						cc = cc + 9
+        						new_value = sheet_data.cell(r,cc)
+        						@property_hash[primary_key][secondary_key] = new_value
+        					end
+        				end
+        				if r == 65 && cc == 3
+        					secondary_key = value.split("Property").first
+        					new_key = "0 < 80" 
+        					@property_hash[primary_key][secondary_key] = {}
+        					@property_hash[primary_key][secondary_key][new_key] = {}
+        					if @property_hash[primary_key][secondary_key][new_key] = {}
+        						cc = cc + 9
+        						new_value = sheet_data.cell(r,cc)
+        						@property_hash[primary_key][secondary_key][new_key] = new_value
+        					end
+        				end
+        				if r == 66 && cc == 3
+        					new_key = "80-85" 
+        					@property_hash[primary_key][secondary_key][new_key] = {}
+        					if @property_hash[primary_key][secondary_key][new_key] = {}
+        						cc = cc + 9
+        						new_value = sheet_data.cell(r,cc)
+        						@property_hash[primary_key][secondary_key][new_key] = new_value
+        					end
+        				end
+        				if r == 67 && cc == 3
+        					new_key = "> 85" 
+        					@property_hash[primary_key][secondary_key][new_key] = {}
+        					if @property_hash[primary_key][secondary_key][new_key] = {}
+        						cc = cc + 9
+        						new_value = sheet_data.cell(r,cc)
+        						@property_hash[primary_key][secondary_key][new_key] = new_value
+        					end
+        				end
+        				# if r >= 58 && r <= 60 && cc == 3
+        				# 	secondary_key = get_value value
+        				# 	@property_hash[primary_key][secondary_key] = {}
+        				# end
+        				# if r >= 58 && r <= 60 && cc == 5
+        				# 	ltv_key = get_value value
+        				# 	@property_hash[primary_key][secondary_key][ltv_key] = {}
+        				# 	if @property_hash[primary_key][secondary_key][ltv_key] = {}
+        				# 		cc = cc + 4
+        				# 		new_value = sheet_data.cell(r,cc)
+        				# 		@property_hash[primary_key][secondary_key][ltv_key] = new_value
+        				# 	end
+        				# end
+        				# if r == 65  && cc == 3
+        				# 	primary_key = value
+        				# 	@property_hash[primary_key] = {}
+        				# 	if @property_hash[primary_key] = {}
+        				# 		cc = cc + 6
+        				# 		new_value = sheet_data.cell(r,cc)
+        				# 		@property_hash[primary_key] = new_value
+        				# 	end
+        				# end
+        				# if r == 66  && cc == 3
+        				# 	primary_key = value
+        				# 	@property_hash[primary_key] = {}
+        				# 	if @property_hash[primary_key] = {}
+        				# 		cc = cc + 6
+        				# 		new_value = sheet_data.cell(r,cc)
+        				# 		@property_hash[primary_key] = new_value
+        				# 	end
+        				# end
+        			end
+        		end
+        	end
+        end
+        adjustment = [@adjustment_hash,@subordinate_hash,@property_hash,@cashout_hash]
+        make_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_ob_quicken_loans3571_path(@sheet_obj)
