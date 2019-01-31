@@ -51,7 +51,7 @@ namespace :sheet_operation do
       end
 
       # set validation to download files from remote
-      $redis.set(today_download, "successful")
+      $redis.set(today_download, "done")
       # call rake task to upload sheets on google drive
       Rake::Task["sheet_operation:upload_on_drive"].invoke
     end
@@ -68,7 +68,7 @@ namespace :sheet_operation do
         end
       end
 
-      $redis.set(today_uploaded, "successful")
+      $redis.set(today_uploaded, "done")
     end
   end
 
