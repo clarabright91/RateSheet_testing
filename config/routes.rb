@@ -1,5 +1,5 @@
+require 'sidekiq/web'
 Rails.application.routes.draw do
-
   root :to => "dashboard#index"
   # root :to => "import_files#index"
   resources :import_files, only: [:index] do
@@ -28,12 +28,14 @@ Rails.application.routes.draw do
       get :import_homereddy_sheet
     end
   end
+
   # resources :ob_cmg_wholesales, only: [:index] do
   #   member do
   #     get :import_gov_sheet
   #   end
   # end
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+
   resources :ob_cmg_wholesales, only: [:index] do
     member do
       get :programs
@@ -90,7 +92,6 @@ Rails.application.routes.draw do
     end
   end
 
-
   resources :ob_home_point_financial_wholesale11098, only: [:index] do
     member do
       get :programs
@@ -98,8 +99,6 @@ Rails.application.routes.draw do
       get :single_program
     end
   end
-
-
 
   resources :ob_united_wholesale_mortgage4892, only: [:index] do
     member do
@@ -149,4 +148,5 @@ Rails.application.routes.draw do
   end
 
   match "dashboard/index", to: 'dashboard#index', via: [:get, :post]
+  mount Sidekiq::Web => '/sidekiq'
 end
