@@ -99,6 +99,8 @@ Rails.application.routes.draw do
     end
   end
 
+
+
   resources :ob_united_wholesale_mortgage4892, only: [:index] do
     member do
       get :programs
@@ -124,6 +126,14 @@ Rails.application.routes.draw do
       get :va_irrrl_pricing_govy_llpas
       get :na_jumbo_pricing_llpas
       get :du_lp_llpas
+    end
+  end
+
+  resources :ob_union_home_mortgage_wholesale1711, only: [:index] do
+    member do
+      get :programs
+      get :single_program
+      get :conventional
     end
   end
 
