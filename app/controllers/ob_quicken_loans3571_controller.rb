@@ -281,6 +281,7 @@ class ObQuickenLoans3571Controller < ApplicationController
         @government_hash = {}
         primary_key1 = ''
         secondary_key = ''
+
         # programs
         (13..66).each do |r|
           row = sheet_data.row(r)
@@ -322,6 +323,7 @@ class ObQuickenLoans3571Controller < ApplicationController
             end
           end
         end
+
         (75..93).each do |r|
         	row = sheet_data.row(r)
         	(0..29).each do |cc|
@@ -420,6 +422,7 @@ class ObQuickenLoans3571Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@government_hash]
         make_adjust(adjustment,sheet)
+
       end
     end
     redirect_to programs_ob_quicken_loans3571_path(@sheet_obj)
@@ -694,14 +697,6 @@ class ObQuickenLoans3571Controller < ApplicationController
         					primary_key = "PropertyType/LTV"
         					@property_hash[primary_key] = {}
         				end
-        				# if value == "Home Possible & Home Ready Adjustment Caps"
-        				# 	primary_key = "Caps/FICO/LTV"
-        				# 	@property_hash[primary_key] = {}
-        				# end
-        				# if value == "Cash Out"
-        				# 	primary_key1 = "RefinanceOption/FICO/LTV"
-        				# 	@cashout_hash[primary_key1] = {}
-        				# end
         				
         				# DURP LTV/FICO; Terms > 15 Years, Including ARMs
         				if r >= 31 && r <= 37 && cc == 3
@@ -754,16 +749,7 @@ class ObQuickenLoans3571Controller < ApplicationController
         					@subordinate_hash[primary_key][secondary_key][ltv_key] = {}
         					@subordinate_hash[primary_key][secondary_key][ltv_key] = value
         				end
-        				# # Cash Out
-        				# if r >= 39 && r <= 45 && cc == 13
-        				# 	secondary_key1 = get_value value
-        				# 	@cashout_hash[primary_key1][secondary_key1] = {}
-        				# end
-        				# if r >= 39 && r <= 45 && cc >= 15 && cc <= 21
-        				# 	ltv_key1 = get_value @cltv_data[cc-1]
-        				# 	@cashout_hash[primary_key1][secondary_key1][ltv_key1] = {}
-        				# 	@cashout_hash[primary_key1][secondary_key1][ltv_key1] = value
-        				# end
+        				
         				# Multiple Unit Property
         				if r >= 63 && r <= 64 && cc == 3
         					secondary_key = value.split("Property").first
@@ -803,37 +789,6 @@ class ObQuickenLoans3571Controller < ApplicationController
         						@property_hash[primary_key][secondary_key][new_key] = new_value
         					end
         				end
-        				# if r >= 58 && r <= 60 && cc == 3
-        				# 	secondary_key = get_value value
-        				# 	@property_hash[primary_key][secondary_key] = {}
-        				# end
-        				# if r >= 58 && r <= 60 && cc == 5
-        				# 	ltv_key = get_value value
-        				# 	@property_hash[primary_key][secondary_key][ltv_key] = {}
-        				# 	if @property_hash[primary_key][secondary_key][ltv_key] = {}
-        				# 		cc = cc + 4
-        				# 		new_value = sheet_data.cell(r,cc)
-        				# 		@property_hash[primary_key][secondary_key][ltv_key] = new_value
-        				# 	end
-        				# end
-        				# if r == 65  && cc == 3
-        				# 	primary_key = value
-        				# 	@property_hash[primary_key] = {}
-        				# 	if @property_hash[primary_key] = {}
-        				# 		cc = cc + 6
-        				# 		new_value = sheet_data.cell(r,cc)
-        				# 		@property_hash[primary_key] = new_value
-        				# 	end
-        				# end
-        				# if r == 66  && cc == 3
-        				# 	primary_key = value
-        				# 	@property_hash[primary_key] = {}
-        				# 	if @property_hash[primary_key] = {}
-        				# 		cc = cc + 6
-        				# 		new_value = sheet_data.cell(r,cc)
-        				# 		@property_hash[primary_key] = new_value
-        				# 	end
-        				# end
         			end
         		end
         	end
