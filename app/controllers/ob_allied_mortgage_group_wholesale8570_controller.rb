@@ -215,6 +215,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         Adjustment.create(data: @lock_adjustment, sheet_name: sheet)
         Adjustment.create(data: @avrg_adjustment, sheet_name: sheet)
         Adjustment.create(data: @alhs_adjustment, sheet_name: sheet)
+        create_program_association_with_adjustment(sheet)
       end
     end
     redirect_to programs_ob_allied_mortgage_group_wholesale8570_path(@sheet_obj)
@@ -250,7 +251,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
 
               cc = (4*max_column) + (2+max_column)  # (2 / 7 / 12)
               @title = sheet_data.cell(r,cc)
-              if @title.present?
+              if @title.present? && @title != 3.5 && @title != 3.125
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
                 # Program Property
@@ -427,6 +428,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         Adjustment.create(data: @awlm_adjustment, sheet_name: sheet)
         Adjustment.create(data: @indi_adjustment, sheet_name: sheet)
         Adjustment.create(data: @lock_adjustment, sheet_name: sheet)
+        create_program_association_with_adjustment(sheet)
       end
     end
     redirect_to programs_ob_allied_mortgage_group_wholesale8570_path(@sheet_obj)
@@ -826,6 +828,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         Adjustment.create(data: @valn_adjustment, sheet_name: sheet)
         Adjustment.create(data: @avrg_adjustment, sheet_name: sheet)
         Adjustment.create(data: @lock_adjustment, sheet_name: sheet)
+        create_program_association_with_adjustment(sheet)
       end
     end
     redirect_to programs_ob_allied_mortgage_group_wholesale8570_path(@sheet_obj)
@@ -950,5 +953,50 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
       end
       @program.save
       @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline)
+    end
+
+    def create_program_association_with_adjustment(sheet)
+      adjustment_list = Adjustment.where(sheet_name: sheet)
+      adjustment_list.each_with_index do |adj_ment, index|
+        key_list = adj_ment.data.keys.first.split("/")
+        program_filter1={}
+        program_filter2={}
+
+        if key_list.present?
+          key_list.each_with_index do |key_name, key_index|
+            if key_name == "LoanType" || key_name == "Term"
+              program_filter1[key_name.underscore] = nil
+            end
+            if key_name == "FICO"
+
+            end
+
+            if key_name == "LTV"
+
+            end
+
+            if key_name == "LoanAmount"
+
+            end
+            if key_name == "FinancingType"
+
+            end
+            if key_name == "CashOut"
+
+            end
+          end
+          program_list1 = Program.where.not(program_filter1)
+          program_list2 = program_list1.where(program_filter2)
+          if program_list2.present?
+            program_list2.each do |program|
+              program.adjustments.destroy_all
+            end
+
+            program_list2.each do |program|
+              program.adjustments << adj_ment
+            end
+          end
+        end
+      end
     end
 end

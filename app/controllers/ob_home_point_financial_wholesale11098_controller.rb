@@ -33,54 +33,44 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
           row = sheet_data.row(r)
           if ((row.compact.count >= 1) && (row.compact.count <= 2))
             rr = r + 1
-            max_column_section = row.compact.count - 1
+            max_column_section = row.compact.count
             (0..max_column_section).each do |max_column|
-              cc = 8*max_column + 1
-
+              if r <= 53 || (r >= 80 && 11 <= 101)
+                cc = 8*max_column + 1 # 1 / 9
+              elsif r >= 55 && 11 <= 76
+                cc = 5
+              end
               @title = sheet_data.cell(r,cc)
-              if @title.present?
+
+              if @title.present? && @title != "Margin 2.25%; Caps 2/2/5, index Libor"
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                program_property @program
                 @programs_ids << @program.id
-                # Program Property
-                program_property @title
                 @program.adjustments.destroy_all
-              end
-              @block_hash = {}
-              key = ''
-              if @program.term.present?
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
-              (1..50).each do |max_row|
-                @data = []
-                (0..3).each_with_index do |index, c_i|
-                  rrr = rr + max_row -1
-                  ccc = cc + c_i
-                  value = sheet_data.cell(rrr,ccc)
-                  if value.present?
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[main_key][key] = {}
-                    elsif (c_i == 1)
-                      @block_hash[main_key][key][21] = value
-                    elsif (c_i == 2)
-                      @block_hash[main_key][key][30] = value
-                    elsif (c_i == 3)
-                      @block_hash[main_key][key][45] = value
+                @block_hash = {}
+                key = ''
+                (1..20).each do |max_row|
+                  @data = []
+                  (0..6).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        @block_hash[key][15*c_i] = value
+                      end
+                      @data << value
                     end
-                    @data << value
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
                   end
                 end
-                if @data.compact.reject { |c| c.blank? }.length == 0
-                  break # terminate the loop
-                end
+                @program.update(base_rate: @block_hash)
               end
-              if @block_hash.values.first.keys.first.nil?
-                @block_hash.values.first.shift
-              end
-              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -257,116 +247,116 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
   end
 
   # skip for same name programs
-  # def durp
-  #   @programs_ids = []
-  #   file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-  #   xlsx = Roo::Spreadsheet.open(file)
-  #   xlsx.sheets.each do |sheet|
-  #     if (sheet == "DURP")
-  #       sheet_data = xlsx.sheet(sheet)
-  #       @programs_ids = []
-  #       @block_hash = {}
+  def durp
+    @programs_ids = []
+    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
+    xlsx = Roo::Spreadsheet.open(file)
+    xlsx.sheets.each do |sheet|
+      if (sheet == "DURP")
+        sheet_data = xlsx.sheet(sheet)
+        @programs_ids = []
+        @block_hash = {}
 
-  #       (11..107).each do |r|
-  #         row = sheet_data.row(r)
-  #         if ((row.compact.count >= 1) && (row.compact.count <= 3))
-  #           rr = r + 1
-  #           max_column_section = row.compact.count
-  #           (0..max_column_section).each do |max_column|
-  #             cc = 7*max_column + 2 #2/9/16
-  #             @title = sheet_data.cell(r,cc)
-  #             if @title.present?
-  #               @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-  #               program_property @program
-  #               @programs_ids << @program.id
-  #               @program.adjustments.destroy_all
-  #               @block_hash = {}
-  #               key = ''
-  #               (1..20).each do |max_row|
-  #                 @data = []
-  #                 (0..6).each_with_index do |index, c_i|
-  #                   rrr = rr + max_row
-  #                   ccc = cc + c_i
-  #                   value = sheet_data.cell(rrr,ccc)
-  #                   if value.present?
-  #                     if (c_i == 0)
-  #                       key = value
-  #                       @block_hash[key] = {}
-  #                     else
-  #                       @block_hash[key][15*c_i] = value
-  #                     end
-  #                     @data << value
-  #                   end
-  #                 end
-  #                 if @data.compact.reject { |c| c.blank? }.length == 0
-  #                   break # terminate the loop
-  #                 end
-  #               end
-  #               @program.update(base_rate: @block_hash)
-  #             end
-  #           end
-  #         end
-  #       end
-  #     end
-  #   end
-  #   redirect_to programs_ob_home_point_financial_wholesale11098_path(@sheet_obj)
-  # end
+        (9..128).each do |r|
+          row = sheet_data.row(r)
+          if ((row.compact.count >= 1) && (row.compact.count <= 3))
+            rr = r + 1
+            max_column_section = row.compact.count
+            (0..max_column_section).each do |max_column|
+              cc = 7*max_column + 2 #2/9/16
+              @title = sheet_data.cell(r,cc)
+              if @title.present?
+                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                program_property @program
+                @programs_ids << @program.id
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+                (1..20).each do |max_row|
+                  @data = []
+                  (0..6).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        @block_hash[key][15*c_i] = value
+                      end
+                      @data << value
+                    end
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
+                  end
+                end
+                @program.update(base_rate: @block_hash)
+              end
+            end
+          end
+        end
+      end
+    end
+    redirect_to programs_ob_home_point_financial_wholesale11098_path(@sheet_obj)
+  end
 
   # skip for same name programs
-  # def lpoa
-  #   @programs_ids = []
-  #   file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-  #   xlsx = Roo::Spreadsheet.open(file)
-  #   xlsx.sheets.each do |sheet|
-  #     if (sheet == "LPOA")
-  #       sheet_data = xlsx.sheet(sheet)
-  #       @programs_ids = []
-  #       @block_hash = {}
+  def lpoa
+    @programs_ids = []
+    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
+    xlsx = Roo::Spreadsheet.open(file)
+    xlsx.sheets.each do |sheet|
+      if (sheet == "LPOA")
+        sheet_data = xlsx.sheet(sheet)
+        @programs_ids = []
+        @block_hash = {}
 
-  #       (11..107).each do |r|
-  #         row = sheet_data.row(r)
-  #         if ((row.compact.count >= 1) && (row.compact.count <= 3))
-  #           rr = r + 1
-  #           max_column_section = row.compact.count
-  #           (0..max_column_section).each do |max_column|
-  #             cc = 7*max_column + 2 #2/9/16
-  #             @title = sheet_data.cell(r,cc)
-  #             if @title.present?
-  #               @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-  #               program_property @program
-  #               @programs_ids << @program.id
-  #               @program.adjustments.destroy_all
-  #               @block_hash = {}
-  #               key = ''
-  #               (1..20).each do |max_row|
-  #                 @data = []
-  #                 (0..6).each_with_index do |index, c_i|
-  #                   rrr = rr + max_row
-  #                   ccc = cc + c_i
-  #                   value = sheet_data.cell(rrr,ccc)
-  #                   if value.present?
-  #                     if (c_i == 0)
-  #                       key = value
-  #                       @block_hash[key] = {}
-  #                     else
-  #                       @block_hash[key][15*c_i] = value
-  #                     end
-  #                     @data << value
-  #                   end
-  #                 end
-  #                 if @data.compact.reject { |c| c.blank? }.length == 0
-  #                   break # terminate the loop
-  #                 end
-  #               end
-  #               @program.update(base_rate: @block_hash)
-  #             end
-  #           end
-  #         end
-  #       end
-  #     end
-  #   end
-  #   redirect_to programs_ob_home_point_financial_wholesale11098_path(@sheet_obj)
-  # end
+        (11..169).each do |r|
+          row = sheet_data.row(r)
+          if ((row.compact.count >= 1) && (row.compact.count <= 3))
+            rr = r + 1
+            max_column_section = row.compact.count
+            (0..max_column_section).each do |max_column|
+              cc = 8*max_column + 2 #2/10/18
+              @title = sheet_data.cell(r,cc)
+              if @title.present?
+                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                program_property @program
+                @programs_ids << @program.id
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+                (1..20).each do |max_row|
+                  @data = []
+                  (0..6).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        @block_hash[key][15*c_i] = value
+                      end
+                      @data << value
+                    end
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
+                  end
+                end
+                @program.update(base_rate: @block_hash)
+              end
+            end
+          end
+        end
+      end
+    end
+    redirect_to programs_ob_home_point_financial_wholesale11098_path(@sheet_obj)
+  end
 
 
   def fha_203k
@@ -863,6 +853,51 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
       end
       @program.save
       @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline)
+    end
+
+    def create_program_association_with_adjustment(sheet)
+      adjustment_list = Adjustment.where(sheet_name: sheet)
+      adjustment_list.each_with_index do |adj_ment, index|
+        key_list = adj_ment.data.keys.first.split("/")
+        program_filter1={}
+        program_filter2={}
+
+        if key_list.present?
+          key_list.each_with_index do |key_name, key_index|
+            if key_name == "LoanType" || key_name == "Term"
+              program_filter1[key_name.underscore] = nil
+            end
+
+            if key_name == "FICO"
+            end
+
+            if key_name == "LTV"
+            end
+
+            if key_name == "LoanAmount"
+            end
+
+            if key_name == "FinancingType"
+            end
+
+            if key_name == "CashOut"
+            end
+          end
+
+          program_list1 = Program.where.not(program_filter1)
+          program_list2 = program_list1.where(program_filter2)
+
+          if program_list2.present?
+            program_list2.each do |program|
+              program.adjustments.destroy_all
+            end
+
+            program_list2.each do |program|
+              program.adjustments << adj_ment
+            end
+          end
+        end
+      end
     end
 end
 

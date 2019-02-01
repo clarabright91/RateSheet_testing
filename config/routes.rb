@@ -119,5 +119,43 @@ Rails.application.routes.draw do
     end
   end
 
+
+
+  resources :ob_united_wholesale_mortgage4892, only: [:index] do
+    member do
+      get :programs
+      get :single_program
+      get :conv
+      get :govt
+      get :govt_arms
+      get '/non-conf' => 'ob_united_wholesale_mortgage4892#non_conf'
+      get :harp
+    end
+  end
+
+  resources :ob_quicken_loans3571, only: [:index] do
+    member do
+      get :programs
+      get :single_program
+      get :ws_rate_sheet_summary
+      get :ws_du_lp_pricing
+      get :durp_lp_relief_pricing
+      get :fha_usda_full_doc_pricing
+      get :fha_streamline_pricing
+      get :va_full_doc_pricing
+      get :va_irrrl_pricing_govy_llpas
+      get :na_jumbo_pricing_llpas
+      get :du_lp_llpas
+    end
+  end
+
+  resources :ob_union_home_mortgage_wholesale1711, only: [:index] do
+    member do
+      get :programs
+      get :single_program
+      get :conventional
+    end
+  end
+
   match "dashboard/index", to: 'dashboard#index', via: [:get, :post]
 end

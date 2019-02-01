@@ -629,15 +629,13 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
               @spec_adjustment2[primary_key][value] = c_val
             end
 
-            # if value == "Maximum Interest Rate allowed on USDA Product"
-            #   primary_key = "MaximumInterest"
-            #   @maximum_interest[primary_key] = {}
-            # end
+            if value == "Maximum Interest Rate allowed on USDA Product"
+              primary_key = "MaximumInterest"
+              c_val = sheet_data.cell(r,cc+2)
+              @maximum_interest[primary_key] = {}
+              @maximum_interest[primary_key][value] = c_val
+            end
 
-            # if r >= 2274 && cc == 12
-            #   c_val = sheet_data.cell(r,cc+2)
-            #   @maximum_interest[primary_key][value] = c_val
-            # end
 
             if value == "Program"
               primary_key = "RateType/LoanType"
@@ -913,10 +911,12 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
               ltv_adjustment range1_f, range2_f, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
             end
 
-            # if value == "PROGRAM SPECIFIC RATE ADJUSTMENTS"
-            #   primary_key = "LoanType / RateLock"
-            #   @spec_adjustment7[primary_key] = {}
-            # end
+            if value == "PROGRAM SPECIFIC RATE ADJUSTMENTS"
+              primary_key = "LoanType / RateLock"
+              @spec_adjustment7[primary_key] = {}
+              c_val = sheet_data.cell(r,cc+4)
+              @spec_adjustment7[primary_key][value] = c_val
+            end
 
             # if r >= 2858 && r <= 2884 && cc == 16
             #   c_val = sheet_data.cell(r,cc+4)
@@ -1003,10 +1003,12 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         (range1_g..range2_g).each do |r|
           (0..sheet_data.last_column).each do |cc|
             value = sheet_data.cell(r,cc)
-            # if value == "PROGRAM SPECIFIC RATE ADJUSTMENTS"
-            #   primary_key = "LoanType / RateLock"
-            #   @spec_adjustment12[primary_key] = {}
-            # end
+            if value == "PROGRAM SPECIFIC RATE ADJUSTMENTS"
+              primary_key = "LoanType / RateLock"
+              @spec_adjustment12[primary_key] = {}
+              c_val = sheet_data.cell(r,cc+4)
+              @spec_adjustment12[primary_key][value] = c_val
+            end
 
             # if r >= 3003 && r <= 3024 && cc == 16
             #   c_val = sheet_data.cell(r,cc+4)
@@ -1088,15 +1090,15 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         (range1_h..range2_h).each do |r|
           (0..sheet_data.last_column).each do |cc|
             value = sheet_data.cell(r,cc)
-            # if value == "PROGRAM SPECIFIC RATE ADJUSTMENTS"
-            #   primary_key = "LoanType / RateLock"
-            #   @spec_adjustment8[primary_key] = {}
-            # end
+            if value == "PROGRAM SPECIFIC RATE ADJUSTMENTS"
+              first_key = "LoanType / RateLock"
+              @spec_adjustment8[first_key] = {}
+            end
 
-            # if r >= 3158 && r <= 3181 && cc == 16
-            #   c_val = sheet_data.cell(r,cc+4)
-            #   @spec_adjustment8[primary_key][value] = c_val
-            # end
+            if r >= 3158 && r <= 3181 && cc == 16
+              c_val = sheet_data.cell(r,cc+4)
+              @spec_adjustment8[first_key][value] = c_val
+            end
 
             if value == "45 Day Lock (Price Adjustment)"
               primary_key = "RateType/LoanType/RateLock"
@@ -1197,15 +1199,15 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         (range1_i..range2_i).each do |r|
           (0..sheet_data.last_column).each do |cc|
             value = sheet_data.cell(r,cc)
-            # if value == "PROGRAM SPECIFIC RATE ADJUSTMENTS"
-            #   primary_key = "LoanType / RateLock"
-            #   @spec_adjustment9[primary_key] = {}
-            # end
+            if value == "PROGRAM SPECIFIC RATE ADJUSTMENTS"
+              first_key = "LoanType / RateLock"
+              @spec_adjustment9[first_key] = {}
+            end
 
-            # if r >= 3266 && r <= 3279 && cc == 16
-            #   c_val = sheet_data.cell(r,cc+4)
-            #   @spec_adjustment9[primary_key][value] = c_val
-            # end
+            if r >= 3266 && r <= 3279 && cc == 16
+              c_val = sheet_data.cell(r,cc+4)
+              @spec_adjustment9[first_key][value] = c_val
+            end
 
             if value == "45 Day Lock (Price Adjustment)"
               primary_key = "RateType/LoanType/RateLock"
@@ -1292,15 +1294,15 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         (range1_j..range2_j).each do |r|
           (0..sheet_data.last_column).each do |cc|
             value = sheet_data.cell(r,cc)
-            # if value == "PROGRAM SPECIFIC RATE ADJUSTMENTS"
-            #   primary_key = "LoanType / RateLock"
-            #   @spec_adjustment10[primary_key] = {}
-            # end
+            if value == "PROGRAM SPECIFIC RATE ADJUSTMENTS"
+              first_key = "LoanType / RateLock"
+              @spec_adjustment10[first_key] = {}
+            end
 
-            # if r >= 3358 && r <= 3378 && cc == 16
-            #   c_val = sheet_data.cell(r,cc+4)
-            #   @spec_adjustment10[primary_key][value] = c_val
-            # end
+            if r >= 3358 && r <= 3378 && cc == 16
+              c_val = sheet_data.cell(r,cc+4)
+              @spec_adjustment10[first_key][value] = c_val
+            end
 
             if value == "45 Day Lock (Price Adjustment)"
               primary_key = "RateType/LoanType/RateLock"

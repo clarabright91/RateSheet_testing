@@ -4,8 +4,9 @@ class ImportFilesController < ApplicationController
   require 'roo-xls'
 
   def index
+    # HardWorker.perform_async(1)
     @banks = Bank.all
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     @sheetlist =[]
     begin
@@ -34,19 +35,19 @@ class ImportFilesController < ApplicationController
               @phone = c_row[phone_index]
             end
           end
-          
+
           @bank = Bank.find_or_create_by(name: @name)
           @bank.update(phone: @phone, address1: @address_a.join, state_code: @state_code, zip: @zip)
         end
       end
-    rescue
+    rescue Exception => e
       # the required headers are not all present
     end
   end
 
   def import_government_sheet
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Government")
@@ -98,7 +99,7 @@ class ImportFilesController < ApplicationController
               usda = false
               streamline = false
               full_doc = false
-              if @title.include?("FHA") 
+              if @title.include?("FHA")
                 streamline = true
                 fha = true
                 full_doc = true
@@ -149,11 +150,10 @@ class ImportFilesController < ApplicationController
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              main_key = ''
               if @program.fha
                 gov_key = "FHA"
               elsif @program.va
-                gov_key = "VA"  
+                gov_key = "VA"
               elsif @program.usda
                 gov_key = "USDA"
               end
@@ -163,12 +163,7 @@ class ImportFilesController < ApplicationController
               if @program.loan_type.present?
                 loan_type = @program.loan_type
               end
-              if @program.term.present? 
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
+              
               (1..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -178,13 +173,13 @@ class ImportFilesController < ApplicationController
                   if value.present?
                     if (c_i == 0)
                       key = value
-                      @block_hash[main_key][key] = {}
+                      @block_hash[key] = {}
                     else
                       if @program.lock_period.length <= 3
                         @program.lock_period << 15*c_i
                         @program.save
                       end
-                      @block_hash[main_key][key][15*c_i] = value
+                      @block_hash[key][15*c_i] = value
                     end
                     @data << value
                   end
@@ -209,7 +204,7 @@ class ImportFilesController < ApplicationController
                   rr = adj_row
                   cc = 5
                   @credit_hash = {}
-                  main_key = "Credit Score"
+                  main_key = "LoanType/FICO/LTV"
                   @credit_hash[main_key] = {}
                   @right_adj = {}
                   (0..9).each do |max_row|
@@ -234,7 +229,6 @@ class ImportFilesController < ApplicationController
                       @credit_hash[main_key][key] = value
                       @right_adj[right_adj_key] = right_adj_value
                     end
-
                   end
                   make_adjust(@credit_hash, @programs_ids)
                   make_adjust(@right_adj, @programs_ids)
@@ -247,7 +241,7 @@ class ImportFilesController < ApplicationController
                   rr = adj_row
                   cc = 5
                   @loan_size = {}
-                  main_key = "Loan Size / Loan Type"
+                  main_key = "LoanPurpose/LoanAmount/LTV"
                   @loan_size[main_key] = {}
                   @loan_size[main_key]["Purchase"] = {}
                   @loan_size[main_key]["Refinance"] = {}
@@ -281,7 +275,7 @@ class ImportFilesController < ApplicationController
                   rr = adj_row
                   cc = 5
                   @loan_size_va_bpc = {}
-                  main_key = "Loan Size / Loan Type / VA BPC"
+                  main_key = "VA/LoanPurpose/LoanAmount/LTV"
                   @loan_size_va_bpc[main_key] = {}
                   @loan_size_va_bpc[main_key]["Purchase"] = {}
                   @loan_size_va_bpc[main_key]["Refinance"] = {}
@@ -323,7 +317,7 @@ class ImportFilesController < ApplicationController
   def import_freddie_fixed_rate
     @program_ids = []
     @allAdjustments = {}
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Freddie Fixed Rate")
@@ -409,7 +403,7 @@ class ImportFilesController < ApplicationController
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -705,7 +699,7 @@ class ImportFilesController < ApplicationController
   def import_conforming_fixed_rate
     program_ids = []
     @allAdjustments = {}
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Conforming Fixed Rate")
@@ -797,7 +791,7 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -1071,7 +1065,7 @@ class ImportFilesController < ApplicationController
   def home_possible
     @program_ids = []
     @allAdjustments = {}
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Home Possible")
@@ -1162,7 +1156,7 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -1452,7 +1446,7 @@ class ImportFilesController < ApplicationController
   end
 
   def lp_open_acces_arms
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     @programs_ids = []
     xlsx.sheets.each do |sheet|
@@ -1556,7 +1550,7 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -1718,7 +1712,7 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        
+
         make_adjust(@adjustment_hash, @program_ids)
       end
     end
@@ -1726,7 +1720,7 @@ class ImportFilesController < ApplicationController
   end
 
   def lp_open_access_105
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     @programs_ids = []
     xlsx.sheets.each do |sheet|
@@ -1827,7 +1821,7 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -2028,7 +2022,7 @@ class ImportFilesController < ApplicationController
     previous_key = nil
     previous_element = nil
     @all_data = {}
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     @programs_ids =[]
     xlsx.sheets.each do |sheet|
@@ -2067,7 +2061,7 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -2593,7 +2587,7 @@ class ImportFilesController < ApplicationController
   end
 
   def lp_open_access
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     @programs_ids = []
     xlsx.sheets.each do |sheet|
@@ -2698,7 +2692,7 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -2882,7 +2876,7 @@ class ImportFilesController < ApplicationController
   end
 
   def jumbo_series_f
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Jumbo Series_F")
@@ -2897,7 +2891,7 @@ class ImportFilesController < ApplicationController
               cc = 6 + max_column*6 # (6 / 12 / 18)
               @title = sheet_data.cell(r,cc)
               program_heading = @title.split
-              
+
               # term
               term = nil
               program_heading = @title.split
@@ -2955,7 +2949,7 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -3326,7 +3320,7 @@ class ImportFilesController < ApplicationController
   end
 
   def du_refi_plus_arms
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     @programs_ids = []
     xlsx.sheets.each do |sheet|
@@ -3434,7 +3428,7 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -3592,7 +3586,7 @@ class ImportFilesController < ApplicationController
 
   def jumbo_series_h
     @program_ids = []
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Jumbo Series_H")
@@ -3639,7 +3633,7 @@ class ImportFilesController < ApplicationController
 
                   # rate arm
                   arm_basic = false
-                  if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 Yr ARM") || @title.include?("7/1 Yr ARM") || @title.include?("10/1 Yr ARM") 
+                  if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 Yr ARM") || @title.include?("7/1 Yr ARM") || @title.include?("10/1 Yr ARM")
                     arm_basic = @title.scan(/\d+/)[0].to_i
                   end
 
@@ -3695,7 +3689,7 @@ class ImportFilesController < ApplicationController
                 @block_hash = {}
                 key = ''
                 main_key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = loan_purpose.to_s + "/" +"Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -3903,7 +3897,7 @@ class ImportFilesController < ApplicationController
 
   def du_refi_plus_fixed_rate_105
     @program_ids = []
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Du Refi Plus Fixed Rate_105")
@@ -3991,7 +3985,7 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -4354,7 +4348,7 @@ class ImportFilesController < ApplicationController
   end
 
   def jumbo_series_i
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     @programs_ids = []
     xlsx.sheets.each do |sheet|
@@ -4437,7 +4431,7 @@ class ImportFilesController < ApplicationController
                 @block_hash = {}
                 key = ''
                 new_key = ''
-                if @program.term.present? 
+                if @program.term.present?
                   new_key = "Term/LoanType/InterestRate/LockPeriod"
                 else
                   new_key = "InterestRate/LockPeriod"
@@ -4555,7 +4549,7 @@ class ImportFilesController < ApplicationController
   end
 
   def du_refi_plus_fixed_rate
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     @programs_ids = []
     xlsx.sheets.each do |sheet|
@@ -4651,7 +4645,7 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -4816,7 +4810,7 @@ class ImportFilesController < ApplicationController
   end
 
   def jumbo_series_jqm
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     @programs_ids = []
     xlsx.sheets.each do |sheet|
@@ -4900,7 +4894,7 @@ class ImportFilesController < ApplicationController
                 @block_hash = {}
                 key = ''
                 main_key = ''
-                if @program.term.present? 
+                if @program.term.present?
                   main_key = "Term/LoanType/InterestRate/LockPeriod"
                 else
                   main_key = "InterestRate/LockPeriod"
@@ -5078,7 +5072,7 @@ class ImportFilesController < ApplicationController
   end
 
   def dream_big
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     @programs_ids = []
     xlsx.sheets.each do |sheet|
@@ -5167,7 +5161,7 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -5313,7 +5307,7 @@ class ImportFilesController < ApplicationController
   end
 
   def high_balance_extra
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     @programs_ids = []
     xlsx.sheets.each do |sheet|
@@ -5400,7 +5394,7 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -5513,7 +5507,7 @@ class ImportFilesController < ApplicationController
   def freddie_arms
     @program_ids = []
     @allAdjustments = {}
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Freddie ARMs")
@@ -5602,7 +5596,7 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -5867,7 +5861,7 @@ class ImportFilesController < ApplicationController
   def conforming_arms
     @program_ids = []
     @allAdjustments = {}
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Conforming ARMs")
@@ -5876,7 +5870,7 @@ class ImportFilesController < ApplicationController
 
         (1..47).each do |r|
           row = sheet_data.row(r)
-          if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet"))
+          if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet")) || row.compact.include?("Fannie Mae 10-1 ARM (5-2-5) High Balance")
             # r == 7 / 35 / 55
             rr = r + 1 # (r == 8) / (r == 36) / (r == 56)
             max_column_section = row.compact.count - 1
@@ -5957,7 +5951,7 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -6212,8 +6206,8 @@ class ImportFilesController < ApplicationController
   def import_homereddy_sheet
     program_ids = []
     @allAdjustments = {}
-    # xlsx = Roo::Spreadsheet.open("/home/yuva/Desktop/ratesheet/RateSheetExtractor/OB_New_Penn_Financial_Wholesale5806 (1).xls")
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    # xlsx = Roo::Spreadsheet.open("/home/yuva/Desktop/ratesheet/RateSheetExtractor/OB_NewRez_Wholesale5806 (1).xls")
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "HomeReady")
@@ -6298,7 +6292,7 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -6577,7 +6571,7 @@ class ImportFilesController < ApplicationController
   def import_HomeReadyhb_sheet
     program_ids = []
     @allAdjustments = {}
-    file = File.join(Rails.root,  'OB_New_Penn_Financial_Wholesale5806.xls')
+    file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "HomeReady HB")
@@ -6647,7 +6641,7 @@ class ImportFilesController < ApplicationController
               @block_hash = {}
               key = ''
               main_key = ''
-              if @program.term.present? 
+              if @program.term.present?
                 main_key = "Term/LoanType/InterestRate/LockPeriod"
               else
                 main_key = "InterestRate/LockPeriod"
@@ -6960,7 +6954,7 @@ class ImportFilesController < ApplicationController
 
   def make_adjust(block_hash, p_ids)
     begin
-      adjustment = Adjustment.create(data: block_hash.to_json)
+      adjustment = Adjustment.create(data: block_hash)
 
       # assign for all projects
       p_ids.each do |id|
