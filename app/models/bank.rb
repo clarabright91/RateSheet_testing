@@ -2,14 +2,15 @@ class Bank < ApplicationRecord
   has_many :programs
   has_many :sheets
 
-  SHEET_LINKS = []
-	SHEET_LINKS << "https://www.loansifter.com/DownloadFile.aspx?RateSheetID=8570"
-	SHEET_LINKS << "https://www.loansifter.com/DownloadFile.aspx?RateSheetID=10742"
-	SHEET_LINKS << "https://www.loansifter.com/DownloadFile.aspx?RateSheetID=7575"
-	SHEET_LINKS << "https://www.loansifter.com/DownloadFile.aspx?RateSheetID=11098"
-	SHEET_LINKS << "https://www.loansifter.com/DownloadFile.aspx?RateSheetID=7019"
-	SHEET_LINKS << "https://www.loansifter.com/DownloadFile.aspx?RateSheetID=3571"
-	SHEET_LINKS << "https://www.loansifter.com/DownloadFile.aspx?RateSheetID=5907"
-	SHEET_LINKS << "https://www.loansifter.com/DownloadFile.aspx?RateSheetID=4892"
-	SHEET_LINKS << "https://www.loansifter.com/DownloadFile.aspx?RateSheetID=2982"
+  SHEET_LINKS = %w(
+    https://www.loansifter.com/DownloadFile.aspx?RateSheetID=8570
+    https://www.loansifter.com/DownloadFile.aspx?RateSheetID=10742
+    https://www.loansifter.com/DownloadFile.aspx?RateSheetID=7575
+    https://www.loansifter.com/DownloadFile.aspx?RateSheetID=11098
+    https://www.loansifter.com/DownloadFile.aspx?RateSheetID=7019
+    https://www.loansifter.com/DownloadFile.aspx?RateSheetID=3571
+    https://www.loansifter.com/DownloadFile.aspx?RateSheetID=5907
+    https://www.loansifter.com/DownloadFile.aspx?RateSheetID=4892
+    https://www.loansifter.com/DownloadFile.aspx?RateSheetID=2982
+  )
 end
