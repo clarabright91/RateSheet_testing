@@ -32,7 +32,7 @@
 # session.upload_from_file("/path/to/hello.txt", "hello.txt", convert: false)
 # folder_id = folder.id 
 # session.upload_from_file("/home/yuva/Downloads/OB_New_Penn_Financial_Wholesale5806.xls", "OB_New_Penn_Financial_Wholesale5806.xls", convert: false)
-session = GoogleDrive::Session.from_config("config.json")
+# session = GoogleDrive::Session.from_config("config.json")
 # create folder
 # folder  = session.root_collection.create_subcollection("Uploaded files")
 # p folder
