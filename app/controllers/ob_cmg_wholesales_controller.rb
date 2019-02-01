@@ -3,6 +3,7 @@ class ObCmgWholesalesController < ApplicationController
   before_action :get_program, only: [:single_program]
 
   def index
+    
     file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
     xlsx = Roo::Spreadsheet.open(file)
     begin
@@ -3547,43 +3548,41 @@ class ObCmgWholesalesController < ApplicationController
 
   def create_program_association_with_adjustment(sheet)
     adjustment_list = Adjustment.where(sheet_name: sheet)
+    # program_list = Program.where(sheet_name: sheet)
+    input_values = ["PropertyType","FinancingType","PremiumType","LTV","FICO","RefinanceOption","MiscAdjuster","LPMI","Coverage","LoanAmount","CLTV","DTI","InterestRate","LockPeriod","State"]
     adjustment_list.each_with_index do |adj_ment, index|
       key_list = adj_ment.data.keys.first.split("/")
       program_filter1={}
       program_filter2={}
-
+      include_in_input_values = false
       if key_list.present?
         key_list.each_with_index do |key_name, key_index|
-          if key_name == "LoanType" || key_name == "Term"
-            program_filter1[key_name.underscore] = nil
-          end
-
-          if key_name == "FICO"
-          end
-
-          if key_name == "LTV"
-          end
-
-          if key_name == "LoanAmount"
-          end
-
-          if key_name == "FinancingType"
-          end
-
-          if key_name == "CashOut"
+          if (Program.column_names.include?(key_name.underscore))
+            unless (Program.column_for_attribute(key_name.underscore).type.to_s == "boolean")
+              program_filter1[key_name.underscore] = nil
+            else
+              if (Program.column_for_attribute(key_name.underscore).type.to_s == "boolean")
+                program_filter2[key_name.underscore] = true
+              end
+            end
+          else
+            if(input_values.include?(key_name))
+              include_in_input_values = true
+            end
           end
         end
 
-        program_list1 = Program.where.not(program_filter1)
-        program_list2 = program_list1.where(program_filter2)
+        if (include_in_input_values)
+          program_list1 = Program.where.not(program_filter1)
+          program_list2 = program_list1.where(program_filter2)
 
-        if program_list2.present?
-          program_list2.each do |program|
-            program.adjustments.destroy_all
-          end
-
-          program_list2.each do |program|
-            program.adjustments << adj_ment
+          if program_list2.present?
+            program_list2.each do |program|
+              program.adjustments.destroy_all
+            end
+            program_list2.each do |program|
+              program.adjustments << adj_ment
+            end
           end
         end
       end
