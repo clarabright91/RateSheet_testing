@@ -163,7 +163,7 @@ class ImportFilesController < ApplicationController
               if @program.loan_type.present?
                 loan_type = @program.loan_type
               end
-              
+
               (1..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|

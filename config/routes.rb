@@ -1,5 +1,5 @@
+require 'sidekiq/web'
 Rails.application.routes.draw do
-
   root :to => "dashboard#index"
   # root :to => "import_files#index"
   resources :import_files, only: [:index] do
@@ -28,12 +28,14 @@ Rails.application.routes.draw do
       get :import_homereddy_sheet
     end
   end
+
   # resources :ob_cmg_wholesales, only: [:index] do
   #   member do
   #     get :import_gov_sheet
   #   end
   # end
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+
   resources :ob_cmg_wholesales, only: [:index] do
     member do
       get :programs
@@ -90,7 +92,6 @@ Rails.application.routes.draw do
     end
   end
 
-
   resources :ob_home_point_financial_wholesale11098, only: [:index] do
     member do
       get :programs
@@ -119,8 +120,6 @@ Rails.application.routes.draw do
     end
   end
 
-
-
   resources :ob_united_wholesale_mortgage4892, only: [:index] do
     member do
       get :programs
@@ -146,6 +145,7 @@ Rails.application.routes.draw do
       get :va_irrrl_pricing_govy_llpas
       get :na_jumbo_pricing_llpas
       get :du_lp_llpas
+      get :durp_lp_relief_llpas
     end
   end
 
@@ -154,8 +154,19 @@ Rails.application.routes.draw do
       get :programs
       get :single_program
       get :conventional
+      get :conven_highbalance_30
+      get :gov_highbalance_30
+      get :government_30_15_yr
+      get :arm_programs
+      get '/fnma_du-refi_plus' => 'ob_union_home_mortgage_wholesale1711#fnma_du_refi_plus'
+      get :fhlmc_open_access
+      get :fnma_home_ready
+      get :fhlmc_home_possible
+      get :simple_access
+      get :jumbo_fixed
     end
   end
 
   match "dashboard/index", to: 'dashboard#index', via: [:get, :post]
+  mount Sidekiq::Web => '/sidekiq'
 end
