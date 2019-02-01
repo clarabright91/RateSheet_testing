@@ -843,8 +843,7 @@ class ImportFilesController < ApplicationController
             cc = 3 + max_column * 9 # (2 / 11)
             @title = sheet_data.cell(r,cc)
             @block_hash = {}
-
-            if(@title.eql?("All Fixed Conforming\n(does not apply to terms <=15yrs with LTV <=95)"))
+            if(@title.eql?("All Fixed Conforming\n(does not apply to terms ≤ 15yrs)"))
               @block_hash[@title] = {}
               key = ''
               another_key = ''
@@ -864,7 +863,7 @@ class ImportFilesController < ApplicationController
                     # for Cash-Out
                     @title = sheet_data.cell(rrr,cc)
                     @block_hash[@title] = {} unless @block_hash.has_key?(@title)
-                  elsif rrr.eql?(137) && index == 3
+                  elsif rrr.eql?(138) && index == 3
                     # for Lender Paid MI Adjustments
                     previous_title = @title = sheet_data.cell(rrr,ccc) unless previous_title == @title
                     unless @block_hash.has_key?(@title)
@@ -874,23 +873,23 @@ class ImportFilesController < ApplicationController
                       @block_hash[@title][first_key] = {}
                       @block_hash[@title][second_key] = {}
                     end
-                  elsif rrr.eql?(155) && index == 3
+                  elsif rrr.eql?(156) && index == 3
                     # for Subordinate Financing
                     @title = sheet_data.cell(rrr,ccc)
                     @block_hash[@title] = {} unless @block_hash.has_key?(@title)
-                  elsif rrr.eql?(155) && index == 13
+                  elsif rrr.eql?(156) && index == 13
                     # for Loan Size Adjustments
                     @another_title = sheet_data.cell(rrr,index)
                     @block_hash[@another_title] = {} unless @block_hash.has_key?(@another_title)
-                  elsif rrr.eql?(161) && index == 3
+                  elsif rrr.eql?(162) && index == 3
                     # for Misc Adjusters
                     @title = sheet_data.cell(rrr,ccc)
                     @block_hash[@title] = {} unless @block_hash.has_key?(@title)
-                  elsif rrr.eql?(166) && index.eql?(3)
+                  elsif rrr.eql?(167) && index.eql?(3)
                     # for Non Owner Occupied
                     @another_title = sheet_data.cell(rrr,ccc)
                     @block_hash[@another_title] = {} unless @block_hash.has_key?(@another_title)
-                  elsif rrr.eql?(170) && index.eql?(13)
+                  elsif rrr.eql?(171) && index.eql?(13)
                     # for High Balance Adjustments
                     @another_title = sheet_data.cell(rrr,ccc)
                     @block_hash[@another_title] = {} unless @block_hash.has_key?(@another_title)
@@ -900,22 +899,22 @@ class ImportFilesController < ApplicationController
                     # for 1st and 2nd table
                     key = get_value(value)
                     @block_hash[@title][key] = {} unless @block_hash[@title].has_key?(key)
-                  elsif (rrr > 136) && (rrr < 153)
+                  elsif (rrr > 137) && (rrr < 154)
                     # for Lender Paid MI Adjustments
                     if index == 5 && value
                       key = value
-                      if rrr < 143
+                      if rrr <= 144
                         @block_hash[@title][first_key][value] = {} unless @block_hash[@title][first_key].has_key?(value)
                       else
                         @block_hash[@title][second_key][value] = {} unless @block_hash[@title][first_key].has_key?(value)
                       end
-                    elsif index == 6 && rrr < 153 && value
+                    elsif index == 6 && rrr < 154 && value
                       another_key = get_value(value)
                       @block_hash[@title][second_key][key][another_key] = {} if another_key
                     end
                   end
 
-                  if (155..160).to_a.include?(rrr) && ccc < 12
+                  if (156..161).to_a.include?(rrr) && ccc < 12
                     # for Subordinate Financing
                     if index.eql?(6)
                       key = sheet_data.cell(rrr,ccc)
@@ -928,14 +927,14 @@ class ImportFilesController < ApplicationController
                     end
                   end
 
-                  if rrr.eql?(155) && [18,19].include?(ccc)
+                  if rrr.eql?(156) && [18,19].include?(ccc)
                     # for Loan Size Adjustments
                     another_key = sheet_data.cell(rrr-1,ccc)
                     another_key = get_value(another_key)
                     @block_hash[@another_title][another_key] = {} unless @block_hash[@another_title].has_key?(another_key)
                   end
 
-                  if (161..165).to_a.include?(rrr)
+                  if (162..166).to_a.include?(rrr)
                     # for Misc Adjusters
                     if index.eql?(6)
                       key = sheet_data.cell(rrr,ccc)
@@ -955,7 +954,7 @@ class ImportFilesController < ApplicationController
                     end
                   end
 
-                  if [166,167,168].include?(rrr) && [7].include?(ccc)
+                  if [167,168,169].include?(rrr) && [7].include?(ccc)
                     #for Non Owner Occupied
                     hash_key = sheet_data.cell(rrr,ccc)
                     hash_key = get_value(hash_key)
@@ -974,29 +973,29 @@ class ImportFilesController < ApplicationController
                     end
                   end
 
-                  if rrr > 136 && rrr <= 152 && index >= 7 && value
+                  if rrr > 137 && rrr <= 153 && index >= 7 && value
                     # for Lender Paid MI Adjustments
-                    diff_of_row = rrr - 136
+                    diff_of_row = rrr - 137
                     hash_key = sheet_data.cell((rrr - diff_of_row),ccc)
                     hash_key = get_value(hash_key)
-                    if (137..142).to_a.include?(rrr)
+                    if (138..143).to_a.include?(rrr)
                       @block_hash[@title][first_key][key][hash_key] = value
                     else
-                      unless [143,148].include?(rrr)
+                      unless [144,153].include?(rrr)
                         @block_hash[@title][second_key][key][another_key][hash_key] = value if value
                       end
                     end
                   end
 
-                  if (155..160).to_a.include?(rrr) && ccc > 9 && ccc < 12 && value
+                  if (156..161).to_a.include?(rrr) && ccc > 9 && ccc < 12 && value
                     # for Subordinate Financing
-                    diff_of_row = rrr - 154
+                    diff_of_row = rrr - 155
                     hash_key = sheet_data.cell((rrr - diff_of_row),ccc)
                     hash_key = get_value(hash_key)
                     @block_hash[@title][key][keyOfHash][hash_key] = value if hash_key.present?
                   end
 
-                  if (155..162).to_a.include?(rrr) && ccc > 15 && value
+                  if (156..163).to_a.include?(rrr) && ccc > 15 && value
                     #for Loan Size Adjustments
                     if ccc.eql?(18)
                       diff_of_column = ccc - 15
@@ -1013,9 +1012,9 @@ class ImportFilesController < ApplicationController
                     end
                   end
 
-                  if (161..165).to_a.include?(rrr) && ccc == 11
+                  if (162..166).to_a.include?(rrr) && ccc == 11
                     #for Misc Adjusters
-                    if rrr.eql?(163)
+                    if rrr.eql?(164)
                       @block_hash[@title][first_key][second_key][third_key] = value
                     else
                       first_key = sheet_data.cell(rrr,ccc - 5)
@@ -1023,12 +1022,12 @@ class ImportFilesController < ApplicationController
                     end
                   end
 
-                  if [166,167,168].include?(rrr) && [11].include?(ccc)
+                  if [167,168,169].include?(rrr) && [11].include?(ccc)
                     #for Non Owner Occupied
                     @block_hash[@another_title][key] = value if key && value
                   end
 
-                  if [170,171].include?(rrr)
+                  if [171,172].include?(rrr)
                     # for High Balance
                     if index.eql?(19)
                       has_key = sheet_data.cell(rrr,ccc-2)
