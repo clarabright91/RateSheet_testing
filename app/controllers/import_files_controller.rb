@@ -6001,6 +6001,7 @@ class ImportFilesController < ApplicationController
             cc = 3 + max_column * 9 # (2 / 11)
             @title = sheet_data.cell(r,cc)
             @block_hash = {}
+
             if(@title.eql?("All Conforming ARMs (Does not include DU Refi Plus)"))
               @block_hash[@title] = {}
               key = ''
