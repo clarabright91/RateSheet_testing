@@ -82,6 +82,7 @@ GEM
     concurrent-ruby (1.1.4)
     connection_pool (2.2.2)
     crass (1.0.4)
+    csv (1.0.0)
     declarative (0.0.10)
     declarative-option (0.1.0)
     erubi (1.8.0)
@@ -308,6 +309,7 @@ DEPENDENCIES
   capybara (>= 2.15)
   chromedriver-helper
   coffee-rails (~> 4.2)
+  csv
   google_drive
   jbuilder (~> 2.5)
   jquery-datatables

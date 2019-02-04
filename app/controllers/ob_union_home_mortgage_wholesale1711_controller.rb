@@ -23,6 +23,13 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
       if (sheet == "Conventional")
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
+        @adjustment_hash = {}
+        @mortgage_hash = {}
+        @sub_hash = {}
+        @property_hash = {}
+        primary_key = ''
+        secondary_key = ''
+        ltv_key = ''
         # programs
         (10..77).each do |r|
           row = sheet_data.row(r)
@@ -36,7 +43,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
-                program_property              
+                program_property sheet              
                 @block_hash = {}
                 key = ''
                 (1..16).each do |max_row|
@@ -64,10 +71,124 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
             end
           end
         end
-      end
-    end
+        # adjustments
+        (79..144).each do |r|
+          row = sheet_data.row(r)
+          @ltv_data = sheet_data.row(80)
+          @cltv_data = sheet_data.row(90)
+          @sub_data = sheet_data.row(104)
+          if row.compact.count >= 1
+            (0..13).each do |cc|
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == 'Cash-Out Refinance'
+                  primary_key = "RefinanceOption/FICO/LTV"
+                  @adjustment_hash[primary_key] = {}
+                end
+                if value == "Applicable for all mortgages with terms greater than 15 years  "
+                  primary_key = "Term/FICO/LTV"
+                  @mortgage_hash[primary_key] = {}
+                end
+                if value == "Subordinate Financing LTV/CLTV/FICO Adjustments"
+                  primary_key = "FinancingType/LTV/CLTV/FICO"
+                  @sub_hash[primary_key] = {}
+                end
+                # Cash-Out Refinance
+                if r >= 81 && r <= 87 && cc == 3
+                  secondary_key = get_value value
+                  @adjustment_hash[primary_key][secondary_key] = {}
+                end
+                if r >= 81 && r <= 87 && cc >= 4 && cc <= 7
+                  ltv_key = get_value @ltv_data[cc-1]
+                  @adjustment_hash[primary_key][secondary_key][ltv_key] = {}
+                  @adjustment_hash[primary_key][secondary_key][ltv_key] = (value.class == Float ? value*100 : value)
+                end
+                # Applicable for all mortgages with all terms  
+                if r == 91 && cc == 3
+                  primary_key = "PropertyType/Term"
+                  @adjustment_hash[primary_key] = {}
+                end
+                if r == 91 && cc >= 4 && cc <= 11
+                  ltv_key = get_value @cltv_data[cc-1]
+                  @adjustment_hash[primary_key][ltv_key] = {}
+                  @adjustment_hash[primary_key][ltv_key] = (value.class == Float ? value*100 : value)
+                end
+                # Applicable for all mortgages with terms greater than 15 years  
+                if r >= 95 && r <= 101 && cc == 3
+                  secondary_key = get_value value
+                  @mortgage_hash[primary_key][secondary_key] = {}
+                end
+                if r >= 95 && r <= 101 && cc >= 4 && cc <= 11
+                  ltv_key = get_value @cltv_data[cc-1]
+                  @mortgage_hash[primary_key][secondary_key][ltv_key] = {}
+                  @mortgage_hash[primary_key][secondary_key][ltv_key] = (value.class == Float ? value*100 : value)
+                end
+                # Subordinate Financing LTV/CLTV/FICO Adjustments
+                if r >= 105 && r <= 109 && cc == 3
+                  secondary_key = get_value value
+                  @sub_hash[primary_key][secondary_key] = {}
+                end
+                if r >= 105 && r <= 109 && cc == 4
+                  ltv_key = get_value value
+                  @sub_hash[primary_key][secondary_key][ltv_key] = {}
+                end
+                if r >= 105 && r <= 109 && cc >= 5 && cc <= 6
+                  sub_data = get_value @sub_data[cc-1]
+                  @sub_hash[primary_key][secondary_key][ltv_key][sub_data] = {}
+                  @sub_hash[primary_key][secondary_key][ltv_key][sub_data] = (value.class == Float ? value*100 : value)
+                end
+                # Subordinate Finance
+                if r == 112 && cc == 3
+                  primary_key = "FinancingType"
+                  @sub_hash[primary_key] = value
+                end
+                # Property Type
+                if r == 112 && cc == 6
+                  primary_key = "Condo/LTV/Term/>75%"
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 3
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+                if r == 112 && cc == 11
+                  primary_key = value
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 2
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+                if r == 113 && cc == 6
+                  primary_key = value
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 3
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+                if r == 113 && cc == 11
+                  primary_key = value
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 2
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+              end
+            end
+          end
+        end
+        adjustment = [@adjustment_hash,@mortgage_hash,@sub_hash,@property_hash]
+        make_adjust(adjustment,sheet)
+      end      
+  	end
     redirect_to programs_ob_union_home_mortgage_wholesale1711_path(@sheet_obj)
-	end
+  end
 
   def conven_highbalance_30
     @xlsx.sheets.each do |sheet|
@@ -87,7 +208,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
-                program_property              
+                program_property sheet              
                 @block_hash = {}
                 key = ''
                 (1..10).each do |max_row|
@@ -138,7 +259,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
-                program_property              
+                program_property sheet              
                 @block_hash = {}
                 key = ''
                 (1..8).each do |max_row|
@@ -176,6 +297,8 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
       if (sheet == "Government 30_15 Yr")
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
+        @adjustment_hash = {}
+        primary_key = ''
         # programs
         (11..42).each do |r|
           row = sheet_data.row(r)
@@ -189,7 +312,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
-                program_property              
+                program_property sheet              
                 @block_hash = {}
                 key = ''
                 (1..16).each do |max_row|
@@ -217,6 +340,28 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
             end
           end
         end
+        # Adjustments
+        (30..77).each do |r|
+          row = sheet_data.row(r)
+          if row.compact.count >= 1
+            (0..13).each do |cc|
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if r >= 31 && r <= 42 && cc == 11
+                  primary_key = value
+                  @adjustment_hash[primary_key] = {}
+                  if @adjustment_hash[primary_key] = {}
+                    cc = cc + 1
+                    new_value = sheet_data.cell(r,cc)
+                    @adjustment_hash[primary_key] = new_value
+                  end
+                end
+              end
+            end
+          end
+        end
+        adjustment = [@adjustment_hash]
+        make_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_ob_union_home_mortgage_wholesale1711_path(@sheet_obj)
@@ -227,6 +372,13 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
       if (sheet == "ARM Programs")
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
+        @adjustment_hash = {}
+        @mortgage_hash = {}
+        @sub_hash = {}
+        @property_hash = {}
+        primary_key = ''
+        secondary_key = ''
+        ltv_key = ''
         # programs
         (11..55).each do |r|
           row = sheet_data.row(r)
@@ -240,7 +392,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
-                program_property              
+                program_property sheet              
                 @block_hash = {}
                 key = ''
                 (1..13).each do |max_row|
@@ -268,6 +420,120 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
             end
           end
         end
+        # adjustments
+        (58..123).each do |r|
+          row = sheet_data.row(r)
+          @ltv_data = sheet_data.row(59)
+          @cltv_data = sheet_data.row(68)
+          @sub_data = sheet_data.row(82)
+          if row.compact.count >= 1
+            (0..13).each do |cc|
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == 'Cash-Out Refinance'
+                  primary_key = "RefinanceOption/FICO/LTV"
+                  @adjustment_hash[primary_key] = {}
+                end
+                if value == "Applicable for all mortgages with terms greater than 15 years  "
+                  primary_key = "Term/FICO/LTV"
+                  @mortgage_hash[primary_key] = {}
+                end
+                if value == "Subordinate Financing LTV/CLTV/FICO Adjustments"
+                  primary_key = "FinancingType/LTV/CLTV/FICO"
+                  @sub_hash[primary_key] = {}
+                end
+                # Cash-Out Refinance
+                if r >= 60 && r <= 65 && cc == 2
+                  secondary_key = get_value value
+                  @adjustment_hash[primary_key][secondary_key] = {}
+                end
+                if r >= 60 && r <= 65 && cc >= 3 && cc <= 6
+                  ltv_key = get_value @ltv_data[cc-1]
+                  @adjustment_hash[primary_key][secondary_key][ltv_key] = {}
+                  @adjustment_hash[primary_key][secondary_key][ltv_key] = (value.class == Float ? value*100 : value)
+                end
+                # Applicable for all mortgages with all terms  
+                if r == 69 && cc == 2
+                  primary_key = "PropertyType/Term"
+                  @adjustment_hash[primary_key] = {}
+                end
+                if r == 69 && cc >= 3 && cc <= 10
+                  ltv_key = get_value @cltv_data[cc-1]
+                  @adjustment_hash[primary_key][ltv_key] = {}
+                  @adjustment_hash[primary_key][ltv_key] = (value.class == Float ? value*100 : value)
+                end
+                # Applicable for all mortgages with terms greater than 15 years  
+                if r >= 73 && r <= 79 && cc == 2
+                  secondary_key = get_value value
+                  @mortgage_hash[primary_key][secondary_key] = {}
+                end
+                if r >= 73 && r <= 79 && cc >= 3 && cc <= 10
+                  ltv_key = get_value @cltv_data[cc-1]
+                  @mortgage_hash[primary_key][secondary_key][ltv_key] = {}
+                  @mortgage_hash[primary_key][secondary_key][ltv_key] = (value.class == Float ? value*100 : value)
+                end
+                # Subordinate Financing LTV/CLTV/FICO Adjustments
+                if r >= 83 && r <= 87 && cc == 5
+                  secondary_key = get_value value
+                  @sub_hash[primary_key][secondary_key] = {}
+                end
+                if r >= 83 && r <= 87 && cc == 6
+                  ltv_key = get_value value
+                  @sub_hash[primary_key][secondary_key][ltv_key] = {}
+                end
+                if r >= 83 && r <= 87 && cc >= 7 && cc <= 8
+                  sub_data = get_value @sub_data[cc-1]
+                  @sub_hash[primary_key][secondary_key][ltv_key][sub_data] = {}
+                  @sub_hash[primary_key][secondary_key][ltv_key][sub_data] = (value.class == Float ? value*100 : value)
+                end
+                # Subordinate Finance
+                if r == 90 && cc == 2
+                  primary_key = "FinancingType"
+                  @sub_hash[primary_key] = value
+                end
+                # Property Type
+                if r == 90 && cc == 5
+                  primary_key = "Condo/LTV/Term/>75%"
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 2
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+                if r == 90 && cc == 9
+                  primary_key = value
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 1
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+                if r == 91 && cc == 5
+                  primary_key = value
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 2
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+                if r == 91 && cc == 9
+                  primary_key = value
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 1
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+              end
+            end
+          end
+        end
+        adjustment = [@adjustment_hash,@mortgage_hash,@sub_hash,@property_hash]
+        make_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_ob_union_home_mortgage_wholesale1711_path(@sheet_obj)
@@ -278,6 +544,13 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
       if (sheet == "FNMA DU-Refi Plus")
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
+        @adjustment_hash = {}
+        @mortgage_hash = {}
+        @sub_hash = {}
+        @property_hash = {}
+        primary_key = ''
+        secondary_key = ''
+        ltv_key = ''
         # programs
         (10..24).each do |r|
           row = sheet_data.row(r)
@@ -291,7 +564,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
-                program_property              
+                program_property sheet              
                 @block_hash = {}
                 key = ''
                 (1..13).each do |max_row|
@@ -319,6 +592,120 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
             end
           end
         end
+        # adjustments
+        (27..98).each do |r|
+          row = sheet_data.row(r)
+          @ltv_data = sheet_data.row(35)
+          @cltv_data = sheet_data.row(45)
+          @sub_data = sheet_data.row(59)
+          if row.compact.count >= 1
+            (0..13).each do |cc|
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == 'Cash-Out Refinance'
+                  primary_key = "RefinanceOption/FICO/LTV"
+                  @adjustment_hash[primary_key] = {}
+                end
+                if value == "Applicable for all mortgages with terms greater than 15 years  "
+                  primary_key = "Term/FICO/LTV"
+                  @mortgage_hash[primary_key] = {}
+                end
+                if value == "Subordinate Financing LTV/CLTV/FICO Adjustments"
+                  primary_key = "FinancingType/LTV/CLTV/FICO"
+                  @sub_hash[primary_key] = {}
+                end
+                # Cash-Out Refinance
+                if r >= 36 && r <= 42 && cc == 2
+                  secondary_key = get_value value
+                  @adjustment_hash[primary_key][secondary_key] = {}
+                end
+                if r >= 36 && r <= 42 && cc >= 3 && cc <= 6
+                  ltv_key = get_value @ltv_data[cc-1]
+                  @adjustment_hash[primary_key][secondary_key][ltv_key] = {}
+                  @adjustment_hash[primary_key][secondary_key][ltv_key] = (value.class == Float ? value*100 : value)
+                end
+                # Applicable for all mortgages with all terms  
+                if r == 46 && cc == 2
+                  primary_key = "PropertyType/Term"
+                  @adjustment_hash[primary_key] = {}
+                end
+                if r == 46 && cc >= 3 && cc <= 10
+                  ltv_key = get_value @cltv_data[cc-1]
+                  @adjustment_hash[primary_key][ltv_key] = {}
+                  @adjustment_hash[primary_key][ltv_key] = (value.class == Float ? value*100 : value)
+                end
+                # Applicable for all mortgages with terms greater than 15 years  
+                if r >= 50 && r <= 56 && cc == 2
+                  secondary_key = get_value value
+                  @mortgage_hash[primary_key][secondary_key] = {}
+                end
+                if r >= 50 && r <= 56 && cc >= 3 && cc <= 10
+                  ltv_key = get_value @cltv_data[cc-1]
+                  @mortgage_hash[primary_key][secondary_key][ltv_key] = {}
+                  @mortgage_hash[primary_key][secondary_key][ltv_key] = (value.class == Float ? value*100 : value)
+                end
+                # Subordinate Financing LTV/CLTV/FICO Adjustments
+                if r >= 60 && r <= 64 && cc == 2
+                  secondary_key = get_value value
+                  @sub_hash[primary_key][secondary_key] = {}
+                end
+                if r >= 60 && r <= 64 && cc == 3
+                  ltv_key = get_value value
+                  @sub_hash[primary_key][secondary_key][ltv_key] = {}
+                end
+                if r >= 60 && r <= 64 && cc >= 4 && cc <= 5
+                  sub_data = get_value @sub_data[cc-1]
+                  @sub_hash[primary_key][secondary_key][ltv_key][sub_data] = {}
+                  @sub_hash[primary_key][secondary_key][ltv_key][sub_data] = (value.class == Float ? value*100 : value)
+                end
+                # Subordinate Finance
+                if r == 67 && cc == 2
+                  primary_key = "FinancingType"
+                  @sub_hash[primary_key] = value
+                end
+                # Property Type
+                if r == 67 && cc == 5
+                  primary_key = "Condo/LTV/Term/>75%"
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 3
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+                if r == 67 && cc == 10
+                  primary_key = value
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 2
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+                if r == 68 && cc == 5
+                  primary_key = value
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 3
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+                if r == 68 && cc == 10
+                  primary_key = value
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 2
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+              end
+            end
+          end
+        end
+        adjustment = [@adjustment_hash,@mortgage_hash,@sub_hash,@property_hash]
+        make_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_ob_union_home_mortgage_wholesale1711_path(@sheet_obj)
@@ -329,6 +716,13 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
       if (sheet == "FHLMC Open Access")
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
+        @adjustment_hash = {}
+        @mortgage_hash = {}
+        @sub_hash = {}
+        @property_hash = {}
+        primary_key = ''
+        secondary_key = ''
+        ltv_key = ''
         # programs
         (11..25).each do |r|
           row = sheet_data.row(r)
@@ -342,7 +736,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
-                program_property              
+                program_property sheet              
                 @block_hash = {}
                 key = ''
                 (1..13).each do |max_row|
@@ -370,6 +764,96 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
             end
           end
         end
+        # Adjustments
+        (27..91).each do |r|
+          row = sheet_data.row(r)
+          @ltv_data = sheet_data.row(28)
+          @cltv_data = sheet_data.row(39)
+          @sub_data = sheet_data.row(51)
+          if row.compact.count >= 1
+            (0..13).each do |cc|
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == 'Cash-Out Refinance'
+                  primary_key = "RefinanceOption/FICO/LTV"
+                  @adjustment_hash[primary_key] = {}
+                end
+                if value == "Applicable for all mortgages with terms greater than 15 years  "
+                  primary_key = "Term/FICO/LTV"
+                  @mortgage_hash[primary_key] = {}
+                end
+                if value == "Subordinate Financing LTV/CLTV/FICO Adjustments"
+                  primary_key = "FinancingType/LTV/CLTV/FICO"
+                  @sub_hash[primary_key] = {}
+                end
+                # Cash-Out Refinance
+                if r >= 29 && r <= 35 && cc == 2
+                  secondary_key = get_value value
+                  @adjustment_hash[primary_key][secondary_key] = {}
+                end
+                if r >= 29 && r <= 35 && cc >= 3 && cc <= 6
+                  ltv_key = get_value @ltv_data[cc-1]
+                  @adjustment_hash[primary_key][secondary_key][ltv_key] = {}
+                  @adjustment_hash[primary_key][secondary_key][ltv_key] = (value.class == Float ? value*100 : value)
+                end
+                # Applicable for all mortgages with terms greater than 15 years
+                if r >= 40 && r <= 48 && cc == 2
+                  secondary_key = get_value value
+                  @mortgage_hash[primary_key][secondary_key] = {}
+                end
+                if r >= 40 && r <= 48 && cc >= 3 && cc <= 10
+                  ltv_key = get_value @cltv_data[cc-1]
+                  @mortgage_hash[primary_key][secondary_key][ltv_key] = {}
+                  @mortgage_hash[primary_key][secondary_key][ltv_key] = (value.class == Float ? value*100 : value)
+                end
+                # Subordinate Financing LTV/CLTV/FICO Adjustments
+                if r >= 52 && r <= 58 && cc == 6
+                  secondary_key = get_value value
+                  @sub_hash[primary_key][secondary_key] = {}
+                end
+                if r >= 52 && r <= 58 && cc == 7
+                  ltv_key = get_value value
+                  @sub_hash[primary_key][secondary_key][ltv_key] = {}
+                end
+                if r >= 52 && r <= 58 && cc >= 8 && cc <= 9
+                  sub_data = get_value @sub_data[cc-1]
+                  @sub_hash[primary_key][secondary_key][ltv_key][sub_data] = {}
+                  @sub_hash[primary_key][secondary_key][ltv_key][sub_data] = (value.class == Float ? value*100 : value)
+                end
+                # Property Type
+                if r == 61 && cc == 5
+                  primary_key = "Condo/LTV/Term/>75%"
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 3
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+                if r == 61 && cc == 10
+                  primary_key = value
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 2
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+                if r == 62 && cc == 10
+                  primary_key = value
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 2
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+              end
+            end
+          end
+        end
+        adjustment = [@adjustment_hash,@mortgage_hash,@sub_hash,@property_hash]
+        make_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_ob_union_home_mortgage_wholesale1711_path(@sheet_obj)
@@ -380,6 +864,12 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
       if (sheet == "FNMA Home Ready")
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
+        @adjustment_hash = {}
+        @sub_hash = {}
+        @property_hash = {}
+        primary_key = ''
+        secondary_key = ''
+        ltv_key = ''
         # programs
         (11..28).each do |r|
           row = sheet_data.row(r)
@@ -393,7 +883,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
-                program_property              
+                program_property sheet              
                 @block_hash = {}
                 key = ''
                 (1..16).each do |max_row|
@@ -421,6 +911,99 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
             end
           end
         end
+        # Adjustment
+        (35..90).each do |r|
+          row = sheet_data.row(r)
+          @ltv_data = sheet_data.row(36)
+          @cltv_data = sheet_data.row(50)
+          if row.compact.count >= 1
+            (0..13).each do |cc|
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "Applicable for all mortgages with with all terms"
+                  primary_key = "PropertyType/LTV"
+                  @adjustment_hash[primary_key] = {}
+                end
+                if value == "Applicable for all mortgages with terms greater than 15 years  "
+                  primary_key = "Term/FICO/LTV"
+                  @adjustment_hash[primary_key] = {}
+                end
+                if value == "Subordinate Financing LTV/CLTV/FICO Adjustments"
+                  primary_key = "FinancingType/LTV/CLTV/FICO"
+                  @sub_hash[primary_key] = {}
+                end
+                # Applicable for all mortgages with with all terms
+                if r == 37 && cc >= 3 && cc <= 10
+                  ltv_key = get_value @ltv_data[cc-1]
+                  @adjustment_hash[primary_key][ltv_key] = (value.class == Float ? value*100 : value)
+                end
+                # Applicable for all mortgages with terms greater than 15 years
+                if r >= 41 && r <= 47 && cc == 2
+                  secondary_key = get_value value
+                  @adjustment_hash[primary_key][secondary_key] = {}
+                end
+                if r >= 41 && r <= 47 && cc >= 3 && cc <= 10
+                  ltv_key = get_value @ltv_data[cc-1]
+                  @adjustment_hash[primary_key][secondary_key][ltv_key] = {}
+                  @adjustment_hash[primary_key][secondary_key][ltv_key] = (value.class == Float ? value*100 : value)
+                end
+                # Subordinate Financing LTV/CLTV/FICO Adjustments
+                if r >= 51 && r <= 55 && cc == 5
+                  secondary_key = get_value value
+                  @sub_hash[primary_key][secondary_key] = {}
+                end
+                if r >= 51 && r <= 55 && cc == 6
+                  ltv_key = get_value value
+                  @sub_hash[primary_key][secondary_key][ltv_key] = {}
+                end
+                if r >= 51 && r <= 55 && cc >= 7 && cc <= 8
+                  cltv_key = get_value @cltv_data[cc-1]
+                  @sub_hash[primary_key][secondary_key][ltv_key][cltv_key] = {}
+                  @sub_hash[primary_key][secondary_key][ltv_key][cltv_key] = (value.class == Float ? value*100 : value)
+                end
+                 # Property Type
+                if r == 59 && cc == 5
+                  primary_key = "Condo/LTV/Term/>75%"
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 3
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+                if r == 59 && cc == 10
+                  primary_key = value
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 2
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+                if r == 60 && cc == 5
+                  primary_key = value
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 3
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+                if r == 60 && cc == 10
+                  primary_key = value
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 2
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+              end
+            end
+          end
+        end
+        adjustment = [@adjustment_hash,@sub_hash,@property_hash]
+        make_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_ob_union_home_mortgage_wholesale1711_path(@sheet_obj)
@@ -428,9 +1011,15 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
 
   def fhlmc_home_possible
     @xlsx.sheets.each do |sheet|
-      if (sheet == "FNMA Home Ready")
+      if (sheet == "FHLMC Home Possible")
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
+        @adjustment_hash = {}
+        @sub_hash = {}
+        @property_hash = {}
+        primary_key = ''
+        secondary_key = ''
+        ltv_key = ''
         # programs
         (10..27).each do |r|
           row = sheet_data.row(r)
@@ -444,7 +1033,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
-                program_property              
+                program_property sheet              
                 @block_hash = {}
                 key = ''
                 (1..16).each do |max_row|
@@ -472,6 +1061,90 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
             end
           end
         end
+        # Adjustment
+        (35..86).each do |r|
+          row = sheet_data.row(r)
+          @ltv_data = sheet_data.row(36)
+          @cltv_data = sheet_data.row(46)
+          if row.compact.count >= 1
+            (0..13).each do |cc|
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "Applicable for all mortgages with terms greater than 15 years  "
+                  primary_key = "Term/FICO/LTV"
+                  @adjustment_hash[primary_key] = {}
+                end
+                if value == "Subordinate Financing LTV/CLTV/FICO Adjustments"
+                  primary_key = "FinancingType/LTV/CLTV/FICO"
+                  @sub_hash[primary_key] = {}
+                end
+                # Applicable for all mortgages with terms greater than 15 years
+                if r >= 37 && r <= 43 && cc == 2
+                  secondary_key = get_value value
+                  @adjustment_hash[primary_key][secondary_key] = {}
+                end
+                if r >= 37 && r <= 43 && cc >= 3 && cc <= 10
+                  ltv_key = @ltv_data[cc-1]
+                  @adjustment_hash[primary_key][secondary_key][ltv_key] = {}
+                  @adjustment_hash[primary_key][secondary_key][ltv_key] = (value.class == Float ? value*100 : value)
+                end
+                # Subordinate Financing LTV/CLTV/FICO Adjustments
+                if r >= 47 && r <= 51 && cc == 5
+                  secondary_key = value
+                  @sub_hash[primary_key][secondary_key] = {}
+                end
+                if r >= 47 && r <= 51 && cc == 6
+                  ltv_key = value
+                  @sub_hash[primary_key][secondary_key][ltv_key] = {}
+                end
+                if r >= 47 && r <= 51 && cc >= 7 && cc <= 8
+                  cltv_key = @cltv_data[cc-1]
+                  @sub_hash[primary_key][secondary_key][ltv_key][cltv_key] = {}
+                  @sub_hash[primary_key][secondary_key][ltv_key][cltv_key] = (value.class == Float ? value*100 : value)
+                end
+                 # Property Type
+                if r == 55 && cc == 5
+                  primary_key = "Condo/LTV/Term/>75%"
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 3
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+                if r == 55 && cc == 10
+                  primary_key = value
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 2
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+                if r == 56 && cc == 5
+                  primary_key = value
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 3
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+                if r == 56 && cc == 10
+                  primary_key = value
+                  @property_hash[primary_key] = {}
+                  if @property_hash[primary_key] = {}
+                    cc = cc + 2
+                    new_value = sheet_data.cell(r,cc)
+                    @property_hash[primary_key] = new_value
+                  end
+                end
+              end
+            end
+          end
+        end
+        adjustment = [@adjustment_hash,@sub_hash,@property_hash]
+        make_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_ob_union_home_mortgage_wholesale1711_path(@sheet_obj)
@@ -495,7 +1168,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
-                program_property              
+                program_property sheet              
                 @block_hash = {}
                 key = ''
                 (1..23).each do |max_row|
@@ -546,7 +1219,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
-                program_property              
+                program_property sheet              
                 @block_hash = {}
                 key = ''
                 (1..10).each do |max_row|
@@ -619,7 +1292,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
       @xlsx = Roo::Spreadsheet.open(file)
     end
 
-    def program_property
+    def program_property sheet
       if @program.program_name.include?("30") || @program.program_name.include?("30/25 Year")
         term = 30
       elsif @program.program_name.include?("20")
@@ -702,6 +1375,6 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
         @program.loan_limit_type << "High Balance"
       end
       @program.save
-      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, jumbo_high_balance: jumbo_high_balance, arm_basic: arm_basic, arm_advanced: arm_advanced)
+      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, jumbo_high_balance: jumbo_high_balance, arm_basic: arm_basic, arm_advanced: arm_advanced, sheet_name: sheet)
     end
 end

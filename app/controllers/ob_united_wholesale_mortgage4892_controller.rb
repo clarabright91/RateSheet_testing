@@ -191,6 +191,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@loan_amount]
         make_adjust(adjustment,sheet)
+        create_program_association_with_adjustment(sheet)
       end
     end
     redirect_to programs_ob_united_wholesale_mortgage4892_path(@sheet_obj)
@@ -463,6 +464,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@loan_amount]
         make_adjust(adjustment,sheet)
+        create_program_association_with_adjustment(sheet)
       end
     end
     redirect_to programs_ob_united_wholesale_mortgage4892_path(@sheet_obj)
@@ -681,6 +683,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@loan_amount,@other_adjustment]
         make_adjust(adjustment,sheet)
+        create_program_association_with_adjustment(sheet)
       end
     end
     redirect_to programs_ob_united_wholesale_mortgage4892_path(@sheet_obj)
@@ -743,86 +746,6 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
             end
           end
         end
-
-        # adjustments
-        # (69..93).each do |r|
-        #   row = sheet_data.row(r)
-        #   @ltv_data = sheet_data.row(69)
-        #   if row.compact.count > 1
-        #     (0..14).each do |cc|
-        #       value = sheet_data.cell(r,cc)
-        #       if value.present?
-        #         if value == "Credit Score"
-        #           primary_key = "LoanType/FICO/CLTV"
-        #           @adjustment_hash[primary_key] = {}
-        #         end
-        #         if value == "Loan Amount:"
-        #           primary_key = "LoanType/LoanAmount/CLTV"
-        #           @loan_amount[primary_key] = {}
-        #         end
-        #         if value == "Cash Out"
-        #           primary_key = "RefinanceOption/LTV"
-        #           @other_adjustment[primary_key] = {}
-        #         end
-        #         if value == "Purchase"
-        #           primary_key = "LoanPurpose"
-        #           @other_adjustment[primary_key] = {}
-        #         end
-        #         if value == "Escrow Waiver (LTVs >80%; CA only)"
-        #           primary_key = "Escrow Waiver"
-        #           @other_adjustment[primary_key] = {}
-        #         end
-        #         # Credit Score
-        #         if r >= 70 && r <= 75 && cc == 5
-        #           secondary_key = get_value value
-        #           @adjustment_hash[primary_key][secondary_key] = {}
-        #         end
-        #         if r >= 70 && r <= 75 && cc >= 8 && cc <= 14
-        #           ltv_key = get_value @ltv_data[cc-1]
-        #           @adjustment_hash[primary_key][secondary_key][ltv_key] = {}
-        #           @adjustment_hash[primary_key][secondary_key][ltv_key] = value
-        #         end
-        #         # Loan Amount:
-        #         if r >= 76 && r <= 82 && cc == 5
-        #           secondary_key = get_value value
-        #           @loan_amount[primary_key][secondary_key] = {}
-        #         end
-        #         if r >= 76 && r <= 82 && cc >= 8 && cc <= 14
-        #           ltv_key = get_value @ltv_data[cc-1]
-        #           @loan_amount[primary_key][secondary_key][ltv_key] = {}
-        #           @loan_amount[primary_key][secondary_key][ltv_key] = value
-        #         end
-        #         # Other Adjustment
-        #         if r == 83 && cc >= 8 && cc <= 14
-        #           ltv_key = get_value @ltv_data[cc-1]
-        #           @other_adjustment[primary_key][ltv_key] = {}
-        #           @other_adjustment[primary_key][ltv_key] = value
-        #         end
-        #         if r >= 84 && r <= 88 && cc == 3
-        #           primary_key = value
-        #           @other_adjustment[primary_key] = {}
-        #         end
-        #         if r >= 84 && r <= 88 && cc >= 8 && cc <= 14
-        #           ltv_key = get_value @ltv_data[cc-1]
-        #           @other_adjustment[primary_key][ltv_key] = {}
-        #           @other_adjustment[primary_key][ltv_key] = value
-        #         end
-        #         if r == 89 && cc >= 8 && cc <= 14
-        #           ltv_key = get_value @ltv_data[cc-1]
-        #           @other_adjustment[primary_key][ltv_key] = {}
-        #           @other_adjustment[primary_key][ltv_key] = value
-        #         end
-        #         if r == 90 && cc >= 8 && cc <= 14
-        #           ltv_key = get_value @ltv_data[cc-1]
-        #           @other_adjustment[primary_key][ltv_key] = {}
-        #           @other_adjustment[primary_key][ltv_key] = value
-        #         end
-        #       end
-        #     end
-        #   end
-        # end
-        # adjustment = [@adjustment_hash,@loan_amount,@other_adjustment]
-        # make_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_ob_united_wholesale_mortgage4892_path(@sheet_obj)
@@ -1037,6 +960,44 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 end
               end
               @program.update(base_rate: @block_hash)
+            end
+          end
+        end
+      end
+    end
+
+    def create_program_association_with_adjustment(sheet)
+      adjustment_list = Adjustment.where(sheet_name: sheet)
+      program_list = Program.where(sheet_name: sheet)
+
+      adjustment_list.each_with_index do |adj_ment, index|
+        key_list = adj_ment.data.keys.first.split("/")
+        program_filter1={}
+        program_filter2={}
+        include_in_input_values = false
+        if key_list.present?
+          key_list.each_with_index do |key_name, key_index|
+            if (Program.column_names.include?(key_name.underscore))
+              unless (Program.column_for_attribute(key_name.underscore).type.to_s == "boolean")
+                program_filter1[key_name.underscore] = nil
+              else
+                if (Program.column_for_attribute(key_name.underscore).type.to_s == "boolean")
+                  program_filter2[key_name.underscore] = true
+                end
+              end
+            else
+              if(Adjustment::INPUT_VALUES.include?(key_name))
+                include_in_input_values = true
+              end
+            end
+          end
+
+          if (include_in_input_values)
+            program_list1 = program_list.where.not(program_filter1)
+            program_list2 = program_list1.where(program_filter2)
+
+            if program_list2.present?
+              program_list2.map{ |program| program.adjustments << adj_ment unless program.adjustments.include?(adj_ment) }
             end
           end
         end

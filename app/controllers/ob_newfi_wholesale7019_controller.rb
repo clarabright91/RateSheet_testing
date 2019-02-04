@@ -50,7 +50,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @title = sheet_data.cell(r,cc)
               if @title.present? && @title != "Rate"
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
+                program_property @program, sheet
                 @programs_ids << @program.id
               end
 
@@ -195,7 +195,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @title = sheet_data.cell(r,cc)
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
+                program_property @program, sheet
                 @programs_ids << @program.id
               end
 
@@ -265,7 +265,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @title = sheet_data.cell(r,cc)
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
+                program_property @program, sheet
                 @programs_ids << @program.id
               end
 
@@ -350,7 +350,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @title = sheet_data.cell(r,cc)
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
+                program_property @program, sheet
                 @programs_ids << @program.id
               end
 
@@ -491,7 +491,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @title = sheet_data.cell(r,cc)
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
+                program_property @program, sheet
                 @programs_ids << @program.id
               end
 
@@ -611,7 +611,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @title = sheet_data.cell(r,cc)
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
+                program_property @program, sheet
                 @programs_ids << @program.id
               end
 
@@ -689,7 +689,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @title = sheet_data.cell(r,cc)
               if @title.present? && @title != "5/1 CMT ARM 1/1/5 VA"
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
+                program_property @program, sheet
                 @programs_ids << @program.id
               end
 
@@ -834,7 +834,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @title = sheet_data.cell(r,cc)
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
+                program_property @program, sheet
                 @programs_ids << @program.id
               end
 
@@ -988,7 +988,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @title = sheet_data.cell(r,cc)
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
+                program_property @program, sheet
                 @programs_ids << @program.id
               end
 
@@ -1245,7 +1245,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @title = sheet_data.cell(r,cc)
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
+                program_property @program, sheet
                 @programs_ids << @program.id
               end
 
@@ -1484,7 +1484,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @title = sheet_data.cell(r,cc)
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
+                program_property @program, sheet
                 @programs_ids << @program.id
               end
 
@@ -1768,7 +1768,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @title = sheet_data.cell(r,cc)
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
+                program_property @program, sheet
                 @programs_ids << @program.id
               end
 
@@ -1951,7 +1951,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @title = sheet_data.cell(r,cc)
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
+                program_property @program, sheet
                 @programs_ids << @program.id
               end
 
@@ -2134,7 +2134,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @title = sheet_data.cell(r,cc)
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
+                program_property @program, sheet
                 @programs_ids << @program.id
               end
 
@@ -2352,7 +2352,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
       @program = Program.find(params[:id])
     end
 
-    def program_property value1
+    def program_property value1, sheet
       # term
       if @program.program_name.include?("30 Year") || @program.program_name.include?("30Yr") || @program.program_name.include?("30 Yr") || @program.program_name.include?("30/25 Year") || @program.program_name.include?("30 YR")
         term = 30
@@ -2418,7 +2418,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
         @program.loan_limit_type << "High Balance"
       end
       @program.save
-      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline)
+      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, sheet_name: sheet)
     end
     def make_adjust(block_hash, sheet)
       block_hash.each do |hash|
@@ -2472,43 +2472,36 @@ class ObNewfiWholesale7019Controller < ApplicationController
 
     def create_program_association_with_adjustment(sheet)
       adjustment_list = Adjustment.where(sheet_name: sheet)
+      program_list = Program.where(sheet_name: sheet)
+
       adjustment_list.each_with_index do |adj_ment, index|
         key_list = adj_ment.data.keys.first.split("/")
         program_filter1={}
         program_filter2={}
-
+        include_in_input_values = false
         if key_list.present?
           key_list.each_with_index do |key_name, key_index|
-            if key_name == "LoanType" || key_name == "Term"
-              program_filter1[key_name.underscore] = nil
-            end
-
-            if key_name == "FICO"
-            end
-
-            if key_name == "LTV"
-            end
-
-            if key_name == "LoanAmount"
-            end
-
-            if key_name == "FinancingType"
-            end
-
-            if key_name == "CashOut"
+            if (Program.column_names.include?(key_name.underscore))
+              unless (Program.column_for_attribute(key_name.underscore).type.to_s == "boolean")
+                program_filter1[key_name.underscore] = nil
+              else
+                if (Program.column_for_attribute(key_name.underscore).type.to_s == "boolean")
+                  program_filter2[key_name.underscore] = true
+                end
+              end
+            else
+              if(Adjustment::INPUT_VALUES.include?(key_name))
+                include_in_input_values = true
+              end
             end
           end
 
-          program_list1 = Program.where.not(program_filter1)
-          program_list2 = program_list1.where(program_filter2)
+          if (include_in_input_values)
+            program_list1 = program_list.where.not(program_filter1)
+            program_list2 = program_list1.where(program_filter2)
 
-          if program_list2.present?
-            program_list2.each do |program|
-              program.adjustments.destroy_all
-            end
-
-            program_list2.each do |program|
-              program.adjustments << adj_ment
+            if program_list2.present?
+              program_list2.map{ |program| program.adjustments << adj_ment unless program.adjustments.include?(adj_ment) }
             end
           end
         end

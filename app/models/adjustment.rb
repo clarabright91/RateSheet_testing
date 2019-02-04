@@ -172,4 +172,22 @@ class Adjustment < ApplicationRecord
       54 => {"> 95" => "95"}
     }
   }
+
+  INPUT_VALUES = [
+    "PropertyType",
+    "FinancingType",
+    "PremiumType",
+    "LTV",
+    "FICO",
+    "RefinanceOption",
+    "MiscAdjuster",
+    "LPMI",
+    "Coverage",
+    "LoanAmount",
+    "CLTV",
+    "DTI",
+    "InterestRate",
+    "LockPeriod",
+    "State"
+  ]
 end
