@@ -3548,8 +3548,8 @@ class ObCmgWholesalesController < ApplicationController
 
   def create_program_association_with_adjustment(sheet)
     adjustment_list = Adjustment.where(sheet_name: sheet)
-    # program_list = Program.where(sheet_name: sheet)
-    input_values = ["PropertyType","FinancingType","PremiumType","LTV","FICO","RefinanceOption","MiscAdjuster","LPMI","Coverage","LoanAmount","CLTV","DTI","InterestRate","LockPeriod","State"]
+    program_list = Program.where(sheet_name: sheet)
+
     adjustment_list.each_with_index do |adj_ment, index|
       key_list = adj_ment.data.keys.first.split("/")
       program_filter1={}
@@ -3566,23 +3566,18 @@ class ObCmgWholesalesController < ApplicationController
               end
             end
           else
-            if(input_values.include?(key_name))
+            if(Adjustment::INPUT_VALUES.include?(key_name))
               include_in_input_values = true
             end
           end
         end
 
         if (include_in_input_values)
-          program_list1 = Program.where.not(program_filter1)
+          program_list1 = program_list.where.not(program_filter1)
           program_list2 = program_list1.where(program_filter2)
 
           if program_list2.present?
-            program_list2.each do |program|
-              program.adjustments.destroy_all
-            end
-            program_list2.each do |program|
-              program.adjustments << adj_ment
-            end
+            program_list2.map{ |program| program.adjustments << adj_ment unless program.adjustments.include?(adj_ment) }
           end
         end
       end
