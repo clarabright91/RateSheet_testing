@@ -302,6 +302,8 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
             end
           end
         end
+        adjustment = [@adjustment_hash,@cashout_adjustment,@product_hash,@subordinate_hash,@subordinate_hash, @additional_hash,@lpmi_hash]
+        make_adjust(adjustment,sheet)
         
         # Freddie programs
         (458..684).each do |r|
@@ -580,6 +582,8 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
             end
           end
         end
+        adjustment = [@freddie_adjustment_hash,@relief_cashout_adjustment,@cashout_adjustment,@product_hash,@subordinate_hash,@subordinate_hash, @additional_hash,@lpmi_hash]
+        make_adjust(adjustment,sheet)
         # FHA Va Usda programs
         (844..1006).each do |r|
           row = sheet_data.row(r)
@@ -840,5 +844,11 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
       end
       @program.save
       @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline)
+    end
+
+    def make_adjust(block_hash, sheet)
+      block_hash.each do |hash|
+        Adjustment.create(data: hash,sheet_name: sheet)
+      end
     end
 end
