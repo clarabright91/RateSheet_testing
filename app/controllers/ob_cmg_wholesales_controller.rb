@@ -257,6 +257,7 @@ class ObCmgWholesalesController < ApplicationController
         end
         adjustment = [@data_hash,@misc_hash,@state_hash]
         make_adjust(adjustment,sheet)
+
         create_program_association_with_adjustment(sheet)
       end
     end
@@ -3620,7 +3621,8 @@ class ObCmgWholesalesController < ApplicationController
 
   def make_adjust(block_hash, sheet)
     block_hash.each do |hash|
-      Adjustment.create(data: hash,sheet_name: sheet)
+      Adjustment.create(data: hash.to_json,sheet_name: sheet)
+      # Adjustment.create(data: hash,sheet_name: sheet)
     end
   end
 end

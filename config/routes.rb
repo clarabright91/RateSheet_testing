@@ -112,6 +112,14 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :ob_sun_west_wholesale_demo5907, only: [:index] do
+    member do
+      get :programs
+      get :ratesheet
+      get :single_program
+    end
+  end
+
   resources :ob_united_wholesale_mortgage4892, only: [:index] do
     member do
       get :programs
