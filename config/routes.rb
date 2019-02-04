@@ -121,6 +121,7 @@ Rails.application.routes.draw do
       get :govt_arms
       get '/non-conf' => 'ob_united_wholesale_mortgage4892#non_conf'
       get :harp
+      get :conv_adjustments
     end
   end
 
@@ -156,6 +157,7 @@ Rails.application.routes.draw do
       get :fhlmc_home_possible
       get :simple_access
       get :jumbo_fixed
+      get '/non-qm' => 'ob_union_home_mortgage_wholesale1711#non_qm'
     end
   end
 
