@@ -160,6 +160,13 @@ class ObCmgWholesalesController < ApplicationController
           make_adjust(adjustment,sheet)
           create_program_association_with_adjustment(sheet)
         end
+<<<<<<< HEAD
+=======
+        adjustment = [@data_hash,@misc_hash,@state_hash]
+        make_adjust(adjustment,sheet)
+
+        create_program_association_with_adjustment(sheet)
+>>>>>>> 69f130303a58615f3be124e9326881b9f2307aa4
       end
     rescue
     end

@@ -251,7 +251,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
 
               cc = (4*max_column) + (2+max_column)  # (2 / 7 / 12)
               @title = sheet_data.cell(r,cc)
-              if @title.present?
+              if @title.present? && @title != 3.5 && @title != 3.125
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
                 # Program Property
