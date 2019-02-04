@@ -5694,7 +5694,7 @@ class ImportFilesController < ApplicationController
                   end
 
                   # implementation of second key inside first key
-                  if rrr < 69 && index == 7 && value
+                  if rrr < 67 && index == 7 && value
                     # for 1st and 2nd table
                     key = get_value(value)
                     @block_hash[@title][key] = {} unless @block_hash[@title].has_key?(key)
