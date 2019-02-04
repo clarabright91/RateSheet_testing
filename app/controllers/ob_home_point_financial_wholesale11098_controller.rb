@@ -759,8 +759,6 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
     redirect_to programs_ob_home_point_financial_wholesale11098_path(@sheet_obj)
   end
 
-<<<<<<< HEAD
-
   def conforming_high_balance
     @programs_ids = []
     file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
