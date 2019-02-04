@@ -1096,7 +1096,7 @@ class ObCmgWholesalesController < ApplicationController
         end
         adjustment = [@adjustment_hash,@subordinate_hash,@adjustment_cap,@misc_adjustment,@state_adjustment]
         make_adjust(adjustment,sheet)
-<<<<<<<
+
         create_program_association_with_adjustment(sheet)
       end
     end
