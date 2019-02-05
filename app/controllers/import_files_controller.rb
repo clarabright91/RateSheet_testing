@@ -456,6 +456,7 @@ class ImportFilesController < ApplicationController
             @title = sheet_data.cell(r,cc)
             @block_hash = {}
             if(@title.eql?("All Fixed Conforming\n(does not apply to terms <=15yrs)"))
+              @title = "Conforming/LoanType/Term/LTV/FICO"
               @block_hash[@title] = {}
               key = ''
               another_key = ''
@@ -494,6 +495,7 @@ class ImportFilesController < ApplicationController
                   elsif rrr.eql?(158) && index == 3
                     # for Subordinate Financing
                     @title = sheet_data.cell(rrr,ccc)
+                    @title = "FinancingType/LTV/CLTV/FICO"
                     @block_hash[@title] = {} unless @block_hash.has_key?(@title)
                   elsif rrr.eql?(163) && index == 3
                     # for Misc Adjusters
@@ -691,7 +693,7 @@ class ImportFilesController < ApplicationController
     end
 
     # create adjustment for each program
-    make_adjust(@allAdjustments, @program_ids)
+    make_adjust(@allAdjustments, @sheet)
 
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
@@ -835,7 +837,7 @@ class ImportFilesController < ApplicationController
         modified_keys  = get_table_keys
         data = get_table_keys
         (123..171).each do |r|
-          row    = sheet_data.row(r)
+          row = sheet_data.row(r)
           # r == 52 / 68 / 81 / 84 / 89 / 94
           rr = r #+ 1 # (r == 53) / (r == 69) / (r == 82) / (r == 90) / (r == 95)
           max_column_section = 0#row.compact.count - 1
@@ -844,6 +846,7 @@ class ImportFilesController < ApplicationController
             @title = sheet_data.cell(r,cc)
             @block_hash = {}
             if(@title.eql?("All Fixed Conforming\n(does not apply to terms ≤ 15yrs)"))
+              @title = "Conforming/LoanType/Term/LTV/FICO"
               @block_hash[@title] = {}
               key = ''
               another_key = ''
@@ -1056,7 +1059,7 @@ class ImportFilesController < ApplicationController
     end
 
     # create adjustment for each program
-    make_adjust(@allAdjustments, program_ids)
+    make_adjust(@allAdjustments, @sheet)
 
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
@@ -1439,7 +1442,7 @@ class ImportFilesController < ApplicationController
       end
     end
     # create adjustment for each program
-    make_adjust(@allAdjustments, @program_ids)
+    make_adjust(@allAdjustments, @sheet)
 
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
@@ -5852,7 +5855,7 @@ class ImportFilesController < ApplicationController
     end
 
     # create adjustment for each program
-    make_adjust(@allAdjustments, @program_ids)
+    make_adjust(@allAdjustments, @sheet)
 
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
@@ -6198,7 +6201,7 @@ class ImportFilesController < ApplicationController
     end
 
     # create adjustment for each program
-    make_adjust(@allAdjustments, @program_ids)
+    make_adjust(@allAdjustments, @sheet)
 
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
@@ -6951,17 +6954,25 @@ class ImportFilesController < ApplicationController
     return hash_keys
   end
 
-  def make_adjust(block_hash, p_ids)
-    begin
-      adjustment = Adjustment.create(data: block_hash)
+  # def make_adjust(block_hash, p_ids)
+  #   begin
+  #     adjustment = Adjustment.create(data: block_hash)
 
-      # assign for all projects
-      p_ids.each do |id|
-        program = Program.find(id)
-        program.adjustments << adjustment
-      end
-    rescue Exception => e
-      puts e
+  #     # assign for all projects
+  #     p_ids.each do |id|
+  #       program = Program.find(id)
+  #       program.adjustments << adjustment
+  #     end
+  #   rescue Exception => e
+  #     puts e
+  #   end
+  # end
+
+  def make_adjust(block_hash, sheet)
+    block_hash.keys.each do |key|
+      hash = {}
+      hash[key] = block_hash[key]
+      Adjustment.create(data: hash,sheet_name: sheet)
     end
   end
 
@@ -7009,6 +7020,13 @@ class ImportFilesController < ApplicationController
       else
         value1
       end
+    end
+  end
+
+  def get_main_key heading
+    heading.split(" ").each do |data|
+      data.gsub!("#{data}", 'LoanType') if data.eql?("Fixed")
+      data.gsub!("#{data}", 'Term') if data.eql?("terms")
     end
   end
 end
