@@ -151,7 +151,6 @@ class ObCmgWholesalesController < ApplicationController
                       @state_hash[first_key2][second_key2][key_val] = k_val
                     end
                   end
-
                 end
               end
             end
@@ -160,18 +159,12 @@ class ObCmgWholesalesController < ApplicationController
           make_adjust(adjustment,sheet)
           create_program_association_with_adjustment(sheet)
         end
-<<<<<<< HEAD
-=======
-        adjustment = [@data_hash,@misc_hash,@state_hash]
-        make_adjust(adjustment,sheet)
-
-        create_program_association_with_adjustment(sheet)
->>>>>>> 69f130303a58615f3be124e9326881b9f2307aa4
       end
     rescue
     end
     redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
   end
+
 
   def agency
     @programs_ids = []

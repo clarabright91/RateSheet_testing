@@ -1,0 +1,21 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  property_type[]: MyText
+  ,financing_type[]: MyText
+  ,premium_type[]: MyText
+  ,ltv[]: 1
+  ,fico[]: 1
+  ,refinance_option[]: MyText
+  ,misc_adjuster[]: MyText
+  ,lpmi: 
+
+two:
+  property_type[]: MyText
+  ,financing_type[]: MyText
+  ,premium_type[]: MyText
+  ,ltv[]: 1
+  ,fico[]: 1
+  ,refinance_option[]: MyText
+  ,misc_adjuster[]: MyText
+  ,lpmi: 

@@ -14,10 +14,13 @@ class DashboardController < ApplicationController
     @filter_data = {}
     @interest = "4.375"
     @lock_period =30
+    @credit_score = "740-759"
   end
 
   def set_variable
     @interest = params[:interest] if params[:interest].present?
+    @credit_score = params[:credit_score] if params[:credit_score].present?
+
     @lock_period = params[:lock_period] if params[:lock_period].present?
 
     if params[:loan_type].present?

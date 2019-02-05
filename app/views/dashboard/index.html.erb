@@ -96,6 +96,26 @@
 
               <div class="col-md-2">
                 <div class="form-group">
+                  <label>Credit Score</label>
+                  <div class="input-group">
+                    <% @credit_score_list =  UserInput.first.present? ? UserInput.first.fico.map{|b| [b]} : []%>
+                    <%= select_tag 'credit_score', options_for_select(@credit_score_list, (params[:credit_score] rescue nil)), :class=> "form-control" %>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>LTV</label>
+                  <div class="input-group">
+                    <% @ltv_values =  UserInput.first.present? ? UserInput.first.ltv.map{|b| [b]} : []%>
+                    <%= select_tag 'credit_score', options_for_select(@ltv_values, (params[:credit_score] rescue nil)), :class=> "form-control" %>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <div class="form-group">
                   <div>
                     <label></label>
                   </div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_21_105544) do
+ActiveRecord::Schema.define(version: 2019_02_04_124401) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -69,18 +69,39 @@ ActiveRecord::Schema.define(version: 2019_01_21_105544) do
     t.string "bank_name"
     t.string "program_name"
     t.string "rate_type"
-    t.string "loan_type"
     t.integer "sheet_id"
+    t.string "loan_type"
     t.integer "lock_period", default: [], array: true
     t.string "loan_limit_type", default: [], array: true
     t.string "loan_purpose"
     t.string "arm_basic"
     t.string "arm_advanced"
+    t.string "loan_size"
   end
 
   create_table "sheets", force: :cascade do |t|
     t.string "name"
     t.integer "bank_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "user_inputs", force: :cascade do |t|
+    t.text "property_type", default: [], array: true
+    t.text "financing_type", default: [], array: true
+    t.text "premium_type", default: [], array: true
+    t.string "ltv", default: [], array: true
+    t.string "fico", default: [], array: true
+    t.text "refinance_option", default: [], array: true
+    t.text "misc_adjuster", default: [], array: true
+    t.boolean "lpmi"
+    t.integer "coverage"
+    t.integer "loan_amount"
+    t.string "cltv"
+    t.boolean "dti"
+    t.float "interest_rate"
+    t.integer "lock_period"
+    t.string "state"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
