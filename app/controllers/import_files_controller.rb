@@ -7002,9 +7002,19 @@ class ImportFilesController < ApplicationController
 
   def make_adjust(block_hash, sheet)
     block_hash.keys.each do |key|
-      hash = {}
-      hash[key] = block_hash[key]
-      Adjustment.create(data: hash,sheet_name: sheet)
+      unless key == "Lender Paid MI Adj."
+        hash = {}
+        hash[key] = block_hash[key]
+        Adjustment.create(data: hash,sheet_name: sheet)
+      else
+        unless block_hash[key].empty?
+          block_hash[key].keys.each do |s_key|
+            h1 = {}
+            h1[s_key] = block_hash[key][s_key]
+            Adjustment.create(data: h1,sheet_name: sheet)
+          end
+        end
+      end
     end
   end
 

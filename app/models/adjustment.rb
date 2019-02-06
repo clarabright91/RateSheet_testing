@@ -15,6 +15,7 @@ class Adjustment < ApplicationRecord
     "Lender Paid MI Adjustments" => "Term/LTV/FICO",
     "Premium Adjustments" => "LPMI/PremiumType/FICO",
     "LTV Adjustments" => "LPMI/Term/LTV/FICO",
+    "Loan Size Adjusters" => "LoanType/Conforming/LTV/FICO",
     "Number Of Units" => "PropertyType/LTV",
     "Subordinate Financing" => "FinancingType/LTV/CLTV/FICO",
     "Misc Adjusters" => "PropertyType/LTV/Term",
