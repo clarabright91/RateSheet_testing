@@ -849,8 +849,8 @@ class ImportFilesController < ApplicationController
               @title = "Conforming/LoanType/Term/LTV/FICO"
               @block_hash[@title] = {}
               @block_hash[@title][true] = {}
-              @block_hash[@title][true]["fixed"] = {}
-              @block_hash[@title][true]["fixed"]["0-15"] = {}
+              @block_hash[@title][true]["Fixed"] = {}
+              @block_hash[@title][true]["Fixed"]["0-15"] = {}
               key = ''
               another_key = ''
               keyOfHash = ''
@@ -915,7 +915,7 @@ class ImportFilesController < ApplicationController
                   #implementation of second key inside first key
                   if rrr > 122 && rrr < 131 && index == 7 && value
                     key = get_value(value)
-                    @block_hash[@title][true]["fixed"]["0-15"][key] = {} unless @block_hash[@title][true]["fixed"]["0-15"].has_key?(key)
+                    @block_hash[@title][true]["Fixed"]["0-15"][key] = {} unless @block_hash[@title][true]["Fixed"]["0-15"].has_key?(key)
                   elsif rrr > 132 && rrr < 136 && index == 7 && value
                     # for 1st and 2nd table
                     key = get_value(value)
@@ -995,7 +995,7 @@ class ImportFilesController < ApplicationController
                     hash_key = sheet_data.cell((rrr - diff_of_row),ccc)
                     hash_key = get_value(hash_key)
                     if hash_key.present?
-                      @block_hash[@title][true]["fixed"]["0-15"][key][hash_key] = value unless @block_hash[@title][true]["fixed"]["0-15"][key].has_key?(hash_key)
+                      @block_hash[@title][true]["Fixed"]["0-15"][key][hash_key] = value unless @block_hash[@title][true]["Fixed"]["0-15"][key].has_key?(hash_key)
                     end
                   end
 
@@ -1092,6 +1092,7 @@ class ImportFilesController < ApplicationController
 
     # create adjustment for each program
     make_adjust(@allAdjustments, @sheet)
+    create_program_association_with_adjustment(@sheet)
 
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
@@ -7084,6 +7085,44 @@ class ImportFilesController < ApplicationController
     heading.split(" ").each do |data|
       data.gsub!("#{data}", 'LoanType') if data.eql?("Fixed")
       data.gsub!("#{data}", 'Term') if data.eql?("terms")
+    end
+  end
+
+  def create_program_association_with_adjustment(sheet)
+    adjustment_list = Adjustment.where(sheet_name: sheet)
+    program_list = Program.where(sheet_name: sheet)
+
+    adjustment_list.each_with_index do |adj_ment, index|
+      key_list = adj_ment.data.keys.first.split("/")
+      program_filter1={}
+      program_filter2={}
+      include_in_input_values = false
+      if key_list.present?
+        key_list.each_with_index do |key_name, key_index|
+          if (Program.column_names.include?(key_name.underscore))
+            unless (Program.column_for_attribute(key_name.underscore).type.to_s == "boolean")
+              program_filter1[key_name.underscore] = nil
+            else
+              if (Program.column_for_attribute(key_name.underscore).type.to_s == "boolean")
+                program_filter2[key_name.underscore] = true
+              end
+            end
+          else
+            if(Adjustment::INPUT_VALUES.include?(key_name))
+              include_in_input_values = true
+            end
+          end
+        end
+
+        if (include_in_input_values)
+          program_list1 = program_list.where.not(program_filter1)
+          program_list2 = program_list1.where(program_filter2)
+
+          if program_list2.present?
+            program_list2.map{ |program| program.adjustments << adj_ment unless program.adjustments.include?(adj_ment) }
+          end
+        end
+      end
     end
   end
 end
