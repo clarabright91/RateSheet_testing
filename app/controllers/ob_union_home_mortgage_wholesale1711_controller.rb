@@ -1272,9 +1272,9 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
     def get_value value1
       if value1.present?
         if value1.include?("<=") || value1.include?("<")
-          value1 = "0"+value1.tr('^0-9><%', '')
+          value1 = "0-"+value1.split("<=").last.tr('^0-9><', '')
         elsif value1.include?(">=") || value1.include?(">")
-          value1 = value1.tr('^0-9><%', '')
+          value1 = value1.tr('^0-9><', '')
         else
           value1
         end

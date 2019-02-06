@@ -52,7 +52,7 @@ class ObCmgWholesalesController < ApplicationController
                 cc = 4*max_column + 1
                 @title = sheet_data.cell(r,cc)
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property
+                program_property sheet
                 @programs_ids << @program.id              
                 # @program.adjustments.destroy_all
                 @block_hash = {}
@@ -185,7 +185,7 @@ class ObCmgWholesalesController < ApplicationController
               @title = sheet_data.cell(r,cc)
               if @title.present? && @title != "2.250% MARGIN - 2/2/6 CAPS - 1 YR LIBOR" && @title != "2.250% MARGIN - 5/2/5 CAPS - 1 YR LIBOR"
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property
+                program_property sheet
                 @programs_ids << @program.id
                 # @program.adjustments.destroy_all
                 @block_hash = {}
@@ -229,32 +229,56 @@ class ObCmgWholesalesController < ApplicationController
         @ltv_data = []
         @cltv_data = []
         @adjustment_hash = {}
+        @adjustment_fico = {}
         @cashout_adjustment = {}
         @subordinate_hash = {}
         @adjustment_cap = {}
         @loan_adjustment = {}
         @state_adjustments = {}
         @other_adjustment = {}
+        @lpmi_hash = {}
+        @lpmi_adj = {}
+        @home_ready = {}
+        @home_possible = {}
+        @property_hash = {}
         primary_key = ''
         primary_key1 = ''
+        primary_key2 = ''
         secondary_key = ''
         secondary_key1 = ''
         ltv_key = ''
         cltv_key = ''
         cash_key = ''
         key = ''
-        (8..62).each do |r|
+        term_key = ''
+        cash_key1 = ''
+        (8..93).each do |r|
           row = sheet_data.row(r)
           @ltv_data = sheet_data.row(10)
           @cltv_data = sheet_data.row(38)
+          @lpmi_data = sheet_data.row(70)
           (0..16).each do |cc|
             value = sheet_data.cell(r,cc)
             if value.present?
               if value == "AGENCY FIXED AND ARM ADJUSTMENTS"
-                primary_key = "LoanType/Term/FICO/LTV"
+                secondary_key = "Fixed"
+                primary_key1 = "ARM"
+                term_key = "15-Inf"
+                primary_key = "LoanType/PropertyType/LTV"
                 @adjustment_hash[primary_key] = {}
-                cash_key = "CashOut/FICO/LTV"
+                primary_key2 = "LoanType/Term/FICO/LTV"
+                @adjustment_fico[primary_key2] = {}
+                @adjustment_fico[primary_key2][secondary_key] = {}
+                @adjustment_fico[primary_key2][secondary_key][term_key] = {}
+                @adjustment_fico[primary_key2][primary_key1] = {}
+                @adjustment_fico[primary_key2][primary_key1][term_key] = {}
+                cash_key = "LoanType/RefinanceOption/FICO/LTV"
+                cash_key1 = "Cash Out"
                 @cashout_adjustment[cash_key] = {}
+                @cashout_adjustment[cash_key][secondary_key] = {}
+                @cashout_adjustment[cash_key][primary_key1] = {}
+                @cashout_adjustment[cash_key][secondary_key][cash_key1] = {}
+                @cashout_adjustment[cash_key][primary_key1][cash_key1] = {}
               end
               if value == "SUBORDINATE FINANCING"
                 primary_key = "FinancingType/LTV/CLTV/FICO"
@@ -264,45 +288,151 @@ class ObCmgWholesalesController < ApplicationController
                 primary_key = "FinancingType/LoanType"
                 @adjustment_cap[primary_key] = {}
               end
-              # AGENCY FIXED AND ARM ADJUSTMENTS
-              if r >= 11 && r <= 24  && cc == 1
-                if value.include?("Condo")
-                  secondary_key = "LoanType/Fixed/Condo"
-                else
-                  secondary_key = get_value value
-                end
-                @adjustment_hash[primary_key][secondary_key] = {}
+              if value == "LENDER PAID MI"
+                primary_key = "LPMI/LoanType/LTV/FICO"
+                cash_key = "LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"
+                @lpmi_hash[primary_key] = {}
+                @lpmi_adj[primary_key] = {}
+                @home_ready[cash_key] = {}
+                @home_possible[cash_key] = {}
               end
-              if r >= 11 && r <= 24 && cc >= 9 && cc <= 16
+              if value == "LPMI (in addition to adjustments above)"
+                primary_key = "LPMI/RefinanceOption/FICO"
+                primary_key1 = "LPMI/PropertyType/FICO"
+                @property_hash[primary_key] = {}
+                @property_hash[primary_key1] = {}
+              end
+              # AGENCY FIXED AND ARM ADJUSTMENTS
+              if r == 11 && cc == 1
+                secondary_key = "Fixed"
+                primary_key1 = "ARM"
+                secondary_key1 = "Investment Property"
+                @adjustment_hash[primary_key][secondary_key] = {}
+                @adjustment_hash[primary_key][secondary_key][secondary_key1] = {}
+                @adjustment_hash[primary_key][primary_key1] = {}
+                @adjustment_hash[primary_key][primary_key1][secondary_key1] = {}
+              end
+              if r == 12 && cc == 1
+                secondary_key1 = "2nd Home"
+                @adjustment_hash[primary_key][secondary_key][secondary_key1] = {}
+                @adjustment_hash[primary_key][primary_key1][secondary_key1] = {}
+              end
+              if r == 13 && cc == 1
+                secondary_key1 = "2 Unit"
+                @adjustment_hash[primary_key][secondary_key][secondary_key1] = {}
+                @adjustment_hash[primary_key][primary_key1][secondary_key1] = {}
+              end
+              if r == 17 && cc == 1
+                secondary_key1 = "Manufactured Home"
+                @adjustment_hash[primary_key][secondary_key][secondary_key1] = {}
+                @adjustment_hash[primary_key][primary_key1][secondary_key1] = {}
+              end
+              if r == 14 && cc == 1
+                secondary_key1 = "3-4 Unit"
+                @adjustment_hash[primary_key][secondary_key][secondary_key1] = {}
+              end
+              if r == 14 && cc >= 9 && cc <= 16
                 ltv_key = get_value @ltv_data[cc-1]
-                @adjustment_hash[primary_key][secondary_key][ltv_key] = {}
-                @adjustment_hash[primary_key][secondary_key][ltv_key] = value
+                @adjustment_hash[primary_key][secondary_key][secondary_key1][ltv_key] = {}
+                @adjustment_hash[primary_key][secondary_key][secondary_key1][ltv_key] = value
+              end
+              if r == 15 && cc == 1
+                secondary_key1 = "3-4 Unit"
+                @adjustment_hash[primary_key][primary_key1][secondary_key1] = {}
+              end
+              if r == 15 && cc >= 9 && cc <= 16
+                ltv_key = get_value @ltv_data[cc-1]
+                @adjustment_hash[primary_key][primary_key1][secondary_key1][ltv_key] = {}
+                @adjustment_hash[primary_key][primary_key1][secondary_key1][ltv_key] = value
+              end
+              if r == 16 && cc == 1
+                primary_key = "LoanType/PropertyType/Term/FICO/LTV"
+                secondary_key = "Fixed"
+                primary_key1 = "ARM"
+                secondary_key1 = "Condo"
+                key = "15-Inf"
+                @adjustment_hash[primary_key] = {}
+                @adjustment_hash[primary_key][secondary_key] = {}
+                @adjustment_hash[primary_key][secondary_key][secondary_key1] = {}
+                @adjustment_hash[primary_key][secondary_key][secondary_key1][key] = {}
+                @adjustment_hash[primary_key][primary_key1] = {}
+                @adjustment_hash[primary_key][primary_key1][secondary_key1] = {}   
+                @adjustment_hash[primary_key][primary_key1][secondary_key1][key] = {}
+              end
+              if r == 16 && cc >= 9 && cc <= 16
+                ltv_key = get_value @ltv_data[cc-1]
+                @adjustment_hash[primary_key][secondary_key][secondary_key1][key][ltv_key] = {}
+                @adjustment_hash[primary_key][secondary_key][secondary_key1][key][ltv_key] = value
+                @adjustment_hash[primary_key][primary_key1][secondary_key1][key][ltv_key] = {}
+                @adjustment_hash[primary_key][primary_key1][secondary_key1][key][ltv_key] = value
+              end
+              if r >= 11 && r <= 17 && r != 14 && r != 15 && r != 16 && cc >= 9 && cc <= 16
+                ltv_key = get_value @ltv_data[cc-1]
+                @adjustment_hash[primary_key][secondary_key][secondary_key1][ltv_key] = {}
+                @adjustment_hash[primary_key][secondary_key][secondary_key1][ltv_key] = value
+                @adjustment_hash[primary_key][primary_key1][secondary_key1][ltv_key] = {}
+                @adjustment_hash[primary_key][primary_key1][secondary_key1][ltv_key] = value
+              end
+              # Fico Adjustments
+              if r >= 18 && r <= 24 && cc == 1
+                if value.include?(">")
+                  cltv_key = value.split(">").last.split("(N/A for 15 Year Term or less)").first.tr('= ' , '') + "-Inf"
+                elsif value.include?("FICO")
+                  cltv_key = value.split("(N/A for 15 Year Term or less)").first.tr('FICO ', '')
+                end
+                @adjustment_fico[primary_key2][secondary_key][term_key][cltv_key] = {}
+                @adjustment_fico[primary_key2][primary_key1][term_key][cltv_key] = {}
+              end
+              if r >= 18 && r <= 24 && cc >= 9 && cc <= 16
+                ltv_key = get_value @ltv_data[cc-1]
+                @adjustment_fico[primary_key2][secondary_key][term_key][cltv_key][ltv_key] = {}
+                @adjustment_fico[primary_key2][secondary_key][term_key][cltv_key][ltv_key] = value
+                @adjustment_fico[primary_key2][primary_key1][term_key][cltv_key][ltv_key] = {}
+                @adjustment_fico[primary_key2][primary_key1][term_key][cltv_key][ltv_key] = value
               end
 
               # cashout_adjustment
               if r >= 25 && r <= 31 && cc == 1
-                secondary_key = get_value value
-                @cashout_adjustment[cash_key][secondary_key] = {}
+                if value.include?(">")
+                  cltv_key = value.split(">").last.tr('= ' , '') + "-Inf"
+                elsif value.include?("FICO")
+                  cltv_key = value.split("FICO").last.tr(' ', '')
+                end
+                @cashout_adjustment[cash_key][secondary_key][cash_key1][cltv_key] = {}
+                @cashout_adjustment[cash_key][primary_key1][cash_key1][cltv_key] = {}
               end
               if r >= 25 && r <= 31 && cc >= 9 && cc <= 16
-                ltv_key = @ltv_data[cc-1]
-                @cashout_adjustment[cash_key][secondary_key][ltv_key] = {}
-                @cashout_adjustment[cash_key][secondary_key][ltv_key] = value
+                ltv_key = get_value @ltv_data[cc-1]
+                @cashout_adjustment[cash_key][secondary_key][cash_key1][cltv_key][ltv_key] = {}
+                @cashout_adjustment[cash_key][secondary_key][cash_key1][cltv_key][ltv_key] = value
+                @cashout_adjustment[cash_key][primary_key1][cash_key1][cltv_key][ltv_key] = {}
+                @cashout_adjustment[cash_key][primary_key1][cash_key1][cltv_key][ltv_key] = value
               end
 
               # High Balance Adjustments
-              if r >= 33 && r <= 35 && cc == 1
-                unless @adjustment_hash[primary_key].has_key?("ARM")
-                  secondary_key = value.split.first
-                else
-                  secondary_key = "/" + value.split.first
-                end
-                @adjustment_hash[primary_key][secondary_key] = {}
+              if r == 33 && cc == 1 
+                cltv_key = "Standard Cash Out"
+                @cashout_adjustment[cash_key][secondary_key][cash_key1][cltv_key] = {}
               end
-              if r >= 33 && r <= 35 && cc >= 9 && cc <= 16
-                ltv_key = @ltv_data[cc-1]
-                @adjustment_hash[primary_key][secondary_key][ltv_key] = {}
-                @adjustment_hash[primary_key][secondary_key][ltv_key] = value
+              if r == 33 && cc >= 9 && cc <= 16
+                ltv_key = get_value @ltv_data[cc-1]
+                @cashout_adjustment[cash_key][secondary_key][cash_key1][cltv_key][ltv_key] = {}
+                @cashout_adjustment[cash_key][secondary_key][cash_key1][cltv_key][ltv_key] = value
+              end
+              if r == 34 && cc == 1
+                cash_key = "LoanType/LoanPurpose/RefinanceOption/FICO/LTV"
+                primary_key1 = "ARM"
+                primary_key2 = "Purchase"
+                secondary_key = "Rate and Term"
+                @cashout_adjustment[cash_key] = {}
+                @cashout_adjustment[cash_key][primary_key1] = {}
+                @cashout_adjustment[cash_key][primary_key1][primary_key2] = {}
+                @cashout_adjustment[cash_key][primary_key1][primary_key2][secondary_key] = {}
+              end
+              if r == 34 && cc >= 9 && cc <= 16
+                ltv_key = get_value @ltv_data[cc-1]
+                @cashout_adjustment[cash_key][primary_key1][primary_key2][secondary_key][ltv_key] = {}
+                @cashout_adjustment[cash_key][primary_key1][primary_key2][secondary_key][ltv_key] = value
               end
 
               # SUBORDINATE FINANCING
@@ -350,6 +480,113 @@ class ObCmgWholesalesController < ApplicationController
               if r >= 54 && r <= 55 && cc == 8
                 @adjustment_cap[primary_key][secondary_key] = value
               end
+              # LENDER PAID MI
+              if r >= 71 && r <= 74 && cc == 3
+                primary_key1 = "True"
+                secondary_key = "Fixed"
+                ltv_key = "ARM"
+                @lpmi_hash[primary_key][primary_key1] = {}
+                @lpmi_hash[primary_key][primary_key1][secondary_key] = {}
+                @lpmi_hash[primary_key][primary_key1][ltv_key] = {}
+              end
+              if r >= 75 && r <= 78 && cc == 3
+                primary_key1 = "True"
+                secondary_key = "Fixed"
+                ltv_key = "ARM"
+                @lpmi_adj[primary_key][primary_key1] = {}
+                @lpmi_adj[primary_key][primary_key1][secondary_key] = {}
+                @lpmi_adj[primary_key][primary_key1][ltv_key] = {}
+              end
+              if r >= 71 && r <= 74 && cc == 5
+                secondary_key1 = get_value value
+                @lpmi_hash[primary_key][primary_key1][secondary_key][secondary_key1] = {}
+                @lpmi_hash[primary_key][primary_key1][ltv_key][secondary_key1] = {}
+              end
+              if r >= 71 && r <= 74 && cc >= 6 && cc <= 14
+                lpmi_key = get_value @lpmi_data[cc-1]
+                @lpmi_hash[primary_key][primary_key1][secondary_key][secondary_key1][lpmi_key] = {}
+                @lpmi_hash[primary_key][primary_key1][secondary_key][secondary_key1][lpmi_key] = value
+                @lpmi_hash[primary_key][primary_key1][ltv_key][secondary_key1][lpmi_key] = {}
+                @lpmi_hash[primary_key][primary_key1][ltv_key][secondary_key1][lpmi_key] = value
+              end
+              if r >= 75 && r <= 78 && cc == 5
+                secondary_key1 = get_value value
+                @lpmi_adj[primary_key][primary_key1][secondary_key][secondary_key1] = {}
+                @lpmi_adj[primary_key][primary_key1][ltv_key][secondary_key1] = {}
+              end
+              if r >= 75 && r <= 78 && cc >= 6 && cc <= 14
+                lpmi_key = get_value @lpmi_data[cc-1]
+                @lpmi_adj[primary_key][primary_key1][secondary_key][secondary_key1][lpmi_key] = {}
+                @lpmi_adj[primary_key][primary_key1][secondary_key][secondary_key1][lpmi_key] = value
+                @lpmi_adj[primary_key][primary_key1][ltv_key][secondary_key1][lpmi_key] = {}
+                @lpmi_adj[primary_key][primary_key1][ltv_key][secondary_key1][lpmi_key] = value
+              end
+              # HomeReady & HomePossible
+              if r >= 79 && r <= 82 && cc == 3
+                primary_key1 = "True"
+                secondary_key = "HomeReady"
+                cltv_key = "HomePossible"
+                ltv_key = "Fixed"
+                @home_ready[cash_key][primary_key1] = {}
+                @home_ready[cash_key][primary_key1][secondary_key] = {}
+                @home_ready[cash_key][primary_key1][secondary_key][ltv_key] = {}
+                @home_ready[cash_key][primary_key1][cltv_key] = {}
+                @home_ready[cash_key][primary_key1][cltv_key][ltv_key] = {}
+              end
+              if r >= 83 && r <= 86 && cc == 3
+                primary_key1 = "True"
+                secondary_key = "HomeReady"
+                cltv_key = "HomePossible"
+                ltv_key = "Fixed"
+                @home_possible[cash_key][primary_key1] = {}
+                @home_possible[cash_key][primary_key1][secondary_key] = {}
+                @home_possible[cash_key][primary_key1][secondary_key][ltv_key] = {}
+                @home_possible[cash_key][primary_key1][cltv_key] = {}
+                @home_possible[cash_key][primary_key1][cltv_key][ltv_key] = {}
+              end
+              if r >= 79 && r <= 82 && cc == 5
+                secondary_key1 = get_value value
+                @home_ready[cash_key][primary_key1][secondary_key][ltv_key][secondary_key1] = {}
+                @home_ready[cash_key][primary_key1][cltv_key][ltv_key][secondary_key1] = {}
+              end
+              if r >= 79 && r <= 82 && cc >= 6 && cc <= 14
+                lpmi_key = get_value @lpmi_data[cc-1]
+                @home_ready[cash_key][primary_key1][secondary_key][ltv_key][secondary_key1][lpmi_key] = {}
+                @home_ready[cash_key][primary_key1][secondary_key][ltv_key][secondary_key1][lpmi_key] = value
+                @home_ready[cash_key][primary_key1][cltv_key][ltv_key][secondary_key1][lpmi_key] = {}
+                @home_ready[cash_key][primary_key1][cltv_key][ltv_key][secondary_key1][lpmi_key] = value
+              end
+              if r >= 83 && r <= 86 && cc == 5
+                secondary_key1 = get_value value
+                @home_possible[cash_key][primary_key1][secondary_key][ltv_key][secondary_key1] = {}
+                @home_possible[cash_key][primary_key1][cltv_key][ltv_key][secondary_key1] = {}
+              end
+              if r >= 83 && r <= 86 && cc >= 6 && cc <= 14
+                lpmi_key = get_value @lpmi_data[cc-1]
+                @home_possible[cash_key][primary_key1][secondary_key][ltv_key][secondary_key1][lpmi_key] = {}
+                @home_possible[cash_key][primary_key1][secondary_key][ltv_key][secondary_key1][lpmi_key] = value
+                @home_possible[cash_key][primary_key1][cltv_key][ltv_key][secondary_key1][lpmi_key] = {}
+                @home_possible[cash_key][primary_key1][cltv_key][ltv_key][secondary_key1][lpmi_key] = value
+              end
+              # LPMI (in addition to adjustments above)
+              if r >= 88 && r <= 89 && cc == 3
+                secondary_key = get_value value
+                @property_hash[primary_key][secondary_key] = {}
+              end
+              if r >= 88 && r <= 89 && cc >= 7 && cc <= 14
+                lpmi_key = get_value @lpmi_data[cc-1]
+                @property_hash[primary_key][secondary_key][lpmi_key] = {}
+                @property_hash[primary_key][secondary_key][lpmi_key] = value
+              end
+              if r >= 90 && r <= 93 && cc == 3
+                secondary_key = get_value value
+                @property_hash[primary_key1][secondary_key] = {}
+              end
+              if r >= 90 && r <= 93 && cc >= 7 && cc <= 14
+                lpmi_key = get_value @lpmi_data[cc-1]
+                @property_hash[primary_key1][secondary_key][lpmi_key] = {}
+                @property_hash[primary_key1][secondary_key][lpmi_key] = value
+              end
             end
           end
           (10..16).each do |cc|
@@ -396,7 +633,7 @@ class ObCmgWholesalesController < ApplicationController
             end
           end
         end
-        adjustment = [@adjustment_hash,@cashout_adjustment,@subordinate_hash,@adjustment_cap,@loan_adjustment,@state_adjustments,@other_adjustment]
+        adjustment = [@adjustment_hash,@adjustment_fico,@cashout_adjustment,@subordinate_hash,@adjustment_cap,@loan_adjustment,@state_adjustments,@other_adjustment,@lpmi_hash,@lpmi_adj,@home_ready,@home_possible,@property_hash]
         make_adjust(adjustment,sheet)
 
         create_program_association_with_adjustment(sheet)
@@ -430,6 +667,7 @@ class ObCmgWholesalesController < ApplicationController
           m_key = ''
           key = ''
           loan_key = ''
+          new_key = ''
           (10..53).each do |r|
             row = sheet_data.row(r)
             if ((row.compact.count > 1) && (row.compact.count <= 4))
@@ -440,7 +678,7 @@ class ObCmgWholesalesController < ApplicationController
 
                 @title = sheet_data.cell(r,cc)
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property
+                program_property sheet
                 @programs_ids << @program.id
                 # @program.adjustments.destroy_all
                 @block_hash = {}
@@ -488,7 +726,7 @@ class ObCmgWholesalesController < ApplicationController
                 if value.present?
 
                   if value == "FNMA DU REFI PLUS ADJUSTMENTS"
-                    primary_key = "FNMA/DU"
+                    primary_key = "PropertyType/LTV"
                     @adjustment_hash[primary_key] = {}
                   elsif value == "SUBORDINATE FINANCING"
                     primary_key = "FinancingType/FICO/LTV/CLTV"
@@ -497,15 +735,37 @@ class ObCmgWholesalesController < ApplicationController
                     primary_key = value
                     @adjustment_cap[primary_key] = {}
                   end
-                  if r >= 58 && r <= 70 && cc == 1
-                    secondary_key = get_value value
-                    @adjustment_hash[primary_key][secondary_key] = {}
+                  if r >= 58 && r <= 59 && cc == 1
+                    new_key = value
+                    @adjustment_hash[primary_key][new_key] = {}
                   end
-                  if r >= 58 && r <= 70 && cc >= 8 && cc <= 16
+                  if r >= 58 && r <= 59 && cc >= 8 && cc <= 16
                     fnma_key = get_value @fnma_data[cc-1]
-                    @adjustment_hash[primary_key][secondary_key][fnma_key] = {}
-                    @adjustment_hash[primary_key][secondary_key][fnma_key] = value
+                    @adjustment_hash[primary_key][new_key][fnma_key] = {}
+                    @adjustment_hash[primary_key][new_key][fnma_key] = value
                   end
+                  if r == 60 && cc >= 8 && cc <= 16
+                    primary_key = "PropertyType/Term/LTV"
+                    @adjustment_hash[primary_key] = {}
+                    new_key = "Condo"
+                    @adjustment_hash[primary_key][new_key] = {}
+                    term_key = "15-Inf"
+                    @adjustment_hash[primary_key][new_key][term_key] = {}
+                  end
+                  if r == 60 && cc >= 8 && cc <= 16
+                    fnma_key = get_value @fnma_data[cc-1]
+                    @adjustment_hash[primary_key][new_key][term_key][fnma_key] = {}
+                    @adjustment_hash[primary_key][new_key][term_key][fnma_key] = value
+                  end
+                  # if r >= 58 && r <= 70 && cc == 1
+                  #   secondary_key = get_value value
+                  #   @adjustment_hash[primary_key][secondary_key] = {}
+                  # end
+                  # if r >= 58 && r <= 70 && cc >= 8 && cc <= 16
+                  #   fnma_key = get_value @fnma_data[cc-1]
+                  #   @adjustment_hash[primary_key][secondary_key][fnma_key] = {}
+                  #   @adjustment_hash[primary_key][secondary_key][fnma_key] = value
+                  # end
 
                   # subordinate adjustment
                   if r >= 74 && r <= 78 && cc == 1
@@ -628,7 +888,7 @@ class ObCmgWholesalesController < ApplicationController
 
                 @title = sheet_data.cell(r,cc)
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property
+                program_property sheet
                 @programs_ids << @program.id
                 # @program.adjustments.destroy_all
                 @block_hash = {}
@@ -816,7 +1076,7 @@ class ObCmgWholesalesController < ApplicationController
 
                 @title = sheet_data.cell(r,cc)
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property
+                program_property sheet
                 @programs_ids << @program.id
                 # @program.adjustments.destroy_all
                 @block_hash = {}
@@ -969,7 +1229,7 @@ class ObCmgWholesalesController < ApplicationController
 
                 @title = sheet_data.cell(r,cc)
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property
+                program_property sheet
                 @programs_ids << @program.id
                 # @program.adjustments.destroy_all
                 @block_hash = {}
@@ -1133,7 +1393,7 @@ class ObCmgWholesalesController < ApplicationController
               @title = sheet_data.cell(r,cc)
               if cc < 5
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property
+                program_property sheet
                 @programs_ids << @program.id
                 # @program.adjustments.destroy_all
                 @block_hash = {}
@@ -1183,7 +1443,7 @@ class ObCmgWholesalesController < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if cc < 5
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  program_property
+                  program_property sheet
                   @programs_ids << @program.id
 
                   # @program.adjustments.destroy_all
@@ -1432,7 +1692,7 @@ class ObCmgWholesalesController < ApplicationController
 
               @title = sheet_data.cell(r,cc)
               @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-              program_property
+              program_property sheet
               @programs_ids << @program.id
               # @program.adjustments.destroy_all
               @block_hash = {}
@@ -1606,7 +1866,7 @@ class ObCmgWholesalesController < ApplicationController
 
               @title = sheet_data.cell(r,cc)
               @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-              program_property
+              program_property sheet
               @programs_ids << @program.id
               # @program.adjustments.destroy_all
               @block_hash = {}
@@ -1779,7 +2039,7 @@ class ObCmgWholesalesController < ApplicationController
               @title = sheet_data.cell(r,cc)
               if @title.present? && cc < 9
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property
+                program_property sheet
                 @programs_ids << @program.id
                 # @program.adjustments.destroy_all
 
@@ -1830,12 +2090,12 @@ class ObCmgWholesalesController < ApplicationController
               @title = sheet_data.cell(r,cc)
               if cc < 5 && @title == "10/1 ARM - 6410"
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property
+                program_property sheet
                 @programs_ids << @program.id
               end
               if @title.present? && cc < 9 && @title == "10/1 ARM - 6410"
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property
+                program_property sheet
                 @programs_ids << @program.id
                 # @program.adjustments.destroy_all
 
@@ -1963,7 +2223,7 @@ class ObCmgWholesalesController < ApplicationController
 
               @title = sheet_data.cell(r,cc)
               @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-              program_property
+              program_property sheet
               @programs_ids << @program.id
               # @program.adjustments.destroy_all
               @block_hash = {}
@@ -2086,7 +2346,7 @@ class ObCmgWholesalesController < ApplicationController
 
               @title = sheet_data.cell(r,cc)
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property
+                program_property sheet
                 @programs_ids << @program.id
               if @title.present?
                 # @program.adjustments.destroy_all
@@ -2136,7 +2396,7 @@ class ObCmgWholesalesController < ApplicationController
 
               @title = sheet_data.cell(r,cc)
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property
+                program_property sheet
                 @programs_ids << @program.id
               if @title.present?
                 # @program.adjustments.destroy_all
@@ -2309,14 +2569,10 @@ class ObCmgWholesalesController < ApplicationController
 
   def get_value value1
     if value1.present?
-      if value1.include?("FICO <")
-        value1 = "0"+value1.split("FICO").last
-      elsif value1.include?("<")
-        value1 = "0"+value1
-      elsif value1.include?("FICO")
-        value1 = value1.split("FICO ").last.first(9)
-      elsif value1 == "Investment Property"
-        value1 = "Property/Type"
+      if value1.include?("<=") || value1.include?("<")
+        value1 = "0-"+value1.split("<=").last.tr('^0-9><', '')
+      elsif value1.include?(">")
+        value1 = value1.split(">").last.tr('^0-9><', '')+"-Inf"
       else
         value1
       end
@@ -2410,7 +2666,7 @@ class ObCmgWholesalesController < ApplicationController
       end
     end
 
-    def program_property
+    def program_property sheet
       # term
       if (@program.program_name.split("Year").count > 1) 
         term = @program.program_name.split("Year").first.tr('^0-9><%', '')
@@ -2457,6 +2713,14 @@ class ObCmgWholesalesController < ApplicationController
       if @program.program_name.include?("High Bal") || @program.program_name.include?("HIGH BAL")
         jumbo_high_balance = true
       end
+       # Fannie mae Product
+      if @program.program_name.include?("HomeReady")
+        fannie_mae_product = "HomeReady"
+      end
+      # Freddie mac product
+      if @program.program_name.include?("Home Possible")
+        freddie_mac_product = "Home Possible"
+      end
       # Program Property  
       if @program.program_name.split("-").count > 1
         program_category = @program.program_name.split("-").last
@@ -2475,7 +2739,7 @@ class ObCmgWholesalesController < ApplicationController
         @program.loan_limit_type << "High Balance"
       end
       @program.save 
-      @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",program_category: program_category, jumbo_high_balance: jumbo_high_balance, streamline: streamline,fha: fha, va: va, usda: usda, full_doc: full_doc, arm_basic: arm_basic)
+      @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",program_category: program_category, jumbo_high_balance: jumbo_high_balance, streamline: streamline,fha: fha, va: va, usda: usda, full_doc: full_doc, arm_basic: arm_basic, sheet_name: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product)
     end
 
     def make_adjust(block_hash, sheet)
