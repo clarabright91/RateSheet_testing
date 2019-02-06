@@ -25,6 +25,8 @@ class DashboardController < ApplicationController
     @premium_type = "Manufactured Home"
     @state = "CA"
     @loan_size = "High-Balance"
+    @loan_type = "Fixed"
+    @term = 30
   end
 
   def set_variable
@@ -39,6 +41,7 @@ class DashboardController < ApplicationController
     @ltv = params[:ltv].to_f if params[:ltv].present?
     @lock_period = params[:lock_period] if params[:lock_period].present?
     if params[:loan_type].present?
+      @loan_type = params[:loan_type]
       @filter_data[:loan_type] = params[:loan_type]
       if params[:loan_type] =="ARM" && params[:arm_basic].present?
         if params[:arm_basic] =="11"
@@ -54,14 +57,17 @@ class DashboardController < ApplicationController
 
       if params[:loan_type] =="Fixed" && params[:term].present?
         @filter_data[:term] = params[:term].to_i
+        @term = params[:term].to_i
       end
 
       if params[:loan_type] =="Floating" && params[:term].present?
         @filter_data[:term] = params[:term].to_i
+        @term = params[:term].to_i
       end
 
       if  params[:loan_type] =="Variable" && params[:term].present?
         @filter_data[:term] = params[:term].to_i
+        @term = params[:term].to_i
       end
     end
 
@@ -119,71 +125,31 @@ class DashboardController < ApplicationController
           end
         end
       end
-      
       @result= []
-
       if @programs.present?
-
         find_points_of_the_loan @programs
-        # @programs.each do |pro|
-        #   @hash_obj[:program_name] = pro.program_name
-        #   if pro.adjustments.present?
-        #     pro.adjustments.each do |adj|
-        #       first_key = adj.data.keys.first
-        #       key_list = first_key.split("/")
-
-        #         adj.data[first_key].keys.each do |credit_score_key|
-        #           credit_score_key_list = credit_score_key.split("-")
-        #           if (credit_score_key_list.count==2)
-        #             if(credit_score_key_list.first.strip.to_i <= @credit_score && credit_score_key_list.second.strip.to_i >= @credit_score)
-        #               if (adj.data[first_key][credit_score_key].present?)
-        #                 adj.data[first_key][credit_score_key].keys.each do |ltv_key|
-        #                   if ltv_key.include?("-")
-        #                     if (ltv_key.split("-").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("-").second.strip.to_f)
-        #                       @adj_point = adj.data[first_key][credit_score_key][ltv_key]
-        #                       @hash_obj[:adj_points] << @adj_point
-        #                     end
-        #                   elsif ltv_key.include?("<=")
-        #                     if (ltv_key.split("<=").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("<=").second.strip.to_f)
-        #                       @adj_point = adj.data[first_key][credit_score_key][ltv_key]
-        #                       @hash_obj[:adj_points] << @adj_point
-        #                     end
-        #                   end
-        #                 end
-        #               end
-        #             end
-        #           end
-        #       end
-        #     end
-        #   end
-        #   @result << @hash_obj
-        #     @hash_obj = {
-        #       :program_name => "",
-        #       :adj_points => []
-        #     }
-        # end
       end     
     end
   end
 
   def find_points_of_the_loan programs
-      hash_obj = {
-        :program_name => "",
-        :adj_points => []
-      }
+    hash_obj = {
+      :program_name => "",
+      :adj_points => []
+    }
     programs.each do |pro|
+      debugger
       hash_obj[:program_name] = pro.program_name
-      # hash_obj[:adj_points] << 
-      # key_list.count-1 == key_index
-
       if pro.adjustments.present?
         pro.adjustments.each do |adj|
           first_key = adj.data.keys.first
+          debugger
           # first_key = "RefinanceOption/LTV"
           key_list = first_key.split("/")
           adj_key_hash = {}
           key_list.each_with_index do |key_name, key_index|
             if(Adjustment::INPUT_VALUES.include?(key_name))
+              debugger
               if key_index==0
                 if key_name == "PropertyType"
                   adj.data[first_key][@property_type]
@@ -198,6 +164,7 @@ class DashboardController < ApplicationController
                   adj_key_hash[key_index] = @premium_type
                 end
                 if key_name == "LTV"
+                  debugger
                   adj.data[first_key].keys.each do |ltv_key|
                     if ltv_key.include?("-")
                       if (ltv_key.split("-").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("-").second.strip.to_f)
@@ -237,138 +204,548 @@ class DashboardController < ApplicationController
                   adj.data[first_key][@state]
                   adj_key_hash[key_index] = @state
                 end
+                if key_name == "LoanType"
+                  adj.data[first_key][@loan_type]
+                  adj_key_hash[key_index] = @loan_type
+                end
+                if key_name == "Term"
+                  term_key = adj.data[first_key].keys.first
+                  if term_key.include?("-")
+                    if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
+                      adj.data[first_key][term_key]
+                      adj_key_hash[key_index] = @loan_type
+                    end
+                  end
+                  if term_key.include?("-")
+                    if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
+                      adj.data[first_key][term_key]
+                      adj_key_hash[key_index] = term_key
+                    end
+                  elsif term_key.include?("Inf") || term_key.include?("Infinite")
+                    if (term_key.split("-").first.strip.to_i <= @term)
+                      adj.data[first_key][term_key]
+                      adj_key_hash[key_index] = term_key
+                    end
+                  end
+                end
               end
               if key_index==1
                 if key_name == "PropertyType"
-                  adj.data[first_key][adj_key_hash[key_name-1]][@property_type]
+                  adj.data[first_key][adj_key_hash[key_index-1]][@property_type]
                   adj_key_hash[key_index] = @property_type
                 end
                 if key_name == "FinancingType"
-                  adj.data[first_key][adj_key_hash[key_name-1]][@financing_type]
+                  adj.data[first_key][adj_key_hash[key_index-1]][@financing_type]
                   adj_key_hash[key_index] = @financing_type
                 end
                 if key_name == "PremiumType"
-                  adj.data[first_key][adj_key_hash[key_name-1]][@premium_type]
+                  adj.data[first_key][adj_key_hash[key_index-1]][@premium_type]
                   adj_key_hash[key_index] = @premium_type
                 end
                 if key_name == "LTV"
-                  adj.data[first_key][adj_key_hash[key_name-1]].keys.each do |ltv_key|
+                  adj.data[first_key][adj_key_hash[key_index-1]].keys.each do |ltv_key|
                     if ltv_key.include?("-")
                       if (ltv_key.split("-").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("-").second.strip.to_f)
-                        adj.data[first_key][adj_key_hash[key_name-1]][ltv_key]
+                        adj.data[first_key][adj_key_hash[key_index-1]][ltv_key]
                         adj_key_hash[key_index] = ltv_key
                       end
                     end
                   end
                 end
                 if key_name == "FICO"
-                  adj.data[first_key][adj_key_hash[key_name-1]].keys.each do |fico_key|
+                  adj.data[first_key][adj_key_hash[key_index-1]].keys.each do |fico_key|
                     if fico_key.include?("-")
                       if (fico_key.split("-").first.strip.to_i <= @credit_score && fico_key.split("-").second.strip.to_i >= @credit_score)
-                        adj.data[first_key][adj_key_hash[key_name-1]][fico_key]
+                        adj.data[first_key][adj_key_hash[key_index-1]][fico_key]
                         adj_key_hash[key_index] = fico_key
                       end
                     end
                   end
                 end
                 if key_name == "RefinanceOption"
-                  adj.data[first_key][adj_key_hash[key_name-1]][@refinance_option]
+                  adj.data[first_key][adj_key_hash[key_index-1]][@refinance_option]
                   adj_key_hash[key_index] = @refinance_option
                 end
                 if key_name == "MiscAdjuster"
-                  adj.data[first_key][adj_key_hash[key_name-1]][@misc_adjuster]
+                  adj.data[first_key][adj_key_hash[key_index-1]][@misc_adjuster]
                   adj_key_hash[key_index] = @misc_adjuster
                 end
                 if key_name == "LoanSize"
-                  adj.data[first_key][adj_key_hash[key_name-1]][@loan_size]
+                  adj.data[first_key][adj_key_hash[key_index-1]][@loan_size]
                   adj_key_hash[key_index] = @loan_size
                 end
                 if key_name == "CLTV"
-                  adj.data[first_key][adj_key_hash[key_name-1]][@cltv]
+                  adj.data[first_key][adj_key_hash[key_index-1]][@cltv]
                   adj_key_hash[key_index] = @cltv
                 end
                 if key_name == "State"
-                  adj.data[first_key][adj_key_hash[key_name-1]][@state]
+                  adj.data[first_key][adj_key_hash[key_index-1]][@state]
                   adj_key_hash[key_index] = @state
+                end
+                if key_name == "LoanType"
+                  adj.data[first_key][adj_key_hash[key_index-1]][@loan_type]
+                  adj_key_hash[key_index] = @loan_type
+                end
+                if key_name == "Term"
+                  term_key = adj.data[first_key].keys.first
+                  if term_key.include?("-")
+                    if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
+                      adj.data[first_key][adj_key_hash[key_index-1]][term_key]
+                      adj_key_hash[key_index] = @loan_type
+                    end
+                  end
+                  if term_key.include?("-")
+                    if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
+                      adj.data[first_key][adj_key_hash[key_index-1]][term_key]
+                      adj_key_hash[key_index] = term_key
+                    end
+                  elsif term_key.include?("Inf") || term_key.include?("Infinite")
+                    if (term_key.split("-").first.strip.to_i <= @term)
+                      adj.data[first_key][adj_key_hash[key_index-1]][term_key]
+                      adj_key_hash[key_index] = term_key
+                    end
+                  end
                 end
               end
               if key_index==2
                 if key_name == "PropertyType"
-                  adj.data[first_key][adj_key_hash[key_name-2]][adj_key_hash[key_name-1]][@property_type]
+                  adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type]
                   adj_key_hash[key_index] = @property_type
                 end
                 if key_name == "FinancingType"
-                  adj.data[first_key][adj_key_hash[key_name-2]][adj_key_hash[key_name-1]][@financing_type]
+                  adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@financing_type]
                   adj_key_hash[key_index] = @financing_type
                 end
                 if key_name == "PremiumType"
-                  adj.data[first_key][adj_key_hash[key_name-2]][adj_key_hash[key_name-1]][@premium_type]
+                  adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@premium_type]
                   adj_key_hash[key_index] = @premium_type
                 end
                 if key_name == "LTV"
-                  adj.data[first_key][adj_key_hash[key_name-2]][adj_key_hash[key_name-1]].keys.each do |ltv_key|
+                  adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |ltv_key|
                     if ltv_key.include?("-")
                       if (ltv_key.split("-").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("-").second.strip.to_f)
-                        adj.data[first_key][adj_key_hash[key_name-2]][adj_key_hash[key_name-1]][ltv_key]
+                        adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][ltv_key]
                         adj_key_hash[key_index] = ltv_key
                       end
                     end
                   end
                 end
                 if key_name == "FICO"
-                  adj.data[first_key][adj_key_hash[key_name-2]][adj_key_hash[key_name-1]].keys.each do |fico_key|
+                  adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |fico_key|
                     if fico_key.include?("-")
                       if (fico_key.split("-").first.strip.to_i <= @credit_score && fico_key.split("-").second.strip.to_i >= @credit_score)
-                        adj.data[first_key][adj_key_hash[key_name-2]][adj_key_hash[key_name-1]][fico_key]
+                        adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][fico_key]
                         adj_key_hash[key_index] = fico_key
                       end
                     end
                   end
                 end
                 if key_name == "RefinanceOption"
-                  adj.data[first_key][adj_key_hash[key_name-2]][adj_key_hash[key_name-1]][@refinance_option]
+                  adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@refinance_option]
                   adj_key_hash[key_index] = @refinance_option
                 end
                 if key_name == "MiscAdjuster"
-                  adj.data[first_key][adj_key_hash[key_name-2]][adj_key_hash[key_name-1]][@misc_adjuster]
+                  adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@misc_adjuster]
                   adj_key_hash[key_index] = @misc_adjuster
                 end
                 if key_name == "LoanSize"
-                  adj.data[first_key][adj_key_hash[key_name-2]][adj_key_hash[key_name-1]][@loan_size]
+                  adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_size]
                   adj_key_hash[key_index] = @loan_size
                 end
                 if key_name == "CLTV"
-                  adj.data[first_key][adj_key_hash[key_name-2]][adj_key_hash[key_name-1]][@cltv]
+                  adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@cltv]
                   adj_key_hash[key_index] = @cltv
                 end
                 if key_name == "State"
-                  adj.data[first_key][adj_key_hash[key_name-2]][adj_key_hash[key_name-1]][@state]
+                  adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@state]
                   adj_key_hash[key_index] = @state
+                end
+                if key_name == "LoanType"
+                  adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_type]
+                  adj_key_hash[key_index] = @loan_type
+                end
+                if key_name == "Term"
+                  term_key = adj.data[first_key].keys.first
+                  if term_key.include?("-")
+                    if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
+                      adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
+                      adj_key_hash[key_index] = @loan_type
+                    end
+                  end
+                  if term_key.include?("-")
+                    if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
+                      adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
+                      adj_key_hash[key_index] = term_key
+                    end
+                  elsif term_key.include?("Inf") || term_key.include?("Infinite")
+                    if (term_key.split("-").first.strip.to_i <= @term)
+                      adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
+                      adj_key_hash[key_index] = term_key
+                    end
+                  end
+                end
+              end
+              if key_index==3
+                if key_name == "PropertyType"
+                  adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type]
+                  adj_key_hash[key_index] = @property_type
+                end
+                if key_name == "FinancingType"
+                  adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@financing_type]
+                  adj_key_hash[key_index] = @financing_type
+                end
+                if key_name == "PremiumType"
+                  adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@premium_type]
+                  adj_key_hash[key_index] = @premium_type
+                end
+                if key_name == "LTV"
+                  debugger
+                  adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |ltv_key|
+                    if ltv_key.include?("-")
+                      if (ltv_key.split("-").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("-").second.strip.to_f)
+                        adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][ltv_key]
+                        adj_key_hash[key_index] = ltv_key
+                      end
+                    end
+                  end
+                end
+                if key_name == "FICO"
+                  adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |fico_key|
+                    if fico_key.include?("-")
+                      if (fico_key.split("-").first.strip.to_i <= @credit_score && fico_key.split("-").second.strip.to_i >= @credit_score)
+                        adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][fico_key]
+                        adj_key_hash[key_index] = fico_key
+                      end
+                    end
+                  end
+                end
+                if key_name == "RefinanceOption"
+                  adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@refinance_option]
+                  adj_key_hash[key_index] = @refinance_option
+                end
+                if key_name == "MiscAdjuster"
+                  adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@misc_adjuster]
+                  adj_key_hash[key_index] = @misc_adjuster
+                end
+                if key_name == "LoanSize"
+                  adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_size]
+                  adj_key_hash[key_index] = @loan_size
+                end
+                if key_name == "CLTV"
+                  adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@cltv]
+                  adj_key_hash[key_index] = @cltv
+                end
+                if key_name == "State"
+                  adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@state]
+                  adj_key_hash[key_index] = @state
+                end
+                if key_name == "LoanType"
+                  adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_type]
+                  adj_key_hash[key_index] = @loan_type
+                end
+                if key_name == "Term"
+                  term_key = adj.data[first_key].keys.first
+                  if term_key.include?("-")
+                    if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
+                      adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
+                      adj_key_hash[key_index] = @loan_type
+                    end
+                  end
+                  if term_key.include?("-")
+                    if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
+                      adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
+                      adj_key_hash[key_index] = term_key
+                    end
+                  elsif term_key.include?("Inf") || term_key.include?("Infinite")
+                    if (term_key.split("-").first.strip.to_i <= @term)
+                      adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
+                      adj_key_hash[key_index] = term_key
+                    end
+                  end
+                end
+              end
+              if key_index==4
+                if key_name == "PropertyType"
+                  adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type]
+                  adj_key_hash[key_index] = @property_type
+                end
+                if key_name == "FinancingType"
+                  adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@financing_type]
+                  adj_key_hash[key_index] = @financing_type
+                end
+                if key_name == "PremiumType"
+                  adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@premium_type]
+                  adj_key_hash[key_index] = @premium_type
+                end
+                if key_name == "LTV"
+                  adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |ltv_key|
+                    if ltv_key.include?("-")
+                      if (ltv_key.split("-").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("-").second.strip.to_f)
+                        adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][ltv_key]
+                        adj_key_hash[key_index] = ltv_key
+                      end
+                    end
+                  end
+                end
+                if key_name == "FICO"
+                  adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |fico_key|
+                    if fico_key.include?("-")
+                      if (fico_key.split("-").first.strip.to_i <= @credit_score && fico_key.split("-").second.strip.to_i >= @credit_score)
+                        adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][fico_key]
+                        adj_key_hash[key_index] = fico_key
+                      end
+                    end
+                  end
+                end
+                if key_name == "RefinanceOption"
+                  adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@refinance_option]
+                  adj_key_hash[key_index] = @refinance_option
+                end
+                if key_name == "MiscAdjuster"
+                  adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@misc_adjuster]
+                  adj_key_hash[key_index] = @misc_adjuster
+                end
+                if key_name == "LoanSize"
+                  adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_size]
+                  adj_key_hash[key_index] = @loan_size
+                end
+                if key_name == "CLTV"
+                  adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@cltv]
+                  adj_key_hash[key_index] = @cltv
+                end
+                if key_name == "State"
+                  adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@state]
+                  adj_key_hash[key_index] = @state
+                end
+                if key_name == "LoanType"
+                  adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_type]
+                  adj_key_hash[key_index] = @loan_type
+                end
+                if key_name == "Term"
+                  term_key = adj.data[first_key].keys.first
+                  if term_key.include?("-")
+                    if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
+                      adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
+                      adj_key_hash[key_index] = @loan_type
+                    end
+                  end
+                  if term_key.include?("-")
+                    if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
+                      adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
+                      adj_key_hash[key_index] = term_key
+                    end
+                  elsif term_key.include?("Inf") || term_key.include?("Infinite")
+                    if (term_key.split("-").first.strip.to_i <= @term)
+                      adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
+                      adj_key_hash[key_index] = term_key
+                    end
+                  end
+                end
+              end
+              if key_index==5
+                if key_name == "PropertyType"
+                  adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type]
+                  adj_key_hash[key_index] = @property_type
+                end
+                if key_name == "FinancingType"
+                  adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@financing_type]
+                  adj_key_hash[key_index] = @financing_type
+                end
+                if key_name == "PremiumType"
+                  adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@premium_type]
+                  adj_key_hash[key_index] = @premium_type
+                end
+                if key_name == "LTV"
+                  adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |ltv_key|
+                    if ltv_key.include?("-")
+                      if (ltv_key.split("-").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("-").second.strip.to_f)
+                        adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][ltv_key]
+                        adj_key_hash[key_index] = ltv_key
+                      end
+                    end
+                  end
+                end
+                if key_name == "FICO"
+                  adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |fico_key|
+                    if fico_key.include?("-")
+                      if (fico_key.split("-").first.strip.to_i <= @credit_score && fico_key.split("-").second.strip.to_i >= @credit_score)
+                        adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][fico_key]
+                        adj_key_hash[key_index] = fico_key
+                      end
+                    end
+                  end
+                end
+                if key_name == "RefinanceOption"
+                  adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@refinance_option]
+                  adj_key_hash[key_index] = @refinance_option
+                end
+                if key_name == "MiscAdjuster"
+                  adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@misc_adjuster]
+                  adj_key_hash[key_index] = @misc_adjuster
+                end
+                if key_name == "LoanSize"
+                  adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_size]
+                  adj_key_hash[key_index] = @loan_size
+                end
+                if key_name == "CLTV"
+                  adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@cltv]
+                  adj_key_hash[key_index] = @cltv
+                end
+                if key_name == "State"
+                  adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@state]
+                  adj_key_hash[key_index] = @state
+                end
+                if key_name == "LoanType"
+                  adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_type]
+                  adj_key_hash[key_index] = @loan_type
+                end
+                if key_name == "Term"
+                  term_key = adj.data[first_key].keys.first
+                  if term_key.include?("-")
+                    if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
+                      adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
+                      adj_key_hash[key_index] = @loan_type
+                    end
+                  end
+                  if term_key.include?("-")
+                    if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
+                      adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
+                      adj_key_hash[key_index] = term_key
+                    end
+                  elsif term_key.include?("Inf") || term_key.include?("Infinite")
+                    if (term_key.split("-").first.strip.to_i <= @term)
+                      adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
+                      adj_key_hash[key_index] = term_key
+                    end
+                  end
+                end
+              end
+              if key_index==6
+                if key_name == "PropertyType"
+                  adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type]
+                  adj_key_hash[key_index] = @property_type
+                end
+                if key_name == "FinancingType"
+                  adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@financing_type]
+                  adj_key_hash[key_index] = @financing_type
+                end
+                if key_name == "PremiumType"
+                  adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@premium_type]
+                  adj_key_hash[key_index] = @premium_type
+                end
+                if key_name == "LTV"
+                  adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |ltv_key|
+                    if ltv_key.include?("-")
+                      if (ltv_key.split("-").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("-").second.strip.to_f)
+                        adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][ltv_key]
+                        adj_key_hash[key_index] = ltv_key
+                      end
+                    end
+                  end
+                end
+                if key_name == "FICO"
+                  adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |fico_key|
+                    if fico_key.include?("-")
+                      if (fico_key.split("-").first.strip.to_i <= @credit_score && fico_key.split("-").second.strip.to_i >= @credit_score)
+                        adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][fico_key]
+                        adj_key_hash[key_index] = fico_key
+                      end
+                    end
+                  end
+                end
+                if key_name == "RefinanceOption"
+                  adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@refinance_option]
+                  adj_key_hash[key_index] = @refinance_option
+                end
+                if key_name == "MiscAdjuster"
+                  adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@misc_adjuster]
+                  adj_key_hash[key_index] = @misc_adjuster
+                end
+                if key_name == "LoanSize"
+                  adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_size]
+                  adj_key_hash[key_index] = @loan_size
+                end
+                if key_name == "CLTV"
+                  adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@cltv]
+                  adj_key_hash[key_index] = @cltv
+                end
+                if key_name == "State"
+                  adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@state]
+                  adj_key_hash[key_index] = @state
+                end
+                if key_name == "LoanType"
+                  adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_type]
+                  adj_key_hash[key_index] = @loan_type
+                end
+                if key_name == "Term"
+                  term_key = adj.data[first_key].keys.first
+                  if term_key.include?("-")
+                    if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
+                      adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
+                      adj_key_hash[key_index] = @loan_type
+                    end
+                  end
+                  if term_key.include?("-")
+                    if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
+                      adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
+                      adj_key_hash[key_index] = term_key
+                    end
+                  elsif term_key.include?("Inf") || term_key.include?("Infinite")
+                    if (term_key.split("-").first.strip.to_i <= @term)
+                      adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
+                      adj_key_hash[key_index] = term_key
+                    end
+                  end
                 end
               end
             else
               if key_index==0
-                if (key_name == "HighBalance" || key_name == "Conforming" || key_name =  "FannieMae" || key_name =  "FannieMaeHomeReady" || key_name =  "FreddieMac" || key_name =  "FreddieMacHomePossible" || key_name =  "FHA" || key_name =  "VA" || key_name =  "USDA" || key_name =  "StreamLine" || key_name =  "FullDoc")
+                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc")
                   adj_key_hash[key_index] = "true"
                   adj.data[first_key]["true"]
                 end
               end
               if key_index==1
-                if (key_name == "HighBalance" || key_name == "Conforming" || key_name =  "FannieMae" || key_name =  "FannieMaeHomeReady" || key_name =  "FreddieMac" || key_name =  "FreddieMacHomePossible" || key_name =  "FHA" || key_name =  "VA" || key_name =  "USDA" || key_name =  "StreamLine" || key_name =  "FullDoc")
+                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc")
                   adj_key_hash[key_index] = "true"
-                  adj.data[first_key][adj_key_hash[key_name-1]]["true"]
+                  adj.data[first_key][adj_key_hash[key_index-1]]["true"]
                 end
               end
               if key_index==2
-                if (key_name == "HighBalance" || key_name == "Conforming" || key_name =  "FannieMae" || key_name =  "FannieMaeHomeReady" || key_name =  "FreddieMac" || key_name =  "FreddieMacHomePossible" || key_name =  "FHA" || key_name =  "VA" || key_name =  "USDA" || key_name =  "StreamLine" || key_name =  "FullDoc")
+                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc")
                   adj_key_hash[key_index] = "true"
-                  adj.data[first_key][adj_key_hash[key_name-2]][adj_key_hash[key_name-1]]["true"]
+                  debugger
+                  adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"]
+                end
+              end
+              if key_index==3
+                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc")
+                  adj_key_hash[key_index] = "true"
+                  adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"]
+                end
+              end
+              if key_index==4
+                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc")
+                  adj_key_hash[key_index] = "true"
+                  adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"]
+                end
+              end
+              if key_index==5
+                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc")
+                  adj_key_hash[key_index] = "true"
+                  adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"]
+                end
+              end
+              if key_index==6
+                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc")
+                  adj_key_hash[key_index] = "true"
+                  adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"]
                 end
               end
             end
           end
           adj_key_hash.keys.each do |hash_key, index|
-            
+            debugger
           end
         end
       end
