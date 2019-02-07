@@ -244,6 +244,7 @@ class ObCmgWholesalesController < ApplicationController
         primary_key = ''
         primary_key1 = ''
         primary_key2 = ''
+        primary_key3 = ''
         secondary_key = ''
         secondary_key1 = ''
         ltv_key = ''
@@ -282,11 +283,19 @@ class ObCmgWholesalesController < ApplicationController
               end
               if value == "SUBORDINATE FINANCING"
                 primary_key = "FinancingType/LTV/CLTV/FICO"
+                primary_key3 = "Subordinate Financing"
                 @subordinate_hash[primary_key] = {}
+                @subordinate_hash[primary_key][primary_key3] = {}
               end
               if value == "HOMEREADY ADJUSTMENT CAPS*"
-                primary_key = "FinancingType/LoanType"
+                primary_key = "FannieMaeProduct/FICO/LTV"
                 @adjustment_cap[primary_key] = {}
+                @adjustment_cap[primary_key]["HomeReady"] = {}
+              end
+              if value == "HOME POSSIBLE AND HOME POSSIBLE ADVANTAGE ADJUSTMENT CAPS*"
+                primary_key1 = "FreddieMacProduct/FICO/LTV"
+                @adjustment_cap[primary_key1] = {}
+                @adjustment_cap[primary_key1]["HomePossible"] = {}
               end
               if value == "LENDER PAID MI"
                 primary_key = "LPMI/LoanType/LTV/FICO"
@@ -438,16 +447,16 @@ class ObCmgWholesalesController < ApplicationController
               # SUBORDINATE FINANCING
               if r >= 39 && r <= 43 && cc == 1
                 secondary_key = get_value value
-                @subordinate_hash[primary_key][secondary_key] = {}
+                @subordinate_hash[primary_key][primary_key3][secondary_key] = {}
               end
               if r >= 39 && r <= 43 && cc == 3
                 ltv_key = get_value value
-                @subordinate_hash[primary_key][secondary_key][ltv_key] = {}
+                @subordinate_hash[primary_key][primary_key3][secondary_key][ltv_key] = {}
               end
               if r >= 39 && r <= 43 && cc >= 5 && cc <= 7
                 cltv_key = get_value @cltv_data[cc-1]
-                @subordinate_hash[primary_key][secondary_key][ltv_key][cltv_key] = {}
-                @subordinate_hash[primary_key][secondary_key][ltv_key][cltv_key] = value
+                @subordinate_hash[primary_key][primary_key3][secondary_key][ltv_key][cltv_key] = {}
+                @subordinate_hash[primary_key][primary_key3][secondary_key][ltv_key][cltv_key] = value
               end
               if r == 44 && cc == 1
                 secondary_key = "Home Possible"
@@ -458,27 +467,35 @@ class ObCmgWholesalesController < ApplicationController
               end
 
               # HOMEREADY ADJUSTMENT CAPS
-              if r >= 48 && r <= 49 && cc ==1
-                if value == "LTV > 80% AND FICO >= 680"
-                  secondary_key = "FICO/LTV"
-                else
-                  secondary_key = "All/FICO/LTV"
-                end
-                @adjustment_cap[primary_key][secondary_key] = {}
+              if r == 48 && cc == 1
+                @adjustment_cap[primary_key]["HomeReady"]["680-Inf"] = {}
+                @adjustment_cap[primary_key]["HomeReady"]["680-Inf"]["80-Inf"] = {}
               end
-              if r >= 48 && r <= 49 && cc == 8
-                @adjustment_cap[primary_key][secondary_key] = value
+              if r == 48 && cc == 8
+                @adjustment_cap[primary_key]["HomeReady"]["680-Inf"]["80-Inf"] = value
               end
-              if r >= 54 && r <= 55 && cc ==1
-                if value == "LTV > 80% AND FICO >= 680"
-                  secondary_key = "HOME/FICO/LTV"
-                else
-                  secondary_key = "All/HOME/FICO/LTV"
-                end
-                @adjustment_cap[primary_key][secondary_key] = {}
+              if r == 49 && cc == 1
+                @adjustment_cap[primary_key]["HomeReady"]["0-679"] = {}
+                @adjustment_cap[primary_key]["HomeReady"]["0-679"]["0-79"] = {}
               end
-              if r >= 54 && r <= 55 && cc == 8
-                @adjustment_cap[primary_key][secondary_key] = value
+              if r == 49 && cc == 8
+                @adjustment_cap[primary_key]["HomeReady"]["0-679"]["0-79"] = value
+              end
+              if r == 54 && cc == 1
+                @adjustment_cap[primary_key1]["HomePossible"]["680-Inf"] = {}
+                @adjustment_cap[primary_key1]["HomePossible"]["680-Inf"]["80-Inf"] = {}
+              end
+              if r == 54 && cc == 8
+                @adjustment_cap[primary_key1]["HomePossible"]["680-Inf"]["80-Inf"] = value
+              end
+              if r == 55 && cc == 1
+                @adjustment_cap["FreddieMacProduct/FICO/LTV"] = {}
+                @adjustment_cap["FreddieMacProduct/FICO/LTV"]["HomePossible"] = {}
+                @adjustment_cap["FreddieMacProduct/FICO/LTV"]["HomePossible"]["0-679"] = {}
+                @adjustment_cap["FreddieMacProduct/FICO/LTV"]["HomePossible"]["0-679"]["0-79"] = {}
+              end
+              if r == 55 && cc == 8
+                @adjustment_cap["FreddieMacProduct/FICO/LTV"]["HomePossible"]["0-679"]["0-79"] = value
               end
               # LENDER PAID MI
               if r >= 71 && r <= 74 && cc == 3
@@ -593,7 +610,7 @@ class ObCmgWholesalesController < ApplicationController
             value = sheet_data.cell(r,cc)
             if value.present?
               if value == "LOAN AMOUNT "
-                primary_key1 = "LoanType/LoanAmount/CLTV"
+                primary_key1 = "LoanAmount/LTV"
                 @loan_adjustment[primary_key1] = {}
               end
               if value == "STATE ADJUSTMENTS"
@@ -601,12 +618,18 @@ class ObCmgWholesalesController < ApplicationController
                 @state_adjustments[primary_key1] = {}
               end
               if value == "MISCELLANEOUS"
-                primary_key1 = "Miscellaneous"
+                primary_key1 = "MiscAdjuster"
                 @other_adjustment[primary_key1] = {}
               end
               # LOAN AMOUNT
               if r >= 38 && r <= 42 && cc == 10
-                secondary_key1 = get_value value
+                if value.include?("Conf Limit")
+                  secondary_key1 = value.split("Loan Amount").last.tr('$a-zA-Z><= ', '')+"Inf"
+                elsif value.include?("Loan Amount")
+                  secondary_key1 = value.split("Loan Amount").last.tr('$><= ', '')
+                else
+                  secondary_key1 = get_value value 
+                end
                 @loan_adjustment[primary_key1][secondary_key1] = {}
               end
               if r >= 38 && r <= 42 && cc == 16
@@ -822,7 +845,6 @@ class ObCmgWholesalesController < ApplicationController
                   end
                   # LOAN AMOUNT ADJUSTMENT
                   if r >= 76 && r <= 80 && cc == 10
-                    # m_key = value
                     m_key =  value.include?("<") ? "0"+value.split("Loan Amount").last : value.split("Loan Amount").last
                     @misc_adjustment[primary_key1][m_key] = {}
                   end
@@ -2570,9 +2592,9 @@ class ObCmgWholesalesController < ApplicationController
   def get_value value1
     if value1.present?
       if value1.include?("<=") || value1.include?("<")
-        value1 = "0-"+value1.split("<=").last.tr('^0-9><', '')
+        value1 = "0-"+value1.split("<=").last.tr('^0-9', '')
       elsif value1.include?(">")
-        value1 = value1.split(">").last.tr('^0-9><', '')+"-Inf"
+        value1 = value1.split(">").last.tr('^0-9', '')+"-Inf"
       else
         value1
       end
