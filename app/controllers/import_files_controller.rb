@@ -474,7 +474,6 @@ class ImportFilesController < ApplicationController
                   rrr = rr + max_row
                   ccc = index
                   value = sheet_data.cell(rrr,ccc)
-                  # binding.pry
                   # implementation of first key
                   if rrr.eql?(132)
                     # for Cash-Out
