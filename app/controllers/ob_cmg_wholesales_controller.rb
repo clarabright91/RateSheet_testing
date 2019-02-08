@@ -1513,6 +1513,7 @@ class ObCmgWholesalesController < ApplicationController
                       end
                       @data << value
                     end
+                  end  
                   end
                   if @data.compact.reject { |c| c.blank? }.length == 0
                     break # terminate the loop
