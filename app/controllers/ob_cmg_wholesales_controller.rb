@@ -2391,95 +2391,147 @@ class ObCmgWholesalesController < ApplicationController
               value = sheet_data.cell(r,cc)
               if value.present?
                 if value == "Purchase Transaction"
-                  primary_key = "LoanPurpose/FICO/LTV"
-                  @purchase_adjustment[primary_key] = {}
+                  @purchase_adjustment["LoanPurpose/FICO/LTV"] = {}
+                  @purchase_adjustment["LoanPurpose/FICO/LTV"]["Purchase"] = {}
                 elsif value == "Rate/Term Transaction"
-                  primary_key = "LoanType/Term/FICO/LTV"
-                  @rate_adjustment[primary_key] = {}
+                  @rate_adjustment["RefinanceOption/FICO/LTV"] = {}
+                  @rate_adjustment["RefinanceOption/FICO/LTV"]["Rate and Term"] = {}
                 elsif value == "Cash Out Transaction"
-                  primary_key = "LoanPurpose/RefinanceOption/LTV"
-                  @adjustment_hash[primary_key] = {}
+                  @adjustment_hash["RefinanceOption/FICO/LTV"] = {}
+                  @adjustment_hash["RefinanceOption/FICO/LTV"]["Cash Out"] = {}
+                  @adjustment_hash["RefinanceOption/LoanAmount/FICO/LTV"] = {}
+                  @adjustment_hash["RefinanceOption/LoanAmount/FICO/LTV"]["Cash Out"] = {}
+                  @adjustment_hash["RefinanceOption/PropertyType/LTV"] = {}
+                  @adjustment_hash["RefinanceOption/PropertyType/LTV"]["Cash Out"] = {}
                 elsif value == "MISCELLANEOUS"
-                  primary_key = "Miscellaneous"
-                  @other_adjustment[primary_key] = {}
-                elsif value == "MAX PRICE AFTER ADJUSTMENTS"
-                  primary_key = "LoanType/LA/"
-                  @other_adjustment[primary_key] = {}
+                  @other_adjustment["MiscAdjuster/State"] = {}
+                  @other_adjustment["MiscAdjuster/State"]["Miscellaneous"] = {}
+                  @other_adjustment["MiscAdjuster/State"]["Miscellaneous"]["NY"] = {}
                 end
                 # Purchase Transaction Adjustment
                 if r >= 42 && r <= 48 && cc == 1
-                  secondary_key = get_value value
-                  @purchase_adjustment[primary_key][secondary_key] = {}
+                  if value.include?("-")
+                    secondary_key = value.tr('A-Z ','')
+                  else
+                    secondary_key = get_value value
+                  end
+                  @purchase_adjustment["LoanPurpose/FICO/LTV"]["Purchase"][secondary_key] = {}
                 end
                 if r >= 42 && r <= 48 && cc >= 6 && cc <= 14
                   cltv_key = get_value @cltv_data[cc-1]
-                  @purchase_adjustment[primary_key][secondary_key][cltv_key] = {}
-                  @purchase_adjustment[primary_key][secondary_key][cltv_key] = value
+                  @purchase_adjustment["LoanPurpose/FICO/LTV"]["Purchase"][secondary_key][cltv_key] = {}
+                  @purchase_adjustment["LoanPurpose/FICO/LTV"]["Purchase"][secondary_key][cltv_key] = value
                 end
 
                 # Rate/Term Transaction Adjustment
                 if r >= 51 && r <= 57 && cc == 1
-                  secondary_key = get_value value
-                  @rate_adjustment[primary_key][secondary_key] = {}
-                end
-                if r >= 51 && r <= 57 && cc >= 6 && cc <= 14
-                  cltv_key = get_value @cltv_data[cc-1]
-                  @rate_adjustment[primary_key][secondary_key][cltv_key] = {}
-                  @rate_adjustment[primary_key][secondary_key][cltv_key] = value
-                end
-
-                # Cash Out Transaction Adjustment
-                if r >= 60 && r <= 75 && cc == 1
-                  if value.include?("Loan Amount")
-                    secondary_key = value.include?("<") ? "0"+value.split("Loan Amount").last : value.split("Loan Amount").last
+                  if value.include?("-")
+                    secondary_key = value.tr('A-Z ','')
                   else
                     secondary_key = get_value value
                   end
-                  @adjustment_hash[primary_key][secondary_key] = {}
+                  @rate_adjustment["RefinanceOption/FICO/LTV"]["Rate and Term"][secondary_key] = {}
                 end
-                if r >= 60 && r <= 75 && cc >= 6 && cc <= 14
+                if r >= 51 && r <= 57 && cc >= 6 && cc <= 14
                   cltv_key = get_value @cltv_data[cc-1]
-                  @adjustment_hash[primary_key][secondary_key][cltv_key] = {}
-                  @adjustment_hash[primary_key][secondary_key][cltv_key] = value
+                  @rate_adjustment["RefinanceOption/FICO/LTV"]["Rate and Term"][secondary_key][cltv_key] = {}
+                  @rate_adjustment["RefinanceOption/FICO/LTV"]["Rate and Term"][secondary_key][cltv_key] = value
+                end
+
+                # Cash Out Transaction Adjustment
+                if r >= 60 && r <= 66 && cc == 1
+                  if value.include?("-")
+                    secondary_key = value.tr('A-Z ','')
+                  else
+                    secondary_key = get_value value
+                  end
+                  @adjustment_hash["RefinanceOption/FICO/LTV"]["Cash Out"][secondary_key] = {}
+                end
+                if r >= 60 && r <= 66 && cc >= 6 && cc <= 14
+                  cltv_key = get_value @cltv_data[cc-1]
+                  @adjustment_hash["RefinanceOption/FICO/LTV"]["Cash Out"][secondary_key][cltv_key] = {}
+                  @adjustment_hash["RefinanceOption/FICO/LTV"]["Cash Out"][secondary_key][cltv_key] = value
+                end
+                if r >= 67 && r <= 69 && cc == 1
+                  if value.include?("-")
+                    secondary_key = value.tr('A-Za-z$ ','')
+                  else
+                    secondary_key = get_value value
+                  end
+                  @adjustment_hash["RefinanceOption/LoanAmount/FICO/LTV"]["Cash Out"][secondary_key] = {}
+                end
+                if r >= 67 && r <= 69 && cc >= 6 && cc <= 14
+                  cltv_key = get_value @cltv_data[cc-1]
+                  @adjustment_hash["RefinanceOption/LoanAmount/FICO/LTV"]["Cash Out"][secondary_key][cltv_key] = {}
+                  @adjustment_hash["RefinanceOption/LoanAmount/FICO/LTV"]["Cash Out"][secondary_key][cltv_key] = value
+                end
+                if r >= 70 && r <= 75 && cc == 1
+                  secondary_key = value
+                  @adjustment_hash["RefinanceOption/PropertyType/LTV"]["Cash Out"][secondary_key] = {}
+                end
+                if r >= 70 && r <= 75 && cc >= 6 && cc <= 14
+                  cltv_key = get_value @cltv_data[cc-1]
+                  @adjustment_hash["RefinanceOption/PropertyType/LTV"]["Cash Out"][secondary_key][cltv_key] = {}
+                  @adjustment_hash["RefinanceOption/PropertyType/LTV"]["Cash Out"][secondary_key][cltv_key] = value
                 end
                 if r == 76 && cc == 1
-                  secondary_key = "Escrow-Waiver/NY"
-                  @adjustment_hash[primary_key][secondary_key] = {}
+                  @adjustment_hash["RefinanceOption/MiscAdjuster/LTV"] = {}
+                  @adjustment_hash["RefinanceOption/MiscAdjuster/LTV"]["Cash Out"] = {}
+                  @adjustment_hash["RefinanceOption/MiscAdjuster/LTV"]["Cash Out"]["Escrow Waiver"] = {}
                 end
                 if r == 76 && cc >= 6 && cc <= 14
                   cltv_key = get_value @cltv_data[cc-1]
-                  @adjustment_hash[primary_key][secondary_key][cltv_key] = {}
-                  @adjustment_hash[primary_key][secondary_key][cltv_key] = value
+                  @adjustment_hash["RefinanceOption/MiscAdjuster/LTV"]["Cash Out"]["Escrow Waiver"][cltv_key] = {}
+                  @adjustment_hash["RefinanceOption/MiscAdjuster/LTV"]["Cash Out"]["Escrow Waiver"][cltv_key] = value
                 end
                 if r == 77 && cc == 1
-                  secondary_key = "FL"
-                  adj_key = "NV"
-                  @adjustment_hash[primary_key][secondary_key] = {}
-                  @adjustment_hash[primary_key][adj_key] = {}
+                  @adjustment_hash["RefinanceOption/State/LTV"] = {}
+                  @adjustment_hash["RefinanceOption/State/LTV"]["Cash Out"] = {}
+                  @adjustment_hash["RefinanceOption/State/LTV"]["Cash Out"]["FL"] = {}
+                  @adjustment_hash["RefinanceOption/State/LTV"]["Cash Out"]["NV"] = {}
                 end
                 if r == 77 && cc >= 6 && cc <= 14
                   cltv_key = get_value @cltv_data[cc-1]
-                  @adjustment_hash[primary_key][secondary_key][cltv_key] = {}
-                  @adjustment_hash[primary_key][adj_key][cltv_key] = {}
-                  @adjustment_hash[primary_key][secondary_key][cltv_key] = value
-                  @adjustment_hash[primary_key][adj_key][cltv_key] = value
+                  @adjustment_hash["RefinanceOption/State/LTV"]["Cash Out"]["FL"][cltv_key] = {}
+                  @adjustment_hash["RefinanceOption/State/LTV"]["Cash Out"]["NV"][cltv_key] = {}
+                  @adjustment_hash["RefinanceOption/State/LTV"]["Cash Out"]["FL"][cltv_key] = value
+                  @adjustment_hash["RefinanceOption/State/LTV"]["Cash Out"]["NV"][cltv_key] = value
                 end
 
                 # Other Adjustments
-                if r == 80 && cc == 1
-                  secondary_key = "NY"
-                  @other_adjustment[primary_key][secondary_key] = {}
-                end
                 if r == 80 && cc == 4
-                  @other_adjustment[primary_key][secondary_key] = value
+                  @other_adjustment["MiscAdjuster/State"]["Miscellaneous"]["NY"] = value
                 end
-                if r >= 84 && r <= 85 && cc == 1
-                  key = value.include?("LA <") ? "0" + value.split("LA").last : value.split("LA").last
-                  @other_adjustment[primary_key][key] = {}
+                if r == 84 && cc == 1
+                  @other_adjustment["LoanAmount/Term"] = {}
+                  @other_adjustment["LoanAmount/Term"]["0-1,000,000"] = {}
+                  @other_adjustment["LoanAmount/Term"]["0-1,000,000"]["30"] = {}
+                  @other_adjustment["LoanAmount/Term"]["0-1,000,000"]["15"] = {}
+                  @other_adjustment["LoanAmount/Term"]["0-1,000,000"]["ARM"] = {}
                 end
-                if r >= 84 && r <= 85 && cc >=2 && cc <= 4
-                  @other_adjustment[primary_key][key][@max_data[cc-1]] = {}
-                  @other_adjustment[primary_key][key][@max_data[cc-1]] = value
+                if r == 84 && cc == 2
+                  @other_adjustment["LoanAmount/Term"]["0-1,000,000"]["30"] = value
+                end
+                if r == 84 && cc == 3
+                  @other_adjustment["LoanAmount/Term"]["0-1,000,000"]["15"] = value
+                end
+                if r == 84 && cc == 4
+                  @other_adjustment["LoanAmount/Term"]["0-1,000,000"]["ARM"] = value
+                end
+                if r == 85 && cc == 1
+                  @other_adjustment["LoanAmount/Term"]["1,000,000-Inf"] = {}
+                  @other_adjustment["LoanAmount/Term"]["1,000,000-Inf"]["30"] = {}
+                  @other_adjustment["LoanAmount/Term"]["1,000,000-Inf"]["15"] = {}
+                  @other_adjustment["LoanAmount/Term"]["1,000,000-Inf"]["ARM"] = {}
+                end
+                if r == 85 && cc == 2
+                  @other_adjustment["LoanAmount/Term"]["1,000,000-Inf"]["30"] = value
+                end
+                if r == 85 && cc == 3
+                  @other_adjustment["LoanAmount/Term"]["1,000,000-Inf"]["15"] = value
+                end
+                if r == 85 && cc == 4
+                  @other_adjustment["LoanAmount/Term"]["1,000,000-Inf"]["ARM"] = value
                 end
               end
             end
