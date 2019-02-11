@@ -799,7 +799,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
             end
           end
         end
-        adjustment = [@price_adjustment,@family_adjustment,condo_adjustment]
+        adjustment = [@price_adjustment,@family_adjustment,@condo_adjustment]
         make_adjust(adjustment,sheet)
         create_program_association_with_adjustment(sheet)
       end
