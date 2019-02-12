@@ -98,48 +98,129 @@ class ObCmgWholesalesController < ApplicationController
                 value = sheet_data.cell(r,cc)
                 if value.present?
                   if value == "GOVERNMENT ADJUSTMENTS"
-                    first_key = "GovermentAdjustments"
-                    @data_hash[first_key] = {}
+                    @data_hash["FICO"] = {}
+                    @data_hash["LoanAmount"] = {}
+                    @data_hash["PropertyType"] = {}
+                    @data_hash["LoanSize/Term"] = {}
+                    @data_hash["LoanSize/Term"]["High Balance"] = {}
                   end
-
-                  if value == "FICO, LOAN AMOUNT & PROPERTY TYPE ADJUSTMENTS"
-                    second_key = "FicoLoanAmont"
-                    @data_hash[first_key][second_key] = {}
-                  end
-
-                  if r >= 70 && r <= 87 && cc == 1
-                    value = get_value value
+                  if r >= 70 && r <= 76 && cc == 1
+                    if value.include?("-")
+                      secondary_key = value.tr('A-Z+ ' , '')
+                    elsif value.include?("+")
+                      secondary_key = value.tr('A-Z+ ','')+"-Inf"
+                    end
                     ccc = cc + 6
                     c_val = sheet_data.cell(r,ccc)
-                    @data_hash[first_key][second_key][value] = c_val
+                    @data_hash["FICO"][secondary_key] = c_val
                   end
-
+                  if r == 77 && cc == 1
+                    ccc = cc +6
+                    c_val = sheet_data.cell(r,ccc)
+                    @data_hash["One Score"] = {}
+                    @data_hash["One Score"] = c_val
+                  end
+                  if r >= 78 && r <= 82 && cc == 1
+                    if value.include?("Conf Limit")
+                      secondary_key = value.tr('A-Za-z<>=$ ','') + "Inf"
+                    elsif value.include?("-")
+                      secondary_key = value.tr('A-Za-z<>=$ ','')
+                    end
+                    @data_hash["LoanAmount"][secondary_key] = {}
+                    ccc = cc + 6
+                    c_val = sheet_data.cell(r,ccc)
+                    @data_hash["LoanAmount"][secondary_key] = c_val
+                  end
+                  if r >= 83 && r <= 85 && cc == 1
+                    secondary_key = value
+                    @data_hash["PropertyType"][secondary_key] = {}
+                    ccc = cc + 6
+                    c_val = sheet_data.cell(r,ccc)
+                    @data_hash["PropertyType"][secondary_key] = c_val
+                  end
+                  if r == 86 && cc == 1
+                    @data_hash["LoanSize/Term"]["High Balance"]["15"] = {}
+                    @data_hash["LoanSize/Term"]["High Balance"]["20"] = {}
+                    ccc = cc + 6
+                    c_val = sheet_data.cell(r,ccc)
+                    @data_hash["LoanSize/Term"]["High Balance"]["15"] = c_val
+                    @data_hash["LoanSize/Term"]["High Balance"]["20"] = c_val
+                  end
+                  if r == 87 && cc == 1
+                    @data_hash["LoanSize/LoanType"] = {}
+                    @data_hash["LoanSize/LoanType"]["High Balance"] = {}
+                    @data_hash["LoanSize/LoanType"]["High Balance"]["ARM"] = {}
+                    ccc = cc + 6
+                    c_val = sheet_data.cell(r,ccc)
+                    @data_hash["LoanSize/LoanType"]["High Balance"]["ARM"] = c_val
+                  end
                 end
               end
-
               (10..16).each do |max_column|
                 cc = max_column
                 value = sheet_data.cell(r,cc)
                 if value.present?
                   if value == "MISCELLANEOUS"
-                    first_key1 = "GovermentAdjustments"
-                    second_key1 = "Miscellaneous"
-                    @misc_hash[first_key1] = {}
-                    @misc_hash[first_key1][second_key1] = {}
+                    @misc_hash["MiscAdjuster/LockDay"] = {}
+                    @misc_hash["MiscAdjuster/LockDay"]["Miscellaneous"] = {}
+                    @misc_hash["MiscAdjuster/LockDay"]["Miscellaneous"]["60"] = {}
+                    @misc_hash["MiscAdjuster/VA/RefinanceOption"] = {}
+                    @misc_hash["MiscAdjuster/VA/RefinanceOption"]["Miscellaneous"] = {}
+                    @misc_hash["MiscAdjuster/VA/RefinanceOption"]["Miscellaneous"][true] = {}
                   end
-
-                  if r >= 70 && r <= 77 && cc == 10
-                    value1 = get_key value
+                  if r == 70 && cc == 10
                     ccc = cc + 6
                     c_val = sheet_data.cell(r,ccc)
-                    @misc_hash[first_key1][second_key1][value] = c_val
+                    @misc_hash["MiscAdjuster/LockDay"]["Miscellaneous"]["60"] = c_val
+                  end
+                  if r == 71 && cc == 10
+                    @misc_hash["MiscAdjuster/FHA/Streamline"] = {}
+                    @misc_hash["MiscAdjuster/FHA/Streamline"]["Miscellaneous"] = {}
+                    @misc_hash["MiscAdjuster/FHA/Streamline"]["Miscellaneous"][true] = {}
+                    @misc_hash["MiscAdjuster/FHA/Streamline"]["Miscellaneous"][true][true] = {}
+                    ccc = cc + 6
+                    c_val = sheet_data.cell(r,ccc)
+                    @misc_hash["MiscAdjuster/FHA/Streamline"]["Miscellaneous"][true][true] = c_val
+                  end
+                  if r >= 72 && r <= 74 && cc == 10
+                    if value.include?("Non-IRRRL")
+                      secondary_key = "Non-IRRRL"
+                    else
+                      secondary_key = get_value value
+                    end
+                    @misc_hash["MiscAdjuster/VA/RefinanceOption"]["Miscellaneous"][true][secondary_key] = {}
+                    ccc = cc + 6
+                    c_val = sheet_data.cell(r,ccc)
+                    @misc_hash["MiscAdjuster/VA/RefinanceOption"]["Miscellaneous"][true][secondary_key] = c_val
+                  end
+                  if r == 75 && cc == 10
+                    @misc_hash["MiscAdjuster/RefinanceOption/VA/FICO"] = {}
+                    @misc_hash["MiscAdjuster/RefinanceOption/VA/FICO"]["Miscellaneous"] = {}
+                    @misc_hash["MiscAdjuster/RefinanceOption/VA/FICO"]["Miscellaneous"]["Cash Out"] = {}
+                    @misc_hash["MiscAdjuster/RefinanceOption/VA/FICO"]["Miscellaneous"]["Cash Out"][true] = {}
+                    ccc = cc + 6
+                    c_val = sheet_data.cell(r,ccc)
+                    @misc_hash["MiscAdjuster/RefinanceOption/VA/FICO"]["Miscellaneous"]["Cash Out"][true] = c_val
+                  end
+                  if r == 76 && cc == 10 
+                    @misc_hash["MiscAdjuster/LoanType"] = {}
+                    @misc_hash["MiscAdjuster/LoanType"]["Miscellaneous"] = {}
+                    @misc_hash["MiscAdjuster/LoanType"]["Miscellaneous"]["Fixed"] = {}
+                    ccc = cc + 6
+                    c_val = sheet_data.cell(r,ccc)
+                    @misc_hash["MiscAdjuster/LoanType"]["Miscellaneous"]["Fixed"] = c_val
+                  end
+                  if r == 77 && cc == 10
+                    @misc_hash["MiscAdjuster/State"] = {}
+                    @misc_hash["MiscAdjuster/State"]["Miscellaneous"] = {}
+                    @misc_hash["MiscAdjuster/State"]["Miscellaneous"]["NY"] = {}
+                    ccc = cc + 6
+                    c_val = sheet_data.cell(r,ccc)
+                    @misc_hash["MiscAdjuster/State"]["Miscellaneous"]["NY"] = c_val
                   end
 
                   if value == "STATE ADJUSTMENTS"
-                    first_key2 = "GovermentAdjustments"
-                    second_key2 = "StateAdjustments"
-                    @state_hash[first_key2] = {}
-                    @state_hash[first_key2][second_key2] = {}
+                    @state_hash["State"] = {}
                   end
 
                   if r >= 80 && r <= 87 && cc == 11
@@ -148,7 +229,7 @@ class ObCmgWholesalesController < ApplicationController
                       key_val = f_key
                       ccc = cc + 5
                       k_val = sheet_data.cell(r,ccc)
-                      @state_hash[first_key2][second_key2][key_val] = k_val
+                      @state_hash["State"][key_val] = k_val
                     end
                   end
                 end
