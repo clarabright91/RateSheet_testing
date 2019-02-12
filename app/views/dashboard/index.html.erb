@@ -8,7 +8,6 @@
                 <div class="form-group">
                   <label>Loan Type</label>
                   <% @loan_type_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"]]%>
-                  <%#debugger%>
                   <%= select_tag 'loan_type', options_for_select(@loan_type_list, (params[:loan_type] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control", :required => true} %>
                 </div>
               </div>
@@ -110,7 +109,7 @@
                 <div class="form-group">
                   <label>LTV</label>
                   <div class="input-group">                    
-                    <%@ltv_values = [["96-97",96], ["91-95",91], ["86-90",86], ["81-85",81], ["76-80",76], ["71-75",71], ["61-70",61],[ "1-60",1]]%>
+                    <%@ltv_values = [["76-80",76], ["96-97",96], ["91-95",91], ["86-90",86], ["81-85",81], ["71-75",71], ["61-70",61],[ "1-60",1]]%>
                     <%= select_tag 'ltv', options_for_select(@ltv_values, (params[:ltv] rescue nil)), :class=> "form-control" %>
                   </div>
                 </div>
@@ -120,7 +119,7 @@
                 <div class="form-group">
                   <label>CLTV</label>
                   <div class="input-group">                    
-                    <%@cltv_values = [["96-97",96], ["91-95",91], ["86-90",86], ["81-85",81], ["76-80",76], ["71-75",71], ["61-70",61],[ "1-60",1]]%>
+                    <%@cltv_values = [["71-75",71], ["96-97",96], ["91-95",91], ["86-90",86], ["81-85",81], ["76-80",76], ["61-70",61],[ "1-60",1]]%>
                     <%= select_tag 'cltv', options_for_select(@cltv_values, (params[:cltv] rescue nil)), :class=> "form-control" %>
                   </div>
                 </div>
