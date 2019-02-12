@@ -37,7 +37,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
         #program
         (51..92).each do |r|
           row = sheet_data.row(r)
-          if ((row.compact.count > 1) && (row.compact.count < 4)) || row.include?("7/1 LIBOR ARM BISCAYNE JUMBO") || row.include?("10/1 LIBOR ARM BISCAYNE JUMBO")
+          if ((row.compact.count >= 1) && (row.compact.count < 4)) || row.include?("7/1 LIBOR ARM BISCAYNE JUMBO") || row.include?("10/1 LIBOR ARM BISCAYNE JUMBO")
             rr = r + 1
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
@@ -52,51 +52,43 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_property @program, sheet
                 @programs_ids << @program.id
-              end
+              
 
-              @program.adjustments.destroy_all
-              @block_hash = {}
-              key = ''
-              if @program.term.present?
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
-              (1..50).each do |max_row|
-                @data = []
-                (0..4).each_with_index do |index, c_i|
-                  rrr = rr + max_row
-                  ccc = cc + c_i
-                  value = sheet_data.cell(rrr,ccc)
-                  if value.present?
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[main_key][key] = {}
-                    elsif (c_i == 1)
-                      @block_hash[main_key][key][30] = value
-                    elsif (c_i == 2)
-                      @block_hash[main_key][key][45] = value
-                    elsif (c_i == 3)
-                      @block_hash[main_key][key][60] = value
-                    else
-                      if @program.lock_period.length <= 3
-                        @program.lock_period << 15*c_i
-                        @program.save
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+
+                (1..50).each do |max_row|
+                  @data = []
+                  (0..4).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      elsif (c_i == 1)
+                        @block_hash[key][30] = value
+                      elsif (c_i == 2)
+                        @block_hash[key][45] = value
+                      elsif (c_i == 3)
+                        @block_hash[key][60] = value
+                      else
+                        @block_hash[key][15*c_i] = value
                       end
-                      @block_hash[main_key][key][15*c_i] = value
+                      @data << value
                     end
-                    @data << value
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
                   end
                 end
-                if @data.compact.reject { |c| c.blank? }.length == 0
-                  break # terminate the loop
+               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
+                  @block_hash.shift
                 end
+                @program.update(base_rate: @block_hash)
               end
-              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-                @block_hash.values.first.shift
-              end
-              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -202,12 +194,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              if @program.term.present?
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
+              # if @program.term.present?
+              #   main_key = "Term/LoanType/InterestRate/LockPeriod"
+              # else
+              #   main_key = "InterestRate/LockPeriod"
+              # end
+              # @block_hash[main_key] = {}
               (1..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -217,13 +209,13 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   if value.present?
                     if (c_i == 0)
                       key = value
-                      @block_hash[main_key][key] = {}
+                      @block_hash[key] = {}
                     else
                       if @program.lock_period.length <= 3
                         @program.lock_period << 15*c_i
                         @program.save
                       end
-                      @block_hash[main_key][key][15*c_i] = value
+                      @block_hash[key][15*c_i] = value
                     end
                     @data << value
                   end
@@ -232,8 +224,11 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   break # terminate the loop
                 end
               end
-              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-                @block_hash.values.first.shift
+              # if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
+              #   @block_hash.values.first.shift
+              # end
+              if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
+                @block_hash.shift
               end
               @program.update(base_rate: @block_hash)
             end
@@ -272,12 +267,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              if @program.term.present?
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
+              # if @program.term.present?
+              #   main_key = "Term/LoanType/InterestRate/LockPeriod"
+              # else
+              #   main_key = "InterestRate/LockPeriod"
+              # end
+              # @block_hash[main_key] = {}
               (1..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -287,13 +282,13 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   if value.present?
                     if (c_i == 0)
                       key = value
-                      @block_hash[main_key][key] = {}
+                      @block_hash[key] = {}
                     else
                       if @program.lock_period.length <= 3
                         @program.lock_period << 15*c_i
                         @program.save
                       end
-                      @block_hash[main_key][key][15*c_i] = value
+                      @block_hash[key][15*c_i] = value
                     end
                     @data << value
                   end
@@ -302,8 +297,11 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   break # terminate the loop
                 end
               end
-              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-                @block_hash.values.first.shift
+              # if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
+              #   @block_hash.values.first.shift
+              # end
+              if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
+                @block_hash.shift
               end
               @program.update(base_rate: @block_hash)
             end
@@ -357,12 +355,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              if @program.term.present?
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
+              # if @program.term.present?
+              #   main_key = "Term/LoanType/InterestRate/LockPeriod"
+              # else
+              #   main_key = "InterestRate/LockPeriod"
+              # end
+              # @block_hash[main_key] = {}
               (1..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -372,14 +370,14 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   if value.present?
                     if (c_i == 0)
                       key = value
-                      @block_hash[main_key][key] = {}
+                      @block_hash[key] = {}
                     else
 
                       if @program.lock_period.length <= 3
                         @program.lock_period << 15*c_i
                         @program.save
                       end
-                      @block_hash[main_key][key][15*c_i] = value
+                      @block_hash[key][15*c_i] = value
                     end
                     @data << value
                   end
@@ -388,8 +386,11 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   break # terminate the loop
                 end
               end
-              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-                @block_hash.values.first.shift
+              # if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
+              #   @block_hash.values.first.shift
+              # end
+              if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
+                @block_hash.shift
               end
               @program.update(base_rate: @block_hash)
             end
@@ -483,7 +484,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
         #program
         (51..93).each do |r|
           row = sheet_data.row(r)
-          if ((row.compact.count > 1) && (row.compact.count <= 4))
+          if ((row.compact.count >= 1) && (row.compact.count <= 4)) 
             rr = r + 1
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
@@ -493,46 +494,35 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_property @program, sheet
                 @programs_ids << @program.id
-              end
 
-              @program.adjustments.destroy_all
-              @block_hash = {}
-              key = ''
-              if @program.term.present?
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
-              (1..50).each do |max_row|
-                @data = []
-                (0..4).each_with_index do |index, c_i|
-                  rrr = rr + max_row
-                  ccc = cc + c_i
-                  value = sheet_data.cell(rrr,ccc)
-                  if value.present?
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[main_key][key] = {}
-                    else
-
-                      if @program.lock_period.length <= 3
-                        @program.lock_period << 15*c_i
-                        @program.save
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+                (1..50).each do |max_row|
+                  @data = []
+                  (0..4).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        @block_hash[key][15*c_i] = value
                       end
-                      @block_hash[main_key][key][15*c_i] = value
+                      @data << value
                     end
-                    @data << value
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
                   end
                 end
-                if @data.compact.reject { |c| c.blank? }.length == 0
-                  break # terminate the loop
+                if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
+                  @block_hash.shift
                 end
+                @program.update(base_rate: @block_hash)
               end
-              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-                @block_hash.values.first.shift
-              end
-              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -618,12 +608,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              if @program.term.present?
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
+              # if @program.term.present?
+              #   main_key = "Term/LoanType/InterestRate/LockPeriod"
+              # else
+              #   main_key = "InterestRate/LockPeriod"
+              # end
+              # @block_hash[main_key] = {}
               (1..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -633,14 +623,14 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   if value.present?
                     if (c_i == 0)
                       key = value
-                      @block_hash[main_key][key] = {}
+                      @block_hash[key] = {}
                     else
 
                       if @program.lock_period.length <= 3
                         @program.lock_period << 15*c_i
                         @program.save
                       end
-                      @block_hash[main_key][key][15*c_i] = value
+                      @block_hash[key][15*c_i] = value
                     end
                     @data << value
                   end
@@ -649,8 +639,11 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   break # terminate the loop
                 end
               end
-              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-                @block_hash.values.first.shift
+              # if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
+              #   @block_hash.values.first.shift
+              # end
+              if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
+                @block_hash.shift
               end
               @program.update(base_rate: @block_hash)
             end
@@ -691,46 +684,35 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_property @program, sheet
                 @programs_ids << @program.id
-              end
 
-              @program.adjustments.destroy_all
-              @block_hash = {}
-              key = ''
-              if @program.term.present?
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
-              (1..50).each do |max_row|
-                @data = []
-                (0..4).each_with_index do |index, c_i|
-                  rrr = rr + max_row
-                  ccc = cc + c_i
-                  value = sheet_data.cell(rrr,ccc)
-                  if value.present?
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[main_key][key] = {}
-                    else
-
-                      if @program.lock_period.length <= 3
-                        @program.lock_period << 15*c_i
-                        @program.save
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+                (1..50).each do |max_row|
+                  @data = []
+                  (0..4).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        @block_hash[key][15*c_i] = value
                       end
-                      @block_hash[main_key][key][15*c_i] = value
+                      @data << value
                     end
-                    @data << value
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
                   end
                 end
-                if @data.compact.reject { |c| c.blank? }.length == 0
-                  break # terminate the loop
+                if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
+                  @block_hash.shift
                 end
+                @program.update(base_rate: @block_hash)
               end
-              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-                @block_hash.values.first.shift
-              end
-              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -841,12 +823,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              if @program.term.present?
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
+              # if @program.term.present?
+              #   main_key = "Term/LoanType/InterestRate/LockPeriod"
+              # else
+              #   main_key = "InterestRate/LockPeriod"
+              # end
+              # @block_hash[main_key] = {}
               (1..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -856,14 +838,14 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   if value.present?
                     if (c_i == 0)
                       key = value
-                      @block_hash[main_key][key] = {}
+                      @block_hash[key] = {}
                     else
 
                       if @program.lock_period.length <= 3
                         @program.lock_period << 15*c_i
                         @program.save
                       end
-                      @block_hash[main_key][key][15*c_i] = value
+                      @block_hash[key][15*c_i] = value
                     end
                     @data << value
                   end
@@ -872,8 +854,11 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   break # terminate the loop
                 end
               end
-              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-                @block_hash.values.first.shift
+              # if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
+              #   @block_hash.values.first.shift
+              # end
+              if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
+                @block_hash.shift
               end
               @program.update(base_rate: @block_hash)
             end
@@ -995,12 +980,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              if @program.term.present?
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
+              # if @program.term.present?
+              #   main_key = "Term/LoanType/InterestRate/LockPeriod"
+              # else
+              #   main_key = "InterestRate/LockPeriod"
+              # end
+              # @block_hash[main_key] = {}
               (1..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -1010,14 +995,14 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   if value.present?
                     if (c_i == 0)
                       key = value
-                      @block_hash[main_key][key] = {}
+                      @block_hash[key] = {}
                     else
 
                       if @program.lock_period.length <= 3
                         @program.lock_period << 15*c_i
                         @program.save
                       end
-                      @block_hash[main_key][key][15*c_i] = value
+                      @block_hash[key][15*c_i] = value
                     end
                     @data << value
                   end
@@ -1026,8 +1011,11 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   break # terminate the loop
                 end
               end
-              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-                @block_hash.values.first.shift
+              # if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
+              #   @block_hash.values.first.shift
+              # end
+              if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
+                @block_hash.shift
               end
               @program.update(base_rate: @block_hash)
             end
@@ -1252,12 +1240,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              if @program.term.present?
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
+              # if @program.term.present?
+              #   main_key = "Term/LoanType/InterestRate/LockPeriod"
+              # else
+              #   main_key = "InterestRate/LockPeriod"
+              # end
+              # @block_hash[main_key] = {}
               (1..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -1267,14 +1255,14 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   if value.present?
                     if (c_i == 0)
                       key = value
-                      @block_hash[main_key][key] = {}
+                      @block_hash[key] = {}
                     else
 
                       if @program.lock_period.length <= 3
                         @program.lock_period << 15*c_i
                         @program.save
                       end
-                      @block_hash[main_key][key][15*c_i] = value
+                      @block_hash[key][15*c_i] = value
                     end
                     @data << value
                   end
@@ -1283,8 +1271,11 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   break # terminate the loop
                 end
               end
-              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-                @block_hash.values.first.shift
+              # if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
+              #   @block_hash.values.first.shift
+              # end
+              if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
+                @block_hash.shift
               end
               @program.update(base_rate: @block_hash)
             end
@@ -1491,12 +1482,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              if @program.term.present?
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
+              lock_hash = {}
               (1..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -1506,14 +1492,14 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   if value.present?
                     if (c_i == 0)
                       key = value
-                      @block_hash[main_key][key] = {}
+                      @block_hash[key] = {}
                     else
 
                       if @program.lock_period.length <= 3
                         @program.lock_period << 15*c_i
                         @program.save
                       end
-                      @block_hash[main_key][key][15*c_i] = value
+                      @block_hash[key][15*c_i] = value
                     end
                     @data << value
                   end
@@ -1522,8 +1508,8 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   break # terminate the loop
                 end
               end
-              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-                @block_hash.values.first.shift
+              if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
+                @block_hash.shift
               end
               @program.update(base_rate: @block_hash)
             end
@@ -1734,7 +1720,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
         end
         adjustment = [@secondary_hash,@cashout_hash,@other_adjustment]
         make_adjust(adjustment,sheet)
-        create_program_association_with_adjustment(sheet)
+        # create_program_association_with_adjustment(sheet)
       end
     end
     redirect_to programs_ob_newfi_wholesale7019_path(@sheet_obj)
@@ -1775,12 +1761,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              if @program.term.present?
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
+              # if @program.term.present?
+              #   main_key = "Term/LoanType/InterestRate/LockPeriod"
+              # else
+              #   main_key = "InterestRate/LockPeriod"
+              # end
+              # @block_hash[main_key] = {}
               (1..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -1790,14 +1776,14 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   if value.present?
                     if (c_i == 0)
                       key = value
-                      @block_hash[main_key][key] = {}
+                      @block_hash[key] = {}
                     else
 
                       if @program.lock_period.length <= 3
                         @program.lock_period << 15*c_i
                         @program.save
                       end
-                      @block_hash[main_key][key][15*c_i] = value
+                      @block_hash[key][15*c_i] = value
                     end
                     @data << value
                   end
@@ -1806,8 +1792,8 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   break # terminate the loop
                 end
               end
-              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-                @block_hash.values.first.shift
+              if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
+                @block_hash.shift
               end
               @program.update(base_rate: @block_hash)
             end
@@ -1958,12 +1944,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              if @program.term.present?
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
+              # if @program.term.present?
+              #   main_key = "Term/LoanType/InterestRate/LockPeriod"
+              # else
+              #   main_key = "InterestRate/LockPeriod"
+              # end
+              # @block_hash[main_key] = {}
               (1..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -1973,14 +1959,14 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   if value.present?
                     if (c_i == 0)
                       key = value
-                      @block_hash[main_key][key] = {}
+                      @block_hash[key] = {}
                     else
 
                       if @program.lock_period.length <= 3
                         @program.lock_period << 15*c_i
                         @program.save
                       end
-                      @block_hash[main_key][key][15*c_i] = value
+                      @block_hash[key][15*c_i] = value
                     end
                     @data << value
                   end
@@ -1989,8 +1975,11 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   break # terminate the loop
                 end
               end
-              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-                @block_hash.values.first.shift
+              # if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
+              #   @block_hash.values.first.shift
+              # end
+              if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
+                @block_hash.shift
               end
               @program.update(base_rate: @block_hash)
             end
@@ -2141,12 +2130,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              if @program.term.present?
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
+              # if @program.term.present?
+              #   main_key = "Term/LoanType/InterestRate/LockPeriod"
+              # else
+              #   main_key = "InterestRate/LockPeriod"
+              # end
+              # @block_hash[main_key] = {}
               (1..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -2156,14 +2145,14 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   if value.present?
                     if (c_i == 0)
                       key = value
-                      @block_hash[main_key][key] = {}
+                      @block_hash[key] = {}
                     else
 
                       if @program.lock_period.length <= 3
                         @program.lock_period << 15*c_i
                         @program.save
                       end
-                      @block_hash[main_key][key][15*c_i] = value
+                      @block_hash[key][15*c_i] = value
                     end
                     @data << value
                   end
@@ -2172,8 +2161,11 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   break # terminate the loop
                 end
               end
-              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-                @block_hash.values.first.shift
+              # if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
+              #   @block_hash.values.first.shift
+              # end
+              if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
+                @block_hash.shift
               end
               @program.update(base_rate: @block_hash)
             end
@@ -2399,9 +2391,26 @@ class ObNewfiWholesale7019Controller < ApplicationController
         full_doc = true
       end
 
+       # Arm Basic
+      if @program.program_name.include?("3/1") || @program.program_name.include?("3 / 1")
+        arm_basic = 3
+      elsif @program.program_name.include?("5/1") || @program.program_name.include?("5 / 1")
+        arm_basic = 5
+      elsif @program.program_name.include?("7/1") || @program.program_name.include?("7 / 1")
+        arm_basic = 7
+      elsif @program.program_name.include?("10/1") || @program.program_name.include?("10 / 1")
+        arm_basic = 10          
+      end
+
       # High Balance
+      jumbo_high_balance = false
       if @program.program_name.include?("High Bal")
-        @jumbo_high_balance = true
+        jumbo_high_balance = true
+      end
+
+      # Arm Advanced
+      if @program.program_name.include?("ARM")
+        arm_advanced = @program.program_name.split.last
       end
 
       # Loan Limit Type
@@ -2418,8 +2427,9 @@ class ObNewfiWholesale7019Controller < ApplicationController
         @program.loan_limit_type << "High Balance"
       end
       @program.save
-      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, sheet_name: sheet)
+      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, sheet_name: sheet, jumbo_high_balance: jumbo_high_balance, arm_basic: arm_basic, arm_advanced: arm_advanced)
     end
+    
     def make_adjust(block_hash, sheet)
       block_hash.each do |hash|
         Adjustment.create(data: hash,sheet_name: sheet)
@@ -2467,7 +2477,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
       # return @adjustment_hash
       adjustment = [@adjustment_hash]
       make_adjust(adjustment,sheet)
-      create_program_association_with_adjustment(sheet)
+      # create_program_association_with_adjustment(sheet)
     end
 
     def create_program_association_with_adjustment(sheet)

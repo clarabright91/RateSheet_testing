@@ -53,6 +53,7 @@ class ObCmgWholesalesController < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_property sheet
+                
                 @programs_ids << @program.id              
                 # @program.adjustments.destroy_all
                 @block_hash = {}
@@ -63,6 +64,7 @@ class ObCmgWholesalesController < ApplicationController
                     rrr = rr + max_row -1
                     ccc = cc + c_i
                     value = sheet_data.cell(rrr,ccc)
+                    
                     if value.present?
                       if (c_i == 0)
                         key = value
@@ -77,12 +79,13 @@ class ObCmgWholesalesController < ApplicationController
                       @data << value
                     end
                   end
+
                   if @data.compact.reject { |c| c.blank? }.length == 0
                     break # terminate the loop
                   end
                 end
-                if @block_hash.values.first.keys.first.nil?
-                  @block_hash.values.first.shift
+                if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
+                  @block_hash.shift
                 end
                 @program.update(base_rate: @block_hash)
               end
@@ -295,8 +298,8 @@ class ObCmgWholesalesController < ApplicationController
                   end
                 end
               end
-              if @block_hash.values.first.keys.first.nil?
-                @block_hash.values.first.shift
+              if @block_hash.keys.first.nil?|| @block_hash.keys.first == "Rate"
+                @block_hash.shift
               end
               @program.update(base_rate: @block_hash)
             end
@@ -828,8 +831,8 @@ class ObCmgWholesalesController < ApplicationController
                     break # terminate the loop
                   end
                 end
-                if @block_hash.values.first.keys.first.nil?
-                  @block_hash.values.first.shift
+                if @block_hash.keys.first.nil?|| @block_hash.keys.first == "Rate"
+                  @block_hash.shift
                 end
                 @program.update(base_rate: @block_hash)
               end
@@ -1092,8 +1095,8 @@ class ObCmgWholesalesController < ApplicationController
                     break # terminate the loop
                   end
                 end
-                if @block_hash.values.first.keys.first.nil?
-                  @block_hash.values.first.shift
+                if @block_hash.keys.first.nil?|| @block_hash.keys.first == "Rate"
+                  @block_hash.shift
                 end
                 @program.update(base_rate: @block_hash)
               end
@@ -1364,8 +1367,8 @@ class ObCmgWholesalesController < ApplicationController
                     break # terminate the loop
                   end
                 end
-                if @block_hash.values.first.keys.first.nil?
-                  @block_hash.values.first.shift
+                if @block_hash.keys.first.nil?|| @block_hash.keys.first == "Rate"
+                  @block_hash.shift
                 end
                 @program.update(base_rate: @block_hash)
               end
@@ -1554,13 +1557,14 @@ class ObCmgWholesalesController < ApplicationController
                       end
                       @data << value
                     end
+                  end  
                   end
                   if @data.compact.reject { |c| c.blank? }.length == 0
                     break # terminate the loop
                   end
                 end
-                if @block_hash.values.first.keys.first.nil?
-                  @block_hash.values.first.shift
+                if @block_hash.keys.first.nil?|| @block_hash.keys.first == "Rate"
+                  @block_hash.shift
                 end
                 @program.update(base_rate: @block_hash)
               end
@@ -1800,16 +1804,17 @@ class ObCmgWholesalesController < ApplicationController
                       end
                       @data << value
                     end
+                  end  
                   end
                   if @data.compact.reject { |c| c.blank? }.length == 0
                     break # terminate the loop
                   end
+                end            
+                if @block_hash.keys.first.nil?|| @block_hash.keys.first == "Rate"
+                  @block_hash.shift
                 end
-              end
-              if  @block_hash.values.first.values.first == "21 Day"
-                if @block_hash.values.first.keys.first.nil?
-                  @block_hash.values.first.shift
-                end
+                
+                @program.update(base_rate: @block_hash)
               end
               @program.update(base_rate: @block_hash)
             end
@@ -1856,13 +1861,11 @@ class ObCmgWholesalesController < ApplicationController
                     break # terminate the loop
                   end
                 end
-              end
-              if  @block_hash.values.first.values.first == "21 Day"
-                if @block_hash.values.first.keys.first.nil?
-                @block_hash.values.first.shift
-              end
-              end
-              @program.update(base_rate: @block_hash)
+                if @block_hash.keys.first.nil?|| @block_hash.keys.first == "Rate"
+                  @block_hash.shift
+                end
+              
+                @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -2228,8 +2231,8 @@ class ObCmgWholesalesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              if @block_hash.values.first.keys.first.nil?
-                @block_hash.values.first.shift
+              if @block_hash.keys.first.nil?|| @block_hash.keys.first == "Rate"
+                @block_hash.shift
               end
               @program.update(base_rate: @block_hash)
             end
@@ -2455,8 +2458,8 @@ class ObCmgWholesalesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              if @block_hash.values.first.keys.first.nil?
-                @block_hash.values.first.shift
+              if @block_hash.keys.first.nil?|| @block_hash.keys.first == "Rate"
+                @block_hash.shift
               end
               @program.update(base_rate: @block_hash)
             end
@@ -2682,10 +2685,8 @@ class ObCmgWholesalesController < ApplicationController
                   end
                 end
               end
-              if @block_hash.keys.first == "Rate"
-                if @block_hash.values.first.keys.first.nil?
-                @block_hash.values.first.shift
-              end
+              if @block_hash.keys.first.nil?|| @block_hash.keys.first == "Rate"
+                @block_hash.shift
               end
               @program.update(base_rate: @block_hash)
             end
@@ -2738,11 +2739,9 @@ class ObCmgWholesalesController < ApplicationController
                     end
                   end
                 end
-                if @block_hash.keys.first == "Rate"
-                  if @block_hash.values.first.keys.first.nil?
-                  @block_hash.values.first.shift
+                if @block_hash.keys.first.nil?|| @block_hash.keys.first == "Rate"
+                  @block_hash.shift
                 end
-              end
               @program.update(base_rate: @block_hash)
             end
           end
@@ -2884,6 +2883,7 @@ class ObCmgWholesalesController < ApplicationController
     # redirect_to programs_import_file_path(@bank)
     redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
   end
+ 
   def jumbo_6800
     @programs_ids = []
     @xlsx.sheets.each do |sheet|
@@ -2935,8 +2935,8 @@ class ObCmgWholesalesController < ApplicationController
                   break # terminate the loop
                 end
               end
-              if @block_hash.values.first.keys.first.nil?
-                @block_hash.values.first.shift
+              if @block_hash.keys.first.nil?|| @block_hash.keys.first == "Rate"
+                @block_hash.shift
               end
               @program.update(base_rate: @block_hash)
             end
@@ -3074,10 +3074,8 @@ class ObCmgWholesalesController < ApplicationController
                   end
                 end
               end
-              if @block_hash.values.first.values.first == "21 Day"
-                if @block_hash.values.first.keys.first.nil?
-                @block_hash.values.first.shift
-              end
+              if @block_hash.keys.first.nil?|| @block_hash.keys.first == "Rate"
+                @block_hash.shift
               end
               @program.update(base_rate: @block_hash)
             end
@@ -3124,10 +3122,8 @@ class ObCmgWholesalesController < ApplicationController
                   end
                 end
               end
-              if @block_hash.values.first.values.first == "21 Day"
-                if @block_hash.values.first.keys.first.nil?
-                @block_hash.values.first.shift
-              end
+              if @block_hash.keys.first.nil?|| @block_hash.keys.first == "Rate"
+                @block_hash.shift
               end
               @program.update(base_rate: @block_hash)
             end
@@ -3533,7 +3529,7 @@ class ObCmgWholesalesController < ApplicationController
       end
       # Program Property  
       if @program.program_name.split("-").count > 1
-        program_category = @program.program_name.split("-").last
+        program_category = @program.program_name.split.last
       end
          # Loan Limit Type
       if @program.program_name.include?("Non-Conforming")
@@ -3548,6 +3544,7 @@ class ObCmgWholesalesController < ApplicationController
       if @program.program_name.include?("High Balance")
         @program.loan_limit_type << "High Balance"
       end
+      
       @program.save 
       @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",program_category: program_category, jumbo_high_balance: jumbo_high_balance, streamline: streamline,fha: fha, va: va, usda: usda, full_doc: full_doc, arm_basic: arm_basic, sheet_name: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product)
     end
