@@ -8,6 +8,7 @@
                 <div class="form-group">
                   <label>Loan Type</label>
                   <% @loan_type_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"]]%>
+
                   <%= select_tag 'loan_type', options_for_select(@loan_type_list, (params[:loan_type] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control", :required => true} %>
                 </div>
               </div>
