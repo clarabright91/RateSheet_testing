@@ -6,10 +6,10 @@
             <div class="row">
               <div class="col-md-2">
                 <div class="form-group">
-                  <label>Rate Type</label>
+                  <label>Loan Type</label>
                   <% @loan_type_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"]]%>
                   <%#debugger%>
-                  <%= select_tag 'loan_type', options_for_select(@loan_type_list, (params[:loan_type] rescue nil)), { prompt: 'Select Rate Type', :class=> "form-control", :required => true} %>
+                  <%= select_tag 'loan_type', options_for_select(@loan_type_list, (params[:loan_type] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control", :required => true} %>
                 </div>
               </div>
 
