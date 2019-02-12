@@ -46,7 +46,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         # Fannie Mae Programs
         (71..298).each do |r|
           row = sheet_data.row(r)
-          if ((row.compact.count > 1) && (row.compact.count <= 4)) && !row.include?("Specials") && !row.include?("Max Net Rebate") && !row.include?("State Adjustment") && !row.include?("ALASKA") && !row.include?("> 484.35K") && !row.include?("7. Not applicable if the subordinate financing is an Affordable Second") && !row.include?("> 100k & ≤ 125k ") && !row.include?("8. Applies to Relief Refiance Mortgages Only") && !row.include?("*Approval Required by Credit Committee for all No Credit loans") && !row.include?("Other Specific Adjustments") && !row.include?("*State Adj. Applied After The Cap") && !row.include?("104.5") || (row.include?("Jumbo 5/1 ARM"))
+          if ((row.compact.count > 1) && (row.compact.count <= 4))
             rr = r + 1 
             max_column_section = row.compact.count - 1
             (0..max_column_section).each_with_index do |max_column, index|
@@ -59,41 +59,30 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                 # Program Property
                 program_property @title
                 @program.adjustments.destroy_all
-              end
-              @block_hash = {}
-              key = ''
-              main_key = ''
-              if @program.term.present? 
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
-              (1..50).each do |max_row|
-                @data = []
-                (0..8).each_with_index do |index, c_i|
-                  rrr = rr + max_row +1
-                  ccc = cc + c_i
-                  value = sheet_data.cell(rrr,ccc)
-                  if value.present?
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[main_key][key] = {}
-                    else
-                      if @program.lock_period.length <= 3
-                        @program.lock_period << 15*(c_i/2)
-                        @program.save
+                @block_hash = {}
+                key = ''
+                (1..50).each do |max_row|
+                  @data = []
+                  (0..8).each_with_index do |index, c_i|
+                    rrr = rr + max_row +1
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        @block_hash[key][15*(c_i/2)] = value unless @block_hash[key].nil?
                       end
-                      @block_hash[main_key][key][15*(c_i/2)] = value unless @block_hash[main_key][key].nil?
+                      @data << value
                     end
-                    @data << value
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
                   end
                 end
-                if @data.compact.reject { |c| c.blank? }.length == 0
-                  break # terminate the loop
-                end
+                @program.update(base_rate: @block_hash)
               end
-              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -308,7 +297,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         # Freddie programs
         (458..684).each do |r|
           row = sheet_data.row(r)
-          if ((row.compact.count > 1) && (row.compact.count <= 4)) && !row.include?("Specials") && !row.include?("Max Net Rebate") && !row.include?("State Adjustment") && !row.include?("ALASKA") && !row.include?("> 484.35K") && !row.include?("7. Not applicable if the subordinate financing is an Affordable Second") && !row.include?("> 100k & ≤ 125k ") && !row.include?("8. Applies to Relief Refiance Mortgages Only") && !row.include?("*Approval Required by Credit Committee for all No Credit loans") && !row.include?("Other Specific Adjustments") && !row.include?("*State Adj. Applied After The Cap") && !row.include?("104.5") || (row.include?("Jumbo 5/1 ARM"))
+          if ((row.compact.count > 1) && (row.compact.count <= 4))
             rr = r + 1 
             max_column_section = row.compact.count - 1
             (0..max_column_section).each_with_index do |max_column, index|
@@ -321,41 +310,34 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                 # Program Property
                 program_property @title
                 @program.adjustments.destroy_all
-              end
-              @block_hash = {}
-              key = ''
-              main_key = ''
-              if @program.term.present? 
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
-              (1..50).each do |max_row|
-                @data = []
-                (0..8).each_with_index do |index, c_i|
-                  rrr = rr + max_row +1
-                  ccc = cc + c_i
-                  value = sheet_data.cell(rrr,ccc)
-                  if value.present?
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[main_key][key] = {}
-                    else
-                      if @program.lock_period.length <= 3
-                        @program.lock_period << 15*(c_i/2)
-                        @program.save
+                @block_hash = {}
+                key = ''
+                (1..50).each do |max_row|
+                  @data = []
+                  (0..8).each_with_index do |index, c_i|
+                    rrr = rr + max_row +1
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        if @program.lock_period.length <= 3
+                          @program.lock_period << 15*(c_i/2)
+                          @program.save
+                        end
+                        @block_hash[key][15*(c_i/2)] = value unless @block_hash[key].nil?
                       end
-                      @block_hash[main_key][key][15*(c_i/2)] = value unless @block_hash[main_key][key].nil?
+                      @data << value
                     end
-                    @data << value
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
                   end
                 end
-                if @data.compact.reject { |c| c.blank? }.length == 0
-                  break # terminate the loop
-                end
+                @program.update(base_rate: @block_hash)
               end
-              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -587,7 +569,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         # FHA Va Usda programs
         (844..1006).each do |r|
           row = sheet_data.row(r)
-          if ((row.compact.count > 1) && (row.compact.count <= 4)) && !row.include?("Specials") && !row.include?("Max Net Rebate") && !row.include?("State Adjustment") && !row.include?("ALASKA") && !row.include?("> 484.35K") && !row.include?("7. Not applicable if the subordinate financing is an Affordable Second") && !row.include?("> 100k & ≤ 125k ") && !row.include?("8. Applies to Relief Refiance Mortgages Only") && !row.include?("*Approval Required by Credit Committee for all No Credit loans") && !row.include?("Other Specific Adjustments") && !row.include?("*State Adj. Applied After The Cap") && !row.include?("104.5") || (row.include?("Jumbo 5/1 ARM"))
+          if ((row.compact.count > 1) && (row.compact.count <= 4)) 
             rr = r + 1 
             max_column_section = row.compact.count - 1
             (0..max_column_section).each_with_index do |max_column, index|
@@ -600,48 +582,41 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                 # Program Property
                 program_property @title
                 @program.adjustments.destroy_all
-              end
-              @block_hash = {}
-              key = ''
-              main_key = ''
-              if @program.term.present? 
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
-              (1..50).each do |max_row|
-                @data = []
-                (0..8).each_with_index do |index, c_i|
-                  rrr = rr + max_row +1
-                  ccc = cc + c_i
-                  value = sheet_data.cell(rrr,ccc)
-                  if value.present?
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[main_key][key] = {}
-                    else
-                      if @program.lock_period.length <= 3
-                        @program.lock_period << 15*(c_i/2)
-                        @program.save
+                @block_hash = {}
+                key = ''
+                (1..50).each do |max_row|
+                  @data = []
+                  (0..8).each_with_index do |index, c_i|
+                    rrr = rr + max_row +1
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        if @program.lock_period.length <= 3
+                          @program.lock_period << 15*(c_i/2)
+                          @program.save
+                        end
+                        @block_hash[key][15*(c_i/2)] = value unless @block_hash[key].nil?
                       end
-                      @block_hash[main_key][key][15*(c_i/2)] = value unless @block_hash[main_key][key].nil?
+                      @data << value
                     end
-                    @data << value
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
                   end
                 end
-                if @data.compact.reject { |c| c.blank? }.length == 0
-                  break # terminate the loop
-                end
+                @program.update(base_rate: @block_hash)
               end
-              @program.update(base_rate: @block_hash)
             end
           end
         end
         # Non Conforming programs
         (1126..1145).each do |r|
           row = sheet_data.row(r)
-          if ((row.compact.count > 1) && (row.compact.count <= 4)) && !row.include?("Specials") && !row.include?("Max Net Rebate") && !row.include?("State Adjustment") && !row.include?("ALASKA") && !row.include?("> 484.35K") && !row.include?("7. Not applicable if the subordinate financing is an Affordable Second") && !row.include?("> 100k & ≤ 125k ") && !row.include?("8. Applies to Relief Refiance Mortgages Only") && !row.include?("*Approval Required by Credit Committee for all No Credit loans") && !row.include?("Other Specific Adjustments") && !row.include?("*State Adj. Applied After The Cap") && !row.include?("104.5") || (row.include?("Jumbo 5/1 ARM"))
+          if ((row.compact.count > 1) && (row.compact.count <= 3)) 
             rr = r + 1 
             max_column_section = row.compact.count - 1
             (0..max_column_section).each_with_index do |max_column, index|
@@ -657,13 +632,6 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
               end
               @block_hash = {}
               key = ''
-              main_key = ''
-              if @program.term.present? 
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
               (1..50).each do |max_row|
                 @data = []
                 (0..8).each_with_index do |index, c_i|
@@ -673,13 +641,9 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                   if value.present?
                     if (c_i == 0)
                       key = value
-                      @block_hash[main_key][key] = {}
+                      @block_hash[key] = {}
                     else
-                      if @program.lock_period.length <= 3
-                        @program.lock_period << 15*(c_i/2)
-                        @program.save
-                      end
-                      @block_hash[main_key][key][15*(c_i/2)] = value unless @block_hash[main_key][key].nil?
+                      @block_hash[key][15*(c_i/2)] = value unless @block_hash[key].nil?
                     end
                     @data << value
                   end
@@ -695,7 +659,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         # Jumbo Non Conforming programs
         (1220..1260).each do |r|
           row = sheet_data.row(r)
-          if ((row.compact.count > 1) && (row.compact.count <= 4)) && !row.include?("Specials") && !row.include?("Max Net Rebate") && !row.include?("State Adjustment") && !row.include?("ALASKA") && !row.include?("> 484.35K") && !row.include?("7. Not applicable if the subordinate financing is an Affordable Second") && !row.include?("> 100k & ≤ 125k ") && !row.include?("8. Applies to Relief Refiance Mortgages Only") && !row.include?("*Approval Required by Credit Committee for all No Credit loans") && !row.include?("Other Specific Adjustments") && !row.include?("*State Adj. Applied After The Cap") && !row.include?("104.5") || (row.include?("Jumbo 5/1 ARM"))
+          if ((row.compact.count >= 1) && (row.compact.count <= 4))
             rr = r + 1 
             max_column_section = row.compact.count - 1
             (0..max_column_section).each_with_index do |max_column, index|
@@ -708,41 +672,34 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                 # Program Property
                 program_property @title
                 @program.adjustments.destroy_all
-              end
-              @block_hash = {}
-              key = ''
-              main_key = ''
-              if @program.term.present? 
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
-              (1..50).each do |max_row|
-                @data = []
-                (0..8).each_with_index do |index, c_i|
-                  rrr = rr + max_row +1
-                  ccc = cc + c_i
-                  value = sheet_data.cell(rrr,ccc)
-                  if value.present?
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[main_key][key] = {}
-                    else
-                      if @program.lock_period.length <= 3
-                        @program.lock_period << 15*(c_i/2)
-                        @program.save
+                @block_hash = {}
+                key = ''
+                (1..50).each do |max_row|
+                  @data = []
+                  (0..8).each_with_index do |index, c_i|
+                    rrr = rr + max_row +1
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        if @program.lock_period.length <= 3
+                          @program.lock_period << 15*(c_i/2)
+                          @program.save
+                        end
+                        @block_hash[key][15*(c_i/2)] = value unless @block_hash[key].nil?
                       end
-                      @block_hash[main_key][key][15*(c_i/2)] = value unless @block_hash[main_key][key].nil?
+                      @data << value
                     end
-                    @data << value
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
                   end
                 end
-                if @data.compact.reject { |c| c.blank? }.length == 0
-                  break # terminate the loop
-                end
+                @program.update(base_rate: @block_hash)
               end
-              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -829,6 +786,12 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         usda = true
         full_doc = true
       end
+      # High Balance
+      jumbo_high_balance = false
+      if @program.program_name.include?("High Balance") || @program.program_name.include?("High Bal")
+        jumbo_high_balance = true
+      end
+
       # Loan Limit Type
       if @program.program_name.include?("Non-Conforming")
         @program.loan_limit_type << "Non-Conforming"
@@ -843,7 +806,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         @program.loan_limit_type << "High Balance"
       end
       @program.save
-      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline)
+      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, jumbo_high_balance: jumbo_high_balance)
     end
 
     def make_adjust(block_hash, sheet)

@@ -39,7 +39,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         c_val = ''
 
         #program
-        (13..80).each do |r|
+        (13..80).each do |r| 
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 4))
             rr = r + 1
@@ -51,45 +51,37 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_property @program
                 @programs_ids << @program.id
-              end
-
-              # @program.adjustments.destroy_all
-              @block_hash = {}
-              key = ''
-              if @program.term.present?
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
-              (1..50).each do |max_row|
-                @data = []
-                (0..4).each_with_index do |index, c_i|
-                  rrr = rr + max_row
-                  ccc = cc + c_i
-                  value = sheet_data.cell(rrr,ccc)
-                  if value.present?
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[main_key][key] = {}
-                    else
-                      if @program.lock_period.length <= 3
-                        @program.lock_period << 15*c_i
-                        @program.save
+                # @program.adjustments.destroy_all
+                key = ''
+                @block_hash = {}
+                (1..50).each do |max_row|
+                  @data = []
+                  (0..4).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        @block_hash[key][15*c_i] = value
                       end
-                      @block_hash[main_key][key][15*c_i] = value
+                      @data << value
                     end
-                    @data << value
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
                   end
                 end
-                if @data.compact.reject { |c| c.blank? }.length == 0
-                  break # terminate the loop
+                # if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
+                #   @block_hash.values.first.shift
+                # end
+                if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
+                  @block_hash.shift
                 end
+                @program.update(base_rate: @block_hash)
               end
-              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-                @block_hash.values.first.shift
-              end
-              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -242,7 +234,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         # programs
         (13..79).each do |r|
           row = sheet_data.row(r)
-          if ((row.compact.count > 1) && (row.compact.count <= 4))
+          if ((row.compact.count > 1) && (row.compact.count <= 5))
             rr = r + 1
             max_column_section = row.compact.count - 1
             (0..max_column_section).each_with_index do |max_column, index|
@@ -251,47 +243,36 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
 
               cc = (4*max_column) + (2+max_column)  # (2 / 7 / 12)
               @title = sheet_data.cell(r,cc)
-              if @title.present? && @title != 3.5 && @title != 3.125
+              if @title.present? && @title != 3.5 && @title != 3.125 && @title != "Loan Amount"
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
                 # Program Property
                 program_property @title
                 @program.adjustments.destroy_all
-              end
-              @block_hash = {}
-              key = ''
-              main_key = ''
-              if @program.term.present?
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
-              (1..50).each do |max_row|
-                @data = []
-                (0..4).each_with_index do |index, c_i|
-                  rrr = rr + max_row +1
-                  ccc = cc + c_i
-                  value = sheet_data.cell(rrr,ccc)
-                  if value.present?
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[main_key][key] = {}
-                    else
-                      if @program.lock_period.length <= 3
-                        @program.lock_period << 15*(c_i)
-                        @program.save
+                key = ''
+                @block_hash = {}
+                (1..50).each do |max_row|
+                  @data = []
+                  (0..4).each_with_index do |index, c_i|
+                    rrr = rr + max_row +1
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        @block_hash[key][15*(c_i)] = value unless @block_hash[key].nil?
                       end
-                      @block_hash[main_key][key][15*(c_i)] = value unless @block_hash[main_key][key].nil?
+                      @data << value
                     end
-                    @data << value
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
                   end
                 end
-                if @data.compact.reject { |c| c.blank? }.length == 0
-                  break # terminate the loop
-                end
+                @program.update(base_rate: @block_hash)
               end
-              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -564,12 +545,12 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
               # @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              if @program.term.present?
-                main_key = "Term/LoanType/InterestRate/LockPeriod"
-              else
-                main_key = "InterestRate/LockPeriod"
-              end
-              @block_hash[main_key] = {}
+              # if @program.term.present?
+              #   main_key = "Term/LoanType/InterestRate/LockPeriod"
+              # else
+              #   main_key = "InterestRate/LockPeriod"
+              # end
+              @block_hash = {}
               (1..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -579,13 +560,13 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   if value.present?
                     if (c_i == 0)
                       key = value
-                      @block_hash[main_key][key] = {}
+                      @block_hash[key] = {}
                     else
                       if @program.lock_period.length <= 3
                         @program.lock_period << 15*c_i
                         @program.save
                       end
-                      @block_hash[main_key][key][15*c_i] = value
+                      @block_hash[key][15*c_i] = value
                     end
                     @data << value
                   end
@@ -594,8 +575,11 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   break # terminate the loop
                 end
               end
-              if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-                @block_hash.values.first.shift
+              # if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
+              #   @block_hash.values.first.shift
+              # end
+              if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
+                @block_hash.shift
               end
               @program.update(base_rate: @block_hash)
             end
@@ -915,28 +899,13 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
       end
 
       # High Balance
+      jumbo_high_balance = false
       if @program.program_name.include?("High Bal")
-        @jumbo_high_balance = true
+        jumbo_high_balance = true
       end
 
        # Program Category
-      if @program.program_name.include?("F30/F25")
-        @program_category = "F30/F25"
-      elsif @program.program_name.include?("F15")
-        @program_category = "F15"
-      elsif @program.program_name.include?("f30J")
-        @program_category = "f30J"
-      elsif @program.program_name.include?("F15S")
-        @program_category = "F15S"
-      elsif @program.program_name.include?("F30JS")
-        @program_category = "F30JS"
-      elsif @program.program_name.include?("F5YT")
-        @program_category = "F5YT"
-      elsif @program.program_name.include?("F5YTS")
-        @program_category = "F5YTS"
-      elsif @program.program_name.include?("F5YTJ")
-        @program_category = "F5YTJ"
-      end
+      program_category = @program.program_name.split.last
 
       # Loan Limit Type
       if @program.program_name.include?("Non-Conforming")
@@ -952,7 +921,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         @program.loan_limit_type << "High Balance"
       end
       @program.save
-      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline)
+      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, jumbo_high_balance: jumbo_high_balance, program_category: program_category)
     end
 
     def create_program_association_with_adjustment(sheet)
