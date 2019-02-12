@@ -2676,17 +2676,21 @@ class ObCmgWholesalesController < ApplicationController
               value = sheet_data.cell(r,cc)
               if value.present?
                 if value == "FLEX JUMBO 6400 SERIES ADJUSTMENTS"
-                  primary_key = "Jumbo/LoanType/FICO/LTV"
-                  @flex_hash[primary_key] = {}
+                  @flex_hash["Jumbo/FICO/LTV"] = {}
+                  @flex_hash["Jumbo/FICO/LTV"][true] = {}
                 end
                 if r >= 14 && r <= 19 && cc == 10
-                  secondary_key = get_value value
-                  @flex_hash[primary_key][secondary_key] = {}
+                  if value.include?("-")
+                    secondary_key = value.tr('A-Z ','')
+                  else
+                    secondary_key = get_value value
+                  end
+                  @flex_hash["Jumbo/FICO/LTV"][true][secondary_key] = {}
                 end
                 if r >= 14 && r <= 19 && cc >= 12 && cc <= 16
                   cltv_key = get_value @cltv_data[cc-1]
-                  @flex_hash[primary_key][secondary_key][cltv_key] = {}
-                  @flex_hash[primary_key][secondary_key][cltv_key] = value
+                  @flex_hash["Jumbo/FICO/LTV"][true][secondary_key][cltv_key] = {}
+                  @flex_hash["Jumbo/FICO/LTV"][true][secondary_key][cltv_key] = value
                 end
               end
             end
@@ -2703,21 +2707,88 @@ class ObCmgWholesalesController < ApplicationController
               value = sheet_data.cell(r,cc)
               if value.present?
                 if value == "FLEX JUMBO 6400 SERIES ADJUSTMENTS"
-                  primary_key = "Jumbo/LoanType/FICO/LTV"
-                  @jumbo_flex_hash[primary_key] = {}
+                  @jumbo_flex_hash["Jumbo/LoanAmount"] = {}
+                  @jumbo_flex_hash["Jumbo/LoanAmount"][true] = {}
+                  @jumbo_flex_hash["Jumbo/PropertyType"] = {}
+                  @jumbo_flex_hash["Jumbo/PropertyType"][true] = {}
                 end
-                if r >= 23 && r <= 38 && cc == 10
-                  if value.include?("Loan Amount")
-                    secondary_key = value.include?("<") ? "0"+value.split("Loan Amount").last : value.split("Loan Amount").last
-                  elsif value.include?("Cash Out")
-                    secondary_key = "Cashout/Fico/ltv"
+                if r >= 23 && r <= 24 && cc == 10
+                  if value.include?("-")
+                    secondary_key = value.tr('A-Za-z$ ','')
                   else
                     secondary_key = get_value value
                   end
-                  @jumbo_flex_hash[primary_key][secondary_key] = {}
+                  @jumbo_flex_hash["Jumbo/LoanAmount"][true][secondary_key] = {}
                 end
-                if r >= 23 && r <= 38 && cc == 16
-                  @jumbo_flex_hash[primary_key][secondary_key] = value
+                if r >= 23 && r <= 24 && cc == 16
+                  @jumbo_flex_hash["Jumbo/LoanAmount"][true][secondary_key] = value
+                end
+                if r >= 25 && r <= 31 && cc == 10
+                  if value.include?("(N/A for Investment Properties)")
+                    secondary_key = value.split("(N/A for Investment Properties)").first
+                  else
+                    secondary_key = value
+                  end
+                  @jumbo_flex_hash["Jumbo/PropertyType"][true][secondary_key] = {}
+                end
+                if r >= 25 && r <= 31 && cc == 16
+                  @jumbo_flex_hash["Jumbo/PropertyType"][true][secondary_key] = value
+                end
+                if r == 32 && cc == 10
+                  @jumbo_flex_hash["Jumbo/PropertyType"][true]["Fully Warrantable Condo NYC"] = {}
+                end
+                if r == 32 && cc == 16
+                  @jumbo_flex_hash["Jumbo/PropertyType"][true]["Fully Warrantable Condo NYC"] = value
+                end
+                if r == 33 && cc == 10
+                  @jumbo_flex_hash["Jumbo/PropertyType"][true]["Fully Warrantable Condo"] = {}
+                end
+                if r == 33 && cc == 16
+                  @jumbo_flex_hash["Jumbo/PropertyType"][true]["Fully Warrantable Condo"] = value
+                end
+                if r == 34 && cc == 10
+                  @jumbo_flex_hash["Jumbo/PropertyType"][true]["Non-Warrantable Condo"] = {}
+                end
+                if r == 34 && cc == 16
+                  @jumbo_flex_hash["Jumbo/PropertyType"][true]["Non-Warrantable Condo"] = value
+                end
+                if r == 35 && cc == 10
+                  @jumbo_flex_hash["Jumbo/PropertyType"][true]["Special Approval Condo"] = {}
+                end
+                if r == 35 && cc == 16
+                  @jumbo_flex_hash["Jumbo/PropertyType"][true]["Special Approval Condo"] = value
+                end
+                if r == 36 && cc == 10
+                  @jumbo_flex_hash["Jumbo/State"] = {}
+                  @jumbo_flex_hash["Jumbo/State"][true] = {}
+                  @jumbo_flex_hash["Jumbo/State"][true]["CA"] = {}
+                  cc = cc + 6
+                  new_val = sheet_data.cell(r,cc)
+                  @jumbo_flex_hash["Jumbo/State"][true]["CA"] = new_val
+                end
+                if r == 37 && cc == 10
+                  @jumbo_flex_hash["Jumbo/State"][true]["NY"] = {}
+                  cc = cc + 6
+                  new_val = sheet_data.cell(r,cc)
+                  @jumbo_flex_hash["Jumbo/State"][true]["NY"] = new_val
+                end
+                if r == 38 && cc == 10
+                  @jumbo_flex_hash["Jumbo/State"][true]["NJ"] = {}
+                  @jumbo_flex_hash["Jumbo/State"][true]["FL"] = {}
+                  @jumbo_flex_hash["Jumbo/State"][true]["CT"] = {}
+                  cc = cc + 6
+                  new_val = sheet_data.cell(r,cc)
+                  @jumbo_flex_hash["Jumbo/State"][true]["NJ"] = new_val
+                  @jumbo_flex_hash["Jumbo/State"][true]["FL"] = new_val
+                  @jumbo_flex_hash["Jumbo/State"][true]["CT"] = new_val
+                end
+                if r == 41 && cc == 10
+                  @jumbo_flex_hash["MiscAdjuster/State"] = {}
+                  @jumbo_flex_hash["MiscAdjuster/State"]["Miscellaneous"] = {}
+                  @jumbo_flex_hash["MiscAdjuster/State"]["Miscellaneous"]["NY"] = {}
+                  cc = cc + 6
+                  new_val = sheet_data.cell(r,cc)
+                  @jumbo_flex_hash["MiscAdjuster/State"]["Miscellaneous"]["NY"] = new_val
                 end
               end
             end
