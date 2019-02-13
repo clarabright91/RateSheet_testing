@@ -758,9 +758,9 @@ class ObCmgWholesalesController < ApplicationController
           end
         end
         adjustment = [@adjustment_hash,@adjustment_fico,@cashout_adjustment,@subordinate_hash,@adjustment_cap,@loan_adjustment,@state_adjustments,@other_adjustment,@lpmi_hash,@lpmi_adj,@home_ready,@home_possible,@property_hash]
-        make_adjust(adjustment,sheet)
+        make_adjust(adjustment,"AGENCY")
 
-        create_program_association_with_adjustment(sheet)
+        create_program_association_with_adjustment("AGENCY")
       end
     end
     rescue
@@ -1023,7 +1023,6 @@ class ObCmgWholesalesController < ApplicationController
           end
           adjustment = [@adjustment_hash,@subordinate_hash,@adjustment_cap,@misc_adjustment,@state_adjustment]
           make_adjust(adjustment,sheet)
-
           create_program_association_with_adjustment(sheet)
         end
       end

@@ -651,7 +651,7 @@ class ObQuickenLoans3571Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@subordinate_hash,@property_hash,@cashout_hash]
         make_adjust(adjustment,sheet)
-        create_program_association_with_adjustment(sheet)
+        # create_program_association_with_adjustment(sheet)
       end
     end
     redirect_to programs_ob_quicken_loans3571_path(@sheet_obj)
@@ -796,7 +796,7 @@ class ObQuickenLoans3571Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@subordinate_hash,@property_hash,@cashout_hash]
         make_adjust(adjustment,sheet)
-        create_program_association_with_adjustment(sheet)
+        # create_program_association_with_adjustment(sheet)
       end
     end
     redirect_to programs_ob_quicken_loans3571_path(@sheet_obj)

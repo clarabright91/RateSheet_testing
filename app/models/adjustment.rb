@@ -189,6 +189,8 @@ class Adjustment < ApplicationRecord
     "DTI",
     "InterestRate",
     "LockPeriod",
-    "State"
+    "State",
+    "Term",
+    "LoanType"
   ]
 end

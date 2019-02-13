@@ -177,7 +177,7 @@ class ImportFilesController < ApplicationController
                     else
                       if @program.lock_period.length <= 3
                         @program.lock_period << 15*c_i
-                        @program.save
+                        @programs.save
                       end
                       @block_hash[key][15*c_i] = value
                     end
@@ -311,6 +311,7 @@ class ImportFilesController < ApplicationController
         end
       end
     end
+    create_program_association_with_adjustment(sheet)
     redirect_to programs_import_file_path(@bank)
   end
 
@@ -730,7 +731,7 @@ class ImportFilesController < ApplicationController
 
     # create adjustment for each program
     make_adjust(@allAdjustments, @sheet)
-
+    create_program_association_with_adjustment(@sheet)
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
@@ -1130,6 +1131,7 @@ class ImportFilesController < ApplicationController
 
     # create adjustment for each program
     make_adjust(@allAdjustments, @sheet)
+    create_program_association_with_adjustment(@sheet)
 
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
@@ -1527,7 +1529,7 @@ class ImportFilesController < ApplicationController
     end
     # create adjustment for each program
     make_adjust(@allAdjustments, @sheet)
-
+    create_program_association_with_adjustment(@sheet)
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
@@ -1800,6 +1802,7 @@ class ImportFilesController < ApplicationController
         end
 
         make_adjust(@adjustment_hash, @program_ids)
+        create_program_association_with_adjustment(@sheet)
       end
     end
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
@@ -2081,6 +2084,7 @@ class ImportFilesController < ApplicationController
           end
         end
         make_adjust(@adjustment_hash, @program_ids)
+        create_program_association_with_adjustment(@sheet)
       end
     end
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
@@ -2668,7 +2672,7 @@ class ImportFilesController < ApplicationController
 
     # create adjustment for each program
     make_adjust(@all_data, @programs_ids)
-
+    create_program_association_with_adjustment(@sheet)
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
@@ -2956,6 +2960,7 @@ class ImportFilesController < ApplicationController
           end
         end
         make_adjust(@adjustment_hash, @program_ids)
+        create_program_association_with_adjustment(@sheet)
       end
     end
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
@@ -3399,6 +3404,7 @@ class ImportFilesController < ApplicationController
           end
           # Adjustment.create(data: @hash,program_name: @program.program_name, sheet_name: sheet, program_ids: @programs_ids)
           make_adjust(@hash, @program_ids)
+          create_program_association_with_adjustment(@sheet)
         end
       end
     end
@@ -3665,6 +3671,7 @@ class ImportFilesController < ApplicationController
           end
         end
         make_adjust(@adjustment_hash, @program_ids)
+        create_program_association_with_adjustment(@sheet)
       end
     end
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
@@ -4430,6 +4437,7 @@ class ImportFilesController < ApplicationController
         end
       end
     end
+    create_program_association_with_adjustment(@sheet)
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
@@ -4629,6 +4637,7 @@ class ImportFilesController < ApplicationController
           end
         end
         make_adjust(@adjustment_hash, @program_ids)
+        create_program_association_with_adjustment(@sheet)
       end
     end
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
@@ -4890,6 +4899,7 @@ class ImportFilesController < ApplicationController
           end
         end
         make_adjust(@adjustment_hash, @program_ids)
+        create_program_association_with_adjustment(@sheet)
       end
     end
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
@@ -5152,6 +5162,7 @@ class ImportFilesController < ApplicationController
           end
         end
         make_adjust(@adjustment_hash, @program_ids)
+        create_program_association_with_adjustment(@sheet)
       end
     end
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
@@ -5387,6 +5398,7 @@ class ImportFilesController < ApplicationController
           end
         end
         make_adjust(@adjustment_hash, @program_ids)
+        create_program_association_with_adjustment(@sheet)
       end
     end
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
@@ -5585,6 +5597,7 @@ class ImportFilesController < ApplicationController
           end
         end
         make_adjust(@adjustment_hash, @program_ids)
+        create_program_association_with_adjustment(@sheet)
       end
     end
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
@@ -5972,7 +5985,7 @@ class ImportFilesController < ApplicationController
 
     # create adjustment for each program
     make_adjust(@allAdjustments, @sheet)
-
+    create_program_association_with_adjustment(@sheet)
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
@@ -6356,7 +6369,7 @@ class ImportFilesController < ApplicationController
 
     # create adjustment for each program
     make_adjust(@allAdjustments, @sheet)
-
+    create_program_association_with_adjustment(@sheet)
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
@@ -6751,7 +6764,7 @@ class ImportFilesController < ApplicationController
 
     # create adjustment for each program
     make_adjust(@allAdjustments, @sheet)
-
+    create_program_association_with_adjustment(@sheet)
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
@@ -7114,7 +7127,7 @@ class ImportFilesController < ApplicationController
 
     # create adjustment for each program
     make_adjust(@allAdjustments, @sheet)
-
+    create_program_association_with_adjustment(@sheet)
     redirect_to programs_import_file_path(@bank, sheet: @sheet)
   end
 
