@@ -17,6 +17,7 @@ class DashboardController < ApplicationController
     @credit_score = 740
     @ltv = 81.0
     @cltv = 81.0
+    @fico = ""
     @property_type = "Manufactured Home"
     @financing_type = "Subordinate Financing"
     @refinance_option = "Cash Out"
@@ -134,51 +135,58 @@ class DashboardController < ApplicationController
   def find_points_of_the_loan programs
     hash_obj = {
       :program_name => "",
-      :base_rate => 0.0,
-      :sheet_name=> "",
       :adj_points => []
     }
+    debugger
     programs.each do |pro|
-      hash_obj[:program_name] = pro.program_name.present? ? pro.program_name : ""
-      hash_obj[:sheet_name] = pro.sheet_name.present? ? pro.sheet_name : ""
-      hash_obj[:base_rate] = pro.base_rate[@interest.to_f.to_s][@lock_period].present? ? pro.base_rate[@interest.to_f.to_s][@lock_period] : 0.0
+      hash_obj[:program_name] = pro.program_name
       if pro.adjustments.present?
         pro.adjustments.each do |adj|
           first_key = adj.data.keys.first          
           key_list = first_key.split("/")
           adj_key_hash = {}
+          debugger
           key_list.each_with_index do |key_name, key_index|
             if(Adjustment::INPUT_VALUES.include?(key_name))
+            debugger
               if key_index==0
-                # ((key_name == "PropertyType"
+                # ((key_name == "PropertyType") ? @property_type : (key_name == "FinancingType") ?  @financing_type : (key_name == "PremiumType") ? @premium_type : "")
                 if key_name == "PropertyType"
+                  debugger
                   if adj.data[first_key][@property_type].present?
                     adj_key_hash[key_index] = @property_type
                   else
                     break
                   end
+                  debugger
                 end
                 if key_name == "FinancingType"
+                  debugger
                   if adj.data[first_key][@financing_type].present?
                     adj_key_hash[key_index] = @financing_type
                   else
                     break
                   end
+                  debugger
                 end
                 if key_name == "PremiumType"
+                  debugger
                   if adj.data[first_key][@premium_type].present?
                     adj_key_hash[key_index] = @premium_type
                   else
                     break
                   end
+                  debugger
                 end
                 if key_name == "LTV"
+                    debugger                  
                   if adj.data[first_key].present?
                     adj.data[first_key].keys.each do |ltv_key|
                       if ltv_key.include?("-")
                         if (ltv_key.split("-").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("-").second.strip.to_f)
                           adj.data[first_key][ltv_key]
-                          adj_key_hash[key_index] = ltv_key                          
+                          adj_key_hash[key_index] = ltv_key
+                          debugger
                         end
                       end
                     end
@@ -187,12 +195,14 @@ class DashboardController < ApplicationController
                   end
                 end
                 if key_name == "FICO"
+                  debugger
                   if adj.data[first_key].present?
                       adj.data[first_key].keys.each do |fico_key|
                         if fico_key.include?("-")
                           if (fico_key.split("-").first.strip.to_i <= @credit_score && fico_key.split("-").second.strip.to_i >= @credit_score)
                             adj.data[first_key][fico_key]
-                            adj_key_hash[key_index] = fico_key                                                  
+                            adj_key_hash[key_index] = fico_key
+                            debugger                        
                           end
                         end
                       end
@@ -201,6 +211,7 @@ class DashboardController < ApplicationController
                   end
                 end
                 if key_name == "RefinanceOption"
+                    debugger                  
                   if (@refinance_option == "Cash Out" || @refinance_option == "Cash-Out")
                     if adj.data[first_key]["Cash-Out"].present?
                       adj.data[first_key]["Cash-Out"]
@@ -213,37 +224,45 @@ class DashboardController < ApplicationController
                   else
                     adj.data[first_key][@refinance_option]
                     adj_key_hash[key_index] = @refinance_option
+                    debugger                    
                   end
                 end
                 if key_name == "MiscAdjuster"
+                  debugger
                   if adj.data[first_key][@misc_adjuster].present?
                     adj_key_hash[key_index] = @misc_adjuster
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
-                if key_name == "LoanSize"                  
+                if key_name == "LoanSize"
+                  debugger
                   if adj.data[first_key][@loan_size].present?
                     adj_key_hash[key_index] = @loan_size
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "CLTV"
+                  debugger
                   if adj.data[first_key].present?
                     adj.data[first_key].keys.each do |cltv_key|
                       if cltv_key.include?("-")
+                        debugger
                         if (cltv_key.split("-").first.strip.to_f < @cltv.to_f && @cltv.to_f <= cltv_key.split("-").second.strip.to_f)
                           adj.data[first_key][cltv_key]
                           adj_key_hash[key_index] = cltv_key
+                          debugger                        
                         end
                       end
                       if cltv_key.include?("<=")
+                        debugger
                         if (cltv_key.split("<=").first.strip.to_f < @cltv.to_f && @cltv.to_f <= cltv_key.split("<=").second.strip.to_f)
                           adj.data[first_key][cltv_key]
                           adj_key_hash[key_index] = cltv_key
+                          debugger                        
                         end
                       end
                     end
@@ -251,41 +270,47 @@ class DashboardController < ApplicationController
                 end
                 if key_name == "State"
                   if adj.data[first_key][@state].present?
-                    adj_key_hash[key_index] = @state
+                    adj_key_hash[key_index] = @state                  
                   else
                     break
                   end
                 end
                 if key_name == "LoanType"
+                    debugger                  
                   if adj.data[first_key][@loan_type].present?
                     adj_key_hash[key_index] = @loan_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
 
-                if key_name == "Term"                  
+                if key_name == "Term"
+                  debugger
                   term_key = adj.data[first_key].keys.first
                   if term_key.include?("Inf") || term_key.include?("Infinite")                    
                     if (term_key.split("-").first.strip.to_i <= @term)
                       adj.data[first_key][term_key]
                       adj_key_hash[key_index] = term_key
+                      debugger                      
                     else
                       break
                     end
-                  elsif term_key.include?("-")                                        
+                  elsif term_key.include?("-")
+                      debugger                    
                     if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
                       adj.data[first_key][term_key]
                       adj_key_hash[key_index] = term_key
+                      debugger                      
                     else
                       break
                     end
                   end
                 end
                 if key_name == "LPMI"
+                  debugger
                   if adj.data[first_key]["true"].present?
-                    adj_key_hash[key_index] = "true"
+                    adj_key_hash[key_index] = "true"                  
                   else
                     break
                   end
@@ -293,37 +318,41 @@ class DashboardController < ApplicationController
               end
               if key_index==1
                 if key_name == "PropertyType"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-1]][@property_type].present?
                     adj_key_hash[key_index] = @property_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "FinancingType"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-1]][@financing_type].present?
                     adj_key_hash[key_index] = @financing_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "PremiumType"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-1]][@premium_type].present?
                     adj_key_hash[key_index] = @premium_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "LTV"
+                    debugger                  
                   if adj.data[first_key][adj_key_hash[key_index-1]].present?
                     adj.data[first_key][adj_key_hash[key_index-1]].keys.each do |ltv_key|
                       if ltv_key.include?("-")
                         if (ltv_key.split("-").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("-").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-1]][ltv_key]
                           adj_key_hash[key_index] = ltv_key
-                                                
+                          debugger                        
                         end
                       end
                     end
@@ -332,12 +361,14 @@ class DashboardController < ApplicationController
                   end
                 end
                 if key_name == "FICO"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-1]].present?
                       adj.data[first_key][adj_key_hash[key_index-1]].keys.each do |fico_key|
                         if fico_key.include?("-")
                           if (fico_key.split("-").first.strip.to_i <= @credit_score && fico_key.split("-").second.strip.to_i >= @credit_score)
                             adj.data[first_key][adj_key_hash[key_index-1]][fico_key]
-                            adj_key_hash[key_index] = fico_key                                                  
+                            adj_key_hash[key_index] = fico_key
+                            debugger                        
                           end
                         end
                       end
@@ -346,7 +377,8 @@ class DashboardController < ApplicationController
                   end
                 end
 
-                if key_name == "RefinanceOption"                      
+                if key_name == "RefinanceOption"
+                      debugger
                   if (@refinance_option == "Cash Out" || @refinance_option == "Cash-Out")
                     if adj.data[first_key][adj_key_hash[key_index-1]]["Cash-Out"].present?
                       adj.data[first_key][adj_key_hash[key_index-1]]["Cash-Out"]
@@ -359,40 +391,46 @@ class DashboardController < ApplicationController
                   else
                     adj.data[first_key][adj_key_hash[key_index-1]][@refinance_option]
                     adj_key_hash[key_index] = @refinance_option
+                    debugger                    
                   end
                 end
 
                 if key_name == "MiscAdjuster"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-1]][@misc_adjuster].present?
                     adj_key_hash[key_index] = @misc_adjuster
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
-                if key_name == "LoanSize"                  
+                if key_name == "LoanSize"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-1]][@loan_size].present?
                     adj_key_hash[key_index] = @loan_size
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "CLTV"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-1]].present?
                     adj.data[first_key][adj_key_hash[key_index-1]].keys.each do |cltv_key|
                       if cltv_key.include?("-")
-                                          
+                      debugger                      
                         if (cltv_key.split("-").first.strip.to_f < @cltv.to_f && @cltv.to_f <= cltv_key.split("-").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-1]][cltv_key]
                           adj_key_hash[key_index] = cltv_key
+                          debugger                        
                         end
                       end
                       if cltv_key.include?("<=")
-                                          
+                      debugger                      
                         if (cltv_key.split("<=").first.strip.to_f < @cltv.to_f && @cltv.to_f <= cltv_key.split("<=").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-1]][cltv_key]
                           adj_key_hash[key_index] = cltv_key
+                          debugger                        
                         end
                       end
                     end
@@ -400,33 +438,38 @@ class DashboardController < ApplicationController
                 end
                 if key_name == "State"
                   if adj.data[first_key][adj_key_hash[key_index-1]][@state].present?
-                    adj_key_hash[key_index] = @state
+                    adj_key_hash[key_index] = @state                  
                   else
                     break
                   end
                 end
                 if key_name == "LoanType"
+                    debugger                  
                   if adj.data[first_key][adj_key_hash[key_index-1]][@loan_type].present?
                     adj_key_hash[key_index] = @loan_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
 
-                if key_name == "Term"                  
+                if key_name == "Term"
+                  debugger
                   term_key = adj.data[first_key][adj_key_hash[key_index-1]].keys.first
                   if term_key.include?("Inf") || term_key.include?("Infinite")                    
                     if (term_key.split("-").first.strip.to_i <= @term)
                       adj.data[first_key][adj_key_hash[key_index-1]][term_key]
                       adj_key_hash[key_index] = term_key
+                      debugger                      
                     else
                       break
                     end
-                  elsif term_key.include?("-")                                        
+                  elsif term_key.include?("-")
+                      debugger                    
                     if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
                       adj.data[first_key][adj_key_hash[key_index-1]][term_key]
                       adj_key_hash[key_index] = term_key
+                      debugger                      
                     else
                       break
                     end
@@ -434,9 +477,9 @@ class DashboardController < ApplicationController
                 end
 
                 if key_name == "LPMI"
-                                
+                debugger                  
                   if adj.data[first_key][adj_key_hash[key_index-1]]["true"].present?
-                    adj_key_hash[key_index] = "true"
+                    adj_key_hash[key_index] = "true"                  
                   else
                     break
                   end
@@ -444,37 +487,41 @@ class DashboardController < ApplicationController
               end
               if key_index==2
                 if key_name == "PropertyType"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
                     adj_key_hash[key_index] = @property_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "FinancingType"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@financing_type].present?
                     adj_key_hash[key_index] = @financing_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "PremiumType"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@premium_type].present?
                     adj_key_hash[key_index] = @premium_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "LTV"
+                    debugger                  
                   if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                     adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |ltv_key|
                       if ltv_key.include?("-")
                         if (ltv_key.split("-").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("-").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][ltv_key]
                           adj_key_hash[key_index] = ltv_key
-                                                
+                          debugger                        
                         end
                       end
                     end
@@ -483,12 +530,14 @@ class DashboardController < ApplicationController
                   end
                 end
                 if key_name == "FICO"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |fico_key|
                         if fico_key.include?("-")
                           if (fico_key.split("-").first.strip.to_i <= @credit_score && fico_key.split("-").second.strip.to_i >= @credit_score)
                             adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][fico_key]
-                            adj_key_hash[key_index] = fico_key                                                  
+                            adj_key_hash[key_index] = fico_key
+                            debugger                        
                           end
                         end
                       end
@@ -498,6 +547,7 @@ class DashboardController < ApplicationController
                 end
 
                 if key_name == "RefinanceOption"
+                    debugger                  
                   if (@refinance_option == "Cash Out" || @refinance_option == "Cash-Out")
                     if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["Cash-Out"].present?
                       adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["Cash-Out"]
@@ -510,38 +560,46 @@ class DashboardController < ApplicationController
                   else
                     adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@refinance_option]
                     adj_key_hash[key_index] = @refinance_option
+                    debugger                    
                   end
                 end
 
                 if key_name == "MiscAdjuster"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@misc_adjuster].present?
                     adj_key_hash[key_index] = @misc_adjuster
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
-                if key_name == "LoanSize"                  
+                if key_name == "LoanSize"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_size].present?
                     adj_key_hash[key_index] = @loan_size
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "CLTV"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                     adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |cltv_key|
                       if cltv_key.include?("-")
+                        debugger
                         if (cltv_key.split("-").first.strip.to_f < @cltv.to_f && @cltv.to_f <= cltv_key.split("-").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][cltv_key]
                           adj_key_hash[key_index] = cltv_key
+                          debugger                        
                         end
                       end
                       if cltv_key.include?("<=")
+                        debugger
                         if (cltv_key.split("<=").first.strip.to_f < @cltv.to_f && @cltv.to_f <= cltv_key.split("<=").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][cltv_key]
                           adj_key_hash[key_index] = cltv_key
+                          debugger                        
                         end
                       end
                     end
@@ -549,32 +607,37 @@ class DashboardController < ApplicationController
                 end
                 if key_name == "State"
                   if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@state].present?
-                    adj_key_hash[key_index] = @state
+                    adj_key_hash[key_index] = @state                  
                   else
                     break
                   end
                 end
                 if key_name == "LoanType"
+                    debugger                  
                   if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_type].present?
                     adj_key_hash[key_index] = @loan_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
-                if key_name == "Term"                  
+                if key_name == "Term"
+                  debugger
                   term_key = adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
                   if term_key.include?("Inf") || term_key.include?("Infinite")                    
                     if (term_key.split("-").first.strip.to_i <= @term)
                       adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
                       adj_key_hash[key_index] = term_key
+                      debugger                      
                     else
                       break
                     end
-                  elsif term_key.include?("-")                                        
+                  elsif term_key.include?("-")
+                      debugger                    
                     if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
                       adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
                       adj_key_hash[key_index] = term_key
+                      debugger                      
                     else
                       break
                     end
@@ -582,9 +645,9 @@ class DashboardController < ApplicationController
                 end
 
                 if key_name == "LPMI"
-                                
+                debugger                  
                   if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"].present?
-                    adj_key_hash[key_index] = "true"
+                    adj_key_hash[key_index] = "true"                  
                   else
                     break
                   end
@@ -592,37 +655,41 @@ class DashboardController < ApplicationController
               end
               if key_index==3
                 if key_name == "PropertyType"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
                     adj_key_hash[key_index] = @property_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "FinancingType"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@financing_type].present?
                     adj_key_hash[key_index] = @financing_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "PremiumType"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@premium_type].present?
                     adj_key_hash[key_index] = @premium_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "LTV"
-                if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
+                      debugger
+                  if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                     adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |ltv_key|
                       if ltv_key.include?("-")
                         if (ltv_key.split("-").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("-").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][ltv_key]
                           adj_key_hash[key_index] = ltv_key
-                                                
+                          debugger                        
                         end
                       end
                     end
@@ -631,12 +698,14 @@ class DashboardController < ApplicationController
                   end
                 end
                 if key_name == "FICO"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |fico_key|
                         if fico_key.include?("-")
                           if (fico_key.split("-").first.strip.to_i <= @credit_score && fico_key.split("-").second.strip.to_i >= @credit_score)
                             adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][fico_key]
-                            adj_key_hash[key_index] = fico_key                                                  
+                            adj_key_hash[key_index] = fico_key
+                            debugger                        
                           end
                         end
                       end
@@ -646,6 +715,7 @@ class DashboardController < ApplicationController
                 end
 
                 if key_name == "RefinanceOption"
+                    debugger                  
                   if (@refinance_option == "Cash Out" || @refinance_option == "Cash-Out")
                     if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["Cash-Out"].present?
                       adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["Cash-Out"]
@@ -658,38 +728,46 @@ class DashboardController < ApplicationController
                   else
                     adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@refinance_option]
                     adj_key_hash[key_index] = @refinance_option
+                    debugger                    
                   end
                 end
 
                 if key_name == "MiscAdjuster"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@misc_adjuster].present?
                     adj_key_hash[key_index] = @misc_adjuster
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
-                if key_name == "LoanSize"                  
+                if key_name == "LoanSize"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_size].present?
                     adj_key_hash[key_index] = @loan_size
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "CLTV"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                     adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |cltv_key|
                       if cltv_key.include?("-")
+                        debugger
                         if (cltv_key.split("-").first.strip.to_f < @cltv.to_f && @cltv.to_f <= cltv_key.split("-").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][cltv_key]
                           adj_key_hash[key_index] = cltv_key
+                          debugger                        
                         end
                       end
                       if cltv_key.include?("<=")
+                        debugger
                         if (cltv_key.split("<=").first.strip.to_f < @cltv.to_f && @cltv.to_f <= cltv_key.split("<=").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][cltv_key]
                           adj_key_hash[key_index] = cltv_key
+                          debugger                        
                         end
                       end
                     end
@@ -697,32 +775,37 @@ class DashboardController < ApplicationController
                 end
                 if key_name == "State"
                   if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@state].present?
-                    adj_key_hash[key_index] = @state
+                    adj_key_hash[key_index] = @state                  
                   else
                     break
                   end
                 end
                 if key_name == "LoanType"
+                    debugger                  
                   if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_type].present?
                     adj_key_hash[key_index] = @loan_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
-                if key_name == "Term"                  
+                if key_name == "Term"
+                  debugger
                   term_key = adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
                   if term_key.include?("Inf") || term_key.include?("Infinite")                    
                     if (term_key.split("-").first.strip.to_i <= @term)
                       adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
                       adj_key_hash[key_index] = term_key
+                      debugger                      
                     else
                       break
                     end
-                  elsif term_key.include?("-")                                        
+                  elsif term_key.include?("-")
+                      debugger                    
                     if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
                       adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
                       adj_key_hash[key_index] = term_key
+                      debugger                      
                     else
                       break
                     end
@@ -730,8 +813,9 @@ class DashboardController < ApplicationController
                 end
 
                 if key_name == "LPMI"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"].present?
-                    adj_key_hash[key_index] = "true"
+                    adj_key_hash[key_index] = "true"                  
                   else
                     break
                   end
@@ -739,37 +823,41 @@ class DashboardController < ApplicationController
               end
               if key_index==4
                 if key_name == "PropertyType"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
                     adj_key_hash[key_index] = @property_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "FinancingType"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@financing_type].present?
                     adj_key_hash[key_index] = @financing_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "PremiumType"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@premium_type].present?
                     adj_key_hash[key_index] = @premium_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "LTV"
+                    debugger                  
                   if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                     adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |ltv_key|
                       if ltv_key.include?("-")
                         if (ltv_key.split("-").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("-").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][ltv_key]
                           adj_key_hash[key_index] = ltv_key
-                                                
+                          debugger                        
                         end
                       end
                     end
@@ -778,12 +866,14 @@ class DashboardController < ApplicationController
                   end
                 end
                 if key_name == "FICO"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |fico_key|
                         if fico_key.include?("-")
                           if (fico_key.split("-").first.strip.to_i <= @credit_score && fico_key.split("-").second.strip.to_i >= @credit_score)
                             adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][fico_key]
-                            adj_key_hash[key_index] = fico_key                                                  
+                            adj_key_hash[key_index] = fico_key
+                            debugger                        
                           end
                         end
                       end
@@ -792,6 +882,7 @@ class DashboardController < ApplicationController
                   end
                 end
                 if key_name == "RefinanceOption"
+                    debugger                  
                   if (@refinance_option == "Cash Out" || @refinance_option == "Cash-Out")
                     if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["Cash-Out"].present?
                       adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["Cash-Out"]
@@ -804,37 +895,45 @@ class DashboardController < ApplicationController
                   else
                     adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@refinance_option]
                     adj_key_hash[key_index] = @refinance_option
+                    debugger                    
                   end
                 end
                 if key_name == "MiscAdjuster"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@misc_adjuster].present?
                     adj_key_hash[key_index] = @misc_adjuster
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
-                if key_name == "LoanSize"                  
+                if key_name == "LoanSize"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_size].present?
                     adj_key_hash[key_index] = @loan_size
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "CLTV"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                     adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |cltv_key|
                       if cltv_key.include?("-")
+                        debugger
                         if (cltv_key.split("-").first.strip.to_f < @cltv.to_f && @cltv.to_f <= cltv_key.split("-").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][cltv_key]
                           adj_key_hash[key_index] = cltv_key
+                          debugger                        
                         end
                       end
                       if cltv_key.include?("<=")
+                        debugger
                         if (cltv_key.split("<=").first.strip.to_f < @cltv.to_f && @cltv.to_f <= cltv_key.split("<=").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][cltv_key]
                           adj_key_hash[key_index] = cltv_key
+                          debugger                        
                         end
                       end
                     end
@@ -842,33 +941,38 @@ class DashboardController < ApplicationController
                 end
                 if key_name == "State"
                   if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@state].present?
-                    adj_key_hash[key_index] = @state
+                    adj_key_hash[key_index] = @state                  
                   else
                     break
                   end
                 end
                 if key_name == "LoanType"
+                    debugger                  
                   if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_type].present?
                     adj_key_hash[key_index] = @loan_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
 
-                if key_name == "Term"                  
+                if key_name == "Term"
+                  debugger
                   term_key = adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
                   if term_key.include?("Inf") || term_key.include?("Infinite")                    
                     if (term_key.split("-").first.strip.to_i <= @term)
                       adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
                       adj_key_hash[key_index] = term_key
+                      debugger                      
                     else
                       break
                     end
-                  elsif term_key.include?("-")                                        
+                  elsif term_key.include?("-")
+                      debugger                    
                     if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
                       adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
                       adj_key_hash[key_index] = term_key
+                      debugger                      
                     else
                       break
                     end
@@ -876,8 +980,9 @@ class DashboardController < ApplicationController
                 end
 
                 if key_name == "LPMI"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"].present?
-                    adj_key_hash[key_index] = "true"
+                    adj_key_hash[key_index] = "true"                  
                   else
                     break
                   end
@@ -885,37 +990,41 @@ class DashboardController < ApplicationController
               end
               if key_index==5
                 if key_name == "PropertyType"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
                     adj_key_hash[key_index] = @property_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "FinancingType"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@financing_type].present?
                     adj_key_hash[key_index] = @financing_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "PremiumType"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@premium_type].present?
                     adj_key_hash[key_index] = @premium_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "LTV"
+                    debugger                  
                   if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                     adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |ltv_key|
                       if ltv_key.include?("-")
                         if (ltv_key.split("-").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("-").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][ltv_key]
                           adj_key_hash[key_index] = ltv_key
-                                                
+                          debugger                        
                         end
                       end
                     end
@@ -924,12 +1033,14 @@ class DashboardController < ApplicationController
                   end
                 end
                 if key_name == "FICO"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |fico_key|
                         if fico_key.include?("-")
                           if (fico_key.split("-").first.strip.to_i <= @credit_score && fico_key.split("-").second.strip.to_i >= @credit_score)
                             adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][fico_key]
-                            adj_key_hash[key_index] = fico_key                                                  
+                            adj_key_hash[key_index] = fico_key
+                            debugger                        
                           end
                         end
                       end
@@ -939,6 +1050,7 @@ class DashboardController < ApplicationController
                 end
 
                 if key_name == "RefinanceOption"
+                    debugger                  
                   if (@refinance_option == "Cash Out" || @refinance_option == "Cash-Out")
                     if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["Cash-Out"].present?
                       adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["Cash-Out"]
@@ -951,38 +1063,46 @@ class DashboardController < ApplicationController
                   else
                     adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@refinance_option]
                     adj_key_hash[key_index] = @refinance_option
+                    debugger                    
                   end
                 end
 
                 if key_name == "MiscAdjuster"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@misc_adjuster].present?
                     adj_key_hash[key_index] = @misc_adjuster
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
-                if key_name == "LoanSize"                  
+                if key_name == "LoanSize"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_size].present?
                     adj_key_hash[key_index] = @loan_size
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "CLTV"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                     adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |cltv_key|
                       if cltv_key.include?("-")
+                        debugger
                         if (cltv_key.split("-").first.strip.to_f < @cltv.to_f && @cltv.to_f <= cltv_key.split("-").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][cltv_key]
                           adj_key_hash[key_index] = cltv_key
+                          debugger                        
                         end
                       end
                       if cltv_key.include?("<=")
+                        debugger
                         if (cltv_key.split("<=").first.strip.to_f < @cltv.to_f && @cltv.to_f <= cltv_key.split("<=").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][cltv_key]
                           adj_key_hash[key_index] = cltv_key
+                          debugger                        
                         end
                       end
                     end
@@ -990,32 +1110,37 @@ class DashboardController < ApplicationController
                 end
                 if key_name == "State"
                   if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@state].present?
-                    adj_key_hash[key_index] = @state
+                    adj_key_hash[key_index] = @state                  
                   else
                     break
                   end
                 end
                 if key_name == "LoanType"
+                    debugger                  
                   if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_type].present?
                     adj_key_hash[key_index] = @loan_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
-                if key_name == "Term"                  
+                if key_name == "Term"
+                  debugger
                   term_key = adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
                   if term_key.include?("Inf") || term_key.include?("Infinite")                    
                     if (term_key.split("-").first.strip.to_i <= @term)
                       adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
                       adj_key_hash[key_index] = term_key
+                      debugger                      
                     else
                       break
                     end
-                  elsif term_key.include?("-")                                        
+                  elsif term_key.include?("-")
+                      debugger                    
                     if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
                       adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
                       adj_key_hash[key_index] = term_key
+                      debugger                      
                     else
                       break
                     end
@@ -1023,8 +1148,9 @@ class DashboardController < ApplicationController
                 end
 
                 if key_name == "LPMI"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"].present?
-                    adj_key_hash[key_index] = "true"
+                    adj_key_hash[key_index] = "true"                  
                   else
                     break
                   end
@@ -1032,37 +1158,41 @@ class DashboardController < ApplicationController
               end
               if key_index==6
                 if key_name == "PropertyType"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
                     adj_key_hash[key_index] = @property_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "FinancingType"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@financing_type].present?
                     adj_key_hash[key_index] = @financing_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "PremiumType"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@premium_type].present?
                     adj_key_hash[key_index] = @premium_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "LTV"
+                    debugger                  
                   if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                     adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |ltv_key|
                       if ltv_key.include?("-")
                         if (ltv_key.split("-").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("-").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][ltv_key]
                           adj_key_hash[key_index] = ltv_key
-                                                
+                          debugger                        
                         end
                       end
                     end
@@ -1071,12 +1201,14 @@ class DashboardController < ApplicationController
                   end
                 end
                 if key_name == "FICO"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |fico_key|
                         if fico_key.include?("-")
                           if (fico_key.split("-").first.strip.to_i <= @credit_score && fico_key.split("-").second.strip.to_i >= @credit_score)
                             adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][fico_key]
-                            adj_key_hash[key_index] = fico_key                                                  
+                            adj_key_hash[key_index] = fico_key
+                            debugger                        
                           end
                         end
                       end
@@ -1085,6 +1217,7 @@ class DashboardController < ApplicationController
                   end
                 end
                 if key_name == "RefinanceOption"
+                    debugger                  
                   if (@refinance_option == "Cash Out" || @refinance_option == "Cash-Out")
                     if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["Cash-Out"].present?
                       adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["Cash-Out"]
@@ -1097,37 +1230,45 @@ class DashboardController < ApplicationController
                   else
                     adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@refinance_option]
                     adj_key_hash[key_index] = @refinance_option
+                    debugger                    
                   end
                 end
                 if key_name == "MiscAdjuster"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@misc_adjuster].present?
                     adj_key_hash[key_index] = @misc_adjuster
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
-                if key_name == "LoanSize"                  
+                if key_name == "LoanSize"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_size].present?
                     adj_key_hash[key_index] = @loan_size
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
                 if key_name == "CLTV"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                     adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |cltv_key|
                       if cltv_key.include?("-")
+                        debugger
                         if (cltv_key.split("-").first.strip.to_f < @cltv.to_f && @cltv.to_f <= cltv_key.split("-").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][cltv_key]
                           adj_key_hash[key_index] = cltv_key
+                          debugger                        
                         end
                       end
                       if cltv_key.include?("<=")
+                        debugger
                         if (cltv_key.split("<=").first.strip.to_f < @cltv.to_f && @cltv.to_f <= cltv_key.split("<=").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][cltv_key]
                           adj_key_hash[key_index] = cltv_key
+                          debugger                        
                         end
                       end
                     end
@@ -1135,33 +1276,38 @@ class DashboardController < ApplicationController
                 end
                 if key_name == "State"
                   if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@state].present?
-                    adj_key_hash[key_index] = @state
+                    adj_key_hash[key_index] = @state                  
                   else
                     break
                   end
                 end
                 if key_name == "LoanType"
+                    debugger                  
                   if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_type].present?
                     adj_key_hash[key_index] = @loan_type
                   else
                     break
                   end
-                                  
+                  debugger                  
                 end
 
-                if key_name == "Term"                  
+                if key_name == "Term"
+                  debugger
                   term_key = adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
                   if term_key.include?("Inf") || term_key.include?("Infinite")                    
                     if (term_key.split("-").first.strip.to_i <= @term)
                       adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
                       adj_key_hash[key_index] = term_key
+                      debugger                      
                     else
                       break
                     end
-                  elsif term_key.include?("-")                                        
+                  elsif term_key.include?("-")
+                      debugger                    
                     if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
                       adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
                       adj_key_hash[key_index] = term_key
+                      debugger                      
                     else
                       break
                     end
@@ -1169,112 +1315,92 @@ class DashboardController < ApplicationController
                 end
 
                 if key_name == "LPMI"
+                  debugger
                   if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"].present?
-                    adj_key_hash[key_index] = "true"
+                    adj_key_hash[key_index] = "true"                  
                   else
                     break
                   end
                 end
               end
-            else              
+            else
+              debugger
               if key_index==0
                 if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc")                  
                   adj.data[first_key]["true"]
-                  adj_key_hash[key_index] = "true"
+                  adj_key_hash[key_index] = "true"                  
                 end
               end
               if key_index==1
                 if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc")                  
                   adj.data[first_key][adj_key_hash[key_index-1]]["true"]
-                  adj_key_hash[key_index] = "true"
+                  adj_key_hash[key_index] = "true"                  
                 end
               end
               if key_index==2
                 if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc")                  
                   adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"]
-                  adj_key_hash[key_index] = "true"
+                  adj_key_hash[key_index] = "true"                  
                 end
               end
               if key_index==3
                 if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc")                  
                   adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"]
-                  adj_key_hash[key_index] = "true"
+                  adj_key_hash[key_index] = "true"                  
                 end
               end
               if key_index==4
                 if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc")                  
                   adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"]
-                  adj_key_hash[key_index] = "true"
+                  adj_key_hash[key_index] = "true"                  
                 end
               end
               if key_index==5
                 if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc")                  
                   adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"]
-                  adj_key_hash[key_index] = "true"
+                  adj_key_hash[key_index] = "true"                  
                 end
               end
               if key_index==6
                 if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc")                  
                   adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"]
-                  adj_key_hash[key_index] = "true"
+                  adj_key_hash[key_index] = "true"                  
                 end
               end
             end
           end
-          adj_key_hash.keys.each do |hash_key, index|            
+          adj_key_hash.keys.each do |hash_key, index| 
+            debugger
             if hash_key==0 && adj_key_hash.keys.count-1==hash_key
-              point = adj.data[first_key][adj_key_hash[hash_key]]
-              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A"))
-                hash_obj[:adj_points] << point
-              end
+              hash_obj[:adj_points] << adj.data[first_key][adj_key_hash[hash_key]]
             end
             if hash_key==1 && adj_key_hash.keys.count-1==hash_key
-              point = adj.data[first_key][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
-              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A"))
-                hash_obj[:adj_points] << point
-              end
+              hash_obj[:adj_points] << adj.data[first_key][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
             end
             if hash_key==2 && adj_key_hash.keys.count-1==hash_key
-              point = adj.data[first_key][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
-              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A"))
-                hash_obj[:adj_points] << point
-              end
+              hash_obj[:adj_points] << adj.data[first_key][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
             end
-            if hash_key==3 && adj_key_hash.keys.count-1==hash_key              
-              point = adj.data[first_key][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
-              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A"))
-                hash_obj[:adj_points] << point
-              end
+            if hash_key==3 && adj_key_hash.keys.count-1==hash_key
+              hash_obj[:adj_points] << adj.data[first_key][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
             end
-            if hash_key==4 && adj_key_hash.keys.count-1==hash_key              
-              point = adj.data[first_key][adj_key_hash[hash_key-4]][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
-              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A"))
-                hash_obj[:adj_points] << point
-              end
+            if hash_key==4 && adj_key_hash.keys.count-1==hash_key
+              hash_obj[:adj_points] << adj.data[first_key][adj_key_hash[hash_key-4]][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
             end
-            if hash_key==5 && adj_key_hash.keys.count-1==hash_key              
-              point = adj.data[first_key][adj_key_hash[hash_key-5]][adj_key_hash[hash_key-4]][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
-              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A"))
-                hash_obj[:adj_points] << point
-              end
+            if hash_key==5 && adj_key_hash.keys.count-1==hash_key
+              hash_obj[:adj_points] << adj.data[first_key][adj_key_hash[hash_key-5]][adj_key_hash[hash_key-4]][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
             end
-            if hash_key==6 && adj_key_hash.keys.count-1==hash_key              
-              point = adj.data[first_key][adj_key_hash[hash_key-6]][adj_key_hash[hash_key-5]][adj_key_hash[hash_key-4]][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
-              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A"))
-                hash_obj[:adj_points] << point
-              end
+            if hash_key==6 && adj_key_hash.keys.count-1==hash_key
+              hash_obj[:adj_points] << adj.data[first_key][adj_key_hash[hash_key-6]][adj_key_hash[hash_key-5]][adj_key_hash[hash_key-4]][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
             end
           end
+          @result << hash_obj
+          hash_obj = {
+            :program_name => "",
+            :adj_points => []
+          }
         end
-        @result << hash_obj
-        hash_obj = {
-        :program_name => "",
-        :base_rate => 0.0,
-        :sheet_name=> "",
-        :adj_points => []
-      }
-      end      
-    end    
+      end
+    end
   end
 
   render :index
