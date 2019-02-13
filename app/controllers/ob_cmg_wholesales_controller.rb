@@ -1530,7 +1530,6 @@ class ObCmgWholesalesController < ApplicationController
               max_column_section = row.compact.count - 1
               (0..max_column_section).each do |max_column|
                 cc = 4*max_column + 1
-
                 @title = sheet_data.cell(r,cc)
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_property sheet
@@ -1557,7 +1556,6 @@ class ObCmgWholesalesController < ApplicationController
                       end
                       @data << value
                     end
-                  end  
                   end
                   if @data.compact.reject { |c| c.blank? }.length == 0
                     break # terminate the loop
@@ -1804,7 +1802,6 @@ class ObCmgWholesalesController < ApplicationController
                       end
                       @data << value
                     end
-                  end  
                   end
                   if @data.compact.reject { |c| c.blank? }.length == 0
                     break # terminate the loop
@@ -1827,7 +1824,6 @@ class ObCmgWholesalesController < ApplicationController
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
               cc = 4*max_column + 1
-
               @title = sheet_data.cell(r,cc)
               if cc < 5
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
@@ -1864,8 +1860,8 @@ class ObCmgWholesalesController < ApplicationController
                 if @block_hash.keys.first.nil?|| @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
-              
                 @program.update(base_rate: @block_hash)
+              end
             end
           end
         end
