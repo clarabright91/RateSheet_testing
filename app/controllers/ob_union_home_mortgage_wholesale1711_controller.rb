@@ -1251,55 +1251,55 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
           end
         end
         # Adjustment
-        (90..122).each do |r|
-          row = sheet_data.row(r)
-          @ltv_data = sheet_data.row(93)
-          @cltv_data = sheet_data.row(96)
-          if row.compact.count >= 1
-            (0..15).each do |cc|
-              value = sheet_data.cell(r,cc)
-              if value.present?
-                if value == "OTHER LLPAs (Price Adjustments)(1)(2)"
-                  first_key = "FinancingType/LTV/CLTV/FICO"
-                  @other_hash[first_key] = {}
-                end
-                if r >= 94 && r <= 105 && cc == 10
-                  ltv_key = get_key value
-                  @other_hash[first_key][ltv_key] = {}
-                end
-                if r >= 94 && r <= 105 && cc >= 11 && cc <= 15
-                  third_key = @ltv_data[cc-3]
-                  @other_hash[first_key][ltv_key][third_key] = value
-                end
-                if value == "FICO/LTV LLPAs (Price Adjustments)"
-                  secondary_key = "FICO/LTV"
-                  @adjustment_hash[secondary_key] = {}
-                end
+        # (90..122).each do |r|
+        #   row = sheet_data.row(r)
+        #   @ltv_data = sheet_data.row(93)
+        #   @cltv_data = sheet_data.row(96)
+        #   if row.compact.count >= 1
+        #     (0..15).each do |cc|
+        #       value = sheet_data.cell(r,cc)
+        #       if value.present?
+        #         if value == "OTHER LLPAs (Price Adjustments)(1)(2)"
+        #           first_key = "FinancingType/LTV/CLTV/FICO"
+        #           @other_hash[first_key] = {}
+        #         end
+        #         if r >= 94 && r <= 105 && cc == 10
+        #           ltv_key = get_key value
+        #           @other_hash[first_key][ltv_key] = {}
+        #         end
+        #         if r >= 94 && r <= 105 && cc >= 11 && cc <= 15
+        #           third_key = @ltv_data[cc-3]
+        #           @other_hash[first_key][ltv_key][third_key] = value
+        #         end
+        #         if value == "FICO/LTV LLPAs (Price Adjustments)"
+        #           secondary_key = "FICO/LTV"
+        #           @adjustment_hash[secondary_key] = {}
+        #         end
 
-                if r >= 97 && r <= 105 && cc == 3
-                  ltv_key = value
-                  @adjustment_hash[secondary_key][ltv_key] = {}
-                end
-                if r >= 97 && r <= 105 && cc >= 4 && cc <= 8
-                  third_key = @cltv_data[cc-3]
-                  @adjustment_hash[secondary_key][ltv_key][third_key] = value
-                end
+        #         if r >= 97 && r <= 105 && cc == 3
+        #           ltv_key = value
+        #           @adjustment_hash[secondary_key][ltv_key] = {}
+        #         end
+        #         if r >= 97 && r <= 105 && cc >= 4 && cc <= 8
+        #           third_key = @cltv_data[cc-3]
+        #           @adjustment_hash[secondary_key][ltv_key][third_key] = value
+        #         end
 
-                if value == "Product LLPAs (Price Adjustments)"
-                  secondary_key = "Product LLPAs"
-                  @llpa_hash[secondary_key] = {}
-                end
-                if r >= 91 && r <= 93 && cc == 3
-                  ltv_key = value
-                  cltv_key = sheet_data.cell(r,cc+1)
-                  @llpa_hash[secondary_key][ltv_key] = cltv_key
-                end
-              end
-            end
-          end
-        end
-        adjustment = [@adjustment_hash,@other_hash,@llpa_hash]
-        make_adjust(adjustment,sheet)
+        #         if value == "Product LLPAs (Price Adjustments)"
+        #           secondary_key = "Product LLPAs"
+        #           @llpa_hash[secondary_key] = {}
+        #         end
+        #         if r >= 91 && r <= 93 && cc == 3
+        #           ltv_key = value
+        #           cltv_key = sheet_data.cell(r,cc+1)
+        #           @llpa_hash[secondary_key][ltv_key] = cltv_key
+        #         end
+        #       end
+        #     end
+        #   end
+        # end
+        # adjustment = [@adjustment_hash,@other_hash,@llpa_hash]
+        # make_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_ob_union_home_mortgage_wholesale1711_path(@sheet_obj)
@@ -1352,135 +1352,135 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
           end
         end
         # Adjustment
-        (36..63).each do |r|
-          row = sheet_data.row(r)
-          @ltv_data = sheet_data.row(38)
-          if row.compact.count >= 1
-            (0..15).each do |cc|
-              value = sheet_data.cell(r,cc)
-              if value.present?
-                if value == "Other Adjustments"
-                  first_key = "FinancingType/LTV/CLTV/FICO"
-                  @other_hash[first_key] = {}
-                end
-                if value == "State"
-                  second_key = "State"
-                  @other_hash[first_key][second_key] = {}
-                end
-                if value == "Property Type"
-                  second_key = "Property Type"
-                  @other_hash[first_key][second_key] = {}
-                end
-                if value == "2nd Home (700+)"
-                  second_key = "2nd Home (700+)"
-                  @other_hash[first_key][second_key] = {}
-                end
-                if value == "Miscellaneous"
-                  second_key = "Miscellaneous"
-                  @other_hash[first_key][second_key] = {}
-                end
-                if value == "Purpose"
-                  second_key = "Purpose"
-                  @other_hash[first_key][second_key] = {}
-                end
+        # (36..63).each do |r|
+        #   row = sheet_data.row(r)
+        #   @ltv_data = sheet_data.row(38)
+        #   if row.compact.count >= 1
+        #     (0..15).each do |cc|
+        #       value = sheet_data.cell(r,cc)
+        #       if value.present?
+        #         if value == "Other Adjustments"
+        #           first_key = "FinancingType/LTV/CLTV/FICO"
+        #           @other_hash[first_key] = {}
+        #         end
+        #         if value == "State"
+        #           second_key = "State"
+        #           @other_hash[first_key][second_key] = {}
+        #         end
+        #         if value == "Property Type"
+        #           second_key = "Property Type"
+        #           @other_hash[first_key][second_key] = {}
+        #         end
+        #         if value == "2nd Home (700+)"
+        #           second_key = "2nd Home (700+)"
+        #           @other_hash[first_key][second_key] = {}
+        #         end
+        #         if value == "Miscellaneous"
+        #           second_key = "Miscellaneous"
+        #           @other_hash[first_key][second_key] = {}
+        #         end
+        #         if value == "Purpose"
+        #           second_key = "Purpose"
+        #           @other_hash[first_key][second_key] = {}
+        #         end
 
-                if r >= 39 && r <= 42 && cc == 10
-                  ltv_key = value
-                  @other_hash[first_key][second_key][ltv_key] = {}
-                end
+        #         if r >= 39 && r <= 42 && cc == 10
+        #           ltv_key = value
+        #           @other_hash[first_key][second_key][ltv_key] = {}
+        #         end
 
-                if r >= 39 && r <= 42 && cc >= 11 && cc <= 15
-                  third_key = @ltv_data[cc-3]
-                  @other_hash[first_key][second_key][ltv_key][third_key] = value
-                end
+        #         if r >= 39 && r <= 42 && cc >= 11 && cc <= 15
+        #           third_key = @ltv_data[cc-3]
+        #           @other_hash[first_key][second_key][ltv_key][third_key] = value
+        #         end
 
-                if r >= 45 && r <= 46 && cc == 10
-                  ltv_key = value
-                  @other_hash[first_key][second_key][ltv_key] = {}
-                end
+        #         if r >= 45 && r <= 46 && cc == 10
+        #           ltv_key = value
+        #           @other_hash[first_key][second_key][ltv_key] = {}
+        #         end
 
-                if r >= 45 && r <= 46 && cc >= 11 && cc <= 15
-                  third_key = @ltv_data[cc-3]
-                  @other_hash[first_key][second_key][ltv_key][third_key] = value
-                end
+        #         if r >= 45 && r <= 46 && cc >= 11 && cc <= 15
+        #           third_key = @ltv_data[cc-3]
+        #           @other_hash[first_key][second_key][ltv_key][third_key] = value
+        #         end
 
-                if r == 49 && cc == 10
-                  ltv_key = value
-                  @other_hash[first_key][second_key][ltv_key] = {}
-                end
+        #         if r == 49 && cc == 10
+        #           ltv_key = value
+        #           @other_hash[first_key][second_key][ltv_key] = {}
+        #         end
 
-                if r == 49 && cc >= 11 && cc <= 15
-                  third_key = @ltv_data[cc-3]
-                  @other_hash[first_key][second_key][ltv_key][third_key] = value
-                end
+        #         if r == 49 && cc >= 11 && cc <= 15
+        #           third_key = @ltv_data[cc-3]
+        #           @other_hash[first_key][second_key][ltv_key][third_key] = value
+        #         end
 
-                if r >= 52 && r <= 53 && cc == 10
-                  ltv_key = value
-                  @other_hash[first_key][second_key][ltv_key] = {}
-                end
+        #         if r >= 52 && r <= 53 && cc == 10
+        #           ltv_key = value
+        #           @other_hash[first_key][second_key][ltv_key] = {}
+        #         end
 
-                if r >= 52 && r <= 53 && cc >= 11 && cc <= 15
-                  third_key = @ltv_data[cc-3]
-                  @other_hash[first_key][second_key][ltv_key][third_key] = value
-                end
+        #         if r >= 52 && r <= 53 && cc >= 11 && cc <= 15
+        #           third_key = @ltv_data[cc-3]
+        #           @other_hash[first_key][second_key][ltv_key][third_key] = value
+        #         end
 
-                if r >= 56 && r <= 57 && cc == 10
-                  ltv_key = value
-                  @other_hash[first_key][second_key][ltv_key] = {}
-                end
+        #         if r >= 56 && r <= 57 && cc == 10
+        #           ltv_key = value
+        #           @other_hash[first_key][second_key][ltv_key] = {}
+        #         end
 
-                if r >= 56 && r <= 57 && cc >= 11 && cc <= 15
-                  third_key = @ltv_data[cc-3]
-                  @other_hash[first_key][second_key][ltv_key][third_key] = value
-                end
+        #         if r >= 56 && r <= 57 && cc >= 11 && cc <= 15
+        #           third_key = @ltv_data[cc-3]
+        #           @other_hash[first_key][second_key][ltv_key][third_key] = value
+        #         end
 
-                if value == "LTV/CLTV/HLTV/FICO "
-                  first_key = "FinancingType/LTV/CLTV/FICO"
-                  @adjustment_hash[first_key] = {}
-                end
-                if value == "<=1.0MM"
-                  secondary_key = "<=1.0MM"
-                  @adjustment_hash[first_key][secondary_key] = {}
-                end
-                if value == "<=1.5MM"
-                  secondary_key = "<=1.5MM"
-                  @adjustment_hash[first_key][secondary_key] = {}
-                end
-                if value == "<=2.0MM"
-                  secondary_key = "<=2.0MM"
-                  @adjustment_hash[first_key][secondary_key] = {}
-                end
-                if r >= 39 && r <= 43 && cc == 3
-                  ltv_key = value
-                  @adjustment_hash[first_key][secondary_key][ltv_key] = {}
-                end
-                if r >= 39 && r <= 43 && cc >= 4 && cc <= 8
-                  third_key = @ltv_data[cc-3]
-                  @adjustment_hash[first_key][secondary_key][ltv_key][third_key] = value
-                end
-                if r >= 46 && r <= 49 && cc == 3
-                  ltv_key = value
-                  @adjustment_hash[first_key][secondary_key][ltv_key] = {}
-                end
-                if r >= 46 && r <= 49 && cc >= 4 && cc <= 8
-                  third_key = @ltv_data[cc-3]
-                  @adjustment_hash[first_key][secondary_key][ltv_key][third_key] = value
-                end
-                if r >= 52 && r <= 55 && cc == 3
-                  ltv_key = value
-                  @adjustment_hash[first_key][secondary_key][ltv_key] = {}
-                end
-                if r >= 52 && r <= 55 && cc >= 4 && cc <= 8
-                  third_key = @ltv_data[cc-3]
-                  @adjustment_hash[first_key][secondary_key][ltv_key][third_key] = value
-                end
+        #         if value == "LTV/CLTV/HLTV/FICO "
+        #           first_key = "FinancingType/LTV/CLTV/FICO"
+        #           @adjustment_hash[first_key] = {}
+        #         end
+        #         if value == "<=1.0MM"
+        #           secondary_key = "<=1.0MM"
+        #           @adjustment_hash[first_key][secondary_key] = {}
+        #         end
+        #         if value == "<=1.5MM"
+        #           secondary_key = "<=1.5MM"
+        #           @adjustment_hash[first_key][secondary_key] = {}
+        #         end
+        #         if value == "<=2.0MM"
+        #           secondary_key = "<=2.0MM"
+        #           @adjustment_hash[first_key][secondary_key] = {}
+        #         end
+        #         if r >= 39 && r <= 43 && cc == 3
+        #           ltv_key = value
+        #           @adjustment_hash[first_key][secondary_key][ltv_key] = {}
+        #         end
+        #         if r >= 39 && r <= 43 && cc >= 4 && cc <= 8
+        #           third_key = @ltv_data[cc-3]
+        #           @adjustment_hash[first_key][secondary_key][ltv_key][third_key] = value
+        #         end
+        #         if r >= 46 && r <= 49 && cc == 3
+        #           ltv_key = value
+        #           @adjustment_hash[first_key][secondary_key][ltv_key] = {}
+        #         end
+        #         if r >= 46 && r <= 49 && cc >= 4 && cc <= 8
+        #           third_key = @ltv_data[cc-3]
+        #           @adjustment_hash[first_key][secondary_key][ltv_key][third_key] = value
+        #         end
+        #         if r >= 52 && r <= 55 && cc == 3
+        #           ltv_key = value
+        #           @adjustment_hash[first_key][secondary_key][ltv_key] = {}
+        #         end
+        #         if r >= 52 && r <= 55 && cc >= 4 && cc <= 8
+        #           third_key = @ltv_data[cc-3]
+        #           @adjustment_hash[first_key][secondary_key][ltv_key][third_key] = value
+        #         end
 
-              end
-            end
-          end
-        end
-        adjustment = [@adjustment_hash,@other_hash]
-        make_adjust(adjustment,sheet)
+        #       end
+        #     end
+        #   end
+        # end
+        # adjustment = [@adjustment_hash,@other_hash]
+        # make_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_ob_union_home_mortgage_wholesale1711_path(@sheet_obj)

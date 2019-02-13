@@ -65,30 +65,31 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
                 program_property
-              end
-              @block_hash = {}
-              key = ''
-              (1..14).each do |max_row|
-                @data = []
-                (0..3).each_with_index do |index, c_i|
-                  rrr = rr + max_row
-                  ccc = cc + c_i
-                  value = sheet_data.cell(rrr,ccc)
-                  if value.present?
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[key] = {}
-                    else
-                      @block_hash[key][15*c_i] = value
+                
+                @block_hash = {}
+                key = ''
+                (1..14).each do |max_row|
+                  @data = []
+                  (0..3).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        @block_hash[key][15*c_i] = value
+                      end
+                      @data << value
                     end
-                    @data << value
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
                   end
                 end
-                if @data.compact.reject { |c| c.blank? }.length == 0
-                  break # terminate the loop
-                end
-              end
-              @program.update(base_rate: @block_hash)
+                @program.update(base_rate: @block_hash)
+              end  
             end
           end
         end
