@@ -199,16 +199,18 @@
         <th>Program Name</th>
         <th>Base Rate</th>
         <th>Sheet Name</th>
+        <th>Adjustments Points</th>
       </tr>
     </thead>
     <tbody>
-    <% if @programs.present? %>
-      <% @programs.each_with_index do |program, index|%>
+    <% if @result.present? %>
+      <% @result.each_with_index do |program, index|%>
         <tr>
           <td><%= index +1 %></td>
-          <td><%= program.program_name%></td>
-          <td><%= program.base_rate[program.base_rate.keys.first][@interest.to_f.to_s][@lock_period] %></td>
-          <td><%= program.sheet_name %></td>
+          <td><%= program[:program_name] %></td>
+          <td><%= program[:base_rate] %></td>
+          <td><%= program[:sheet_name] %></td>
+          <td><%= program[:adj_points] %></td>
         </tr>
       <%end%>
     <%end%>
