@@ -231,7 +231,11 @@
         <tr>
           <td>1</td>
           <td>New Penn Financial</td>
-          <td class="text-center"><a class='btn btn-info btn-xs' href="<%=import_files_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
+          <td class="text-center">
+            <%= link_to import_files_path, :class => 'btn btn-info btn-xs' do %>
+              <span class="glyphicon glyphicon-edit">View</span>
+            <% end %>
+          </td>
         </tr>
         <tr>
           <td>2</td>

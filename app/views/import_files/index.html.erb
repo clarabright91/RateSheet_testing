@@ -67,7 +67,10 @@
           <td><%= index +1 %></td>
           <td><%= bank.name%></td>
           <td><%= bank.phone%></td>
-          <td class="text-center"><a class='btn btn-info btn-xs' href="<%=import_files_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
+          <td class="text-center">
+            <%= link_to import_files_path, :class => 'btn btn-info btn-xs' do %>
+              <span class="glyphicon glyphicon-edit"> View</span>
+            <% end %>
         </tr>
       <%end%>
     <% end %>
