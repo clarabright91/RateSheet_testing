@@ -2320,7 +2320,7 @@ class ObCmgWholesalesController < ApplicationController
                   @adjustment_hash["RefinanceOption/LoanAmount/FICO/LTV"]["Cash Out"][secondary_key][cltv_key] = value
                 end
                 if r >= 69 && r <= 74 && cc == 1
-                  secondary_key = value
+                  secondary_key = value.split("s").first
                   @adjustment_hash["RefinanceOption/PropertyType/LTV"]["Cash Out"][secondary_key] = {}
                 end
                 if r >= 69 && r <= 74 && cc >= 6 && cc <= 14
@@ -2800,7 +2800,7 @@ class ObCmgWholesalesController < ApplicationController
                 end
                 if r >= 25 && r <= 31 && cc == 10
                   if value.include?("(N/A for Investment Properties)")
-                    secondary_key = value.split("(N/A for Investment Properties)").first
+                    secondary_key = value.split("s (N/A for Investment Properties)").first
                   else
                     secondary_key = value
                   end
