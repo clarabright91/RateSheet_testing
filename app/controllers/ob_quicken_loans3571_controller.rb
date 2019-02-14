@@ -1,6 +1,6 @@
 class ObQuickenLoans3571Controller < ApplicationController
-	before_action :get_sheet, only: [:programs, :ws_du_lp_pricing, :durp_lp_relief_pricing, :fha_usda_full_doc_pricing, :fha_streamline_pricing, :va_full_doc_pricing, :va_irrrl_pricing_govy_llpas, :na_jumbo_pricing_llpas, :du_lp_llpas, :durp_lp_relief_llpas]
-  before_action :read_sheet, only: [:index,:ws_du_lp_pricing, :durp_lp_relief_pricing, :fha_usda_full_doc_pricing, :fha_streamline_pricing, :va_full_doc_pricing, :va_irrrl_pricing_govy_llpas, :na_jumbo_pricing_llpas, :du_lp_llpas, :durp_lp_relief_llpas]
+	before_action :get_sheet, only: [:programs, :ws_du_lp_pricing, :durp_lp_relief_pricing, :fha_usda_full_doc_pricing, :fha_streamline_pricing, :va_full_doc_pricing, :va_irrrl_pricing_govy_llpas, :na_jumbo_pricing_llpas, :du_lp_llpas, :durp_lp_relief_llpas, :lpmi]
+  before_action :read_sheet, only: [:index,:ws_du_lp_pricing, :durp_lp_relief_pricing, :fha_usda_full_doc_pricing, :fha_streamline_pricing, :va_full_doc_pricing, :va_irrrl_pricing_govy_llpas, :na_jumbo_pricing_llpas, :du_lp_llpas, :durp_lp_relief_llpas, :lpmi]
   before_action :get_program, only: [:single_program, :program_property]
 
 	def index
@@ -1147,6 +1147,7 @@ class ObQuickenLoans3571Controller < ApplicationController
       if (sheet == "NA Jumbo Pricing & LLPAs")
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
+        @adjustment_hash = {}
         # programs
         (7..50).each do |r|
           row = sheet_data.row(r)
@@ -1188,155 +1189,153 @@ class ObQuickenLoans3571Controller < ApplicationController
             end
           end
         end
+        # Adjustments
+        (56..94).each do |r|
+          row = sheet_data.row(r)
+          if row.compact.count > 1
+            (0..29).each do |cc|
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if r == 70 && cc == 5
+                  secondary_key = value.tr('A-Za-z><= ','')+"-Inf"
+                  @adjustment_hash["LoanAmount"] = {}
+                  @adjustment_hash["LoanAmount"][secondary_key] = {}
+                  cc = cc + 10
+                  new_value = sheet_data.cell(r,cc)
+                  @adjustment_hash["LoanAmount"][secondary_key] = new_value
+                end
+                if r == 73 && cc == 5
+                  @adjustment_hash["PropertyType/Term/LTV"] = {}
+                  @adjustment_hash["PropertyType/Term/LTV"]["Investment Property"] = {}
+                  @adjustment_hash["PropertyType/Term/LTV"]["Investment Property"]["30"] = {}
+                  @adjustment_hash["PropertyType/Term/LTV"]["Investment Property"]["30"]["0-60"] = {}
+                  cc = cc + 10
+                  new_value = sheet_data.cell(r,cc)
+                  @adjustment_hash["PropertyType/Term/LTV"]["Investment Property"]["30"]["0-60"] = new_value
+                end
+                if r == 74 && cc == 5
+                  @adjustment_hash["PropertyType/Term/LTV"]["Investment Property"]["15"] = {}
+                  @adjustment_hash["PropertyType/Term/LTV"]["Investment Property"]["15"]["0-60"] = {}
+                  cc = cc + 10
+                  new_value = sheet_data.cell(r,cc)
+                  @adjustment_hash["PropertyType/Term/LTV"]["Investment Property"]["15"]["0-60"] = new_value
+                end
+              end
+            end
+          end
+        end
+        adjustment = [@adjustment_hash]
+        make_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_ob_quicken_loans3571_path(@sheet_obj)
   end
 
-  # def durp_lp_relief_llpas
-  # 	@xlsx.sheets.each do |sheet|
-  #     if (sheet == "DURP & LP Relief LLPAs")
-  #       sheet_data = @xlsx.sheet(sheet)
-  #       @adjustment_hash = {}
-  #       @subordinate_hash = {}
-  #       @property_hash = {}
-  #       @cashout_hash = {}
-  #       primary_key = ''
-  #       primary_key1 = ''
-  #       secondary_key1 = ''
-  #       secondary_key = ''
-  #       ltv_key = ''
-  #       ltv_key1 = ''
-  #       cltv_key = ''
-  #       new_key = ''
-  #       # Adjustments
-  #       (29..79).each do |r|
-  #       	row = sheet_data.row(r)
-  #       	@ltv_data = sheet_data.row(30)
-  #       	@cltv_data = sheet_data.row(50)
-  #       	if row.compact.count
-  #       		(0..25).each do |cc|
-  #       			value = sheet_data.cell(r,cc)
-  #       			if value.present?
-  #       				if value == "DURP LTV/FICO; Terms > 15 Years, Including ARMs"
-		# 							primary_key = "Durp/LoanType/Term/FICO/LTV"
-		# 							@adjustment_hash[primary_key] = {}
-  #       				end
-  #       				if value == "LP Relief LTV/FICO; Terms > 15 Years, Including ARMs"
-		# 							primary_key = "LP/LoanType/Term/FICO/LTV"
-		# 							@adjustment_hash[primary_key] = {}
-  #       				end
-  #       				if value == "Subordinate Financing"
-  #       					primary_key = "FinancingType/LTV/CLTV/FICO"
-  #       					@subordinate_hash[primary_key] = {}
-  #       				end
-  #       				if value == "Multiple Unit Property"
-  #       					primary_key = "PropertyType/LTV"
-  #       					@property_hash[primary_key] = {}
-  #       				end
-        				
-  #       				# DURP LTV/FICO; Terms > 15 Years, Including ARMs
-  #       				if r >= 31 && r <= 37 && cc == 3
-  #       					secondary_key = get_value value
-  #       					@adjustment_hash[primary_key][secondary_key] = {}
-  #       				end
-  #       				if r >= 31 && r <= 37 && cc >= 5 && cc <= 25
-  #       					ltv_key = get_value @ltv_data[cc-1]
-  #       					@adjustment_hash[primary_key][secondary_key][ltv_key] = {}
-  #       					@adjustment_hash[primary_key][secondary_key][ltv_key] = value
-  #       				end
-  #       				# LP Relief LTV/FICO; Terms > 15 Years, Including ARMs
-  #       				if r >= 41 && r <= 47 && cc == 3
-  #       					secondary_key = get_value value
-  #       					@adjustment_hash[primary_key][secondary_key] = {}
-  #       				end
-  #       				if r >= 41 && r <= 47 && cc >= 5 && cc <= 25
-  #       					ltv_key = get_value @ltv_data[cc-1]
-  #       					@adjustment_hash[primary_key][secondary_key][ltv_key] = {}
-  #       					@adjustment_hash[primary_key][secondary_key][ltv_key] = value
-  #       				end
-  #       				# Subordinate Financing
-  #       				if r >= 51 && r <= 53 && cc == 3
-  #       					new_key = "DU"
-  #       					@subordinate_hash[primary_key][new_key] = {}
-  #       				end
-  #       				if r >= 54 && r <= 59 && cc == 3
-  #       					new_key = "LP"
-  #       					@subordinate_hash[primary_key][new_key] = {}
-  #       				end
-  #       				if r >= 51 && r <= 53 && cc == 5 || r >= 54 && r <= 59 && cc == 5
-  #       					secondary_key = get_value value
-  #       					@subordinate_hash[primary_key][new_key][secondary_key]  = {}
-  #       				end
-  #       				if r >= 51 && r <= 53 && cc == 7 || r >= 54 && r <= 59 && cc == 7
-  #       					cltv_key = get_value value
-  #       					@subordinate_hash[primary_key][new_key][secondary_key][cltv_key] = {}
-  #       				end
-  #       				if r >= 51 && r <= 53 && cc >= 10 && cc <= 12 || r >= 54 && r <= 59 && cc >= 10 && cc <= 12
-  #       					ltv_key = get_value @cltv_data[cc-1]
-  #       					@subordinate_hash[primary_key][new_key][secondary_key][cltv_key][ltv_key] = {}
-  #       					@subordinate_hash[primary_key][new_key][secondary_key][cltv_key][ltv_key] = value
-  #       				end
-  #       				if r == 60 && cc == 5
-  #       					secondary_key = get_value value
-  #       					@subordinate_hash[primary_key][secondary_key] = {}
-  #       				end
-  #       				if r == 60 && cc >= 7 && cc <= 12
-  #       					ltv_key = get_value @cltv_data[cc-1]
-  #       					@subordinate_hash[primary_key][secondary_key][ltv_key] = {}
-  #       					@subordinate_hash[primary_key][secondary_key][ltv_key] = value
-  #       				end
-        				
-  #       				# Multiple Unit Property
-  #       				if r >= 63 && r <= 64 && cc == 3
-  #       					secondary_key = value.split("Property").first
-  #       					@property_hash[primary_key][secondary_key] = {}
-  #       					if @property_hash[primary_key][secondary_key] = {}
-  #       						cc = cc + 9
-  #       						new_value = sheet_data.cell(r,cc)
-  #       						@property_hash[primary_key][secondary_key] = new_value
-  #       					end
-  #       				end
-  #       				if r == 65 && cc == 3
-  #       					secondary_key = value.split("Property").first
-  #       					new_key = "0 < 80" 
-  #       					@property_hash[primary_key][secondary_key] = {}
-  #       					@property_hash[primary_key][secondary_key][new_key] = {}
-  #       					if @property_hash[primary_key][secondary_key][new_key] = {}
-  #       						cc = cc + 9
-  #       						new_value = sheet_data.cell(r,cc)
-  #       						@property_hash[primary_key][secondary_key][new_key] = new_value
-  #       					end
-  #       				end
-  #       				if r == 66 && cc == 3
-  #       					new_key = "80-85" 
-  #       					@property_hash[primary_key][secondary_key][new_key] = {}
-  #       					if @property_hash[primary_key][secondary_key][new_key] = {}
-  #       						cc = cc + 9
-  #       						new_value = sheet_data.cell(r,cc)
-  #       						@property_hash[primary_key][secondary_key][new_key] = new_value
-  #       					end
-  #       				end
-  #       				if r == 67 && cc == 3
-  #       					new_key = "> 85" 
-  #       					@property_hash[primary_key][secondary_key][new_key] = {}
-  #       					if @property_hash[primary_key][secondary_key][new_key] = {}
-  #       						cc = cc + 9
-  #       						new_value = sheet_data.cell(r,cc)
-  #       						@property_hash[primary_key][secondary_key][new_key] = new_value
-  #       					end
-  #       				end
-  #       			end
-  #       		end
-  #       	end
-  #       end
-  #       adjustment = [@adjustment_hash,@subordinate_hash,@property_hash,@cashout_hash]
-  #       make_adjust(adjustment,sheet)
-  #       create_program_association_with_adjustment(sheet)
-  #     end
-  #   end
-  #   redirect_to programs_ob_quicken_loans3571_path(@sheet_obj)
-  # end
+  def lpmi
+    @xlsx.sheets.each do |sheet|
+      if (sheet == "LPMI")
+        sheet_data = @xlsx.sheet(sheet)
+        @programs_ids = []
+        @adjustment_hash = {}
+        @additional_adjustment = {}
+        secondary_key = ''
+        ltv_key = ''
+        # Adjustments
+        (7..49).each do |r|
+          row = sheet_data.row(r)
+          @ltv_data = sheet_data.row(8)
+          if row.compact.count >= 1
+            (0..13).each do |cc|
+              value = sheet_data.cell(r,cc)
+              if value.present?  
+                if value == "30-26 Years Fixed & ARMs"
+                  @adjustment_hash["LPMI/LoanType/Term/FICO/LTV"] = {}
+                  @adjustment_hash["LPMI/LoanType/Term/FICO/LTV"][true] = {}
+                  @adjustment_hash["LPMI/LoanType/Term/FICO/LTV"][true]["Fixed"] = {}
+                  @adjustment_hash["LPMI/LoanType/Term/FICO/LTV"][true]["Fixed"]["30-26"] = {}
+                  @adjustment_hash["LPMI/LoanType/Term/FICO/LTV"][true]["ARM"] = {}
+                  @adjustment_hash["LPMI/LoanType/Term/FICO/LTV"][true]["ARM"]["30-26"] = {}
+                end
+                if value == "30 Year Fixed: Freddie Home Possible "
+                  @adjustment_hash["FreddieMacProduct/LoanType/Term/FICO/LTV"] = {}
+                  @adjustment_hash["FreddieMacProduct/LoanType/Term/FICO/LTV"]["Home Possible"] = {}
+                  @adjustment_hash["FreddieMacProduct/LoanType/Term/FICO/LTV"]["Home Possible"]["Fixed"] = {}
+                  @adjustment_hash["FreddieMacProduct/LoanType/Term/FICO/LTV"]["Home Possible"]["Fixed"]["30"] = {}
+                end
+                if value == "25-21 Years Fixed"
+                  @additional_adjustment["LoanType/Term"] = {}
+                  @additional_adjustment["LoanType/Term"]["Fixed"] = {}
+                  @additional_adjustment["LoanType/Term"]["Fixed"]["25-21"] = {}
+                  @additional_adjustment["LoanType/Term"]["Fixed"]["20-8"] = {}
+                  @additional_adjustment["PropertyType/FICO"] = {}
+                end
+                # 30-26 Years Fixed & ARMs
+                if r >= 9 && r <= 12 && cc == 3
+                  secondary_key = get_value value
+                  @adjustment_hash["LPMI/LoanType/Term/FICO/LTV"][true]["Fixed"]["30-26"][secondary_key] = {}
+                  @adjustment_hash["LPMI/LoanType/Term/FICO/LTV"][true]["ARM"]["30-26"][secondary_key] = {}
+                end
+                if r >= 9 && r <= 12 && cc >= 4 && cc <= 13
+                  ltv_key = get_value @ltv_data[cc-2]
+                  @adjustment_hash["LPMI/LoanType/Term/FICO/LTV"][true]["Fixed"]["30-26"][secondary_key][ltv_key] = {}
+                  @adjustment_hash["LPMI/LoanType/Term/FICO/LTV"][true]["Fixed"]["30-26"][secondary_key][ltv_key] = value
+                  @adjustment_hash["LPMI/LoanType/Term/FICO/LTV"][true]["ARM"]["30-26"][secondary_key][ltv_key] = {}
+                  @adjustment_hash["LPMI/LoanType/Term/FICO/LTV"][true]["ARM"]["30-26"][secondary_key][ltv_key] = value
+                end
+                # 30 Year Fixed: Freddie Home Possible 
+                if r >= 18 && r <= 21 && cc == 3
+                  secondary_key = get_value value
+                  @adjustment_hash["FreddieMacProduct/LoanType/Term/FICO/LTV"]["Home Possible"]["Fixed"]["30"][secondary_key] = {}
+                end
+                if r >= 18 && r <= 21 && cc >= 4 && cc <= 13
+                  ltv_key = get_value @ltv_data[cc-2]
+                  @adjustment_hash["FreddieMacProduct/LoanType/Term/FICO/LTV"]["Home Possible"]["Fixed"]["30"][secondary_key][ltv_key] = {}
+                  @adjustment_hash["FreddieMacProduct/LoanType/Term/FICO/LTV"]["Home Possible"]["Fixed"]["30"][secondary_key][ltv_key] = value
+                end
+                # 25-21 Years Fixed
+                if r >= 27 && r <= 30 && cc == 3
+                  secondary_key = get_value value
+                  @additional_adjustment["LoanType/Term"]["Fixed"]["25-21"][secondary_key] = {}
+                end
+                if r >= 27 && r <= 30 && cc >= 4 && cc <= 13
+                  ltv_key = get_value @ltv_data[cc-2]
+                  @additional_adjustment["LoanType/Term"]["Fixed"]["25-21"][secondary_key][ltv_key] = {}
+                  @additional_adjustment["LoanType/Term"]["Fixed"]["25-21"][secondary_key][ltv_key] = value
+                end
+                # 20-8 Years Fixed
+                if r >= 36 && r <= 39 && cc == 3
+                  secondary_key = get_value value
+                  @additional_adjustment["LoanType/Term"]["Fixed"]["20-8"][secondary_key] = {}
+                end
+                if r >= 36 && r <= 39 && cc >= 4 && cc <= 13
+                  ltv_key = get_value @ltv_data[cc-2]
+                  @additional_adjustment["LoanType/Term"]["Fixed"]["20-8"][secondary_key][ltv_key] = {}
+                  @additional_adjustment["LoanType/Term"]["Fixed"]["20-8"][secondary_key][ltv_key] = value
+                end
+                # Misc Adjustments
+                if r >= 47 && r <= 49 && cc == 3
+                  if value == "Inv. Prop"
+                    secondary_key = "Investment Property"
+                  else
+                    secondary_key = get_value value
+                  end
+                  @additional_adjustment["PropertyType/FICO"][secondary_key] = {}
+                end
+                if r >= 47 && r <= 49 && cc >= 4 && cc <= 13
+                  ltv_key = get_value @ltv_data[cc-2]
+                  @additional_adjustment["PropertyType/FICO"][secondary_key][ltv_key] = {}
+                  @additional_adjustment["PropertyType/FICO"][secondary_key][ltv_key] = value
+                end
+              end
+            end
+          end
+        end
+        adjustment = [@adjustment_hash,@additional_adjustment]
+        make_adjust(adjustment,sheet)
+      end
+    end
+    redirect_to programs_ob_quicken_loans3571_path(@sheet_obj)
+  end
 
   def programs
     @programs = @sheet_obj.programs
@@ -1359,8 +1358,8 @@ class ObQuickenLoans3571Controller < ApplicationController
       if value1.present?
 				if value1.include?("<=") || value1.include?("<")
           value1 = "0-"+value1.tr('A-Z<>=%$ ', '')
-        elsif value1.include?(">=") || value1.include?(">")
-        	value1 = value1.tr('A-Z<>$%= ','')+"-Inf"
+        elsif value1.include?(">=") || value1.include?(">") || value1.include?("+")
+        	value1 = value1.tr('A-Z<>$%=+ ','')+"-Inf"
         elsif value1.include?("-")
           value1 = value1.tr('A-Z<>$%= ','')
         else
