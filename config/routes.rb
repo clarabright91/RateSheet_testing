@@ -2,7 +2,7 @@ require 'sidekiq/web'
 Rails.application.routes.draw do
   root :to => "dashboard#index"
   # root :to => "import_files#index"
-  resources :import_files, only: [:index] do
+  resources :import_files, :only => [:index] do
     member do
       get :programs
       get :import_government_sheet
