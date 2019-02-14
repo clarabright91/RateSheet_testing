@@ -89,12 +89,6 @@ Rails.application.configure do
     config.logger    = ActiveSupport::TaggedLogging.new(logger)
   end
 
-  begin
-    require 'minitest/autorun'
-  rescue LoadError => e
-    raise e unless ENV['RAILS_ENV'] == "production"
-  end
-
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
