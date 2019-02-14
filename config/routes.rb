@@ -178,5 +178,5 @@ Rails.application.routes.draw do
   end
 
   match "dashboard/index", to: 'dashboard#index', via: [:get, :post]
-  mount Sidekiq::Web => '/sidekiq'
+  # mount Sidekiq::Web => '/sidekiq'
 end
