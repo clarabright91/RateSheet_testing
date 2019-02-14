@@ -1,5 +1,7 @@
 class ImportFilesController < ApplicationController
-  before_action :get_bank, only: [:import_government_sheet, :programs, :import_freddie_fixed_rate, :import_conforming_fixed_rate, :home_possible, :conforming_arms, :lp_open_acces_arms, :lp_open_access_105, :lp_open_access, :du_refi_plus_arms, :du_refi_plus_fixed_rate_105, :du_refi_plus_fixed_rate, :dream_big, :high_balance_extra, :freddie_arms, :jumbo_series_d,:jumbo_series_f, :jumbo_series_h, :jumbo_series_i, :jumbo_series_jqm, :import_homereddy_sheet, :import_HomeReadyhb_sheet]
+  # before_action :get_bank, only: [:import_government_sheet, :programs, :import_freddie_fixed_rate, :import_conforming_fixed_rate, :home_possible, :conforming_arms, :lp_open_acces_arms, :lp_open_access_105, :lp_open_access, :du_refi_plus_arms, :du_refi_plus_fixed_rate_105, :du_refi_plus_fixed_rate, :dream_big, :high_balance_extra, :freddie_arms, :jumbo_series_d,:jumbo_series_f, :jumbo_series_h, :jumbo_series_i, :jumbo_series_jqm, :import_homereddy_sheet, :import_HomeReadyhb_sheet]
+  before_action :get_sheet, only: [:government, :programs, :freddie_fixed_rate, :conforming_fixed_rate, :home_possible, :conforming_arms, :lp_open_acces_arms, :lp_open_access_105, :lp_open_access, :du_refi_plus_arms, :du_refi_plus_fixed_rate_105, :du_refi_plus_fixed_rate, :dream_big, :high_balance_extra, :freddie_arms, :jumbo_series_d,:jumbo_series_f, :jumbo_series_h, :jumbo_series_i, :jumbo_series_jqm, :homeready, :homeready_hb]
+  before_action :get_program, only: [:single_program, :program_property]
   require 'roo'
   require 'roo-xls'
 
@@ -39,13 +41,14 @@ class ImportFilesController < ApplicationController
           @bank = Bank.find_or_create_by(name: @name)
           @bank.update(phone: @phone, address1: @address_a.join, state_code: @state_code, zip: @zip)
         end
+        @sheet = @bank.sheets.find_or_create_by(name: sheet)
       end
     rescue Exception => e
       # the required headers are not all present
     end
   end
 
-  def import_government_sheet
+  def government
     @programs_ids = []
     file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -129,8 +132,8 @@ class ImportFilesController < ApplicationController
               if @title.include?("High Balance")
                 jumbo_high_balance = true
               end
-
-              @program = @bank.programs.find_or_create_by(program_name: @title)
+              
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               @programs_ids << @program.id
                 # Loan Limit Type
               if @title.include?("Non-Conforming")
@@ -175,10 +178,6 @@ class ImportFilesController < ApplicationController
                       key = value
                       @block_hash[key] = {}
                     else
-                      if @program.lock_period.length <= 3
-                        @program.lock_period << 15*c_i
-                        @programs.save
-                      end
                       @block_hash[key][15*c_i] = value
                     end
                     @data << value
@@ -311,11 +310,12 @@ class ImportFilesController < ApplicationController
         end
       end
     end
-    create_program_association_with_adjustment(sheet)
-    redirect_to programs_import_file_path(@bank)
+    # create_program_association_with_adjustment(sheet)
+    # redirect_to programs_import_file_path(@bank)
+    redirect_to programs_import_file_path(@sheet_obj)
   end
 
-  def import_freddie_fixed_rate
+  def freddie_fixed_rate
     @program_ids = []
     @allAdjustments = {}
     file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
@@ -384,7 +384,7 @@ class ImportFilesController < ApplicationController
                 fannie_mae = true
               end
 
-              @program = @bank.programs.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
                 # Loan Limit Type
               if @title.include?("Non-Conforming")
@@ -732,10 +732,10 @@ class ImportFilesController < ApplicationController
     # create adjustment for each program
     make_adjust(@allAdjustments, @sheet)
     create_program_association_with_adjustment(@sheet)
-    redirect_to programs_import_file_path(@bank, sheet: @sheet)
+    redirect_to programs_import_file_path(@sheet_obj)
   end
 
-  def import_conforming_fixed_rate
+  def conforming_fixed_rate
     program_ids = []
     @allAdjustments = {}
     file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
@@ -809,7 +809,7 @@ class ImportFilesController < ApplicationController
                 jumbo_high_balance = true
               end
 
-              @program = @bank.programs.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               program_ids << @program.id
                 # Loan Limit Type
               if @title.include?("Non-Conforming")
@@ -1132,7 +1132,7 @@ class ImportFilesController < ApplicationController
     # create adjustment for each program
     make_adjust(@allAdjustments, @sheet)
     create_program_association_with_adjustment(@sheet)
-    redirect_to programs_import_file_path(@bank, sheet: @sheet)
+    redirect_to programs_import_file_path(@sheet_obj)
   end
 
   def home_possible
@@ -1207,7 +1207,7 @@ class ImportFilesController < ApplicationController
                 fannie_mae = true
               end
 
-              @program = @bank.programs.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
               # Loan Limit Type
               if @title.include?("Non-Conforming")
@@ -1529,7 +1529,7 @@ class ImportFilesController < ApplicationController
     # create adjustment for each program
     make_adjust(@allAdjustments, @sheet)
     create_program_association_with_adjustment(@sheet)
-    redirect_to programs_import_file_path(@bank, sheet: @sheet)
+    redirect_to programs_import_file_path(@sheet_obj)
   end
 
   def lp_open_acces_arms
@@ -1616,7 +1616,7 @@ class ImportFilesController < ApplicationController
                 fannie_mae = true
               end
 
-              @program = @bank.programs.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
                # Loan Limit Type
               if @title.include?("Non-Conforming")
@@ -1804,7 +1804,7 @@ class ImportFilesController < ApplicationController
         create_program_association_with_adjustment(@sheet)
       end
     end
-    redirect_to programs_import_file_path(@bank, sheet: @sheet)
+    redirect_to programs_import_file_path(@sheet_obj)
   end
 
   def lp_open_access_105
@@ -1888,7 +1888,7 @@ class ImportFilesController < ApplicationController
                 fannie_mae = true
               end
 
-              @program = @bank.programs.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
               # Loan Limit Type
               if @title.include?("Non-Conforming")
@@ -2086,7 +2086,7 @@ class ImportFilesController < ApplicationController
         create_program_association_with_adjustment(@sheet)
       end
     end
-    redirect_to programs_import_file_path(@bank, sheet: @sheet)
+    redirect_to programs_import_file_path(@sheet_obj)
   end
 
   def jumbo_series_d
@@ -2129,7 +2129,7 @@ class ImportFilesController < ApplicationController
                 program_heading = @title.split
                 term =  program_heading[3]
                 loan_type = program_heading[5]
-                @program = @bank.programs.find_or_create_by(program_name: @title)
+                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids  << @program.id
                  # Loan Limit Type
               if @title.include?("Non-Conforming")
@@ -2672,7 +2672,7 @@ class ImportFilesController < ApplicationController
     # create adjustment for each program
     make_adjust(@all_data, @programs_ids)
     create_program_association_with_adjustment(@sheet)
-    redirect_to programs_import_file_path(@bank, sheet: @sheet)
+    redirect_to programs_import_file_path(@sheet_obj)
   end
 
   def lp_open_access
@@ -2760,7 +2760,7 @@ class ImportFilesController < ApplicationController
                 fannie_mae = true
               end
 
-              @program = @bank.programs.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
               # Loan Limit Type
               if @title.include?("Non-Conforming")
@@ -2962,7 +2962,7 @@ class ImportFilesController < ApplicationController
         create_program_association_with_adjustment(@sheet)
       end
     end
-    redirect_to programs_import_file_path(@bank, sheet: @sheet)
+    redirect_to programs_import_file_path(@sheet_obj)
   end
 
   def jumbo_series_f
@@ -3020,7 +3020,7 @@ class ImportFilesController < ApplicationController
                 arm_basic = @title.scan(/\d+/)[0].to_i
               end
 
-              @program = @bank.programs.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               # Loan Limit Type
               if @title.include?("Non-Conforming")
                 @program.loan_limit_type << "Non-Conforming"
@@ -3407,7 +3407,7 @@ class ImportFilesController < ApplicationController
         end
       end
     end
-    redirect_to programs_import_file_path(@bank, sheet: @sheet)
+    redirect_to programs_import_file_path(@sheet_obj)
   end
 
   def du_refi_plus_arms
@@ -3498,7 +3498,7 @@ class ImportFilesController < ApplicationController
                 jumbo_high_balance = true
               end
 
-              @program = @bank.programs.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
               # Loan Limit Type
               if @title.include?("Non-Conforming")
@@ -3673,7 +3673,7 @@ class ImportFilesController < ApplicationController
         create_program_association_with_adjustment(@sheet)
       end
     end
-    redirect_to programs_import_file_path(@bank, sheet: @sheet)
+    redirect_to programs_import_file_path(@sheet_obj)
   end
 
   def jumbo_series_h
@@ -3759,7 +3759,7 @@ class ImportFilesController < ApplicationController
                     loan_purpose = "Refinance"
                   end
 
-                @program = @bank.programs.find_or_create_by(program_name: @title)
+                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @program_ids << @program.id
                 # Loan Limit Type
                 if @title.include?("Non-Conforming")
@@ -3984,7 +3984,7 @@ class ImportFilesController < ApplicationController
         end
       end
     end
-    redirect_to programs_import_file_path(@bank)
+    redirect_to programs_import_file_path(@sheet_obj)
   end
 
   def du_refi_plus_fixed_rate_105
@@ -4056,7 +4056,7 @@ class ImportFilesController < ApplicationController
                 fannie_mae = true
               end
 
-              @program = @bank.programs.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
               # Loan Limit Type
               if @title.include?("Non-Conforming")
@@ -4437,7 +4437,7 @@ class ImportFilesController < ApplicationController
       end
     end
     create_program_association_with_adjustment(@sheet)
-    redirect_to programs_import_file_path(@bank, sheet: @sheet)
+    redirect_to programs_import_file_path(@sheet_obj)
   end
 
   def jumbo_series_i
@@ -4503,7 +4503,7 @@ class ImportFilesController < ApplicationController
                   end
 
 
-                @program = @bank.programs.find_or_create_by(program_name: @title)
+                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @program_ids << @program.id
                   # Loan Limit Type
                 if @title.include?("Non-Conforming")
@@ -4639,7 +4639,7 @@ class ImportFilesController < ApplicationController
         create_program_association_with_adjustment(@sheet)
       end
     end
-    redirect_to programs_import_file_path(@bank, sheet: @sheet)
+    redirect_to programs_import_file_path(@sheet_obj)
   end
 
   def du_refi_plus_fixed_rate
@@ -4718,7 +4718,7 @@ class ImportFilesController < ApplicationController
                 jumbo_high_balance = true
               end
 
-              @program = @bank.programs.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
               # Loan Limit Type
               if @title.include?("Non-Conforming")
@@ -4901,7 +4901,7 @@ class ImportFilesController < ApplicationController
         create_program_association_with_adjustment(@sheet)
       end
     end
-    redirect_to programs_import_file_path(@bank, sheet: @sheet)
+    redirect_to programs_import_file_path(@sheet_obj)
   end
 
   def jumbo_series_jqm
@@ -4968,7 +4968,7 @@ class ImportFilesController < ApplicationController
                 if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 LIBOR ARM") || @title.include?("7/1 LIBOR ARM") || @title.include?("10/1 LIBOR ARM")
                   arm_basic = @title.scan(/\d+/)[0].to_i
                 end
-                @program = @bank.programs.find_or_create_by(program_name: @title)
+                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @program_ids << @program.id
                 # Loan Limit Type
                 if @title.include?("Non-Conforming")
@@ -5164,7 +5164,7 @@ class ImportFilesController < ApplicationController
         create_program_association_with_adjustment(@sheet)
       end
     end
-    redirect_to programs_import_file_path(@bank, sheet: @sheet)
+    redirect_to programs_import_file_path(@sheet_obj)
   end
 
   def dream_big
@@ -5250,7 +5250,7 @@ class ImportFilesController < ApplicationController
                 fannie_mae = true
               end
 
-              @program = @bank.programs.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
               @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: sheet)
               @program.adjustments.destroy_all
@@ -5400,7 +5400,7 @@ class ImportFilesController < ApplicationController
         create_program_association_with_adjustment(@sheet)
       end
     end
-    redirect_to programs_import_file_path(@bank, sheet: @sheet)
+    redirect_to programs_import_file_path(@sheet_obj)
   end
 
   def high_balance_extra
@@ -5470,7 +5470,7 @@ class ImportFilesController < ApplicationController
                 jumbo_high_balance = true
               end
 
-              @program = @bank.programs.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
               # Loan Limit Type
               if @title.include?("Non-Conforming")
@@ -5599,7 +5599,7 @@ class ImportFilesController < ApplicationController
         create_program_association_with_adjustment(@sheet)
       end
     end
-    redirect_to programs_import_file_path(@bank, sheet: @sheet)
+    redirect_to programs_import_file_path(@sheet_obj)
   end
 
   def freddie_arms
@@ -5673,7 +5673,7 @@ class ImportFilesController < ApplicationController
                 fannie_mae = true
               end
 
-              @program = @bank.programs.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
               # Loan Limit Type
               if @title.include?("Non-Conforming")
@@ -5985,7 +5985,7 @@ class ImportFilesController < ApplicationController
     # create adjustment for each program
     make_adjust(@allAdjustments, @sheet)
     create_program_association_with_adjustment(@sheet)
-    redirect_to programs_import_file_path(@bank, sheet: @sheet)
+    redirect_to programs_import_file_path(@sheet_obj)
   end
 
   def conforming_arms
@@ -6060,7 +6060,7 @@ class ImportFilesController < ApplicationController
                 jumbo_high_balance = true
               end
 
-              @program = @bank.programs.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               @program_ids << @program.id
               # Loan Limit Type
               if @title.include?("Non-Conforming")
@@ -6369,10 +6369,10 @@ class ImportFilesController < ApplicationController
     # create adjustment for each program
     make_adjust(@allAdjustments, @sheet)
     create_program_association_with_adjustment(@sheet)
-    redirect_to programs_import_file_path(@bank, sheet: @sheet)
+    redirect_to programs_import_file_path(@sheet_obj)
   end
 
-  def import_homereddy_sheet
+  def homeready
     program_ids = []
     @allAdjustments = {}
     # xlsx = Roo::Spreadsheet.open("/home/yuva/Desktop/ratesheet/RateSheetExtractor/OB_NewRez_Wholesale5806 (1).xls")
@@ -6440,7 +6440,7 @@ class ImportFilesController < ApplicationController
                 fannie_mae_home_ready = true
               end
 
-              @program = @bank.programs.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               program_ids << @program.id
                # Loan Limit Type
               if @title.include?("Non-Conforming")
@@ -6764,10 +6764,10 @@ class ImportFilesController < ApplicationController
     # create adjustment for each program
     make_adjust(@allAdjustments, @sheet)
     create_program_association_with_adjustment(@sheet)
-    redirect_to programs_import_file_path(@bank, sheet: @sheet)
+    redirect_to programs_import_file_path(@sheet_obj)
   end
 
-  def import_HomeReadyhb_sheet
+  def homeready_hb
     program_ids = []
     @allAdjustments = {}
     file = File.join(Rails.root,  'OB_NewRez_Wholesale5806.xls')
@@ -6832,7 +6832,7 @@ class ImportFilesController < ApplicationController
               if @title.include?("Fannie Mae HomeReady")
                 fannie_mae_home_ready = true
               end
-              @program = @bank.programs.find_or_create_by(program_name: @title)
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               program_ids << @program.id
               @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, loan_purpose: "Purchase", fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, conforming: conforming, sheet_name: sheet)
               @program.adjustments.destroy_all
@@ -7127,14 +7127,25 @@ class ImportFilesController < ApplicationController
     # create adjustment for each program
     make_adjust(@allAdjustments, @sheet)
     create_program_association_with_adjustment(@sheet)
-    redirect_to programs_import_file_path(@bank, sheet: @sheet)
+    redirect_to programs_import_file_path(@sheet_obj)
   end
 
   def programs
-    @programs = @bank.programs.where(sheet_name: params[:sheet])
+    @programs = @sheet_obj.programs
+  end
+
+  def single_program
   end
 
   private
+
+    def get_sheet
+      @sheet_obj = Sheet.find(params[:id])
+    end
+
+    def get_program
+      @program = Program.find(params[:id])
+    end
 
   def get_bank
     @bank = Bank.find(params[:id])
@@ -7252,16 +7263,6 @@ class ImportFilesController < ApplicationController
       end
     end
   end
-
-  # def get_value value1
-  #   if value1.present?
-  #     if value1.include?("<")
-  #       value1 = "0"+value1
-  #     else
-  #       value1
-  #     end
-  #   end
-  # end
 
   def set_range value
     if value.split()[0].eql?("≤") then

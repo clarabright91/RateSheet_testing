@@ -5,9 +5,12 @@ Rails.application.routes.draw do
   resources :import_files, :only => [:index] do
     member do
       get :programs
-      get :import_government_sheet
-      get :import_freddie_fixed_rate
-      get :import_conforming_fixed_rate
+      get :cover_zone_1
+      get :heloc
+      get :smartseries
+      get :government
+      get :freddie_fixed_rate
+      get :conforming_fixed_rate
       get :home_possible
       get :conforming_arms
       get :lp_open_acces_arms
@@ -24,8 +27,9 @@ Rails.application.routes.draw do
       get :jumbo_series_h
       get :jumbo_series_i
       get :jumbo_series_jqm
-      get :import_HomeReadyhb_sheet
-      get :import_homereddy_sheet
+      get :homeready_hb
+      get :homeready
+      get :single_program
     end
   end
 
@@ -147,6 +151,7 @@ Rails.application.routes.draw do
       get :na_jumbo_pricing_llpas
       get :du_lp_llpas
       get :durp_lp_relief_llpas
+      get :lpmi
     end
   end
 
