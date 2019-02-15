@@ -13,16 +13,10 @@ class DashboardController < ApplicationController
     @base_rate = 0.0
     @filter_data = {}
     @interest = "4.375"
-    @lock_period =30
+    @lock_period ="30"
     @credit_score = 740
     @ltv = 81.0
     @cltv = 81.0
-    @property_type = "Manufactured Home"
-    @financing_type = "Subordinate Financing"
-    @refinance_option = "Cash Out"
-    @misc_adjuster = "CA Escrow Waiver (Full or Taxes Only)"
-    @premium_type = "Manufactured Home"
-    @state = "CA"
     @loan_size = "High-Balance"
     @loan_type = "Fixed"
     @term = 30
@@ -30,44 +24,43 @@ class DashboardController < ApplicationController
 
   def set_variable
     @cltv = params[:cltv].to_f if params[:cltv].present?
+    @state = params[:state].to_f if params[:state].present?
     @property_type = params[:property_type] if params[:property_type].present?
     @financing_type = params[:financing_type] if params[:financing_type].present?
     @refinance_option = params[:refinance_option] if params[:refinance_option].present?
     @misc_adjuster = params[:misc_adjuster] if params[:misc_adjuster].present?
+    @premium_type = params[:premium_type] if params[:premium_type].present?
 
     @interest = params[:interest] if params[:interest].present?
     @credit_score = params[:credit_score].to_i if params[:credit_score].present?
     @ltv = params[:ltv].to_f if params[:ltv].present?
     @lock_period = params[:lock_period] if params[:lock_period].present?
+    @fannie_mae_product = params[:fannie_mae_product] if params[:fannie_mae_product].present?
+    @fraddie_mac_product = params[:fraddie_mac_product] if params[:fraddie_mac_product].present?
+    @loan_amount = params[:loan_amount] if params[:loan_amount].present?
+    @program_category = params[:program_category] if params[:program_category].present?
+
     if params[:loan_type].present?
       @loan_type = params[:loan_type]
       @filter_data[:loan_type] = params[:loan_type]
       if params[:loan_type] =="ARM" && params[:arm_basic].present?
-        if params[:arm_basic] =="11"
-          @filter_data[:arm_basic] = 10
-          @filter_data[:arm_advanced] = "3-2-5"
-        elsif params[:arm_basic] =="12"
-          @filter_data[:arm_basic] = 5
-          @filter_data[:arm_advanced] = "3-2-5"
-        else
-          @filter_data[:arm_basic] = params[:arm_basic].to_i
+        @arm_basic = params[:arm_basic]
+        if params[:arm_basic].include?("/")
+          @filter_data[:arm_basic] = params[:arm_basic].split("/").first
+        end
+        if params[:arm_basic].include?("-")
+          @filter_data[:arm_basic] = params[:arm_basic].split("-").first
         end
       end
-
-      if params[:loan_type] =="Fixed" && params[:term].present?
-        @filter_data[:term] = params[:term].to_i
-        @term = params[:term].to_i
+      if params[:loan_type] =="ARM" && params[:arm_advanced].present?
+        @arm_advanced = params[:arm_advanced]
+        @filter_data[:arm_advanced] = params[:arm_advanced]
       end
+    end
 
-      if params[:loan_type] =="Floating" && params[:term].present?
-        @filter_data[:term] = params[:term].to_i
-        @term = params[:term].to_i
-      end
-
-      if  params[:loan_type] =="Variable" && params[:term].present?
-        @filter_data[:term] = params[:term].to_i
-        @term = params[:term].to_i
-      end
+    if (params[:term].present? && params[:loan_type] != "ARM")
+      @filter_data[:term] = params[:term].to_i
+      @term = params[:term].to_i
     end
 
     if params[:fannie_options].present?
@@ -109,12 +102,13 @@ class DashboardController < ApplicationController
     end
 
     if params[:loan_purpose].present?
+      @loan_purpose = params[:loan_purpose]
       @filter_data[:loan_purpose] = params[:loan_purpose]
     end
   end
 
   def find_base_rate
-    @program_list = Program.where(@filter_data)
+    @program_list = Program.where(@filter_data) 
     if @program_list.present?
       @programs =[]
       @program_list.each do |program|
@@ -150,7 +144,63 @@ class DashboardController < ApplicationController
           key_list.each_with_index do |key_name, key_index|
             if(Adjustment::INPUT_VALUES.include?(key_name))
               if key_index==0
-                # ((key_name == "PropertyType"
+                if key_name == "LockDay"
+                  if adj.data[first_key][@property_type].present?
+                    adj_key_hash[key_index] = @lock_period
+                  else
+                    break
+                  end
+                end
+                if key_name == "ArmBasic"
+                  if adj.data[first_key][@property_type].present?
+                    adj_key_hash[key_index] = @property_type
+                  else
+                    break
+                  end
+                end
+                if key_name == "ArmAdvanced"
+                  if adj.data[first_key][@property_type].present?
+                    adj_key_hash[key_index] = @property_type
+                  else
+                    break
+                  end
+                end
+                if key_name == "FannieMaeProduct"
+                  if adj.data[first_key][@property_type].present?
+                    adj_key_hash[key_index] = @property_type
+                  else
+                    break
+                  end
+                end
+                if key_name == "FreddieMacProduct"
+                  if adj.data[first_key][@property_type].present?
+                    adj_key_hash[key_index] = @property_type
+                  else
+                    break
+                  end
+                end
+                if key_name == "LoanPurpose"
+                  if adj.data[first_key][@property_type].present?
+                    adj_key_hash[key_index] = @property_type
+                  else
+                    break
+                  end
+                end
+                if key_name == "LoanAmount"
+                  if adj.data[first_key][@property_type].present?
+                    adj_key_hash[key_index] = @property_type
+                  else
+                    break
+                  end
+                end
+                if key_name == "ProgramCategory"
+                  if adj.data[first_key][@property_type].present?
+                    adj_key_hash[key_index] = @property_type
+                  else
+                    break
+                  end
+                end
+
                 if key_name == "PropertyType"
                   if adj.data[first_key][@property_type].present?
                     adj_key_hash[key_index] = @property_type
@@ -178,7 +228,7 @@ class DashboardController < ApplicationController
                       if ltv_key.include?("-")
                         if (ltv_key.split("-").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("-").second.strip.to_f)
                           adj.data[first_key][ltv_key]
-                          adj_key_hash[key_index] = ltv_key                          
+                          adj_key_hash[key_index] = ltv_key
                         end
                       end
                     end
@@ -1178,43 +1228,43 @@ class DashboardController < ApplicationController
               end
             else              
               if key_index==0
-                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc")                  
+                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo")
                   adj.data[first_key]["true"]
                   adj_key_hash[key_index] = "true"
                 end
               end
               if key_index==1
-                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc")                  
+                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo")
                   adj.data[first_key][adj_key_hash[key_index-1]]["true"]
                   adj_key_hash[key_index] = "true"
                 end
               end
               if key_index==2
-                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc")                  
+                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo")
                   adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"]
                   adj_key_hash[key_index] = "true"
                 end
               end
               if key_index==3
-                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc")                  
+                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo")
                   adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"]
                   adj_key_hash[key_index] = "true"
                 end
               end
               if key_index==4
-                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc")                  
+                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo")
                   adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"]
                   adj_key_hash[key_index] = "true"
                 end
               end
               if key_index==5
-                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc")                  
+                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo")
                   adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"]
                   adj_key_hash[key_index] = "true"
                 end
               end
               if key_index==6
-                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc")                  
+                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo")
                   adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"]
                   adj_key_hash[key_index] = "true"
                 end

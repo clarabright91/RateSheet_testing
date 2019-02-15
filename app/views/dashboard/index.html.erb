@@ -10,7 +10,7 @@
                   <% @loan_type_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"]]%>
                   <%= select_tag 'loan_type', options_for_select(@loan_type_list, (params[:loan_type] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control", :required => true} %>
                 </div>
-              </div>
+              </div>            
 
               <div class="col-md-2 term">
                 <div class="form-group">
@@ -24,11 +24,19 @@
 
               <div class="col-md-2 arm-basic">
                 <div class="form-group">
-                  <label>Term</label>
+                  <label>ARM Basic</label>
                   <div class="input-group">
-                   <% @term_list_arm =[["1/1 ARM",1], ["2/1 ARM",2], ["3/1 ARM",3], ["4/1 ARM",4], ["5/1 ARM",5], ["6/1 ARM",6], ["7/1 ARM",7], ["8/1 ARM",8], ["9/1 ARM",9], ["10/1 ARM",10], ["10/5 3-2-5 ARM",11], ["5/1 3-2-5 ARM",12]] %>
-                    <%= select_tag 'arm_basic', options_for_select(@term_list_arm, (params[:arm_basic] rescue nil)), { prompt: 'Select Term', :class=> "form-control", :id=>"arm_basic"}%>
+                   <% @arm_basic_list =[["1/1 ARM"],["2/1 ARM"],["3/1 ARM"],["7/1 ARM"],["10/1 ARM"],["5-1"],["5/1"]]%>
+                    <%= select_tag 'arm_basic', options_for_select(@arm_basic_list, (params[:arm_basic] rescue nil)), { prompt: 'Select ARM Basic', :class=> "form-control"} %>
                   </div>
+                </div>
+              </div>
+
+              <div class="col-md-2 arm-basic">
+                <div class="form-group">
+                  <label>ARM Advance</label>
+                  <% @arm_advanced_list =[["10/5"], ["5/1 3-2-5"]]%>
+                  <%= select_tag 'arm_advanced', options_for_select(@arm_advanced_list, (params[:arm_advanced] rescue nil)), { prompt: 'Select ARM Advance', :class=> "form-control"} %>
                 </div>
               </div>
 
@@ -67,7 +75,7 @@
                   <label>Loan Purpose</label>
                   <div class="input-group">
                     <% loan_purpose_list =[["Purchase"], ["Refinance"]]%>
-                    <%= select_tag 'loan_purpose', options_for_select(loan_purpose_list, (params[:loan_purpose] rescue nil)), { prompt: 'Select Loan Purpose', :class=> "form-control" }%>
+                    <%= select_tag 'loan_purpose', options_for_select(loan_purpose_list, (params[:loan_purpose] rescue nil)), {:class=> "form-control" }%>
                   </div>
                 </div>
               </div>
@@ -75,7 +83,7 @@
 
 
               <div class="col-md-2">
-                <div class="form-gLock Periodroup">
+                <div class="form-group">
                   <label>Interest Rate</label>
                    <% @interest_list =[["3.250"],["3.375"],["3.625"],["3.750"],["3.875"],["4.000"],["4.125"],["4.250"],["4.375"],["4.500"],["4.625"],["4.750"],["4.875"],["5.000"],["5.125"],["5.250"],["5.375"],["5.500"],["5.625"],["5.750"],["5.875"]]%>
                   <%= select_tag 'interest', options_for_select(@interest_list, @interest), :class=> "form-control" %>
@@ -87,7 +95,7 @@
                 <div class="form-group">
                   <label>Lock Period</label>
                   <div class="input-group">
-                    <% @lock_period_list =[["15 days", 15], ["30 days",30], ["45 days",45], ["60 days",60]]%>
+                    <% @lock_period_list =[["15 days","15"], ["30 days","30"], ["45 days","45"], ["60 days","60"]]%>
                     <%= select_tag 'lock_period', options_for_select(@lock_period_list, @lock_period), :class=> "form-control" %>
                   </div>
                 </div>
@@ -127,6 +135,46 @@
 
               <div class="col-md-2">
                 <div class="form-group">
+                  <label>State</label>
+                  <div class="input-group">
+                    <%@state_list = [["AL"],["AK"],["AZ"],["AR"],["CA"],["CO"],["CT"],["DE"],["FL"],["GA"],["HI"],["ID"],["IL"],["IN"],["IA"],["KS"],["KY"],["LA"],["ME"],["MD"],["MA"],["MI"],["MN"],["MS"],["MO"],["MT"],["NE"],["NV"],["NH"],["NJ"],["NM"],["NY"],["NC"],["ND"],["OH"],["OK"],["OR"],["PA"],["RI"],["SC"],["SD"],["TN"],["TX"],["UT"],["VT"],["VA"],["WA"],["WV"],["WI"],["WY"],["AS"],["DC"],["FM"],["GU"],["MH"],["MP"],["PW"],["PR"],["VI"]]%>
+                    <%= select_tag 'state', options_for_select(@state_list, (params[:state] rescue nil)), :class=> "form-control" %>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Fannie Mae Product</label>
+                  <% @fannie_mae_product_list =[["HomeReady"]]%>
+                  <%= select_tag 'fannie_mae_product', options_for_select(@fannie_mae_product_list, (params[:fannie_mae_product] rescue nil)), { :class=> "form-control", :required => true} %>
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Fraddie Mac Product</label>
+                  <% @fraddie_mac_product_list =[["Home Possible"]]%>
+                  <%= select_tag 'fraddie_mac_product', options_for_select(@fraddie_mac_product_list, (params[:fraddie_mac_product] rescue nil)), { :class=> "form-control", :required => true} %>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Loan Amount</label>
+                  <% @loan_amount_list =[["$100,000 - $199,000"], ["$200,000 - $349,999"], ["$350,000 - $849,999"], [">= $850,000"]]%>
+                  <%= select_tag 'loan_amount', options_for_select(@loan_amount_list, (params[:loan_amount] rescue nil)), { :class=> "form-control", :required => true} %>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Program Category</label>
+                  <% @program_category_list =[["Non-Qm 7900"], ["QM 6900"]]%>
+                  <%= select_tag 'program_category', options_for_select(@program_category_list, (params[:program_category] rescue nil)), { :class=> "form-control", :required => true} %>
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <div class="form-group">
                   <label>Property Type</label>
                   <div class="input-group">
                     <%@property_type_values = [["Manufactured Home"],["2nd Home"],["3-4 Unit"],["Non-Owner Occupied"],["Condo"],["2-4 Unit"],["Investment Property"]] %>
@@ -159,7 +207,7 @@
                 <div class="form-group">
                   <label>Misc Adjuster</label>
                   <div class="input-group">                    
-                    <%@misc_adjuster_values = [["CA Escrow Waiver (Full or Taxes Only)"], ["CA Escrow Waiver (Insurance Only)"]]%>
+                    <%@misc_adjuster_values = [["CA Escrow Waiver (Full or Taxes Only)"], ["CA Escrow Waiver (Insurance Only)"], ["Miscellaneous"]]%>
                     <%= select_tag 'misc_adjuster', options_for_select(@misc_adjuster_values, (params[:misc_adjuster] rescue nil)), :class=> "form-control" %>
                   </div>
                 </div>
