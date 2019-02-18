@@ -22,6 +22,7 @@ class Adjustment < ApplicationRecord
     "Non Owner Occupied" => "PropertyType/LTV",
     "Loan Size Adjustments" => "LoanType/Conforming/LTV/FICO",
     "Super Conforming" => "Conforming/LTV/FICO",
+    "Super Conforming Adjustments" => "LoanPurpose/RefinanceOption",
     "Subordinate Financing\nExcludes Community Seconds®" => "FinancingType/LTV/CLTV/FICO"
   }
 
@@ -68,7 +69,6 @@ class Adjustment < ApplicationRecord
       14 => {"85.01 - 90" => "85.01"},
     }
   }
-
 
   JUMBO_SERIES_I_ADJUSTMENT = {
     5 => {"≤ 60" => "0"},
@@ -123,7 +123,6 @@ class Adjustment < ApplicationRecord
       5 => {">= 720" => "720"}
     }
   }
-
 
   ALL_IP = {
     5 => {"<=80" => "0"},
