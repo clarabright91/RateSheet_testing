@@ -161,7 +161,7 @@
               <div class="col-md-2">
                 <div class="form-group">
                   <label>Loan Amount</label>
-                  <% @loan_amount_list =[["$100,000 - $199,000"], ["$200,000 - $349,999"], ["$350,000 - $849,999"], [">= $850,000"]]%>
+                  <% @loan_amount_list =[["$0 - $99,999", 99999], ["$100,000 - $199,000", 100000], ["$200,000 - $349,999", 200000], ["$350,000 - $849,999", 849999], [">= $850,000", 850000]]%>
                   <%= select_tag 'loan_amount', options_for_select(@loan_amount_list, (params[:loan_amount] rescue nil)), { :class=> "form-control", :required => true} %>
                 </div>
               </div>
