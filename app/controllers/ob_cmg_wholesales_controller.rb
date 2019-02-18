@@ -3524,7 +3524,9 @@ class ObCmgWholesalesController < ApplicationController
     def make_adjust(block_hash, sheet)
       block_hash.each do |hash|
         hash.each do |key|
-          Adjustment.create(data: key,sheet_name: sheet)
+          data = {}
+          data[key[0]] = key[1]
+          Adjustment.create(data: data,sheet_name: sheet)
         end
       end
     end
