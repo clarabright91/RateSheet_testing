@@ -1370,7 +1370,11 @@ class ObQuickenLoans3571Controller < ApplicationController
 
     def make_adjust(block_hash, sheet)
       block_hash.each do |hash|
-        Adjustment.create(data: hash,sheet_name: sheet)
+        hash.each do |key|
+          data = {}
+          data[key[0]] = key[1]
+          Adjustment.create(data: data,sheet_name: sheet)
+        end
       end
     end
 
