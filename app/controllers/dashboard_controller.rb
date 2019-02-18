@@ -24,7 +24,7 @@ class DashboardController < ApplicationController
 
   def set_variable
     @cltv = params[:cltv].to_f if params[:cltv].present?
-    @state = params[:state].to_f if params[:state].present?
+    @state = params[:state] if params[:state].present?
     @property_type = params[:property_type] if params[:property_type].present?
     @financing_type = params[:financing_type] if params[:financing_type].present?
     @refinance_option = params[:refinance_option] if params[:refinance_option].present?
@@ -37,7 +37,7 @@ class DashboardController < ApplicationController
     @lock_period = params[:lock_period] if params[:lock_period].present?
     @fannie_mae_product = params[:fannie_mae_product] if params[:fannie_mae_product].present?
     @fraddie_mac_product = params[:fraddie_mac_product] if params[:fraddie_mac_product].present?
-    @loan_amount = params[:loan_amount] if params[:loan_amount].present?
+    @loan_amount = params[:loan_amount].to_i if params[:loan_amount].present?
     @program_category = params[:program_category] if params[:program_category].present?
 
     if params[:loan_type].present?
@@ -137,7 +137,7 @@ class DashboardController < ApplicationController
       hash_obj[:sheet_name] = pro.sheet_name.present? ? pro.sheet_name : ""
       hash_obj[:base_rate] = pro.base_rate[@interest.to_f.to_s][@lock_period].present? ? pro.base_rate[@interest.to_f.to_s][@lock_period] : 0.0
       if pro.adjustments.present?
-        pro.adjustments.each do |adj|
+        pro.adjustments.each do |adj|          
           first_key = adj.data.keys.first          
           key_list = first_key.split("/")
           adj_key_hash = {}
@@ -153,49 +153,71 @@ class DashboardController < ApplicationController
                 end
                 if key_name == "ArmBasic"
                   if adj.data[first_key][@property_type].present?
-                    adj_key_hash[key_index] = @property_type
+                    adj_key_hash[key_index] = @arm_basic
                   else
                     break
                   end
                 end
                 if key_name == "ArmAdvanced"
                   if adj.data[first_key][@property_type].present?
-                    adj_key_hash[key_index] = @property_type
+                    adj_key_hash[key_index] = @arm_advanced
                   else
                     break
                   end
                 end
                 if key_name == "FannieMaeProduct"
                   if adj.data[first_key][@property_type].present?
-                    adj_key_hash[key_index] = @property_type
+                    adj_key_hash[key_index] = @fannie_mae_product
                   else
                     break
                   end
                 end
                 if key_name == "FreddieMacProduct"
                   if adj.data[first_key][@property_type].present?
-                    adj_key_hash[key_index] = @property_type
+                    adj_key_hash[key_index] = @fraddie_mac_product
                   else
                     break
                   end
                 end
                 if key_name == "LoanPurpose"
                   if adj.data[first_key][@property_type].present?
-                    adj_key_hash[key_index] = @property_type
+                    adj_key_hash[key_index] = @loan_purpose
                   else
                     break
                   end
                 end
+
                 if key_name == "LoanAmount"
-                  if adj.data[first_key][@property_type].present?
-                    adj_key_hash[key_index] = @property_type
+                  if adj.data[first_key].present?
+                    adj.data[first_key].keys.each do |loan_amount_key|
+                      if loan_amount_key.include?("$")
+                        loan_amount_key = loan_amount_key.tr('$', '').strip
+                      end
+                      if loan_amount_key.include?("$")
+                        loan_amount_key = loan_amount_key.tr(',', '').strip
+                      end
+                      if (loan_amount_key.include?("Inf") || loan_amount_key.include?("Infinity"))
+                        if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i)
+                          adj.data[first_key][loan_amount_key]
+                          adj_key_hash[key_index] = loan_amount_key
+                        end
+                      else
+                        if loan_amount_key.include?("-")
+                          if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i && @loan_amount.to_i <= loan_amount_key.split("-").second.strip.to_i)
+                            adj.data[first_key][loan_amount_key]
+                            adj_key_hash[key_index] = loan_amount_key
+                          end
+                        end
+                      end                      
+                    end
                   else
                     break
                   end
                 end
+
                 if key_name == "ProgramCategory"
                   if adj.data[first_key][@property_type].present?
-                    adj_key_hash[key_index] = @property_type
+                    adj_key_hash[key_index] = @program_category
                   else
                     break
                   end
@@ -271,7 +293,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "LoanSize"                  
                   if adj.data[first_key][@loan_size].present?
@@ -279,7 +300,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "CLTV"
                   if adj.data[first_key].present?
@@ -312,7 +332,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
 
                 if key_name == "Term"                  
@@ -342,13 +361,91 @@ class DashboardController < ApplicationController
                 end
               end
               if key_index==1
+                if key_name == "LockDay"
+                  if adj.data[first_key][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @lock_period
+                  else
+                    break
+                  end
+                end
+                if key_name == "ArmBasic"
+                  if adj.data[first_key][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @arm_basic
+                  else
+                    break
+                  end
+                end
+                if key_name == "ArmAdvanced"
+                  if adj.data[first_key][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @arm_advanced
+                  else
+                    break
+                  end
+                end
+                if key_name == "FannieMaeProduct"
+                  if adj.data[first_key][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @fannie_mae_product
+                  else
+                    break
+                  end
+                end
+                if key_name == "FreddieMacProduct"
+                  if adj.data[first_key][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @fraddie_mac_product
+                  else
+                    break
+                  end
+                end
+                if key_name == "LoanPurpose"
+                  if adj.data[first_key][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @loan_purpose
+                  else
+                    break
+                  end
+                end
+                
+                if key_name == "LoanAmount"
+                  if adj.data[first_key][adj_key_hash[key_index-1]].present?
+                    adj.data[first_key][adj_key_hash[key_index-1]].keys.each do |loan_amount_key|
+                      if loan_amount_key.include?("$")
+                        loan_amount_key = loan_amount_key.tr('$', '').strip
+                      end
+                      if loan_amount_key.include?("$")
+                        loan_amount_key = loan_amount_key.tr(',', '').strip
+                      end
+                      if (loan_amount_key.include?("Inf") || loan_amount_key.include?("Infinity"))
+                        if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i)
+                          adj.data[first_key][adj_key_hash[key_index-1]][loan_amount_key]
+                          adj_key_hash[key_index] = loan_amount_key
+                        end
+                      else
+                        if loan_amount_key.include?("-")
+                          if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i && @loan_amount.to_i <= loan_amount_key.split("-").second.strip.to_i)
+                            adj.data[first_key][adj_key_hash[key_index-1]][loan_amount_key]
+                            adj_key_hash[key_index] = loan_amount_key
+                          end
+                        end
+                      end                      
+                    end
+                  else
+                    break
+                  end
+                end
+
+                if key_name == "ProgramCategory"
+                  if adj.data[first_key][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @program_category
+                  else
+                    break
+                  end
+                end
+
                 if key_name == "PropertyType"
                   if adj.data[first_key][adj_key_hash[key_index-1]][@property_type].present?
                     adj_key_hash[key_index] = @property_type
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "FinancingType"
                   if adj.data[first_key][adj_key_hash[key_index-1]][@financing_type].present?
@@ -356,7 +453,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "PremiumType"
                   if adj.data[first_key][adj_key_hash[key_index-1]][@premium_type].present?
@@ -364,7 +460,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "LTV"
                   if adj.data[first_key][adj_key_hash[key_index-1]].present?
@@ -373,7 +468,6 @@ class DashboardController < ApplicationController
                         if (ltv_key.split("-").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("-").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-1]][ltv_key]
                           adj_key_hash[key_index] = ltv_key
-                                                
                         end
                       end
                     end
@@ -418,7 +512,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "LoanSize"                  
                   if adj.data[first_key][adj_key_hash[key_index-1]][@loan_size].present?
@@ -426,7 +519,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "CLTV"
                   if adj.data[first_key][adj_key_hash[key_index-1]].present?
@@ -461,7 +553,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
 
                 if key_name == "Term"                  
@@ -493,13 +584,91 @@ class DashboardController < ApplicationController
                 end
               end
               if key_index==2
+                if key_name == "LockDay"
+                  if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @lock_period
+                  else
+                    break
+                  end
+                end
+                if key_name == "ArmBasic"
+                  if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @arm_basic
+                  else
+                    break
+                  end
+                end
+                if key_name == "ArmAdvanced"
+                  if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @arm_advanced
+                  else
+                    break
+                  end
+                end
+                if key_name == "FannieMaeProduct"
+                  if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @fannie_mae_product
+                  else
+                    break
+                  end
+                end
+                if key_name == "FreddieMacProduct"
+                  if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @fraddie_mac_product
+                  else
+                    break
+                  end
+                end
+                if key_name == "LoanPurpose"
+                  if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @loan_purpose
+                  else
+                    break
+                  end
+                end
+                
+                if key_name == "LoanAmount"
+                  if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
+                    adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |loan_amount_key|
+                      if loan_amount_key.include?("$")
+                        loan_amount_key = loan_amount_key.tr('$', '').strip
+                      end
+                      if loan_amount_key.include?("$")
+                        loan_amount_key = loan_amount_key.tr(',', '').strip
+                      end
+                      if (loan_amount_key.include?("Inf") || loan_amount_key.include?("Infinity"))
+                        if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i)
+                          adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][loan_amount_key]
+                          adj_key_hash[key_index] = loan_amount_key
+                        end
+                      else
+                        if loan_amount_key.include?("-")
+                          if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i && @loan_amount.to_i <= loan_amount_key.split("-").second.strip.to_i)
+                            adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][loan_amount_key]
+                            adj_key_hash[key_index] = loan_amount_key
+                          end
+                        end
+                      end                      
+                    end
+                  else
+                    break
+                  end
+                end
+
+                if key_name == "ProgramCategory"
+                  if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @program_category
+                  else
+                    break
+                  end
+                end
+
                 if key_name == "PropertyType"
                   if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
                     adj_key_hash[key_index] = @property_type
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "FinancingType"
                   if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@financing_type].present?
@@ -507,7 +676,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "PremiumType"
                   if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@premium_type].present?
@@ -515,7 +683,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "LTV"
                   if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
@@ -524,7 +691,6 @@ class DashboardController < ApplicationController
                         if (ltv_key.split("-").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("-").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][ltv_key]
                           adj_key_hash[key_index] = ltv_key
-                                                
                         end
                       end
                     end
@@ -569,7 +735,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "LoanSize"                  
                   if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_size].present?
@@ -577,7 +742,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "CLTV"
                   if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
@@ -610,7 +774,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "Term"                  
                   term_key = adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
@@ -641,13 +804,91 @@ class DashboardController < ApplicationController
                 end
               end
               if key_index==3
+                if key_name == "LockDay"
+                  if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @lock_period
+                  else
+                    break
+                  end
+                end
+                if key_name == "ArmBasic"
+                  if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @arm_basic
+                  else
+                    break
+                  end
+                end
+                if key_name == "ArmAdvanced"
+                  if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @arm_advanced
+                  else
+                    break
+                  end
+                end
+                if key_name == "FannieMaeProduct"
+                  if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @fannie_mae_product
+                  else
+                    break
+                  end
+                end
+                if key_name == "FreddieMacProduct"
+                  if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @fraddie_mac_product
+                  else
+                    break
+                  end
+                end
+                if key_name == "LoanPurpose"
+                  if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @loan_purpose
+                  else
+                    break
+                  end
+                end
+                
+                if key_name == "LoanAmount"
+                  if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
+                    adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |loan_amount_key|
+                      if loan_amount_key.include?("$")
+                        loan_amount_key = loan_amount_key.tr('$', '').strip
+                      end
+                      if loan_amount_key.include?("$")
+                        loan_amount_key = loan_amount_key.tr(',', '').strip
+                      end
+                      if (loan_amount_key.include?("Inf") || loan_amount_key.include?("Infinity"))
+                        if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i)
+                          adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][loan_amount_key]
+                          adj_key_hash[key_index] = loan_amount_key
+                        end
+                      else
+                        if loan_amount_key.include?("-")
+                          if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i && @loan_amount.to_i <= loan_amount_key.split("-").second.strip.to_i)
+                            adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][loan_amount_key]
+                            adj_key_hash[key_index] = loan_amount_key
+                          end
+                        end
+                      end                      
+                    end
+                  else
+                    break
+                  end
+                end
+
+                if key_name == "ProgramCategory"
+                  if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @program_category
+                  else
+                    break
+                  end
+                end
+
                 if key_name == "PropertyType"
                   if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
                     adj_key_hash[key_index] = @property_type
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "FinancingType"
                   if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@financing_type].present?
@@ -655,7 +896,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "PremiumType"
                   if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@premium_type].present?
@@ -663,7 +903,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "LTV"
                 if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
@@ -672,7 +911,6 @@ class DashboardController < ApplicationController
                         if (ltv_key.split("-").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("-").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][ltv_key]
                           adj_key_hash[key_index] = ltv_key
-                                                
                         end
                       end
                     end
@@ -717,7 +955,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "LoanSize"                  
                   if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_size].present?
@@ -725,7 +962,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "CLTV"
                   if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
@@ -758,7 +994,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "Term"                  
                   term_key = adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
@@ -788,13 +1023,91 @@ class DashboardController < ApplicationController
                 end
               end
               if key_index==4
+                if key_name == "LockDay"
+                  if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @lock_period
+                  else
+                    break
+                  end
+                end
+                if key_name == "ArmBasic"
+                  if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @arm_basic
+                  else
+                    break
+                  end
+                end
+                if key_name == "ArmAdvanced"
+                  if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @arm_advanced
+                  else
+                    break
+                  end
+                end
+                if key_name == "FannieMaeProduct"
+                  if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @fannie_mae_product
+                  else
+                    break
+                  end
+                end
+                if key_name == "FreddieMacProduct"
+                  if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @fraddie_mac_product
+                  else
+                    break
+                  end
+                end
+                if key_name == "LoanPurpose"
+                  if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @loan_purpose
+                  else
+                    break
+                  end
+                end
+                
+                if key_name == "LoanAmount"
+                  if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
+                    adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |loan_amount_key|
+                      if loan_amount_key.include?("$")
+                        loan_amount_key = loan_amount_key.tr('$', '').strip
+                      end
+                      if loan_amount_key.include?("$")
+                        loan_amount_key = loan_amount_key.tr(',', '').strip
+                      end
+                      if (loan_amount_key.include?("Inf") || loan_amount_key.include?("Infinity"))
+                        if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i)
+                          adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][loan_amount_key]
+                          adj_key_hash[key_index] = loan_amount_key
+                        end
+                      else
+                        if loan_amount_key.include?("-")
+                          if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i && @loan_amount.to_i <= loan_amount_key.split("-").second.strip.to_i)
+                            adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][loan_amount_key]
+                            adj_key_hash[key_index] = loan_amount_key
+                          end
+                        end
+                      end                      
+                    end
+                  else
+                    break
+                  end
+                end
+
+                if key_name == "ProgramCategory"
+                  if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @program_category
+                  else
+                    break
+                  end
+                end
+
                 if key_name == "PropertyType"
                   if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
                     adj_key_hash[key_index] = @property_type
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "FinancingType"
                   if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@financing_type].present?
@@ -802,7 +1115,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "PremiumType"
                   if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@premium_type].present?
@@ -810,7 +1122,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "LTV"
                   if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
@@ -819,7 +1130,6 @@ class DashboardController < ApplicationController
                         if (ltv_key.split("-").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("-").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][ltv_key]
                           adj_key_hash[key_index] = ltv_key
-                                                
                         end
                       end
                     end
@@ -862,7 +1172,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "LoanSize"                  
                   if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_size].present?
@@ -870,7 +1179,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "CLTV"
                   if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
@@ -903,7 +1211,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
 
                 if key_name == "Term"                  
@@ -934,13 +1241,91 @@ class DashboardController < ApplicationController
                 end
               end
               if key_index==5
+                if key_name == "LockDay"
+                  if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @lock_period
+                  else
+                    break
+                  end
+                end
+                if key_name == "ArmBasic"
+                  if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @arm_basic
+                  else
+                    break
+                  end
+                end
+                if key_name == "ArmAdvanced"
+                  if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @arm_advanced
+                  else
+                    break
+                  end
+                end
+                if key_name == "FannieMaeProduct"
+                  if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @fannie_mae_product
+                  else
+                    break
+                  end
+                end
+                if key_name == "FreddieMacProduct"
+                  if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @fraddie_mac_product
+                  else
+                    break
+                  end
+                end
+                if key_name == "LoanPurpose"
+                  if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @loan_purpose
+                  else
+                    break
+                  end
+                end
+                
+                if key_name == "LoanAmount"
+                  if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
+                    adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |loan_amount_key|
+                      if loan_amount_key.include?("$")
+                        loan_amount_key = loan_amount_key.tr('$', '').strip
+                      end
+                      if loan_amount_key.include?("$")
+                        loan_amount_key = loan_amount_key.tr(',', '').strip
+                      end
+                      if (loan_amount_key.include?("Inf") || loan_amount_key.include?("Infinity"))
+                        if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i)
+                          adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][loan_amount_key]
+                          adj_key_hash[key_index] = loan_amount_key
+                        end
+                      else
+                        if loan_amount_key.include?("-")
+                          if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i && @loan_amount.to_i <= loan_amount_key.split("-").second.strip.to_i)
+                            adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][loan_amount_key]
+                            adj_key_hash[key_index] = loan_amount_key
+                          end
+                        end
+                      end                      
+                    end
+                  else
+                    break
+                  end
+                end
+
+                if key_name == "ProgramCategory"
+                  if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @program_category
+                  else
+                    break
+                  end
+                end
+
                 if key_name == "PropertyType"
                   if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
                     adj_key_hash[key_index] = @property_type
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "FinancingType"
                   if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@financing_type].present?
@@ -948,7 +1333,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "PremiumType"
                   if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@premium_type].present?
@@ -956,7 +1340,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "LTV"
                   if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
@@ -965,7 +1348,6 @@ class DashboardController < ApplicationController
                         if (ltv_key.split("-").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("-").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][ltv_key]
                           adj_key_hash[key_index] = ltv_key
-                                                
                         end
                       end
                     end
@@ -1010,7 +1392,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "LoanSize"                  
                   if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_size].present?
@@ -1018,7 +1399,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "CLTV"
                   if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
@@ -1051,7 +1431,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "Term"                  
                   term_key = adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
@@ -1081,13 +1460,91 @@ class DashboardController < ApplicationController
                 end
               end
               if key_index==6
+                if key_name == "LockDay"
+                  if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @lock_period
+                  else
+                    break
+                  end
+                end
+                if key_name == "ArmBasic"
+                  if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @arm_basic
+                  else
+                    break
+                  end
+                end
+                if key_name == "ArmAdvanced"
+                  if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @arm_advanced
+                  else
+                    break
+                  end
+                end
+                if key_name == "FannieMaeProduct"
+                  if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @fannie_mae_product
+                  else
+                    break
+                  end
+                end
+                if key_name == "FreddieMacProduct"
+                  if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @fraddie_mac_product
+                  else
+                    break
+                  end
+                end
+                if key_name == "LoanPurpose"
+                  if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @loan_purpose
+                  else
+                    break
+                  end
+                end
+                
+                if key_name == "LoanAmount"
+                  if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
+                    adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |loan_amount_key|
+                      if loan_amount_key.include?("$")
+                        loan_amount_key = loan_amount_key.tr('$', '').strip
+                      end
+                      if loan_amount_key.include?("$")
+                        loan_amount_key = loan_amount_key.tr(',', '').strip
+                      end
+                      if (loan_amount_key.include?("Inf") || loan_amount_key.include?("Infinity"))
+                        if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i)
+                          adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][loan_amount_key]
+                          adj_key_hash[key_index] = loan_amount_key
+                        end
+                      else
+                        if loan_amount_key.include?("-")
+                          if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i && @loan_amount.to_i <= loan_amount_key.split("-").second.strip.to_i)
+                            adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][loan_amount_key]
+                            adj_key_hash[key_index] = loan_amount_key
+                          end
+                        end
+                      end                      
+                    end
+                  else
+                    break
+                  end
+                end
+
+                if key_name == "ProgramCategory"
+                  if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    adj_key_hash[key_index] = @program_category
+                  else
+                    break
+                  end
+                end
+
                 if key_name == "PropertyType"
                   if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
                     adj_key_hash[key_index] = @property_type
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "FinancingType"
                   if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@financing_type].present?
@@ -1095,7 +1552,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "PremiumType"
                   if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@premium_type].present?
@@ -1103,7 +1559,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "LTV"
                   if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
@@ -1112,7 +1567,6 @@ class DashboardController < ApplicationController
                         if (ltv_key.split("-").first.strip.to_f < @ltv.to_f && @ltv.to_f <= ltv_key.split("-").second.strip.to_f)
                           adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][ltv_key]
                           adj_key_hash[key_index] = ltv_key
-                                                
                         end
                       end
                     end
@@ -1155,7 +1609,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "LoanSize"                  
                   if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_size].present?
@@ -1163,7 +1616,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
                 if key_name == "CLTV"
                   if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
@@ -1196,7 +1648,6 @@ class DashboardController < ApplicationController
                   else
                     break
                   end
-                                  
                 end
 
                 if key_name == "Term"                  

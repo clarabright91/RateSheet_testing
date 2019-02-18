@@ -185,11 +185,16 @@ class Adjustment < ApplicationRecord
     "Coverage",
     "LoanAmount",
     "CLTV",
-    "DTI",
     "InterestRate",
-    "LockPeriod",
+    "LockDay",
     "State",
     "Term",
-    "LoanType"
+    "LoanType",
+    "ArmBasic",
+    "ArmAdvanced",
+    "FannieMaeProduct",
+    "FreddieMacProduct",
+    "LoanPurpose",
+    "ProgramCategory"
   ]
 end
