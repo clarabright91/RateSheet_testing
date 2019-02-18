@@ -24,20 +24,10 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
     xlsx.sheets.each do |sheet|
       if (sheet == "FHA")
         sheet_data = xlsx.sheet(sheet)
-        @fha_adjustment = {}
-        @indi_adjustment = {}
-        @lock_adjustment = {}
-        @avrg_adjustment = {}
-        @alhs_adjustment = {}
         @programs_ids = []
-        @key_data = []
-        @key_data2 = []
-        f_key = ''
+        @fha_adjustment = {}
+        @loan_adj = {}
         first_key = ''
-        cc = ''
-        ccc = ''
-        c_val = ''
-
         #program
         (13..80).each do |r| 
           row = sheet_data.row(r)
@@ -74,9 +64,6 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                     break # terminate the loop
                   end
                 end
-                # if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-                #   @block_hash.values.first.shift
-                # end
                 if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
@@ -95,119 +82,127 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
               value = sheet_data.cell(r,cc)
               if value.present?
                 if value == "FHA & USDA Loan Level Adjustments"
-                  first_key = "FHA/USDA Loan"
-                  @fha_adjustment[first_key] = {}
+                  @fha_adjustment["FHA/USDA/FICO"] = {}
+                  @fha_adjustment["FHA/USDA/FICO"][true] = {}
+                  @fha_adjustment["FHA/USDA/FICO"][true][true] = {}
                 end
-
-                if r >=41 && r <= 52 && cc == 17
-                  value = get_value value
+                if r >=41 && r <= 45 && cc == 17
+                  first_key = get_value value
                   ccc = cc + 3
                   c_val = sheet_data.cell(r,ccc)
-                  @fha_adjustment[first_key][value] = c_val
+                  @fha_adjustment["FHA/USDA/FICO"][true][true][first_key] = c_val
                 end
-
-                if r >=56 && r <= 57 && cc == 17
-                  value = get_value value
-                  ccc = cc + 2
-                  c_val = sheet_data.cell(r,ccc)
-                  @fha_adjustment[first_key][value] = c_val
+                if r == 46 && cc == 17
+                  @fha_adjustment["FHA/USDA/LoanPurpose"] = {}
+                  @fha_adjustment["FHA/USDA/LoanPurpose"][true] = {}
+                  @fha_adjustment["FHA/USDA/LoanPurpose"][true][true] = {}
+                  @fha_adjustment["FHA/USDA/LoanPurpose"][true][true]["Refinance"] = {}
+                  cc = cc + 3
+                  new_val = sheet_data.cell(r,cc)
+                  @fha_adjustment["FHA/USDA/LoanPurpose"][true][true]["Refinance"] = new_val
                 end
-
+                if r == 47 && cc == 17
+                  @fha_adjustment["FHA/USDA"] = {}
+                  @fha_adjustment["FHA/USDA"][true] = {}
+                  @fha_adjustment["FHA/USDA"][true][true] = {}
+                  cc = cc + 3
+                  new_val = sheet_data.cell(r,cc)
+                  @fha_adjustment["FHA/USDA"][true][true] = new_val
+                end
+                if r == 48 && cc == 17
+                  @fha_adjustment["FHA/USDA/LoanSize/FICO"] = {}
+                  @fha_adjustment["FHA/USDA/LoanSize/FICO"][true] = {}
+                  @fha_adjustment["FHA/USDA/LoanSize/FICO"][true][true] = {}
+                  @fha_adjustment["FHA/USDA/LoanSize/FICO"][true][true]["High Balance"] = {}
+                  @fha_adjustment["FHA/USDA/LoanSize/FICO"][true][true]["High Balance"]["0-680"] = {}
+                  cc = cc + 3
+                  new_val = sheet_data.cell(r,cc)
+                  @fha_adjustment["FHA/USDA/LoanSize/FICO"][true][true]["High Balance"]["0-680"] = new_val
+                end
+                if r == 49 && cc == 17
+                  @fha_adjustment["FHA/Streamline/CLTV"] = {}
+                  @fha_adjustment["FHA/Streamline/CLTV"][true] = {}
+                  @fha_adjustment["FHA/Streamline/CLTV"][true][true] = {}
+                  @fha_adjustment["FHA/Streamline/CLTV"][true][true]["100-125"] = {}
+                  cc = cc + 3
+                  new_val = sheet_data.cell(r,cc)
+                  @fha_adjustment["FHA/Streamline/CLTV"][true][true]["100-125"] = new_val
+                end
+                if r == 50 && cc == 17
+                  @fha_adjustment["FHA/USDA/PropertyType"] = {}
+                  @fha_adjustment["FHA/USDA/PropertyType"][true] = {}
+                  @fha_adjustment["FHA/USDA/PropertyType"][true][true] = {}
+                  @fha_adjustment["FHA/USDA/PropertyType"][true][true]["Gov'n Non Owner"] = {}
+                  cc = cc + 3
+                  new_val = sheet_data.cell(r,cc)
+                  @fha_adjustment["FHA/USDA/PropertyType"][true][true]["Gov'n Non Owner"] = new_val
+                end
+                if r == 51 && cc == 17
+                  @fha_adjustment["FHA/USDA/LoanAmount/FICO"] = {}
+                  @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true] = {}
+                  @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true] = {}
+                  @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true]["0-100k"] = {}
+                  @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true]["0-100k"]["0-640"] = {}
+                  cc = cc + 3
+                  new_val = sheet_data.cell(r,cc)
+                  @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true]["0-100k"]["0-640"] = new_val
+                end
+                if r == 52 && cc == 17
+                  @fha_adjustment["FHA/Usda/State"] = {}
+                  @fha_adjustment["FHA/Usda/State"][true] = {}
+                  @fha_adjustment["FHA/Usda/State"][true][true] = {}
+                  @fha_adjustment["FHA/Usda/State"][true][true]["NY"] = {}
+                  cc = cc + 3
+                  new_val = sheet_data.cell(r,cc)
+                  @fha_adjustment["FHA/Usda/State"][true][true]["NY"] = new_val
+                end
               end
             end
           end
         end
 
         # Adjustments INDICES
-        (84..94).each do |r|
-          row = sheet_data.row(r)
-          if (row.compact.count >= 1)
-            (1..10).each do |max_column|
-              cc = max_column
-              value = sheet_data.cell(r,cc)
-              if value.present?
-                if value == "INDICES"
-                  f_key = "INDICES"
-                  @indi_adjustment[f_key] = {}
-                end
-
-                if r >=85 && r <= 89 && cc == 2
-                  ccc = cc + 2
-                  c_val = sheet_data.cell(r,ccc)
-                  @indi_adjustment[f_key][value] = c_val
-                end
-
-                if value == "Lock Expiration Dates:"
-                  first_key = "Lock/ExpirationDates:"
-                  @lock_adjustment[first_key] = {}
-                end
-
-                if r >=85 && r <= 87 && cc == 7
-                  ccc = cc + 3
-                  c_val = sheet_data.cell(r,ccc)
-                  @lock_adjustment[first_key][value] = c_val
-                end
-              end
-            end
-          end
-        end
-
-        #Adjustments Avrage Price
-        (92..94).each do |r|
-          row = sheet_data.row(r)
-          @key_data = sheet_data.row(93)
-          @key_data2 = sheet_data.row(93)
-          if (row.compact.count >= 1)
-            (2..9).each do |max_column|
-              cc = max_column
-              value = sheet_data.cell(r,cc)
-              if value.present?
-                if value == "Average Price Offer Rate (APOR) For Loans Locked During The Week Of 01/14/2019"
-                  f_key = "AveragePrice"
-                  @avrg_adjustment[f_key] = {}
-                end
-
-                if r == 93 && cc >= 2 && cc <= 9
-                  rr = r+1
-                  c_val = sheet_data.cell(rr,cc)
-                  @avrg_adjustment[f_key][value] = c_val
-                end
-              end
-            end
-          end
-        end
-
-
-        #Adjustments Allied Holesale
         (84..95).each do |r|
           row = sheet_data.row(r)
-          @key_data = sheet_data.row(93)
-          @key_data2 = sheet_data.row(93)
+          @term_data = sheet_data.row(93)
           if (row.compact.count >= 1)
-            (17..20).each do |max_column|
-              cc = max_column
+            (0..20).each do |cc|
               value = sheet_data.cell(r,cc)
               if value.present?
                 if value == "Allied Wholesale Loan Amt Adj"
-                  f_key = "AlliedWholesale/LoanAmount/adj"
-                  @alhs_adjustment[f_key] = {}
+                  @loan_adj["LoanAmount"] = {}
+                  @loan_adj["LoanType/Term"] = {}
+                  @loan_adj["LoanType/Term"]["Fixed"] = {}
+                  @loan_adj["LoanType/Term"]["ARM"] = {}
                 end
-
                 if r >= 87 && r <= 95 && cc == 17
-                  ccc = cc + 3
-                  c_val = sheet_data.cell(r,ccc)
-                  @alhs_adjustment[f_key][value] = c_val
+                  if value.include?(">")
+                    first_key = get_value value
+                  else
+                    first_key = value.sub('to','-').tr('$','')
+                  end
+                  @loan_adj["LoanAmount"][first_key] = {}
+                  cc = cc + 3
+                  new_val = sheet_data.cell(r,cc)
+                  @loan_adj["LoanAmount"][first_key] = new_val
+                end
+                if r == 94 && cc >= 2 && cc <= 6
+                  first_key = @term_data[cc-2].tr('A-Za-z ','')
+                  @loan_adj["LoanType/Term"]["Fixed"][first_key] = {}
+                  @loan_adj["LoanType/Term"]["Fixed"][first_key] = value
+                end
+                if r == 94 && cc >= 7 && cc <= 9
+                  first_key = @term_data[cc-2].tr('A-Za-z ','')
+                  @loan_adj["LoanType/Term"]["ARM"][first_key] = {}
+                  @loan_adj["LoanType/Term"]["ARM"][first_key] = value
                 end
               end
             end
           end
         end
-        Adjustment.create(data: @fha_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @indi_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @lock_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @avrg_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @alhs_adjustment, sheet_name: sheet)
-        create_program_association_with_adjustment(sheet)
+        adjustment = [@fha_adjustment,@loan_adj]
+        make_adjust(adjustment,sheet)
+        # create_program_association_with_adjustment(sheet)
       end
     end
     redirect_to programs_ob_allied_mortgage_group_wholesale8570_path(@sheet_obj)
@@ -220,16 +215,9 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
       if (sheet == "VA")
         sheet_data = xlsx.sheet(sheet)
         @programs_ids = []
-        @valn_adjustment = {}
-        @awlm_adjustment = {}
-        @indi_adjustment = {}
-        @avrg_adjustment = {}
-        @lock_adjustment = {}
+        @adjustment_hash = {}
+        @loan_amount = {}
         primary_key = ''
-        second_key = ''
-        t = 1
-        c_val = ''
-        f_key = ''
 
         # programs
         (13..79).each do |r|
@@ -238,9 +226,6 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
             rr = r + 1
             max_column_section = row.compact.count - 1
             (0..max_column_section).each_with_index do |max_column, index|
-
-              # max_column = max_column + 1
-
               cc = (4*max_column) + (2+max_column)  # (2 / 7 / 12)
               @title = sheet_data.cell(r,cc)
               if @title.present? && @title != 3.5 && @title != 3.125 && @title != "Loan Amount"
@@ -278,138 +263,89 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         end
 
         # VA loan level adjustment
-        (15..33).each do |r|
+        (15..91).each do |r|
           row = sheet_data.row(r)
+          @term_data = sheet_data.row(89)
           if (row.compact.count >= 1)
-            (17..20).each do |max_column|
+            (0..20).each do |max_column|
               cc = max_column
               value = sheet_data.cell(r,cc)
               if value.present?
                 if value == "VA Loan Level Adjustments"
-                  primary_key = "VA/RateType/FICO/LTV"
-                  @valn_adjustment[primary_key] = {}
+                  @adjustment_hash["VA/FICO"] = {}
+                  @adjustment_hash["VA/FICO"][true] = {}
+                  @adjustment_hash["VA/LTV"] = {}
+                  @adjustment_hash["VA/LTV"][true] = {}
                 end
-
-                if r >=17 && r <= 31 && cc == 17
-                  value = get_value value
-                  ccc = cc + 3
-                  c_val = sheet_data.cell(r,ccc)
-                  @valn_adjustment[primary_key][value] = c_val
-                end
-
-                if r >=32 && r <= 33 && cc == 17
-                  value = get_value value
-                  ccc = cc + 2
-                  c_val = sheet_data.cell(r,ccc)
-                  @valn_adjustment[primary_key][value] = c_val
-                end
-              end
-            end
-          end
-        end
-
-        # WholeSale adjustment
-        (34..45).each do |r|
-          row = sheet_data.row(r)
-          if (row.compact.count >= 1)
-            (17..20).each do |max_column|
-              cc = max_column
-              value = sheet_data.cell(r,cc)
-              if value.present?
                 if value == "Allied Wholesale Loan Amt Adj *"
-                  primary_key = "VA/RateType/FICO/LTV"
-                  @awlm_adjustment[primary_key] = {}
+                  @loan_amount["LoanAmount"] = {}
+                  @loan_amount["LoanType/Term"] = {}
+                  @loan_amount["LoanType/Term"]["Fixed"] = {}
+                  @loan_amount["LoanType/Term"]["ARM"] = {}
                 end
-
-                if r >=37 && r <= 45 && cc == 17
-                  value = get_value value
+                # VA Loan Level Adjustments
+                if r >=17 && r <= 21 && cc == 17
+                  primary_key = get_value value
                   ccc = cc + 3
                   c_val = sheet_data.cell(r,ccc)
-                  @awlm_adjustment[primary_key][value] = c_val
+                  @adjustment_hash["VA/FICO"][true][primary_key] = c_val
+                end
+                if r == 22 && cc == 17
+                  @adjustment_hash["VA/LoanSize/FICO"] = {}
+                  @adjustment_hash["VA/LoanSize/FICO"][true] = {}
+                  @adjustment_hash["VA/LoanSize/FICO"][true]["High Balance"] = {}
+                  @adjustment_hash["VA/LoanSize/FICO"][true]["High Balance"]["0-680"] = {}
+                  cc == cc + 3
+                  new_val = sheet_data.cell(r,cc)
+                  @adjustment_hash["VA/LoanSize/FICO"][true]["High Balance"]["0-680"] = new_val
+                end
+                if r == 23 && cc == 17
+                  @adjustment_hash["VA/LTV"][true]["90-95"] = {}
+                  cc = cc + 3
+                  new_val = sheet_data.cell(r,cc)
+                  @adjustment_hash["VA/LTV"][true]["90-95"] = new_val
+                end
+                if r == 24 && cc == 14
+                  @adjustment_hash["VA/LTV"][true]["95-Inf"] = {}
+                  cc = cc + 3
+                  new_val = sheet_data.cell(r,cc)
+                  @adjustment_hash["VA/LTV"][true]["95-Inf"] = new_val
+                end
+                if r == 25 && cc == 14
+                  @adjustment_hash["State"] = {}
+                  @adjustment_hash["State"]["NY"] = {}
+                  cc = cc + 3
+                  new_val = sheet_data.cell(r,cc)
+                  @adjustment_hash["State"]["NY"] = new_val
+                end
+                if r >= 37 && r <= 45 && cc == 17
+                  if value.include?("to")
+                    primary_key = value.sub('to','-').tr('$><% ','')
+                  else
+                    primary_key = get_value value
+                  end
+                  @loan_amount["LoanAmount"][primary_key] = {}
+                  cc = cc + 3
+                  new_val = sheet_data.cell(r,cc)
+                  @loan_amount["LoanAmount"][primary_key] = new_val
+                end
+                if r == 90 && cc >= 2 && cc <= 6
+                  primary_key = @term_data[cc-2].tr('A-Za-z ','')
+                  @loan_amount["LoanType/Term"]["Fixed"][primary_key] = {}
+                  @loan_amount["LoanType/Term"]["Fixed"][primary_key] = value
+                end
+                if r == 90 && cc >= 7 && cc <= 9
+                  primary_key = @term_data[cc-2].tr('A-Za-z ','')
+                  @loan_amount["LoanType/Term"]["ARM"][primary_key] = {}
+                  @loan_amount["LoanType/Term"]["ARM"][primary_key] = value
                 end
               end
             end
           end
         end
-
-        # INDICES adjustment
-        (49..54).each do |r|
-          row = sheet_data.row(r)
-          if (row.compact.count >= 1)
-            (18..20).each do |max_column|
-              cc = max_column
-              value = sheet_data.cell(r,cc)
-              if value.present?
-                if value == "INDICES"
-                  primary_key = "VA/RateType/FICO/LTV"
-                  second_key = "INDICES"
-                  @indi_adjustment[primary_key] = {}
-                  @indi_adjustment[primary_key][second_key] = {}
-                end
-
-                if r >=50 && r <= 54 && cc == 18
-                  value = get_value value
-                  ccc = cc + 2
-                  c_val = sheet_data.cell(r,ccc)
-                  @indi_adjustment[primary_key][second_key][value] = c_val
-                end
-              end
-            end
-          end
-        end
-
-        #Adjustments Avrage Price
-        (88..90).each do |r|
-          row = sheet_data.row(r)
-          if (row.compact.count >= 1)
-            (2..9).each do |max_column|
-              cc = max_column
-              value = sheet_data.cell(r,cc)
-              if value.present?
-                if value == "Average Price Offer Rate (APOR) For Loans Locked During The Week Of 01/14/2019"
-                  f_key = "AveragePrice"
-                  @avrg_adjustment[f_key] = {}
-                end
-
-                if r == 89 && cc >= 2 && cc <= 9
-                  rr = r+1
-                  c_val = sheet_data.cell(rr,cc)
-                  @avrg_adjustment[f_key][value] = c_val
-                end
-              end
-            end
-          end
-        end
-
-        #Adjustment lock Expiration
-        (83..86).each do |r|
-          row = sheet_data.row(r)
-          @key_data = sheet_data.row(93)
-          @key_data2 = sheet_data.row(93)
-          if (row.compact.count >= 1)
-            (2..5).each do |max_column|
-              cc = max_column
-              value = sheet_data.cell(r,cc)
-              if value.present?
-                if value == "Lock Expiration Dates:"
-                  f_key = "Lock/ExpirationDates:"
-                  @lock_adjustment[f_key] = {}
-                end
-
-                if r >=84 && r <= 86 && cc == 2
-                  ccc = cc + 3
-                  c_val = sheet_data.cell(r,ccc)
-                  @lock_adjustment[f_key][value] = c_val
-                end
-              end
-            end
-          end
-        end
-        Adjustment.create(data: @valn_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @awlm_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @indi_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @lock_adjustment, sheet_name: sheet)
-        create_program_association_with_adjustment(sheet)
+        adjustment = [@adjustment_hash,@loan_amount]
+        make_adjust(adjustment,sheet)
+        # create_program_association_with_adjustment(sheet)
       end
     end
     redirect_to programs_ob_allied_mortgage_group_wholesale8570_path(@sheet_obj)
@@ -421,29 +357,17 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
     xlsx.sheets.each do |sheet|
       if (sheet == "CONF FIXED")
         sheet_data = xlsx.sheet(sheet)
-        @valn_adjustment = {}
-        @avrg_adjustment = {}
-        @lock_adjustment = {}
-        @ltv_fico_hash = {}
-        @sub_adjustment = {}
-        @subordinate_hash = {}
-        @home_hash = {}
-        @ltv_co_hash = {}
-        @occp_hash = {}
-        @pro_hash ={}
-        @key_data = []
-        @cltv_data = []
         @programs_ids = []
+        @adjustment_hash = {}
+        @cash_out = {}
+        @subordinate_hash = {}
+        @property_hash = {}
+        @other_adjustment = {}
+        @loan_amount = {}
         primary_key = ''
-        second_key = ''
+        secondary_key = ''
         ltv_key = ''
         cltv_key = ''
-        k_value = ''
-        c_val = ''
-        f_key = ''
-        value1 = ''
-        value2 = ''
-        value3 = ''
 
         #program
         (13..56).each do |r|
@@ -587,232 +511,197 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         end
 
         # VA loan level adjustment
-        (88..102).each do |r|
+        (59..111).each do |r|
           row = sheet_data.row(r)
+          @ltv_data = sheet_data.row(63)
+          @sub_data = sheet_data.row(64)
+          @term_data = sheet_data.row(110)
           if (row.compact.count >= 1)
-            (13..16).each do |max_column|
-              cc = max_column
+            (0..20).each do |cc|
               value = sheet_data.cell(r,cc)
               if value.present?
-                if value == "Allied Wholesale Loan Amt Adj"
-                  primary_key = "AlliedWholesale/LoanAmount/"
-
-                  @valn_adjustment[primary_key] = {}
+                if value == "LOAN LEVEL PRICE ADJUSTMENTS"
+                  @adjustment_hash["FICO/LTV"] = {}
+                  @cash_out["RefinanceOption/FICO/LTV"] = {}
+                  @cash_out["RefinanceOption/FICO/LTV"]["Cash Out"] = {}
+                  @property_hash["PropertyType/FICO/LTV"] = {}
                 end
-
-                if r >=91 && r <= 99 && cc == 13
-                  value = get_value value
-                  ccc = cc + 3
-                  c_val = sheet_data.cell(r,ccc)
-                  @valn_adjustment[primary_key][value] = c_val
-                end
-
-                if r >= 101 && r <= 102 && cc == 13
-                  value = get_value value
-                  ccc = cc + 2
-                  c_val = sheet_data.cell(r,ccc)
-                  @valn_adjustment[primary_key][value] = c_val
-                end
-              end
-            end
-          end
-        end
-
-        #Adjustments Avrage Price
-        (109..111).each do |r|
-          row = sheet_data.row(r)
-          if (row.compact.count >= 1)
-            (7..14).each do |max_column|
-              cc = max_column
-              value = sheet_data.cell(r,cc)
-              if value.present?
-                if value == "Average Price Offer Rate (APOR) For Loans Locked During The Week Of 01/14/2019"
-                  f_key = "AveragePrice"
-                  @avrg_adjustment[f_key] = {}
-                end
-
-                if r == 110 && cc >= 7 && cc <= 14
-                  rr = r+1
-                  c_val = sheet_data.cell(rr,cc)
-                  @avrg_adjustment[f_key][value] = c_val
-                end
-              end
-            end
-          end
-        end
-
-        #Adjustment lock Expiration
-        (109..112).each do |r|
-          row = sheet_data.row(r)
-          if (row.compact.count >= 1)
-            (2..5).each do |max_column|
-              cc = max_column
-              value = sheet_data.cell(r,cc)
-              if value.present?
-                if value == "Lock Expiration Dates:"
-                  f_key = "Lock/ExpirationDates:"
-                  @lock_adjustment[f_key] = {}
-                end
-
-                if r >=110 && r <= 112 && cc == 2
-                  ccc = cc + 3
-                  c_val = sheet_data.cell(r,ccc)
-                  @lock_adjustment[f_key][value] = c_val
-                end
-              end
-            end
-          end
-        end
-
-        #Adjustment LTV/FICO
-        (63..83).each do |r|
-          row = sheet_data.row(r)
-          @key_data = sheet_data.row(63)
-          if (row.compact.count >= 1)
-            (2..12).each do |max_column|
-              cc = max_column
-              value = sheet_data.cell(r,cc)
-              if value.present?
-                if value == "LTV"
-                  f_key = "LoanType/Term/FICO/LTV"
-                  @ltv_fico_hash[f_key] = {}
-                end
-
-                if r >=65 && r <= 71 && cc == 4
-                  value1 = get_value value
-                  @ltv_fico_hash[f_key][value1] = {}
-                end
-
-                if r >=65 && r <= 71 && cc >= 5 && cc<= 12
-                  k_value = get_value @key_data[cc-2]
-                  @ltv_fico_hash[f_key][value1][k_value] = value
-                end
-
-                if value == "Cash-Out"
-                  primary_key = "LoanType/Term/FICO/LTV"
-                  @ltv_co_hash[primary_key] ={}
-                end
-
-                if r >=72 && r <= 78 && cc == 4
-                  value2 = get_value value
-                  @ltv_co_hash[primary_key][value2] = {}
-                end
-
-                if r >=72 && r <= 78 && cc >= 5 && cc<= 12
-                  k_value = get_value @key_data[cc-2]
-                  @ltv_co_hash[primary_key][value2][k_value] = value
-                end
-
-                if value == "OCCUPANCY"
-                  primary_key = "LoanType/Term/FICO/LTV"
-                  @occp_hash[primary_key] ={}
-                end
-
-                if r >=79 && r <= 80 && cc == 4
-                  value3 = get_value value
-                  @occp_hash[primary_key][value3] = {}
-                end
-
-                if r >=79 && r <= 80 && cc >= 5 && cc<= 12
-                  k_value = get_value @key_data[cc-2]
-                  @occp_hash[primary_key][value3][k_value] = value
-                end
-
-                if value == "Property Type"
-                  primary_key = "LoanType/Term/FICO/LTV"
-                  @pro_hash[primary_key] ={}
-                end
-
-                if r >=81 && r <= 83 && cc == 4
-                  value3 = get_value value
-                  @pro_hash[primary_key][value3] = {}
-                end
-
-                if r >=81 && r <= 83 && cc >= 5 && cc<= 12
-                  k_value = get_value @key_data[cc-2]
-                  @pro_hash[primary_key][value3][k_value] = value
-                end
-
-              end
-            end
-          end
-        end
-
-        #Adjustment Subordinate Finance
-        (63..77).each do |r|
-          row = sheet_data.row(r)
-          @cltv_data = sheet_data.row(64)
-          if (row.compact.count >= 1)
-            (13..20).each do |max_column|
-              cc = max_column
-              value = sheet_data.cell(r,cc)
-              if value.present?
                 if value == "SUBORDINATE FINANCING"
-                  f_key = "LTV/CLTV/FICO"
-                  primary_key = "LTV/CLTV/FICO"
-                  @sub_adjustment[f_key] = {}
-                  @subordinate_hash[primary_key] = {}
+                  @subordinate_hash["FinancingType/LTV/CLTV/FICO"] = {}
+                  @subordinate_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"] = {}
+                  @other_adjustment["FICO/Term"] = {}
+                  @loan_amount["LoanAmount"] = {}
+                  @loan_amount["LoanType/Term"] = {}
+                  @loan_amount["LoanType/Term"]["Fixed"] = {}
+                  @loan_amount["LoanType/Term"]["ARM"] = {}
                 end
-
-                if r >=70 && r <= 77 && cc == 13
-                  value1 = get_value value
-                  ccc = cc + 7
-                  c_val = sheet_data.cell(r,ccc)
-                  @sub_adjustment[f_key][value] = c_val
+                if r >=65 && r <= 71 && cc == 4
+                  primary_key = get_value value
+                  @adjustment_hash["FICO/LTV"][primary_key] = {}
                 end
-
-                # SUBORDINATE FINANCING
+                if r >=65 && r <= 71 && cc >= 5 && cc <= 12
+                  if @ltv_data[cc-2].include?("-")
+                    secondary_key = @ltv_data[cc-2].tr('%','')
+                  else
+                    secondary_key = get_value @ltv_data[cc-2]
+                  end
+                  @adjustment_hash["FICO/LTV"][primary_key][secondary_key] = {}
+                  @adjustment_hash["FICO/LTV"][primary_key][secondary_key] = value
+                end
+                # Subordinate Financing
                 if r >= 65 && r <= 69 && cc == 13
-                  second_key = get_value value
-                  @subordinate_hash[primary_key][second_key] = {}
+                  if value.include?("to")
+                    ltv_key = value.sub('to','-').tr('$><% ','')
+                  elsif value.include?("Any") || value.include?("ANY")
+                    ltv_key = value
+                  else
+                    ltv_key = get_value value
+                  end
+                  @subordinate_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"][ltv_key] = {}
                 end
-                if r >= 65 && r <= 69 && cc == 15
-                  ltv_key = get_value value
-                  @subordinate_hash[primary_key][second_key][ltv_key] = {}
+                if r >= 65 && r <= 69 && cc == 15 
+                  if value.include?("to")
+                    cltv_key = value.sub('to','-').tr('$><% ','')
+                  elsif value.include?("CLTV")
+                    cltv_key = value  
+                  else
+                    cltv_key = get_value value
+                  end
+                  @subordinate_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"][ltv_key][cltv_key] = {}
                 end
-                if r >= 65 && r <= 69 && cc >= 17 && cc <= 20
-                  cltv_key = @cltv_data[cc-2]
-                  @subordinate_hash[primary_key][second_key][ltv_key] = {}
-                  @subordinate_hash[primary_key][second_key][ltv_key][cltv_key] = value
+                if r >= 65 && r <= 69 && cc >= 17 && cc <= 19
+                  sub_key = get_value @sub_data[cc-2]
+                  @subordinate_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"][ltv_key][cltv_key][sub_key] = {}
+                  @subordinate_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"][ltv_key][cltv_key][sub_key] = value
+                end
+                if r == 70 && cc == 13
+                  @other_adjustment["MiscAdjuster"] = {}
+                  @other_adjustment["MiscAdjuster"][value] = {}
+                  cc = cc + 7
+                  new_val = sheet_data.cell(r,cc)
+                  @other_adjustment["MiscAdjuster"][value] = new_val
+                end
+                if r >= 71 && r <= 72 && cc == 13
+                  ltv_key = value.tr('A-Za-z)( ','')
+                  @other_adjustment["FICO/Term"][ltv_key] = {}
+                  @other_adjustment["FICO/Term"][ltv_key]["0-Inf"] = {}
+                  cc = cc + 7
+                  new_val = sheet_data.cell(r,cc)
+                  @other_adjustment["FICO/Term"][ltv_key]["0-Inf"] = new_val
+                end
+                # Cashout
+                if r >= 72 && r <= 78 && cc == 4
+                  primary_key = get_value value
+                  @cash_out["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key] = {}
+                end
+                if r >= 72 && r <= 78 && cc >= 5 && cc <= 12
+                  if @ltv_data[cc-2].include?("-")
+                    secondary_key = @ltv_data[cc-2].tr('%','')
+                  else
+                    secondary_key = get_value @ltv_data[cc-2]
+                  end
+                  @cash_out["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key][secondary_key] = {}
+                  @cash_out["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key][secondary_key] = value
+                end
+                if r == 73 && cc == 13
+                  @other_adjustment["FreddieMac/FICO"] = {}
+                  @other_adjustment["FreddieMac/FICO"][true] = {}
+                  @other_adjustment["FreddieMac/FICO"][true]["640-679"] = {}
+                  cc = cc + 7
+                  new_val = sheet_data.cell(r,cc)
+                  @other_adjustment["FreddieMac/FICO"][true]["640-679"] = new_val
+                end
+                if r == 74 && cc == 13
+                  @other_adjustment["LoanSize/FICO"] = {}
+                  @other_adjustment["LoanSize/FICO"]["High Balance"] = {}
+                  @other_adjustment["LoanSize/FICO"]["High Balance"]["0-740"] = {}
+                  cc = cc + 7
+                  new_val = sheet_data.cell(r,cc)
+                  @other_adjustment["LoanSize/FICO"]["High Balance"]["0-740"] = new_val
+                end
+                if r == 75 && cc == 13
+                  @other_adjustment["LoanSize/RefinanceOption"] = {}
+                  @other_adjustment["LoanSize/RefinanceOption"]["High Balance"] = {}
+                  @other_adjustment["LoanSize/RefinanceOption"]["High Balance"]["Rate and Term"] = {}
+                  cc = cc + 7
+                  new_val = sheet_data.cell(r,cc)
+                  @other_adjustment["LoanSize/RefinanceOption"]["High Balance"]["Rate and Term"] = new_val
+                end
+                if r == 76 && cc == 13
+                  @other_adjustment["LoanSize/RefinanceOption"]["High Balance"]["Cash Out"] = {}
+                  cc = cc + 7
+                  new_val = sheet_data.cell(r,cc)
+                  @other_adjustment["LoanSize/RefinanceOption"]["High Balance"]["Cash Out"] = new_val
+                end
+                if r == 77 && cc == 13
+                  @other_adjustment["State"] = {}
+                  @other_adjustment["State"]["NY"] = {}
+                  cc = cc + 7
+                  new_val = sheet_data.cell(r,cc)
+                  @other_adjustment["State"]["NY"] = new_val
+                end
+                # PropertyType
+                if r >= 79 && r <= 83 && cc == 4
+                  if value == "Condo*"
+                    primary_key = "Condo"
+                  else
+                    primary_key = value
+                  end
+                  @property_hash["PropertyType/FICO/LTV"][primary_key] = {}
+                end
+                if r >= 79 && r <= 83 && cc >= 5 && cc <= 12
+                  if @ltv_data[cc-2].include?("-")
+                    secondary_key = @ltv_data[cc-2].tr('%','')
+                  else
+                    secondary_key = get_value @ltv_data[cc-2]
+                  end
+                  @property_hash["PropertyType/FICO/LTV"][primary_key][secondary_key] = {}
+                  @property_hash["PropertyType/FICO/LTV"][primary_key][secondary_key] = value
+                end
+                if r == 83 && cc == 13
+                  @other_adjustment["FannieMaeProduct/FreddieMacProduct/FICO/LTV"] = {}
+                  @other_adjustment["FannieMaeProduct/FreddieMacProduct/FICO/LTV"]["HomeReady"] = {}
+                  @other_adjustment["FannieMaeProduct/FreddieMacProduct/FICO/LTV"]["HomeReady"]["HomePossible"] = {}
+                  @other_adjustment["FannieMaeProduct/FreddieMacProduct/FICO/LTV"]["HomeReady"]["HomePossible"]["680-Inf"] = {}
+                  @other_adjustment["FannieMaeProduct/FreddieMacProduct/FICO/LTV"]["HomeReady"]["HomePossible"]["680-Inf"]["80-Inf"] = {}
+                  cc = cc + 7
+                  new_val = sheet_data.cell(r,cc)
+                  @other_adjustment["FannieMaeProduct/FreddieMacProduct/FICO/LTV"]["HomeReady"]["HomePossible"]["680-Inf"]["80-Inf"] = new_val
+                end
+                if r == 84 && cc == 13
+                  @other_adjustment["FannieMaeProduct/FreddieMacProduct/FICO/LTV"]["HomeReady"]["HomePossible"]["0-680"] = {}
+                  @other_adjustment["FannieMaeProduct/FreddieMacProduct/FICO/LTV"]["HomeReady"]["HomePossible"]["0-680"]["0-80"] = {}
+                  cc = cc + 7
+                  new_val = sheet_data.cell(r,cc)
+                  @other_adjustment["FannieMaeProduct/FreddieMacProduct/FICO/LTV"]["HomeReady"]["HomePossible"]["0-680"]["0-80"] = new_val
+                end
+                if r >= 91 && r <= 99 && cc == 13
+                  if value.include?("to")
+                    ltv_key = value.sub('to','-').tr('$><% ','')
+                  else
+                    ltv_key = get_value value
+                  end
+                  @loan_amount["LoanAmount"][ltv_key] = {}
+                  cc = cc + 3
+                  new_val = sheet_data.cell(r,cc)
+                  @loan_amount["LoanAmount"][ltv_key] = new_val
+                end
+                if r == 111 && cc >= 7 && cc <= 11
+                  first_key = @term_data[cc-2].tr('A-Za-z ','')
+                  @loan_amount["LoanType/Term"]["Fixed"][first_key] = {}
+                  @loan_amount["LoanType/Term"]["Fixed"][first_key] = value
+                end
+                if r == 111 && cc >= 12 && cc <= 14
+                  first_key = @term_data[cc-2].tr('A-Za-z ','')
+                  @loan_amount["LoanType/Term"]["ARM"][first_key] = {}
+                  @loan_amount["LoanType/Term"]["ARM"][first_key] = value
                 end
               end
             end
           end
         end
-
-        #Adjustment HomeReady
-        (82..84).each do |r|
-          row = sheet_data.row(r)
-          if (row.compact.count >= 1)
-            (13..20).each do |max_column|
-              cc = max_column
-              value = sheet_data.cell(r,cc)
-              if value.present?
-                if value == "HomeReady/Home Possible LLPA Caps"
-                  f_key = "LoanType/Term/FICO/LTV"
-                  @home_hash[f_key] = {}
-                end
-
-                if r >=83 && r <= 84 && cc == 13
-                  ccc = cc + 7
-                  c_val = sheet_data.cell(r,ccc)
-                  @home_hash[f_key][value] = c_val
-                end
-
-              end
-            end
-          end
-        end
-        Adjustment.create(data: @home_hash, sheet_name: sheet)
-        Adjustment.create(data: @subordinate_hash, sheet_name: sheet)
-        Adjustment.create(data: @sub_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @occp_hash, sheet_name: sheet)
-        Adjustment.create(data: @ltv_co_hash, sheet_name: sheet)
-        Adjustment.create(data: @ltv_fico_hash, sheet_name: sheet)
-        Adjustment.create(data: @valn_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @avrg_adjustment, sheet_name: sheet)
-        Adjustment.create(data: @lock_adjustment, sheet_name: sheet)
-        create_program_association_with_adjustment(sheet)
+        adjustment = [@adjustment_hash,@cash_out,@subordinate_hash,@property_hash,@other_adjustment,@loan_amount]
+        make_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_ob_allied_mortgage_group_wholesale8570_path(@sheet_obj)
@@ -829,16 +718,12 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
 
     def get_value value1
       if value1.present?
-        if value1.include?("FICO <")
-          value1 = "0"+value1.split("FICO").last
-        elsif value1.include?("<=") || value1.include?(">=")
-          value1 = "0"+value1
-        elsif value1.include?("FICO")
-          value1 = value1.split("FICO ").last.first(9)
-        elsif value1 == "Investment Property"
-          value1 = "Property/Type"
+        if value1.include?("<=") || value1.include?("<")
+          value1 = "0-"+value1.split("<=").last.tr('^0-9', '')
+        elsif value1.include?(">") || value1.include?("+")
+          value1 = value1.split(">").last.tr('^0-9', '')+"-Inf"
         else
-          value1
+          value1 = value1.tr('A-Z ','')
         end
       end
     end
@@ -922,6 +807,14 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
       end
       @program.save
       @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, jumbo_high_balance: jumbo_high_balance, program_category: program_category)
+    end
+
+    def make_adjust(block_hash, sheet)
+      block_hash.each do |hash|
+        hash.each do |key|
+          Adjustment.create(data: key,sheet_name: sheet)
+        end
+      end
     end
 
     def create_program_association_with_adjustment(sheet)

@@ -693,7 +693,7 @@ class ObCmgWholesalesController < ApplicationController
             value = sheet_data.cell(r,cc)
             if value.present?
               if value == "LOAN AMOUNT "
-                primary_key1 = "LoanAmount/LTV"
+                primary_key1 = "LoanAmount"
                 @loan_adjustment[primary_key1] = {}
               end
               if value == "STATE ADJUSTMENTS"
@@ -852,8 +852,8 @@ class ObCmgWholesalesController < ApplicationController
                     primary_key = "PropertyType/LTV"
                     @adjustment_hash[primary_key] = {}
                     @adjustment_hash["FannieMae/Term/FICO/LTV"] = {}
-                    @adjustment_hash["FannieMae/Term/FICO/LTV"]["FNMA"] = {}
-                    @adjustment_hash["FannieMae/Term/FICO/LTV"]["FNMA"]["15-Inf"] = {}
+                    @adjustment_hash["FannieMae/Term/FICO/LTV"][true] = {}
+                    @adjustment_hash["FannieMae/Term/FICO/LTV"][true]["15-Inf"] = {}
                   elsif value == "SUBORDINATE FINANCING"
                     primary_key = "FinancingType/LTV/CLTV/FICO"
                     @subordinate_hash[primary_key] = {}
@@ -861,7 +861,7 @@ class ObCmgWholesalesController < ApplicationController
                   elsif value == "DU REFI PLUS ADJUSTMENT CAP (MAX ADJ) *"
                     primary_key = "FannieMae/PropertyType/Term/LTV"
                     @adjustment_cap[primary_key] = {}
-                    @adjustment_cap[primary_key]["DuRefiPlus"] = {}
+                    @adjustment_cap[primary_key][true] = {}
                   end
                   if r >= 58 && r <= 59 && cc == 1
                     new_key = value
@@ -893,12 +893,12 @@ class ObCmgWholesalesController < ApplicationController
                     elsif value.include?("(N/A for 15 Year Term or less)")
                       secondary_key = value.split("(N/A for 15 Year Term or less)").first.tr('A-Z ','')
                     end
-                    @adjustment_hash["FannieMae/Term/FICO/LTV"]["FNMA"]["15-Inf"][secondary_key] = {}
+                    @adjustment_hash["FannieMae/Term/FICO/LTV"][true]["15-Inf"][secondary_key] = {}
                   end
                   if r >= 61 && r <= 68 && cc >= 8 && cc <= 16
                     ltv_key = get_value @fnma_data[cc-1]
-                    @adjustment_hash["FannieMae/Term/FICO/LTV"]["FNMA"]["15-Inf"][secondary_key][ltv_key] = {}
-                    @adjustment_hash["FannieMae/Term/FICO/LTV"]["FNMA"]["15-Inf"][secondary_key][ltv_key] = value
+                    @adjustment_hash["FannieMae/Term/FICO/LTV"][true]["15-Inf"][secondary_key][ltv_key] = {}
+                    @adjustment_hash["FannieMae/Term/FICO/LTV"][true]["15-Inf"][secondary_key][ltv_key] = value
                   end
                   if r == 69 && cc == 1
                     @adjustment_hash["PropertyType/LTV"]["Manufactured Home"] = {}
@@ -923,6 +923,8 @@ class ObCmgWholesalesController < ApplicationController
                   if r >= 74 && r <= 78 && cc == 1
                     if value.include?("-")
                       secondary_key = value.tr('%$' , '')
+                    elsif value.include?("All")
+                      secondary_key = "0-Inf"  
                     else
                       secondary_key = get_value value
                     end
@@ -945,28 +947,30 @@ class ObCmgWholesalesController < ApplicationController
                   if r >= 81 && r <= 82 && cc == 1
                     if value == "Primary / Second Home"
                       secondary_key = "2nd Home"
+                    elsif value.include?("All")
+                      secondary_key = "0-Inf"  
                     else
                       secondary_key = value
                     end
-                    @adjustment_cap[primary_key]["DuRefiPlus"][secondary_key] = {}
+                    @adjustment_cap[primary_key][true][secondary_key] = {}
                   end
                   if r >= 81 && r <= 82 && cc == 4
                     cltv_key = get_value value
-                    @adjustment_cap[primary_key]["DuRefiPlus"][secondary_key][cltv_key] = {}
+                    @adjustment_cap[primary_key][true][secondary_key][cltv_key] = {}
                   end
                   if r >= 81 && r <= 82 && cc >= 5 && cc <= 7
                     cap_key = get_value @cap_data[cc-1]
-                    @adjustment_cap[primary_key]["DuRefiPlus"][secondary_key][cltv_key][cap_key] = {}
-                    @adjustment_cap[primary_key]["DuRefiPlus"][secondary_key][cltv_key][cap_key] = value
+                    @adjustment_cap[primary_key][true][secondary_key][cltv_key][cap_key] = {}
+                    @adjustment_cap[primary_key][true][secondary_key][cltv_key][cap_key] = value
                   end
                   if r == 83 && cc == 4
                     cltv_key = get_value value
-                    @adjustment_cap[primary_key]["DuRefiPlus"][secondary_key][cltv_key] = {}
+                    @adjustment_cap[primary_key][true][secondary_key][cltv_key] = {}
                   end
                   if r == 83 && cc >= 5 && cc <= 7 
                     cap_key = get_value @cap_data[cc-1]
-                    @adjustment_cap[primary_key]["DuRefiPlus"][secondary_key][cltv_key][cap_key] = {}
-                    @adjustment_cap[primary_key]["DuRefiPlus"][secondary_key][cltv_key][cap_key] = value
+                    @adjustment_cap[primary_key][true][secondary_key][cltv_key][cap_key] = {}
+                    @adjustment_cap[primary_key][true][secondary_key][cltv_key][cap_key] = value
                   end
                 end
               end
@@ -3380,20 +3384,6 @@ class ObCmgWholesalesController < ApplicationController
     end
   end
 
-  def get_key value1
-    if value1.present?
-      if value1.include?("Streamline")
-        value1 = "FHA/Refinance"
-      elsif value1.include?("CashOut")
-        value1 = "VA/CashOut"
-      elsif value1.include?("Lock")
-        value1 = "FHA/Refinance"
-      elsif value1.include?("IRRR")
-        value1 = "FHA/Refinance"
-      end
-    end
-  end
-
   def programs
     @programs = @sheet_obj.programs
   end
@@ -3453,20 +3443,6 @@ class ObCmgWholesalesController < ApplicationController
       @program = Program.find(params[:id])
     end
 
-    def get_key value1
-      if value1.present?
-        if value1.include?("Streamline")
-          value1 = "FHA/Refinance"
-        elsif value1.include?("CashOut")
-          value1 = "VA/CashOut"
-        elsif value1.include?("Lock")
-          value1 = "FHA/Refinance"
-        elsif value1.include?("IRRR")
-          value1 = "FHA/Refinance"
-        end
-      end
-    end
-
     def program_property sheet
       # term
       if (@program.program_name.split("Year").count > 1) 
@@ -3513,6 +3489,7 @@ class ObCmgWholesalesController < ApplicationController
       jumbo_high_balance = false
       if @program.program_name.include?("High Bal") || @program.program_name.include?("HIGH BAL")
         jumbo_high_balance = true
+        loan_size = "High Balance"
       end
        # Fannie mae Product
       if @program.program_name.include?("HomeReady")
@@ -3541,12 +3518,14 @@ class ObCmgWholesalesController < ApplicationController
       end
       
       @program.save 
-      @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",program_category: program_category, jumbo_high_balance: jumbo_high_balance, streamline: streamline,fha: fha, va: va, usda: usda, full_doc: full_doc, arm_basic: arm_basic, sheet_name: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product)
+      @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",program_category: program_category, jumbo_high_balance: jumbo_high_balance, streamline: streamline,fha: fha, va: va, usda: usda, full_doc: full_doc, arm_basic: arm_basic, sheet_name: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product, loan_size: loan_size)
     end
 
     def make_adjust(block_hash, sheet)
       block_hash.each do |hash|
-        Adjustment.create(data: hash,sheet_name: sheet)
+        hash.each do |key|
+          Adjustment.create(data: key,sheet_name: sheet)
+        end
       end
     end
 end

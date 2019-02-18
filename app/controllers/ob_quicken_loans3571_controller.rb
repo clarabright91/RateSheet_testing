@@ -1381,15 +1381,17 @@ class ObQuickenLoans3571Controller < ApplicationController
 
     def program_property
       if @program.program_name.include?("30") || @program.program_name.include?("30/25 Year")
-        term = 30
+        term = @program.program_name.tr('A-Za-z- ','')
       elsif @program.program_name.include?("20")
-        term = 20
+        term = @program.program_name.tr('A-Za-z- ','')
       elsif @program.program_name.include?("15")
-        term = 15
+        term = @program.program_name.tr('A-Za-z- ','')
       elsif @program.program_name.include?("10 Year")
-        term = 10
+        term = @program.program_name.tr('A-Za-z- ','')
       elsif @program.program_name.include?("5 Year")
-      	term = 5
+      	term = @program.program_name.tr('A-Za-z- ','')
+      elsif @program.program_name.include?("7 Year")
+       term = @program.program_name.tr('A-Za-z- ','')
       else
         term = nil
       end
