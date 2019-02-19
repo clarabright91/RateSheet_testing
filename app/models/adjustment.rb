@@ -20,7 +20,7 @@ class Adjustment < ApplicationRecord
     "Subordinate Financing" => "FinancingType/LTV/CLTV/FICO",
     "Misc Adjusters" => "PropertyType/LTV/Term",
     "Non Owner Occupied" => "PropertyType/LTV",
-    "Loan Size Adjustments" => "LoanType/Conforming/LTV/FICO",
+    "Loan Size Adjustments" => "LoanAmount/LoanPurpose",
     "Super Conforming" => "Conforming/LTV/FICO",
     "Super Conforming Adjustments" => "LoanPurpose/RefinanceOption",
     "Subordinate Financing\nExcludes Community Seconds®" => "FinancingType/LTV/CLTV/FICO"
