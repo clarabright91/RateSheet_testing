@@ -11,7 +11,7 @@ class Adjustment < ApplicationRecord
     "All Fixed Conforming\n(does not apply to terms <=15yrs)" => "Conforming/RateType/Term/LTV/FICO",
     "All Fixed Conforming\n(does not apply to terms <=15yrs with LTV <=95)" => "Conforming/RateType/Term/LTV/FICO",
     "All Conforming\n(does not apply to Fixed terms <=15yrs with LTV <=95)" => "Conforming/RateType/Term/LTV/FICO",
-    "Cash-Out" => "RefinanceOption/LTV/FICO",
+    "Cash-Out" => "RefinanceOption/FICO/LTV",
     "Lender Paid MI Adjustments" => "Term/LTV/FICO",
     "Premium Adjustments" => "LPMI/PremiumType/FICO",
     "LTV Adjustments" => "LPMI/Term/LTV/FICO",
