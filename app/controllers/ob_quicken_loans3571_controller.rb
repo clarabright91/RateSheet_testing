@@ -1350,7 +1350,7 @@ class ObQuickenLoans3571Controller < ApplicationController
 
   private
 
-  def get_sheet
+    def get_sheet
       @sheet_obj = Sheet.find(params[:id])
     end
 
