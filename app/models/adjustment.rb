@@ -195,6 +195,7 @@ class Adjustment < ApplicationRecord
     "FannieMaeProduct",
     "FreddieMacProduct",
     "LoanPurpose",
-    "ProgramCategory"
+    "ProgramCategory",
+    "LoanSize"
   ]
 end
