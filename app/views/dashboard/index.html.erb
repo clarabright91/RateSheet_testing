@@ -207,7 +207,7 @@
                 <div class="form-group">
                   <label>Misc Adjuster</label>
                   <div class="input-group">                    
-                    <%@misc_adjuster_values = [["CA Escrow Waiver (Full or Taxes Only)"], ["CA Escrow Waiver (Insurance Only)"], ["Miscellaneous"]]%>
+                    <%@misc_adjuster_values = [["CA Escrow Waiver (Full or Taxes Only)"], ["CA Escrow Waiver (Insurance Only)"], ["Miscellaneous"], ["Escrow Waiver Fee"]]%>
                     <%= select_tag 'misc_adjuster', options_for_select(@misc_adjuster_values, (params[:misc_adjuster] rescue nil)), :class=> "form-control" %>
                   </div>
                 </div>
@@ -299,7 +299,7 @@
         <tr>
           <td>5</td>
           <td>Newfi Wholesale </td>
-          <!-- <td class="text-center"><a class='btn btn-info btn-xs' href="<%#=ob_newfi_wholesale7019_index_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td> -->
+          <td class="text-center"><a class='btn btn-info btn-xs' href="<%=ob_newfi_wholesale7019_index_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
         </tr>
         <tr>
           <td>6</td>
