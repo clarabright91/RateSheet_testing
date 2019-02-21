@@ -55,6 +55,7 @@ Rails.application.routes.draw do
       get :jumbo_6400
       get :jumbo_6800
       get :jumbo_6900_7900
+      get :mi_llpas
       get :single_program
     end
   end
