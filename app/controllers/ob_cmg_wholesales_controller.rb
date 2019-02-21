@@ -1321,18 +1321,6 @@ class ObCmgWholesalesController < ApplicationController
         @property_hash = {}
         ltv_key = ''
         secondary_key = ''
-        # @misc_adjustment = {}
-        # @state_adjustment = {}
-        # primary_key = ''
-        # primary_key1 = ''
-        # fnma_key = ''
-        # sub_data = ''
-        # sub_key = ''
-        # cltv_key = ''
-        # cap_key = ''
-        # m_key = ''
-        # key = ''
-        # loan_key = ''
 
         # Adjustment
         (10..62).each do |r|
@@ -1667,7 +1655,7 @@ class ObCmgWholesalesController < ApplicationController
             raise "value is nil at row = #{r}"
           end
         end
-        adjustment = [@adjustment_hash,@subordinate_hash,@adjustment_cap,@misc_adjustment,@state_adjustment]
+        adjustment = [@adjustment_hash,@subordinate_hash,@adjustment_cap,@standard_hash,@home_hash,@property_hash]
         make_adjust(adjustment,sheet)
 
         create_program_association_with_adjustment(sheet)
