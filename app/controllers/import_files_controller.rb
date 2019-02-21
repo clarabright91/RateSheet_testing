@@ -4629,77 +4629,78 @@ class ImportFilesController < ApplicationController
             end
           end
         end
+
+
+        key = ''
+        another_key = ''
+        keyOfHash = ''
+        # for Misc Adjusters
+        first_key   = ''
+        second_key  = ''
+        third_key   = ''
+        final_key   = ''
+        f1_key      = ''
+        f2_key      = ''
+        loan_amount = ''
         # Adjustments
-        (34..73).each do |r|
-          row = sheet_data.row(r)
-          @credit_data = sheet_data.row(40)
-          (0..10).each do |max_column|
-            cc = 3 + max_column
-            value = sheet_data.cell(r,cc)
-            if value.present?
-              if value == "Jumbo Series I Adjustments"
-                main_key = "LoanType/FICO/CLTV"
-                @adjustment_hash[main_key] = {}
-              end
-              if value == "Fixed Adjustments"
-                @key1 = value
-                @adjustment_hash[main_key][@key1] = {}
-              end
-              if value == "Credit Score" || value == "Loan Amount" || value == "Purpose/Property Type"
-                primary_key = value
-                @adjustment_hash[main_key][@key1][primary_key] = {}
-              end
-              if (r >= 41 && r <= 45 && cc == 3) || (r >= 50 && r <= 53 && cc == 3) || (r >= 58 && r<= 62 && cc == 3)
-                key = get_value value
-                @adjustment_hash[main_key][@key1][primary_key][key] = {}
-              end
-              if (r >= 41 && r <= 45 && cc > 3 && cc <= 10 && cc != 9) || (r >= 50 && r <= 53 && cc > 3 && cc <= 10 && cc != 9) || ( r >= 58 && r <= 62 && cc > 3 && cc <= 10 && cc != 9)
-                cltv_key = get_value @credit_data[cc-2]
-                @adjustment_hash[main_key][@key1][primary_key][key][cltv_key] = {}
-                @adjustment_hash[main_key][@key1][primary_key][key][cltv_key] = value
-              end
-            end
+        (40..73).each do |row|
+          unless @adjustment_hash.has_key?("LoanType/FICO/LTV")
+            #  for Credit Score table
+            @adjustment_hash["LoanType/FICO/LTV"] = {}
+            @adjustment_hash["LoanType/FICO/LTV"]["Fixed"] = {}
+            @adjustment_hash["LoanType/FICO/LTV"]["ARM"] = {}
           end
 
-          (12..19).each do |max_column|
-            cc = max_column
-            value = sheet_data.cell(r,cc)
-            if value.present?
-              if value == "ARM Adjustments"
-                @key = "ARM"
-                @adjustment_hash[main_key][@key] = {} unless @adjustment_hash[main_key].has_key?(@key)
-              end
-              if value == "Credit Score" || value == "Loan Amount" || value == "Purpose/Property Type"
-                primary_key = value
-                @adjustment_hash[main_key][@key][primary_key] = {}
-              end
-              if (r >= 41 && r <= 45 && cc == 12) || (r >= 50 && r <= 53 && cc == 12) || (r >= 58 && r <= 62 && cc == 12)
-                key1 = get_value value
-                @adjustment_hash[main_key][@key][primary_key][key1] = {}
-              end
-              if (r >= 41 && r <= 45 && cc > 12 && cc <= 19 && cc != 15) || (r >= 50 && r <= 53 && cc > 12 && cc <= 19 && cc != 15) || (r >= 58 && r <= 62 && cc > 12 && cc <= 19 && cc != 15)
-                cltv_key1 = get_value @credit_data[cc-2]
-                @adjustment_hash[main_key][@key][primary_key][key1][cltv_key1] = {}
-                @adjustment_hash[main_key][@key][primary_key][key1][cltv_key1] = value
-              end
-            end
+          unless @adjustment_hash.has_key?("LoanType/LoanAmount/LTV")
+            # for Loan Amount table
+            @adjustment_hash["LoanType/LoanAmount/LTV"] = {}
+            @adjustment_hash["LoanType/LoanAmount/LTV"]["Fixed"] = {}
+            @adjustment_hash["LoanType/LoanAmount/LTV"]["ARM"] = {}
           end
 
-          (0..17).each do |max_column|
-            cc = 3 + max_column
-            value = sheet_data.cell(r,cc)
-            if value.present?
-              if value == "Other Adjustments" || value == "Maximum Prices"
-                main_key = value
-                @adjustment_hash[main_key] = {}
-              end
-              if (r == 66 && cc == 3) || (r == 66 && cc == 12) || (r >= 72 && r <= 73 && cc == 3) || (r >= 72 && r <= 73 && cc == 12)
-                primary_key = value
-                @adjustment_hash[main_key][primary_key] = {}
-              end
-              if (r == 66 && cc == 7) || (r == 66 && cc == 17) || (r >= 72 && r <= 73 && cc ==7) || (r >= 72 && r <= 73 && cc ==17)
-                @adjustment_hash[main_key][primary_key] = value
-              end
+          unless @adjustment_hash.has_key?("LoanType/PropertyType/LTV")
+            # for Purpose/Property Type table
+            @adjustment_hash["LoanType/PropertyType/LTV"] = {}
+            @adjustment_hash["LoanType/PropertyType/LTV"]["Fixed"] = {}
+            @adjustment_hash["LoanType/PropertyType/LTV"]["ARM"] = {}
+          end
+
+          unless @adjustment_hash.has_key?("LoanType/RefinanceOption/Term/LTV")
+            @adjustment_hash["LoanType/RefinanceOption/Term/LTV"] = {}
+            @adjustment_hash["LoanType/RefinanceOption/Term/LTV"]["Fixed"] = {}
+            @adjustment_hash["LoanType/RefinanceOption/Term/LTV"]["ARM"] = {}
+          end
+
+          unless @adjustment_hash.has_key?("LoanType/RefinanceOption/LTV")
+            @adjustment_hash["LoanType/RefinanceOption/LTV"] = {}
+            @adjustment_hash["LoanType/RefinanceOption/LTV"]["Fixed"] = {}
+            @adjustment_hash["LoanType/RefinanceOption/LTV"]["ARM"] = {}
+          end
+
+          (3..19).each do |column|
+            value = sheet_data.cell(row,column)
+
+            # prepare first key inside hash
+            if((row >= 41 && row <= 45) && column.eql?(3))
+              first_key = set_range(value) || get_value(value)
+              @adjustment_hash["LoanType/FICO/LTV"]["Fixed"][first_key] = {}
+            end
+
+            if((row >= 50 && row <= 53) && column.eql?(3))
+              first_key = set_range(value) || get_value(value)
+              @adjustment_hash["LoanType/LoanAmount/LTV"]["Fixed"][first_key] = {}
+            end
+
+            if((row >= 58 && row <= 62) && column.eql?(3))
+            end
+
+            if((row >= 41 && row <= 45) && column.eql?(12))
+            end
+
+            if((row >= 50 && row <= 53) && column.eql?(12))
+            end
+
+            if((row >= 58 && row <= 62) && column.eql?(12))
             end
           end
         end
