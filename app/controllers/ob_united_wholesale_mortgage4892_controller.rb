@@ -43,7 +43,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @adjustment_hash = {}
-        @loan_amount = {}
+        @fico_adj = {}
         primary_key = ''
         secondary_key = ''
         start_range = 9
@@ -59,13 +59,13 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
             rr = r + 1
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
-              cc = 4*max_column + 1 
+              cc = 4*max_column + 1
               @title = sheet_data.cell(r,cc)
               if @title.present? && @title != "GOVERNMENT PRICE ADJUSTMENTS"
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
                 program_property
-                
+
                 @block_hash = {}
                 key = ''
                 (1..14).each do |max_row|
@@ -89,7 +89,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                   end
                 end
                 @program.update(base_rate: @block_hash)
-              end  
+              end
             end
           end
         end
@@ -106,12 +106,12 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                   @adjustment_hash[primary_key] = {}
                 end
                 if value == "Credit Score Adjustors:  (lowest middle score)"
-                  primary_key = "LoanType"
-                  @loan_amount[primary_key] = {}
+                  primary_key = "FICO"
+                  @fico_adj[primary_key] = {}
                 end
                 # Loan Size Adjustors
                 if r >= 80 && r <= 82 && cc == 9
-                  secondary_key = get_value value.split("Loan Amount:").last
+                  secondary_key = get_value value
                   @adjustment_hash[primary_key][secondary_key] = {}
                 end
                 if r >= 80 && r <= 82 && cc == 16
@@ -119,78 +119,78 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 end
                 # Credit Score Adjustors
                 if r >= 84 && r <= 85 && cc == 9
-                  secondary_key = value
-                  @loan_amount[primary_key][secondary_key] = {}
+                  secondary_key = value.gsub(/\s+/, '')
+                  @fico_adj[primary_key][secondary_key] = {}
                 end
                 if r >= 84 && r <= 85 && cc == 16
-                  @loan_amount[primary_key][secondary_key] = value
+                  @fico_adj[primary_key][secondary_key] = value
                 end
-                if r == 86 && cc == 9
-                  primary_key = "0<$125,000"
-                  @loan_amount[primary_key] = {}
-                end
-                if r == 86 && cc == 16
-                  @loan_amount[primary_key] = value
-                end
-                if r == 87 && cc == 9
-                  primary_key = "LoanPurpose/LockDay"
-                  @loan_amount[primary_key] = {}
-                end
-                if r == 87 && cc == 16
-                  @loan_amount[primary_key] = value
-                end
-                if r == 89 && cc == 9
-                  primary_key = "LoanType/Term"
-                  @loan_amount[primary_key] = {}
-                  if @loan_amount[primary_key] = {}
-                    cc = cc + 7
-                    new_value = sheet_data.cell(r,cc)
-                    @loan_amount[primary_key] = new_value
-                  end
-                end
-                if r == 90 && cc == 9
-                  primary_key = "Term"
-                  @loan_amount[primary_key] = {}
-                  if @loan_amount[primary_key] = {}
-                    cc = cc + 7
-                    new_value = sheet_data.cell(r,cc)
-                    @loan_amount[primary_key] = new_value
-                  end
-                end
-                if r == 91 && cc == 9
-                  primary_key = "Streamline"
-                  @loan_amount[primary_key] = {}
-                  if @loan_amount[primary_key] = {}
-                    cc = cc + 7
-                    new_value = sheet_data.cell(r,cc)
-                    @loan_amount[primary_key] = new_value
-                  end
-                end
-                if r == 92 && cc == 9
-                  primary_key = "VA/LoanType/RefinanceOption"
-                  secondary_key = "115.01-125%"
-                  @loan_amount[primary_key] = {}
-                  @loan_amount[primary_key][secondary_key] = {}
-                  if @loan_amount[primary_key][secondary_key] = {}
-                    cc = cc + 7
-                    new_value = sheet_data.cell(r,cc)
-                    @loan_amount[primary_key][secondary_key] = new_value
-                  end
-                end
-                if r == 93 && cc == 9
-                  secondary_key = "125.01-150%"
-                  @loan_amount[primary_key][secondary_key] = {}
-                  if @loan_amount[primary_key][secondary_key] = {}
-                    cc = cc + 7
-                    new_value = sheet_data.cell(r,cc)
-                    @loan_amount[primary_key][secondary_key] = new_value
-                  end
-                end
+                # if r == 86 && cc == 9
+                #   primary_key = "0<$125,000"
+                #   @fico_adj[primary_key] = {}
+                # end
+                # if r == 86 && cc == 16
+                #   @fico_adj[primary_key] = value
+                # end
+                # if r == 87 && cc == 9
+                #   primary_key = "LoanPurpose/LockDay"
+                #   @fico_adj[primary_key] = {}
+                # end
+                # if r == 87 && cc == 16
+                #   @fico_adj[primary_key] = value
+                # end
+                # if r == 89 && cc == 9
+                #   primary_key = "LoanType/Term"
+                #   @fico_adj[primary_key] = {}
+                #   if @fico_adj[primary_key] = {}
+                #     cc = cc + 7
+                #     new_value = sheet_data.cell(r,cc)
+                #     @fico_adj[primary_key] = new_value
+                #   end
+                # end
+                # if r == 90 && cc == 9
+                #   primary_key = "Term"
+                #   @fico_adj[primary_key] = {}
+                #   if @fico_adj[primary_key] = {}
+                #     cc = cc + 7
+                #     new_value = sheet_data.cell(r,cc)
+                #     @fico_adj[primary_key] = new_value
+                #   end
+                # end
+                # if r == 91 && cc == 9
+                #   primary_key = "Streamline"
+                #   @fico_adj[primary_key] = {}
+                #   if @fico_adj[primary_key] = {}
+                #     cc = cc + 7
+                #     new_value = sheet_data.cell(r,cc)
+                #     @fico_adj[primary_key] = new_value
+                #   end
+                # end
+                # if r == 92 && cc == 9
+                #   primary_key = "LoanType/RefinanceOption/VA"
+                #   secondary_key = "115.01-125%"
+                #   @fico_adj[primary_key] = {}
+                #   @fico_adj[primary_key][secondary_key] = {}
+                #   if @fico_adj[primary_key][secondary_key] = {}
+                #     cc = cc + 7
+                #     new_value = sheet_data.cell(r,cc)
+                #     @fico_adj[primary_key][secondary_key] = new_value
+                #   end
+                # end
+                # if r == 93 && cc == 9
+                #   secondary_key = "125.01-150%"
+                #   @fico_adj[primary_key][secondary_key] = {}
+                #   if @fico_adj[primary_key][secondary_key] = {}
+                #     cc = cc + 7
+                #     new_value = sheet_data.cell(r,cc)
+                #     @fico_adj[primary_key][secondary_key] = new_value
+                #   end
+                # end
               end
             end
           end
         end
-        adjustment = [@adjustment_hash,@loan_amount]
+        adjustment = [@adjustment_hash,@fico_adj]
         make_adjust(adjustment,sheet)
         create_program_association_with_adjustment(sheet)
       end
@@ -216,7 +216,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
             (0..max_column_section).each do |max_column|
               cc = 4*max_column + 1 # 3 / 7 / 11
               @title = sheet_data.cell(r,cc)
-              if @title.present? 
+              if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
                 program_property
@@ -249,13 +249,13 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
         end
         (15..28).each do |r|
           row = sheet_data.row(r)
-          if ((row.compact.count >= 1) && (row.compact.count <= 4)) 
+          if ((row.compact.count >= 1) && (row.compact.count <= 4))
             rr = r + 1
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
               cc = 4*max_column + 1 # 3 / 7 / 11
               @title = sheet_data.cell(r,cc)
-              if @title.present? 
+              if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
                 program_property
@@ -295,7 +295,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
             (0..max_column_section).each do |max_column|
               cc = 4*max_column + 1 # 3 / 7 / 11
               @title = sheet_data.cell(r,cc)
-              if @title.present? 
+              if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
                 program_property
@@ -328,13 +328,13 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
         end
         (36..49).each do |r|
           row = sheet_data.row(r)
-          if ((row.compact.count >= 1) && (row.compact.count <= 4)) 
+          if ((row.compact.count >= 1) && (row.compact.count <= 4))
             rr = r + 1
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
               cc = 4*max_column + 1 # 3 / 7 / 11
               @title = sheet_data.cell(r,cc)
-              if @title.present? 
+              if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
                 program_property
@@ -379,12 +379,12 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                   @adjustment_hash[primary_key] = {}
                 end
                 if value == "Credit Score Adjustors:  (lowest middle score)"
-                  primary_key = "LoanType"
+                  primary_key = "FICO"
                   @loan_amount[primary_key] = {}
                 end
                 # Loan Size Adjustors
                 if r >= 53 && r <= 55 && cc == 4
-                  secondary_key = get_value value.split("Loan Amount:").last
+                  secondary_key = get_value value
                   @adjustment_hash[primary_key][secondary_key] = {}
                 end
                 if r >= 53 && r <= 55 && cc == 13
@@ -398,67 +398,67 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 if r >= 57 && r <= 58 && cc == 13
                   @loan_amount[primary_key][secondary_key] = value
                 end
-                if r == 59 && cc == 4
-                  primary_key = "0<$125,000"
-                  @loan_amount[primary_key] = {}
-                end
-                if r == 59 && cc == 13
-                  @loan_amount[primary_key] = value
-                end
-                if r == 60 && cc == 4
-                  primary_key = "LoanPurpose/LockDay"
-                  @loan_amount[primary_key] = {}
-                end
-                if r == 60 && cc == 13
-                  @loan_amount[primary_key] = value
-                end
-                if r == 62 && cc == 4
-                  primary_key = "LoanType/Term"
-                  @loan_amount[primary_key] = {}
-                  if @loan_amount[primary_key] = {}
-                    cc = cc + 9
-                    new_value = sheet_data.cell(r,cc)
-                    @loan_amount[primary_key] = new_value
-                  end
-                end
-                if r == 63 && cc == 4
-                  primary_key = "Term"
-                  @loan_amount[primary_key] = {}
-                  if @loan_amount[primary_key] = {}
-                    cc = cc + 9
-                    new_value = sheet_data.cell(r,cc)
-                    @loan_amount[primary_key] = new_value
-                  end
-                end
-                if r == 64 && cc == 4
-                  primary_key = "Streamline"
-                  @loan_amount[primary_key] = {}
-                  if @loan_amount[primary_key] = {}
-                    cc = cc + 9
-                    new_value = sheet_data.cell(r,cc)
-                    @loan_amount[primary_key] = new_value
-                  end
-                end
-                if r == 65 && cc == 4
-                  primary_key = "VA/LoanType/RefinanceOption"
-                  secondary_key = "115.01-125%"
-                  @loan_amount[primary_key] = {}
-                  @loan_amount[primary_key][secondary_key] = {}
-                  if @loan_amount[primary_key][secondary_key] = {}
-                    cc = cc + 9
-                    new_value = sheet_data.cell(r,cc)
-                    @loan_amount[primary_key][secondary_key] = new_value
-                  end
-                end
-                if r == 66 && cc == 4
-                  secondary_key = "125.01-150%"
-                  @loan_amount[primary_key][secondary_key] = {}
-                  if @loan_amount[primary_key][secondary_key] = {}
-                    cc = cc + 9
-                    new_value = sheet_data.cell(r,cc)
-                    @loan_amount[primary_key][secondary_key] = new_value
-                  end
-                end
+                # if r == 59 && cc == 4
+                #   primary_key = "0<$125,000"
+                #   @loan_amount[primary_key] = {}
+                # end
+                # if r == 59 && cc == 13
+                #   @loan_amount[primary_key] = value
+                # end
+                # if r == 60 && cc == 4
+                #   primary_key = "LoanPurpose/LockDay"
+                #   @loan_amount[primary_key] = {}
+                # end
+                # if r == 60 && cc == 13
+                #   @loan_amount[primary_key] = value
+                # end
+                # if r == 62 && cc == 4
+                #   primary_key = "LoanType/Term"
+                #   @loan_amount[primary_key] = {}
+                #   if @loan_amount[primary_key] = {}
+                #     cc = cc + 9
+                #     new_value = sheet_data.cell(r,cc)
+                #     @loan_amount[primary_key] = new_value
+                #   end
+                # end
+                # if r == 63 && cc == 4
+                #   primary_key = "Term"
+                #   @loan_amount[primary_key] = {}
+                #   if @loan_amount[primary_key] = {}
+                #     cc = cc + 9
+                #     new_value = sheet_data.cell(r,cc)
+                #     @loan_amount[primary_key] = new_value
+                #   end
+                # end
+                # if r == 64 && cc == 4
+                #   primary_key = "Streamline"
+                #   @loan_amount[primary_key] = {}
+                #   if @loan_amount[primary_key] = {}
+                #     cc = cc + 9
+                #     new_value = sheet_data.cell(r,cc)
+                #     @loan_amount[primary_key] = new_value
+                #   end
+                # end
+                # if r == 65 && cc == 4
+                #   primary_key = "VA/LoanType/RefinanceOption"
+                #   secondary_key = "115.01-125%"
+                #   @loan_amount[primary_key] = {}
+                #   @loan_amount[primary_key][secondary_key] = {}
+                #   if @loan_amount[primary_key][secondary_key] = {}
+                #     cc = cc + 9
+                #     new_value = sheet_data.cell(r,cc)
+                #     @loan_amount[primary_key][secondary_key] = new_value
+                #   end
+                # end
+                # if r == 66 && cc == 4
+                #   secondary_key = "125.01-150%"
+                #   @loan_amount[primary_key][secondary_key] = {}
+                #   if @loan_amount[primary_key][secondary_key] = {}
+                #     cc = cc + 9
+                #     new_value = sheet_data.cell(r,cc)
+                #     @loan_amount[primary_key][secondary_key] = new_value
+                #   end
+                # end
               end
             end
           end
@@ -491,7 +491,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
             (0..max_column_section).each do |max_column|
               cc = 4*max_column + 3 # 3 / 7 / 11
               @title = sheet_data.cell(r,cc)
-              if @title.present? 
+              if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
                 program_property
@@ -524,13 +524,13 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
         end
         (41..53).each do |r|
           row = sheet_data.row(r)
-          if ((row.compact.count >= 1) && (row.compact.count <= 2)) 
+          if ((row.compact.count >= 1) && (row.compact.count <= 2))
             rr = r + 1
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
               cc = 4*max_column + 5 # 3 / 7 / 11
               @title = sheet_data.cell(r,cc)
-              if @title.present? 
+              if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
                 program_property
@@ -571,7 +571,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
             (0..max_column_section).each do |max_column|
               cc = 4*max_column + 3 # 3 / 7 / 11
               @title = sheet_data.cell(r,cc)
-              if @title.present? 
+              if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
                 program_property
@@ -716,7 +716,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 cc = 4*max_column + 1
               end
               @title = sheet_data.cell(r,cc)
-              if @title.present? 
+              if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
                 program_property
@@ -755,7 +755,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
   def programs
     @programs = @sheet_obj.programs
   end
-  
+
   def single_program
   end
 
@@ -773,9 +773,11 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
         if value1.include?("CLTV  <")
           value1 = "0"+value1.split("CLTV").last
         elsif value1.include?("<=") || value1.include?("<")
-          value1 = "0"+value1
+          value1 = "0-"+ value1.tr('^0-9', '')
         elsif value1.include?("CLTV")
           value1 = value1.split("CLTV ").last.first(9)
+        elsif value1.include?("-")
+          value1.gsub(/[^0-9-]/, "")
         else
           value1
         end
@@ -853,7 +855,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
       elsif @program.program_name.include?("7/1") || @program.program_name.include?("7 / 1")
         arm_basic = 7
       elsif @program.program_name.include?("10/1") || @program.program_name.include?("10 / 1")
-        arm_basic = 10          
+        arm_basic = 10
       end
 
       # Arm Advanced
@@ -882,7 +884,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
       (start_range..end_range).each do |r|
         row = sheet_data.row(r)
         if ((row.compact.count > 1) && (row.compact.count <= 4)) && (!row.compact.include?("GOVERNMENT PRICE ADJUSTMENTS"))
-          rr = r + 1 
+          rr = r + 1
           max_column_section = row.compact.count - 1
           (0..max_column_section).each do |max_column|
             cc = num1 + max_column*num2
@@ -893,7 +895,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
               # term
               if @title.scan(/\d+/).count == 1
                 term = @title.scan(/\d+/)[0]
-              else  
+              else
                 term = (@title.scan(/\d+/)[0]+ @title.scan(/\d+/)[1]).to_i
               end
               # High Balance

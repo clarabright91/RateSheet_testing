@@ -10,7 +10,7 @@
                   <% @loan_type_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"]]%>
                   <%= select_tag 'loan_type', options_for_select(@loan_type_list, (params[:loan_type] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control", :required => true} %>
                 </div>
-              </div>            
+              </div>
 
               <div class="col-md-2 term">
                 <div class="form-group">
@@ -116,7 +116,7 @@
               <div class="col-md-2">
                 <div class="form-group">
                   <label>LTV</label>
-                  <div class="input-group">                    
+                  <div class="input-group">
                     <%@ltv_values = [["76-80",76], ["96-97",96], ["91-95",91], ["86-90",86], ["81-85",81], ["71-75",71], ["61-70",61],[ "1-60",1]]%>
                     <%= select_tag 'ltv', options_for_select(@ltv_values, (params[:ltv] rescue nil)), :class=> "form-control" %>
                   </div>
@@ -126,7 +126,7 @@
               <div class="col-md-2">
                 <div class="form-group">
                   <label>CLTV</label>
-                  <div class="input-group">                    
+                  <div class="input-group">
                     <%@cltv_values = [["71-75",71], ["96-97",96], ["91-95",91], ["86-90",86], ["81-85",81], ["76-80",76], ["61-70",61],[ "1-60",1]]%>
                     <%= select_tag 'cltv', options_for_select(@cltv_values, (params[:cltv] rescue nil)), :class=> "form-control" %>
                   </div>
@@ -186,7 +186,7 @@
               <div class="col-md-2">
                 <div class="form-group">
                   <label>Financing Type</label>
-                  <div class="input-group">                    
+                  <div class="input-group">
                     <%@financing_type_values = [["Subordinate Financing"]]%>
                     <%= select_tag 'financing_type', options_for_select(@financing_type_values, (params[:financing_type] rescue nil)), :class=> "form-control" %>
                   </div>
@@ -206,7 +206,7 @@
               <div class="col-md-2">
                 <div class="form-group">
                   <label>Misc Adjuster</label>
-                  <div class="input-group">                    
+                  <div class="input-group">
                     <%@misc_adjuster_values = [["CA Escrow Waiver (Full or Taxes Only)"], ["CA Escrow Waiver (Insurance Only)"], ["Miscellaneous"]]%>
                     <%= select_tag 'misc_adjuster', options_for_select(@misc_adjuster_values, (params[:misc_adjuster] rescue nil)), :class=> "form-control" %>
                   </div>
@@ -216,7 +216,7 @@
               <div class="col-md-2">
                 <div class="form-group">
                   <label>Premium Type</label>
-                  <div class="input-group">                    
+                  <div class="input-group">
                     <%@premium_type_values = [["Manufactured Home"],["2nd Home"],["3-4 Unit"],["Non-Owner Occupied"],["Condo"],["2-4 Unit"],["Investment Property"], ["Cash Out"], ["Rate and Term"], ["IRRRL"]]%>
                     <%= select_tag 'premium_type', options_for_select(@premium_type_values, (params[:premium_type] rescue nil)), :class=> "form-control" %>
                   </div>
@@ -314,7 +314,7 @@
         <tr>
           <td>8</td>
           <td>United Wholesale Mortgage</td>
-          <!-- <td class="text-center"><a class='btn btn-info btn-xs' href="<%#=ob_united_wholesale_mortgage4892_index_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td> -->
+          <td class="text-center"><a class='btn btn-info btn-xs' href="<%=ob_united_wholesale_mortgage4892_index_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
         </tr>
         <tr>
           <td>9</td>
