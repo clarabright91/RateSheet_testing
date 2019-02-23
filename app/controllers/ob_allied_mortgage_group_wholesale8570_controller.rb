@@ -67,7 +67,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
-                @program.update(base_rate: @block_hash)
+                @program.update(base_rate: @block_hash, sheet_name: sheet)
               end
             end
           end
@@ -113,20 +113,20 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   @fha_adjustment["FHA/USDA/LoanSize/FICO"] = {}
                   @fha_adjustment["FHA/USDA/LoanSize/FICO"][true] = {}
                   @fha_adjustment["FHA/USDA/LoanSize/FICO"][true][true] = {}
-                  @fha_adjustment["FHA/USDA/LoanSize/FICO"][true][true]["High Balance"] = {}
-                  @fha_adjustment["FHA/USDA/LoanSize/FICO"][true][true]["High Balance"]["0-680"] = {}
+                  @fha_adjustment["FHA/USDA/LoanSize/FICO"][true][true]["High-Balance"] = {}
+                  @fha_adjustment["FHA/USDA/LoanSize/FICO"][true][true]["High-Balance"]["0-680"] = {}
                   cc = cc + 3
                   new_val = sheet_data.cell(r,cc)
-                  @fha_adjustment["FHA/USDA/LoanSize/FICO"][true][true]["High Balance"]["0-680"] = new_val
+                  @fha_adjustment["FHA/USDA/LoanSize/FICO"][true][true]["High-Balance"]["0-680"] = new_val
                 end
                 if r == 49 && cc == 17
-                  @fha_adjustment["FHA/Streamline/CLTV"] = {}
-                  @fha_adjustment["FHA/Streamline/CLTV"][true] = {}
-                  @fha_adjustment["FHA/Streamline/CLTV"][true][true] = {}
-                  @fha_adjustment["FHA/Streamline/CLTV"][true][true]["100-125"] = {}
+                  @fha_adjustment["FHA/StreamLine/CLTV"] = {}
+                  @fha_adjustment["FHA/StreamLine/CLTV"][true] = {}
+                  @fha_adjustment["FHA/StreamLine/CLTV"][true][true] = {}
+                  @fha_adjustment["FHA/StreamLine/CLTV"][true][true]["100-125"] = {}
                   cc = cc + 3
                   new_val = sheet_data.cell(r,cc)
-                  @fha_adjustment["FHA/Streamline/CLTV"][true][true]["100-125"] = new_val
+                  @fha_adjustment["FHA/StreamLine/CLTV"][true][true]["100-125"] = new_val
                 end
                 if r == 50 && cc == 17
                   @fha_adjustment["FHA/USDA/PropertyType"] = {}
@@ -148,13 +148,13 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true]["0-100k"]["0-640"] = new_val
                 end
                 if r == 52 && cc == 17
-                  @fha_adjustment["FHA/Usda/State"] = {}
-                  @fha_adjustment["FHA/Usda/State"][true] = {}
-                  @fha_adjustment["FHA/Usda/State"][true][true] = {}
-                  @fha_adjustment["FHA/Usda/State"][true][true]["NY"] = {}
+                  @fha_adjustment["FHA/USDA/State"] = {}
+                  @fha_adjustment["FHA/USDA/State"][true] = {}
+                  @fha_adjustment["FHA/USDA/State"][true][true] = {}
+                  @fha_adjustment["FHA/USDA/State"][true][true]["NY"] = {}
                   cc = cc + 3
                   new_val = sheet_data.cell(r,cc)
-                  @fha_adjustment["FHA/Usda/State"][true][true]["NY"] = new_val
+                  @fha_adjustment["FHA/USDA/State"][true][true]["NY"] = new_val
                 end
               end
             end
@@ -202,7 +202,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         end
         adjustment = [@fha_adjustment,@loan_adj]
         make_adjust(adjustment,sheet)
-        # create_program_association_with_adjustment(sheet)
+        create_program_association_with_adjustment(sheet)
       end
     end
     redirect_to programs_ob_allied_mortgage_group_wholesale8570_path(@sheet_obj)
@@ -256,7 +256,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                     break # terminate the loop
                   end
                 end
-                @program.update(base_rate: @block_hash)
+                @program.update(base_rate: @block_hash, sheet_name: sheet)
               end
             end
           end
@@ -293,11 +293,11 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 if r == 22 && cc == 17
                   @adjustment_hash["VA/LoanSize/FICO"] = {}
                   @adjustment_hash["VA/LoanSize/FICO"][true] = {}
-                  @adjustment_hash["VA/LoanSize/FICO"][true]["High Balance"] = {}
-                  @adjustment_hash["VA/LoanSize/FICO"][true]["High Balance"]["0-680"] = {}
+                  @adjustment_hash["VA/LoanSize/FICO"][true]["High-Balance"] = {}
+                  @adjustment_hash["VA/LoanSize/FICO"][true]["High-Balance"]["0-680"] = {}
                   cc == cc + 3
                   new_val = sheet_data.cell(r,cc)
-                  @adjustment_hash["VA/LoanSize/FICO"][true]["High Balance"]["0-680"] = new_val
+                  @adjustment_hash["VA/LoanSize/FICO"][true]["High-Balance"]["0-680"] = new_val
                 end
                 if r == 23 && cc == 17
                   @adjustment_hash["VA/LTV"][true]["90-95"] = {}
@@ -345,7 +345,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@loan_amount]
         make_adjust(adjustment,sheet)
-        # create_program_association_with_adjustment(sheet)
+        create_program_association_with_adjustment(sheet)
       end
     end
     redirect_to programs_ob_allied_mortgage_group_wholesale8570_path(@sheet_obj)
@@ -465,7 +465,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 @program.loan_limit_type << "High Balance"
               end
               @program.save
-              @program.update(term: @term,loan_type: loan_type,loan_purpose: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc)
+              @program.update(term: @term,loan_type: loan_type,loan_purpose: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, sheet_name: sheet)
               # @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -505,7 +505,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
-              @program.update(base_rate: @block_hash)
+              @program.update(base_rate: @block_hash, sheet_name: sheet)
             end
           end
         end
@@ -576,10 +576,11 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 end
                 if r == 70 && cc == 13
                   @other_adjustment["MiscAdjuster"] = {}
-                  @other_adjustment["MiscAdjuster"][value] = {}
+                  primary_key = value.tr('*','').strip
+                  @other_adjustment["MiscAdjuster"][primary_key] = {}
                   cc = cc + 7
                   new_val = sheet_data.cell(r,cc)
-                  @other_adjustment["MiscAdjuster"][value] = new_val
+                  @other_adjustment["MiscAdjuster"][primary_key] = new_val
                 end
                 if r >= 71 && r <= 72 && cc == 13
                   ltv_key = value.tr('A-Za-z)( ','')
@@ -613,25 +614,25 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 end
                 if r == 74 && cc == 13
                   @other_adjustment["LoanSize/FICO"] = {}
-                  @other_adjustment["LoanSize/FICO"]["High Balance"] = {}
-                  @other_adjustment["LoanSize/FICO"]["High Balance"]["0-740"] = {}
+                  @other_adjustment["LoanSize/FICO"]["High-Balance"] = {}
+                  @other_adjustment["LoanSize/FICO"]["High-Balance"]["0-740"] = {}
                   cc = cc + 7
                   new_val = sheet_data.cell(r,cc)
-                  @other_adjustment["LoanSize/FICO"]["High Balance"]["0-740"] = new_val
+                  @other_adjustment["LoanSize/FICO"]["High-Balance"]["0-740"] = new_val
                 end
                 if r == 75 && cc == 13
                   @other_adjustment["LoanSize/RefinanceOption"] = {}
-                  @other_adjustment["LoanSize/RefinanceOption"]["High Balance"] = {}
-                  @other_adjustment["LoanSize/RefinanceOption"]["High Balance"]["Rate and Term"] = {}
+                  @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"] = {}
+                  @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Rate and Term"] = {}
                   cc = cc + 7
                   new_val = sheet_data.cell(r,cc)
-                  @other_adjustment["LoanSize/RefinanceOption"]["High Balance"]["Rate and Term"] = new_val
+                  @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Rate and Term"] = new_val
                 end
                 if r == 76 && cc == 13
-                  @other_adjustment["LoanSize/RefinanceOption"]["High Balance"]["Cash Out"] = {}
+                  @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Cash Out"] = {}
                   cc = cc + 7
                   new_val = sheet_data.cell(r,cc)
-                  @other_adjustment["LoanSize/RefinanceOption"]["High Balance"]["Cash Out"] = new_val
+                  @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Cash Out"] = new_val
                 end
                 if r == 77 && cc == 13
                   @other_adjustment["State"] = {}
@@ -702,6 +703,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@cash_out,@subordinate_hash,@property_hash,@other_adjustment,@loan_amount]
         make_adjust(adjustment,sheet)
+        create_program_association_with_adjustment(sheet)
       end
     end
     redirect_to programs_ob_allied_mortgage_group_wholesale8570_path(@sheet_obj)
@@ -822,7 +824,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
     def create_program_association_with_adjustment(sheet)
       adjustment_list = Adjustment.where(sheet_name: sheet)
       program_list = Program.where(sheet_name: sheet)
-
+      
       adjustment_list.each_with_index do |adj_ment, index|
         key_list = adj_ment.data.keys.first.split("/")
         program_filter1={}
