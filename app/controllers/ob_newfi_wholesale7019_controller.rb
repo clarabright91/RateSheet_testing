@@ -639,9 +639,6 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   break # terminate the loop
                 end
               end
-              # if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-              #   @block_hash.values.first.shift
-              # end
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
@@ -663,7 +660,6 @@ class ObNewfiWholesale7019Controller < ApplicationController
         @programs_ids = []
         @price_adjustment = {}
         @family_adjustment = {}
-        @condo_adjustment = {}
         @high_adjustment = {}
         ltv_key = ''
         secondary_key = ''
@@ -726,62 +722,102 @@ class ObNewfiWholesale7019Controller < ApplicationController
             value = sheet_data.cell(r,cc)
             if value.present?
               if value == " Price Adjustments"
-                primary_key = "LoanType/LTV/FICO"
+                primary_key = "FICO/LTV"
                 @price_adjustment[primary_key] = {}
               end
               if value == "Multi Family 2- 4 Unit LTV/FICO Adjusters"
-                primary_key = "2-4 Unit"
-                secondary_key = "FICO/LTV"
-                @family_adjustment[primary_key] = {}
-                @family_adjustment[primary_key][secondary_key] = {}
+                @family_adjustment["PropertyType/FICO/LTV"] = {}
+                @family_adjustment["PropertyType/FICO/LTV"]["2-4 Unit"] = {}
               end
               if value == "Condo LTV/FICO Adjusters"
-                primary_key1 = "Condo"
-                secondary_key1 = "LTV/FICO"
-                @condo_adjustment[primary_key1] = {}
-                @condo_adjustment[primary_key1][secondary_key1] = {}
+                @family_adjustment["PropertyType/FICO/LTV"]["Condo"] = {}
               end
               if value == "HIGH BALANCE"
-                primary_key = "HighBalance"
-                secondary_key = "LTV/FICO"
-                @high_adjustment[primary_key] = {}
+                @high_adjustment["LoanSize/LoanType/LTV"] = {}
+                @high_adjustment["LoanSize/LoanType/LTV"]["High-Balance"] = {}
+                @high_adjustment["LoanSize/LoanType/LTV"]["High-Balance"]["ARM"] = {}
+                @high_adjustment["LoanType/RefinanceOption"] = {}
+                @high_adjustment["LoanType/RefinanceOption"]["Fixed"] = {}
+                @high_adjustment["LoanType/RefinanceOption"]["ARM"] = {}
               end
               if r >= 105 && r <= 112 && cc == 7
-                secondary_key = value
+                secondary_key = get_value value
                 @price_adjustment[primary_key][secondary_key] = {}
               end
               if r >= 105 && r <= 112 && cc > 7 && cc <= 112
-                ltv_key = @ltv_data[cc-1]
+                ltv_key = get_value @ltv_data[cc-1]
+                if ltv_key.include?("%")
+                  ltv_key = ltv_key.tr('% ','')
+                else
+                  ltv_key
+                end
                 @price_adjustment[primary_key][secondary_key][ltv_key] = {}
                 @price_adjustment[primary_key][secondary_key][ltv_key] = value
               end
               # Multi Family 2- 4 Unit LTV/FICO Adjusters
               if r >= 115 && r <= 122 && cc == 6
-                ltv_key = value
-                @family_adjustment[primary_key][secondary_key][ltv_key] = {}
+                ltv_key = get_value value
+                @family_adjustment["PropertyType/FICO/LTV"]["2-4 Unit"][ltv_key] = {}
               end
               if r >= 115 && r <= 122 && cc > 6 && cc <= 10
                 cltv_key = get_value @cltv_data[cc-1]
-                @family_adjustment[primary_key][secondary_key][ltv_key][cltv_key] = {}
-                @family_adjustment[primary_key][secondary_key][ltv_key][cltv_key] = value
+                if cltv_key.include?("%")
+                  cltv_key = cltv_key.tr('% ','')
+                else
+                  cltv_key
+                end
+                @family_adjustment["PropertyType/FICO/LTV"]["2-4 Unit"][ltv_key][cltv_key] = {}
+                @family_adjustment["PropertyType/FICO/LTV"]["2-4 Unit"][ltv_key][cltv_key] = value
               end
               # Condo LTV/FICO Adjusters
               if r >= 115 && r <= 122 && cc == 12
-                ltv_key1 = value
-                @condo_adjustment[primary_key1][secondary_key1][ltv_key1] = {}
+                ltv_key1 = get_value value
+                @family_adjustment["PropertyType/FICO/LTV"]["Condo"][ltv_key1] = {}
               end
               if r >= 115 && r <= 122 && cc > 12 && cc <= 16
                 cltv_key1 = get_value @cltv_data[cc-1]
-                @condo_adjustment[primary_key1][secondary_key1][ltv_key1][cltv_key1] = {}
-                @condo_adjustment[primary_key1][secondary_key1][ltv_key1][cltv_key1] = value
+                if cltv_key1.include?("%")
+                  cltv_key1 = cltv_key1.tr('% ','')
+                else
+                  cltv_key1
+                end
+                @family_adjustment["PropertyType/FICO/LTV"]["Condo"][ltv_key1][cltv_key1] = {}
+                @family_adjustment["PropertyType/FICO/LTV"]["Condo"][ltv_key1][cltv_key1] = value
               end
               # HIGH BALANCE
               if r >= 124 && r <= 126 && cc == 9
+                if value.include?("LTV/CLTV >75% <=90%")
+                  ltv_key = value.tr('A-Z/%>< ','').tr('=','-')
+                else
+                  ltv_key = get_value value
+                end
+                @high_adjustment["LoanSize/LoanType/LTV"]["High-Balance"]["ARM"][ltv_key] = {}
+                cc = cc + 4
+                new_val = sheet_data.cell(r,cc)
+                @high_adjustment["LoanSize/LoanType/LTV"]["High-Balance"]["ARM"][ltv_key] = new_val
+              end
+              if r == 127 && cc == 9
+                ltv_key = "Rate and Term"
+                @high_adjustment["LoanType/RefinanceOption"]["Fixed"][ltv_key] = {}
+                @high_adjustment["LoanType/RefinanceOption"]["ARM"][ltv_key] = {}
+                cc = cc + 4
+                new_val = sheet_data.cell(r,cc)
+                @high_adjustment["LoanType/RefinanceOption"]["Fixed"][ltv_key] = new_val
+                @high_adjustment["LoanType/RefinanceOption"]["ARM"][ltv_key] = new_val
+              end
+              if r == 128 && cc == 9
+                ltv_key = "Cash Out"
+                @high_adjustment["LoanType/RefinanceOption"]["Fixed"][ltv_key] = {}
+                @high_adjustment["LoanType/RefinanceOption"]["ARM"][ltv_key] = {}
+                cc = cc + 4
+                new_val = sheet_data.cell(r,cc)
+                @high_adjustment["LoanType/RefinanceOption"]["Fixed"][ltv_key] = new_val
+                @high_adjustment["LoanType/RefinanceOption"]["ARM"][ltv_key] = new_val
               end
             end
           end
         end
-        adjustment = [@price_adjustment,@family_adjustment,@condo_adjustment]
+        adjustment = [@price_adjustment,@family_adjustment,@high_adjustment]
         make_adjust(adjustment,sheet)
         create_program_association_with_adjustment(sheet)
       end
@@ -1240,12 +1276,6 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              # if @program.term.present?
-              #   main_key = "Term/LoanType/InterestRate/LockPeriod"
-              # else
-              #   main_key = "InterestRate/LockPeriod"
-              # end
-              # @block_hash[main_key] = {}
               (1..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -1256,12 +1286,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                     if (c_i == 0)
                       key = value
                       @block_hash[key] = {}
-                    else
-
-                      if @program.lock_period.length <= 3
-                        @program.lock_period << 15*c_i
-                        @program.save
-                      end
+                    else                      
                       @block_hash[key][15*c_i] = value
                     end
                     @data << value
@@ -1271,9 +1296,6 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   break # terminate the loop
                 end
               end
-              # if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-              #   @block_hash.values.first.shift
-              # end
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
@@ -1617,7 +1639,6 @@ class ObNewfiWholesale7019Controller < ApplicationController
             end
             if r == 149 && cc == 14
               secondary_key = "90.01% - 95%"
-              # debugger
               if @other_adjustment[primary_key].present?
                 cc = cc + 1
                 new_value = sheet_data.cell(r,cc)
@@ -2322,14 +2343,10 @@ class ObNewfiWholesale7019Controller < ApplicationController
 
     def get_value value1
       if value1.present?
-        if value1.include?("FICO <")
-          value1 = "0"+value1.split("FICO").last
-        elsif value1.include?("<=") || value1.include?(">=") || value1.include?("<")
-          value1 = "0"+value1
-        elsif value1.include?("FICO")
-          value1 = value1.split("FICO ").last.first(9)
-        elsif value1 == "Investment Property"
-          value1 = "Property/Type"
+        if value1.include?("<=") || value1.include?("<")
+          value1 = "0-"+value1.split("<=").last.tr('A-Za-z%$><= ','')
+        elsif value1.include?(">")
+          value1 = value1.split(">").last.tr('^0-9 ', '')+"-Inf"
         else
           value1
         end
@@ -2432,7 +2449,13 @@ class ObNewfiWholesale7019Controller < ApplicationController
     
     def make_adjust(block_hash, sheet)
       block_hash.each do |hash|
-        Adjustment.create(data: hash,sheet_name: sheet)
+        if hash.present?
+          hash.each do |key|
+            data = {}
+            data[key[0]] = key[1]
+            Adjustment.create(data: data,sheet_name: sheet)
+          end
+        end
       end
     end
 

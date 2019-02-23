@@ -2704,6 +2704,16 @@ class ImportFilesController < ApplicationController
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       if (sheet == "Jumbo Series_F")
+        @adjustment_hash = {}
+        @refinance_hash = {}
+        @loan_amount = {}
+        @state = {}
+        @property_hash = {}
+        primary_key = ''
+        secondry_key = ''
+        ltv_key = ''
+        cltv_key = ''
+        @sheet = sheet
         sheet_data = xlsx.sheet(sheet)
         (2..36).each do |r|
           row = sheet_data.row(r)
@@ -2809,336 +2819,156 @@ class ImportFilesController < ApplicationController
             end
           end
         end
-        (59..sheet_data.last_row).each_with_index do |adj_row, index|
-          @hash = {}
-          index = index +1
-          @hash["Purchase Transactions"] = {}
-          @hash["R/T Refinance Transactions"] = {}
-          @hash["C/O Refinance Transactions"] = {}
-          @hash["State Adjustments"] = {}
-          @hash["Max Price"] = {}
-          @hash["Loan Amount Adjustments"] = {}
-          @hash["Feature Adjustments"] = {}
-          @hash["Product Adjustments"] = {}
-          @hash["Special Adjustments (Amort ≥ 240 Months - Fixed Products Only)"] = {}
-          (adj_row+2..adj_row+6).each do |max_row|
-
-            key_val = ''
-            key_val1 = ''
-            (3..13).each do |max_column|
-              header_r = (adj_row+2) - index
-              ccc = max_column
-              rrr = max_row
-              value = xlsx.sheet(sheet).cell(rrr,ccc)
-              value1 = xlsx.sheet(sheet).cell(header_r,ccc)
-              if value1.present?
-                if (value1.include?("≤"))
-                  value1 = 0
-                elsif (value1.include?("-"))
-                  value1 = value1.split("-").first
-                elsif (value1.include?("≥"))
-                  value1 = value1.split("≥").last
-                else
-                  value1
-                end
-              end
+        # Adjustments
+        (55..94).each do |r|
+          row = sheet_data.row(r)
+          @cltv_data = sheet_data.row(60)
+          @cltv_data2 = sheet_data.row(59)
+          @max_price_data = sheet_data.row(94)
+          if row.compact.count >= 1
+            (3..25).each do |cc|
+              value = sheet_data.cell(r,cc)
+              begin
               if value.present?
-                if ccc == 3
-                  if (value.include?("≥"))
-                    key_val = (value.split("≥").last)
-                  elsif (value.include?("-"))
-                    key_val = value.split("-").first
+                if value == "Purchase Transactions"
+                  @adjustment_hash["LoanPurpose/FICO/LTV"] = {}
+                  @adjustment_hash["LoanPurpose/FICO/LTV"]["Purchase"] = {}
+                  @state["State"] = {}
+                end
+                if value == "R/T Refinance Transactions"
+                  @refinance_hash["RefinanceOption/FICO/LTV"] = {}
+                  @refinance_hash["RefinanceOption/FICO/LTV"]["Rate and Term"] = {}
+                  @refinance_hash["RefinanceOption/FICO/LTV"]["Cash Out"] = {}
+                end
+                if value == "Loan Amount Adjustments"
+                  @loan_amount["LoanAmount/LTV"] = {}
+                end
+                if value == "Feature Adjustments"
+                  @property_hash["PropertyType/LTV"] = {}
+                end
+                # Loan Amount Adjustments
+                if r >= 60 && r <= 63 && cc == 15
+                  if value.include?("≤")
+                    ltv_key = "0-"+value.tr('A-Z≤ $ ','')+",000,000"
                   else
-                    key_val = value
+                    ltv_key = (value.tr('A-Z$ ','').split("-").first.to_f*1000000).to_s+"-"+(value.tr('A-Z$ ','').split("-").last.to_f*1000000).to_s
                   end
-                  @hash["Purchase Transactions"][key_val] = {}
-                else
-                  @hash["Purchase Transactions"][key_val][value1] = value
+                  @loan_amount["LoanAmount/LTV"][ltv_key] = {}
+                end
+                if r >= 60 && r <= 63 && cc > 15 && cc <= 25
+                  if @cltv_data2[cc-2].include?("≤")
+                    secondry_key = "0-"+@cltv_data2[cc-2].tr('≤ ','')
+                  else
+                    secondry_key = get_value @cltv_data2[cc-2]
+                  end
+                  @loan_amount["LoanAmount/LTV"][ltv_key][secondry_key] = {}
+                  @loan_amount["LoanAmount/LTV"][ltv_key][secondry_key] = value
+                end
+                # Purchase Transactions Adjustment
+                if r >= 61 && r <= 65 && cc == 3
+                  if value.include?("≥")
+                    primary_key = value.tr('≥ ','')+"-Inf"
+                  else
+                    primary_key = get_value value
+                  end
+                  @adjustment_hash["LoanPurpose/FICO/LTV"]["Purchase"][primary_key] = {}
+                end
+                if r >= 61 && r <= 65 && cc >3 && cc <= 13
+                  if @cltv_data[cc-2].include?("≤")
+                    secondry_key = "0-"+@cltv_data[cc-2].tr('≤ ','')
+                  else
+                    secondry_key = get_value @cltv_data[cc-2]
+                  end
+                  @adjustment_hash["LoanPurpose/FICO/LTV"]["Purchase"][primary_key][secondry_key] = {}
+                  @adjustment_hash["LoanPurpose/FICO/LTV"]["Purchase"][primary_key][secondry_key] = value
+                end
+                # Feature Adjustments
+                if r >= 68 && r <= 73 && cc == 15
+                  primary_key = value
+                  @property_hash["PropertyType/LTV"][primary_key] = {}
+                end
+                if r >= 68 && r <= 73 && cc > 15 && cc <= 25
+                  if @cltv_data2[cc-2].present? && @cltv_data2[cc-2].include?("≤")
+                    secondry_key = "0-"+@cltv_data2[cc-2].tr('≤ ','')
+                  else
+                    secondry_key = get_value @cltv_data2[cc-2]
+                  end
+                  @property_hash["PropertyType/LTV"][primary_key][secondry_key] = {}
+                  @property_hash["PropertyType/LTV"][primary_key][secondry_key] = value
+                end
+                # R/T Refinance Transactions Adjustment
+                if r >= 69 && r <= 73 && cc == 3
+                  if value.include?("≥")
+                    primary_key = value.tr('≥ ','')+"-Inf"
+                  else
+                    primary_key = get_value value
+                  end
+                  @refinance_hash["RefinanceOption/FICO/LTV"]["Rate and Term"][primary_key] = {}
+                end
+                if r >= 69 && r <= 73 && cc >3 && cc <= 13
+                  if @cltv_data[cc-2].include?("≤")
+                    secondry_key = "0-"+@cltv_data[cc-2].tr('≤ ','')
+                  else
+                    secondry_key = get_value @cltv_data[cc-2]
+                  end
+                  @refinance_hash["RefinanceOption/FICO/LTV"]["Rate and Term"][primary_key][secondry_key] = {}
+                  @refinance_hash["RefinanceOption/FICO/LTV"]["Rate and Term"][primary_key][secondry_key] = value
+                end
+                # # C/O Refinance Transactions Adjustment
+                if r >= 77 && r <= 81 && cc == 3
+                  if value.include?("≥")
+                    primary_key = value.tr('≥ ','')+"-Inf"
+                  else
+                    primary_key = get_value value
+                  end
+                  @refinance_hash["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key] = {}
+                end
+                if r >= 77 && r <= 81 && cc >3 && cc <= 13
+                  if @cltv_data[cc-2].include?("≤")
+                    secondry_key = "0-"+@cltv_data[cc-2].tr('≤ ','')
+                  else
+                    secondry_key = get_value @cltv_data[cc-2]
+                  end
+                  @refinance_hash["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key][secondry_key] = {}
+                  @refinance_hash["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key][secondry_key] = value
+                end
+                # State Adjustments
+                if r == 86 && cc == 3
+                  @state["State"]["FL"] = {}
+                  @state["State"]["NV"] = {}
+                end
+                if r ==86 && cc >3 && cc <= 13
+                  if @cltv_data[cc-2].include?("≤")
+                    secondry_key = "0-"+@cltv_data[cc-2].tr('≤ ','')
+                  else
+                    secondry_key = get_value @cltv_data[cc-2]
+                  end
+                  @state["State"]["FL"][secondry_key] = {}
+                  @state["State"]["NV"][secondry_key] = {}
+                  @state["State"]["FL"][secondry_key] = value
+                  @state["State"]["NV"][secondry_key] = value
+                end
+                if r == 87 && cc == 3
+                  @state["State"]["CA"] = {}
+                end
+                if r ==87 && cc > 3 && cc <= 13
+                  if @cltv_data[cc-2].include?("≤")
+                    secondry_key = "0-"+@cltv_data[cc-2].tr('≤ ','')
+                  else
+                    secondry_key = get_value @cltv_data[cc-2]
+                  end
+                  @state["State"]["CA"][secondry_key] = {}
+                  @state["State"]["CA"][secondry_key] = value
                 end
               end
-            end
-            (15..25).each do |max_column|
-              header_r = adj_row
-              ccc = max_column
-              rrr = max_row - 1
-              value = xlsx.sheet(sheet).cell(rrr,ccc)
-              value1 = xlsx.sheet(sheet).cell(header_r,ccc)
-              if value1.present? && value1.class == String
-                if (value1.include?("≤"))
-                  value1 = 0
-                elsif (value1.include?("-"))
-                  value1 = value1.split("-").first
-                elsif (value1.include?("≥"))
-                  value1 = value1.split("≥").last
-                else
-                  value1
-                end
-              end
-              if value.present?
-                if ccc == 15
-                  if (value.include?("≤"))
-                    key_val1 = 0
-                  elsif (value.include?("≥"))
-                    key_val1 = (value.split("≥").last)
-                  elsif (value.include?("-"))
-                    key_val1 = value.split("-").first
-                  else
-                    key_val1 = value
-                  end
-                  @hash["Loan Amount Adjustments"][key_val1] = {}
-                else
-                  @hash["Loan Amount Adjustments"][key_val1][value1] = value
-                end
+              rescue
+                raise "value is nil at row = #{r} and column = #{cc}"
               end
             end
           end
-
-          (adj_row+10..adj_row+15).each do |max_row|
-
-            key_val = ''
-            key_val1 = ''
-            (3..13).each do |max_column|
-              header_r = (adj_row+10) - index
-              ccc = max_column
-              rrr = max_row
-              value = xlsx.sheet(sheet).cell(rrr,ccc)
-              value1 = xlsx.sheet(sheet).cell(header_r,ccc)
-              if value1.present?
-                if (value1.include?("≤"))
-                  value1 = 0
-                elsif (value1.include?("-"))
-                  value1 = value1.split("-").first
-                elsif (value1.include?("≥"))
-                  value1 = value1.split("≥").last
-                else
-                  value1
-                end
-              end
-              if value.present?
-                if ccc == 3
-                  if (value.include?("≥"))
-                    key_val = (value.split("≥").last)
-                  elsif (value.include?("-"))
-                    key_val = value.split("-").first
-                  else
-                    key_val = value
-                  end
-                  @hash["R/T Refinance Transactions"][key_val] = {}
-                else
-                  @hash["R/T Refinance Transactions"][key_val][value1] = value if key_val.present? && key_val != ""
-                end
-              end
-            end
-            (15..25).each do |max_column|
-              header_r = adj_row+8
-              ccc = max_column
-              rrr = max_row - 1
-              value = xlsx.sheet(sheet).cell(rrr,ccc)
-              value1 = xlsx.sheet(sheet).cell(header_r,ccc)
-              if value1.present? && value1.class == String
-                if (value1.include?("≤"))
-                  value1 = 0
-                elsif (value1.include?("-"))
-                  value1 = value1.split("-").first
-                elsif (value1.include?("≥"))
-                  value1 = value1.split("≥").last
-                else
-                  value1
-                end
-              end
-              if value.present?
-                if ccc == 15
-                  key_val1 = value
-                  @hash["Loan Amount Adjustments"][key_val1] = {}
-                else
-                  @hash["Loan Amount Adjustments"][key_val1][value1] = value if key_val1.present?
-                end
-              end
-            end
-          end
-
-          (adj_row+18..adj_row+22).each do |max_row|
-
-            key_val = ''
-            key_val1 = ''
-            (3..13).each do |max_column|
-              header_r = (adj_row+18) - index
-              ccc = max_column
-              rrr = max_row
-              value = xlsx.sheet(sheet).cell(rrr,ccc)
-              value1 = xlsx.sheet(sheet).cell(header_r,ccc)
-              if value1.present?
-                if (value1.include?("≤"))
-                  value1 = 0
-                elsif (value1.include?("-"))
-                  value1 = value1.split("-").first
-                elsif (value1.include?("≥"))
-                  value1 = value1.split("≥").last
-                else
-                  value1
-                end
-              end
-              if value.present?
-                if ccc == 3
-                  if (value.include?("≥"))
-                    key_val = (value.split("≥").last)
-                  elsif (value.include?("-"))
-                    key_val = value.split("-").first
-                  else
-                    key_val = value
-                  end
-                  @hash["C/O Refinance Transactions"][key_val] = {}
-                else
-                  @hash["C/O Refinance Transactions"][key_val][value1] = value if key_val.present? && key_val != ""
-                end
-              end
-            end
-            (15..25).each do |max_column|
-              header_r = adj_row+9
-              ccc = max_column
-              rrr = max_row + 1
-              value = xlsx.sheet(sheet).cell(rrr,ccc)
-              value1 = xlsx.sheet(sheet).cell(header_r,ccc)
-              if value1.present? && value1.class == String
-                if (value1.include?("≤"))
-                  value1 = 0
-                elsif (value1.include?("-"))
-                  value1 = value1.split("-").first
-                elsif (value1.include?("≥"))
-                  value1 = value1.split("≥").last
-                else
-                  value1
-                end
-              end
-              if value.present?
-                if ccc == 15
-                  key_val1 = value
-                  @hash["Product Adjustments"][key_val1] = {}
-                else
-                  @hash["Product Adjustments"][key_val1][value1] = value if key_val1.present?
-                end
-              end
-            end
-          end
-
-          (adj_row+27..adj_row+28).each do |max_row|
-
-            key_val = ''
-            (3..13).each do |max_column|
-              header_r = (adj_row+27) - index
-              ccc = max_column
-              rrr = max_row
-              value = xlsx.sheet(sheet).cell(rrr,ccc)
-              value1 = xlsx.sheet(sheet).cell(header_r,ccc)
-              if value1.present?
-                if (value1.include?("≤"))
-                  value1 = 0
-                elsif (value1.include?("-"))
-                  value1 = value1.split("-").first
-                elsif (value1.include?("≥"))
-                  value1 = value1.split("≥").last
-                else
-                  value1
-                end
-              end
-              if value.present?
-                if ccc == 3
-                  if (value.include?("≥"))
-                    key_val = (value.split("≥").last)
-                  elsif (value.include?("-"))
-                    key_val = value.split("-").first
-                  else
-                    key_val = value
-                  end
-                  @hash["State Adjustments"][key_val] = {}
-                else
-                  @hash["State Adjustments"][key_val][value1] = value if key_val.present? && key_val != ""
-                end
-              end
-            end
-          end
-
-          (adj_row+33..adj_row+36).each do |max_row|
-
-            key_val = ''
-            (3..13).each do |max_column|
-              header_r = (adj_row+33) - index
-              ccc = max_column
-              rrr = max_row
-              value = xlsx.sheet(sheet).cell(rrr,ccc)
-              value1 = xlsx.sheet(sheet).cell(header_r,ccc)
-              # if value1.present?
-              #   if (value1.include?("≤"))
-              #     value1 = 0
-              #   elsif (value1.include?("-"))
-              #     value1 = value1.split("-").first
-              #   elsif (value1.include?("≥"))
-              #     value1 = value1.split("≥").last
-              #   else
-              #     value1
-              #   end
-              # end
-              if value.present?
-                if ccc == 3
-                  if (value.include?("≤"))
-                    key_val = 0
-                  elsif (value.include?("≥"))
-                    key_val = (value.split("≥").last)
-                  elsif (value.include?("-"))
-                    key_val = value.split("-").first
-                  else
-                    key_val = value
-                  end
-                  @hash["Max Price"][key_val] = {}
-                else
-                  @hash["Max Price"][key_val][value1] = value if value1.present?
-                end
-              end
-            end
-          end
-
-          (adj_row+29..adj_row+31).each do |max_row|
-
-            key_val = ''
-            (15..25).each do |max_column|
-              header_r = (adj_row+33) - index
-              ccc = max_column
-              rrr = max_row
-              value = xlsx.sheet(sheet).cell(rrr,ccc)
-              value1 = xlsx.sheet(sheet).cell(header_r,ccc)
-              if value1.present?
-                if (value1.include?("≤"))
-                  value1 = 0
-                elsif (value1.include?("-"))
-                  value1 = value1.split("-").first
-                elsif (value1.include?("≥"))
-                  value1 = value1.split("≥").last
-                else
-                  value1
-                end
-              end
-              if value.present?
-                if ccc == 15
-                  if (value.include?("≤"))
-                    key_val = 0
-                  elsif (value.include?("≥"))
-                    key_val = (value.split("≥").last)
-                  elsif (value.include?("-"))
-                    key_val = value.split("-").first
-                  else
-                    key_val = value
-                  end
-                  @hash["Special Adjustments (Amort ≥ 240 Months - Fixed Products Only)"][key_val] = {}
-                else
-                  @hash["Special Adjustments (Amort ≥ 240 Months - Fixed Products Only)"][key_val][value1] = value if value1.present?
-                end
-              end
-            end
-          end
-          # Adjustment.create(data: @hash,program_name: @program.program_name, sheet_name: sheet, program_ids: @programs_ids)
-          make_adjust(@hash, @program_ids)
-          create_program_association_with_adjustment(@sheet)
         end
+        adjustment = [@adjustment_hash,@refinance_hash,@loan_amount,@state,@property_hash]
+        create_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_import_file_path(@sheet_obj)
