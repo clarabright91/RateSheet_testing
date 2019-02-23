@@ -4126,7 +4126,6 @@ class ImportFilesController < ApplicationController
           end
         end
 
-
         key = ''
         another_key = ''
         keyOfHash = ''
@@ -4140,6 +4139,25 @@ class ImportFilesController < ApplicationController
         loan_amount = ''
         # Adjustments
         (40..73).each do |row|
+          unless @adjustment_hash.has_key?("MiscAdjuster")
+            #  for 66
+            @adjustment_hash["MiscAdjuster"] = {}
+          end
+
+          unless @adjustment_hash.has_key?("LoanType/LoanPurpose/Term")
+            #  for 66
+            @adjustment_hash["LoanType/LoanPurpose/Term"] = {}
+            @adjustment_hash["LoanType/LoanPurpose/Term"]["Fixed"] = {}
+            @adjustment_hash["LoanType/LoanPurpose/Term"]["Fixed"]["Purchase"] = {}
+          end
+
+          unless @adjustment_hash.has_key?("LoanType/Term")
+            #  for 66
+            @adjustment_hash["LoanType/Term"] = {}
+            @adjustment_hash["LoanType/Term"]["Fixed"] = {}
+            @adjustment_hash["LoanType/Term"]["ARM"] = {}
+          end
+
           unless @adjustment_hash.has_key?("LoanType/FICO/LTV")
             #  for Credit Score table
             @adjustment_hash["LoanType/FICO/LTV"] = {}
@@ -4167,10 +4185,10 @@ class ImportFilesController < ApplicationController
             @adjustment_hash["LoanType/RefinanceOption/Term/LTV"]["ARM"] = {}
           end
 
-          unless @adjustment_hash.has_key?("LoanType/RefinanceOption/LTV")
-            @adjustment_hash["LoanType/RefinanceOption/LTV"] = {}
-            @adjustment_hash["LoanType/RefinanceOption/LTV"]["Fixed"] = {}
-            @adjustment_hash["LoanType/RefinanceOption/LTV"]["ARM"] = {}
+          unless @adjustment_hash.has_key?("LoanType/LoanPurpose/RefinanceOption/LTV")
+            @adjustment_hash["LoanType/LoanPurpose/RefinanceOption/LTV"] = {}
+            @adjustment_hash["LoanType/LoanPurpose/RefinanceOption/LTV"]["Fixed"] = {}
+            @adjustment_hash["LoanType/LoanPurpose/RefinanceOption/LTV"]["ARM"] = {}
           end
 
           (3..19).each do |column|
@@ -4183,24 +4201,135 @@ class ImportFilesController < ApplicationController
             end
 
             if((row >= 50 && row <= 53) && column.eql?(3))
-              first_key = set_range(value) || get_value(value)
+              first_key = convert_range(value)
               @adjustment_hash["LoanType/LoanAmount/LTV"]["Fixed"][first_key] = {}
             end
 
             if((row >= 58 && row <= 62) && column.eql?(3))
+              first_key = set_range(value) || get_value(value)
+              @adjustment_hash["LoanType/PropertyType/LTV"]["Fixed"][first_key] = {} if [58, 61].include?(row)
+              if(row == 59)
+                @adjustment_hash["LoanType/RefinanceOption/Term/LTV"]["Fixed"]["Purchase"] = {}
+                @adjustment_hash["LoanType/RefinanceOption/Term/LTV"]["Fixed"]["Purchase"]["15"] = {}
+              end
+              if(row == 60)
+                @adjustment_hash["LoanType/LoanPurpose/RefinanceOption/LTV"]["Fixed"]["Refinance"] = {}
+                @adjustment_hash["LoanType/LoanPurpose/RefinanceOption/LTV"]["Fixed"]["Refinance"]["Cost Out"] = {}
+              end
             end
 
             if((row >= 41 && row <= 45) && column.eql?(12))
+              first_key = set_range(value) || get_value(value)
+              @adjustment_hash["LoanType/FICO/LTV"]["ARM"][first_key] = {}
             end
 
             if((row >= 50 && row <= 53) && column.eql?(12))
+              first_key = convert_range(value)
+              @adjustment_hash["LoanType/LoanAmount/LTV"]["ARM"][first_key] = {}
             end
 
             if((row >= 58 && row <= 62) && column.eql?(12))
+              first_key = set_range(value) || get_value(value)
+              @adjustment_hash["LoanType/PropertyType/LTV"]["ARM"][first_key] = {} if [58, 61].include?(row)
+              if(row == 59)
+                @adjustment_hash["LoanType/RefinanceOption/Term/LTV"]["ARM"]["Purchase"] = {}
+                @adjustment_hash["LoanType/RefinanceOption/Term/LTV"]["ARM"]["Purchase"]["15"] = {}
+              end
+              if(row == 60)
+                @adjustment_hash["LoanType/LoanPurpose/RefinanceOption/LTV"]["ARM"]["Refinance"] = {}
+                @adjustment_hash["LoanType/LoanPurpose/RefinanceOption/LTV"]["ARM"]["Refinance"]["Cost Out"] = {}
+              end
+            end
+
+            # prepare second key & value
+            if((row >= 41 && row <= 45) && column != 9 && (column > 4 && column <= 10))
+              second_key = set_range(sheet_data.cell(40,column)) || get_value(sheet_data.cell(40,column))
+              @adjustment_hash["LoanType/FICO/LTV"]["Fixed"][first_key][second_key] = value
+            end
+
+            if((row >= 50 && row <= 53) && column != 9 && (column > 4 && column <= 10))
+              second_key = set_range(sheet_data.cell(49,column)) || get_value(sheet_data.cell(49,column))
+              @adjustment_hash["LoanType/LoanAmount/LTV"]["Fixed"][first_key][second_key] = value
+            end
+
+            if((row >= 58 && row <= 62) && column.eql?(3))
+              first_key = set_range(value) || get_value(value)
+              @adjustment_hash["LoanType/PropertyType/LTV"]["Fixed"][first_key] = {} if [58, 61].include?(row)
+              if(row == 59)
+                @adjustment_hash["LoanType/RefinanceOption/Term/LTV"]["Fixed"]["Purchase"] = {}
+                @adjustment_hash["LoanType/RefinanceOption/Term/LTV"]["Fixed"]["Purchase"]["15"] = {}
+              end
+              if(row == 60)
+                @adjustment_hash["LoanType/LoanPurpose/RefinanceOption/LTV"]["Fixed"]["Refinance"] = {}
+                @adjustment_hash["LoanType/LoanPurpose/RefinanceOption/LTV"]["Fixed"]["Refinance"]["Cost Out"] = {}
+              end
+            end
+
+            if((row >= 58 && row <= 61) && column != 9 && (column > 4 && column <= 10))
+              second_key = set_range(sheet_data.cell(57,column)) || get_value(sheet_data.cell(57,column))
+              if [58, 61].include?(row)
+                @adjustment_hash["LoanType/PropertyType/LTV"]["Fixed"][first_key][second_key] = value
+              end
+              if(row == 59)
+                @adjustment_hash["LoanType/RefinanceOption/Term/LTV"]["Fixed"]["Purchase"]["15"][second_key] = value
+              end
+              if(row == 60)
+                @adjustment_hash["LoanType/LoanPurpose/RefinanceOption/LTV"]["Fixed"]["Refinance"]["Cost Out"][second_key] = value
+              end
+            end
+
+            # for arm
+            if((row >= 41 && row <= 45) && column != 15 && (column > 13 && column <= 19))
+              second_key = set_range(sheet_data.cell(40,column)) || get_value(sheet_data.cell(40,column))
+              @adjustment_hash["LoanType/FICO/LTV"]["ARM"][first_key][second_key] = value
+            end
+
+            if((row >= 50 && row <= 53) && column != 15 && (column > 13 && column <= 19))
+              second_key = set_range(sheet_data.cell(49,column)) || get_value(sheet_data.cell(49,column))
+              @adjustment_hash["LoanType/LoanAmount/LTV"]["ARM"][first_key][second_key] = value
+            end
+
+            if((row >= 58 && row <= 61) && column != 15 && (column > 13 && column <= 19))
+              second_key = set_range(sheet_data.cell(57,column)) || get_value(sheet_data.cell(57,column))
+              if [58, 61].include?(row)
+                @adjustment_hash["LoanType/PropertyType/LTV"]["ARM"][first_key][second_key] = value
+              end
+              if(row == 59)
+                @adjustment_hash["LoanType/RefinanceOption/Term/LTV"]["ARM"]["Purchase"]["15"][second_key] = value
+              end
+              if(row == 60)
+                @adjustment_hash["LoanType/LoanPurpose/RefinanceOption/LTV"]["ARM"]["Refinance"]["Cost Out"][second_key] = value
+              end
+            end
+
+            # for last few tables
+            if(row == 66 && column == 7)
+              first_key = sheet_data.cell(row,column - 4)
+              @adjustment_hash["MiscAdjuster"][first_key] = value
+            end
+
+            if(row == 66 && column == 7)
+              first_key = sheet_data.cell(row,column - 4)
+              @adjustment_hash["MiscAdjuster"][first_key] = value
+            end
+
+            if(row == 66 && column == 17)
+              @adjustment_hash["LoanType/LoanPurpose/Term"]["Fixed"]["Purchase"]["30"] = value
+            end
+
+            if(row == 72)
+              @adjustment_hash["LoanType/Term"]["Fixed"]["30"] = value if column == 7
+              @adjustment_hash["LoanType/Term"]["ARM"]["7"] = value if column == 17
+              @adjustment_hash["LoanType/Term"]["ARM"]["10"] = value if column == 17
+            end
+
+            if(row == 73)
+              @adjustment_hash["LoanType/Term"]["Fixed"]["15"] = value if column == 7
+              @adjustment_hash["LoanType/Term"]["ARM"]["5"] = value if column == 17
             end
           end
         end
-        make_adjust(@adjustment_hash, @program_ids)
+        make_adjust(@adjustment_hash, @sheet)
         create_program_association_with_adjustment(@sheet)
       end
     end
@@ -7038,12 +7167,12 @@ class ImportFilesController < ApplicationController
       elsif (value1.include?("+"))
         value1.split("+").first
       elsif value1.include?("$") && !value1.include?("-")
-        "0 - " + value1.split("$").last.gsub(/[\s,]/ ,"").squish
+        "0-" + value1.split("$").last.gsub(/[\s,]/ ,"").squish
       elsif value1.include?("$") && value1.include?("-")
         if !value1.split(" - ").last.eql?("Conforming Limit")
           value1 = value1.split("$")[1].gsub(/[\s,]/ ,"") + value1.split("$")[-1].gsub(/[\s,]/ ,"")
         else
-          value1 = value1.split(" - ").first.gsub("$", "").gsub(",", "") + " - " + value1.split(" - ").last.squish
+          value1 = value1.split(" - ").first.gsub("$", "").gsub(",", "") + "-" + value1.split(" - ").last.squish
         end
       else
         value1
@@ -7053,16 +7182,30 @@ class ImportFilesController < ApplicationController
 
   def set_range value
     if value.split()[0].eql?("≤") || value.split()[0].eql?("<=") then
-      value = "0 - " + value.split()[1]
+      value = "0-" + value.split()[1]
     elsif [">","≥",">=", "+"].include?(value.split()[0]) then
-      value.split()[1] + " - #{Float::INFINITY}"
+      value.split()[1] + "-#{Float::INFINITY}"
     elsif [">","≥",">=", "+"].include?(value.split("")[-1])
-      value.split("+")[0] + " - #{Float::INFINITY}"
+      value.split("+")[0] + "-#{Float::INFINITY}"
     elsif value.include?(">")
-      value.split(">")[-1] + " - #{Float::INFINITY}"
+      value.split(">")[-1] + "-#{Float::INFINITY}"
     elsif value.include?("<=")
-      value = "0 - " + value.split("<=")[-1]
+      value = "0-" + value.split("<=")[-1]
     end
+  end
+
+  def convert_range value
+    if value.include?("≤") && value.include?("MM")
+      value = "0-"+value.split("MM")[0].split("$")[-1] + "000000"
+    elsif value.include?("-") && value.include?("MM") && value.include?("$")
+      if value.split(" - ")[-1].split("MM")[0].split("$")[-1].include?(".")
+        value = value.split(" - ")[0].split("MM")[0].split("$")[-1] + "000000" + "-" + value.split(" - ")[-1].split("MM")[0].split("$")[-1].gsub(".", "") + "000000" 
+      else
+        value = value.split(" - ")[0].split("MM")[0].split("$")[-1].gsub(".", "") + "000000" + "-" + value.split(" - ")[-1].split("MM")[0].split("$")[-1] + "000000" if value.split(" - ")[0].split("MM")[0].split("$")[-1].include?(".")
+      end
+    end
+
+    return value
   end
 
   def get_main_key heading
