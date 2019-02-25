@@ -1,9 +1,9 @@
 class ObUnitedWholesaleMortgage4892Controller < ApplicationController
-	before_action :get_sheet, only: [:programs, :conv, :govt, :govt_arms, :non_conf, :harp]
+  before_action :get_sheet, only: [:programs, :conv, :govt, :govt_arms, :non_conf, :harp]
   before_action :read_sheet, only: [:conv, :govt, :govt_arms, :non_conf, :harp]
   before_action :get_program, only: [:single_program, :program_property]
 
-	def index
+  def index
     file = File.join(Rails.root,'OB_United_Wholesale_Mortgage4892.xls')
     xlsx = Roo::Spreadsheet.open(file)
     begin
@@ -20,7 +20,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
     end
   end
 
-	def conv
+  def conv
     @xlsx.sheets.each do |sheet|
       if (sheet == "Conv")
         sheet_data = @xlsx.sheet(sheet)
@@ -92,7 +92,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
       end
     end
     redirect_to programs_ob_united_wholesale_mortgage4892_path(@sheet_obj)
-	end
+  end
 
   def govt
     @xlsx.sheets.each do |sheet|
@@ -903,7 +903,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
     @program = Program.find(params[:id])
   end
 
-	private
+  private
     def get_sheet
       @sheet_obj = Sheet.find(params[:id])
     end
