@@ -438,25 +438,21 @@ class ObCmgWholesalesController < ApplicationController
                 @adjustment_hash[primary_key][primary_key1][secondary_key1][ltv_key] = value
               end
               if r == 16 && cc == 1
-                primary_key = "LoanType/PropertyType/Term/FICO/LTV"
-                secondary_key = "Fixed"
-                primary_key1 = "ARM"
-                secondary_key1 = "Condo"
-                key = "15-Inf"
-                @adjustment_hash[primary_key] = {}
-                @adjustment_hash[primary_key][secondary_key] = {}
-                @adjustment_hash[primary_key][secondary_key][secondary_key1] = {}
-                @adjustment_hash[primary_key][secondary_key][secondary_key1][key] = {}
-                @adjustment_hash[primary_key][primary_key1] = {}
-                @adjustment_hash[primary_key][primary_key1][secondary_key1] = {}   
-                @adjustment_hash[primary_key][primary_key1][secondary_key1][key] = {}
+                @adjustment_hash["LoanType/PropertyType/Term/LTV"] = {}
+                @adjustment_hash["LoanType/PropertyType/Term/LTV"]["Fixed"] = {}
+                @adjustment_hash["LoanType/PropertyType/Term/LTV"]["Fixed"]["Condo"] = {}
+                @adjustment_hash["LoanType/PropertyType/Term/LTV"]["Fixed"]["Condo"]["15-Inf"] = {}
+
+                @adjustment_hash["LoanType/PropertyType/Term/LTV"]["ARM"] = {}
+                @adjustment_hash["LoanType/PropertyType/Term/LTV"]["ARM"]["Condo"] = {}
+                @adjustment_hash["LoanType/PropertyType/Term/LTV"]["ARM"]["Condo"]["15-Inf"] = {}
               end
               if r == 16 && cc >= 9 && cc <= 16
                 ltv_key = get_value @ltv_data[cc-1]
-                @adjustment_hash[primary_key][secondary_key][secondary_key1][key][ltv_key] = {}
-                @adjustment_hash[primary_key][secondary_key][secondary_key1][key][ltv_key] = value
-                @adjustment_hash[primary_key][primary_key1][secondary_key1][key][ltv_key] = {}
-                @adjustment_hash[primary_key][primary_key1][secondary_key1][key][ltv_key] = value
+                @adjustment_hash["LoanType/PropertyType/Term/LTV"]["Fixed"]["Condo"]["15-Inf"][ltv_key] = {}
+                @adjustment_hash["LoanType/PropertyType/Term/LTV"]["ARM"]["Condo"]["15-Inf"][ltv_key] = {}
+                @adjustment_hash["LoanType/PropertyType/Term/LTV"]["Fixed"]["Condo"]["15-Inf"][ltv_key] = value
+                @adjustment_hash["LoanType/PropertyType/Term/LTV"]["ARM"]["Condo"]["15-Inf"][ltv_key] = value
               end
               if r >= 11 && r <= 17 && r != 14 && r != 15 && r != 16 && cc >= 9 && cc <= 16
                 ltv_key = get_value @ltv_data[cc-1]
