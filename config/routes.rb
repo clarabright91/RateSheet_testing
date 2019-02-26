@@ -1,5 +1,6 @@
 require 'sidekiq/web'
 Rails.application.routes.draw do
+  # get 'ob_american_financial_resources_wholesale5513/index'
   root :to => "dashboard#index"
   # root :to => "import_files#index"
   resources :import_files, :only => [:index] do
@@ -179,6 +180,14 @@ Rails.application.routes.draw do
     member do
       get :programs
       get :ratesheet
+      get :single_program
+    end
+  end
+
+  resources :ob_american_financial_resources_wholesale5513, only: [:index] do
+    member do
+      get :programs
+      get :gnma
       get :single_program
     end
   end
