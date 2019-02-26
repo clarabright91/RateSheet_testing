@@ -188,6 +188,11 @@ Rails.application.routes.draw do
     member do
       get :programs
       get :gnma
+      get :gnma_hb
+      get :fnma
+      get :fhlmc
+      get :hp
+      get :jumbo
       get :single_program
     end
   end
