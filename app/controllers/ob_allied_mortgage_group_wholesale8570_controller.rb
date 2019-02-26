@@ -1,5 +1,5 @@
 class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
-  before_action :get_sheet, only: [:programs, :fha, :va, :conf_fixed]
+  before_action :get_sheet, only: [:programs, :va, :conf_fixed]
   before_action :get_program, only: [:single_program]
   def index
     file = File.join(Rails.root,  'OB_Allied_Mortgage_Group_Wholesale8570.xls')
@@ -18,7 +18,8 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
     end
   end
 
-  def fha
+  def fha sheet_id
+    @sheet_obj = Sheet.find(sheet_id)
     file = File.join(Rails.root,  'OB_Allied_Mortgage_Group_Wholesale8570.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
