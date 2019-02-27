@@ -127,45 +127,45 @@ class ImportFilesController < ApplicationController
                   arm_basic = @title.scan(/\d+/)[0].to_i
                 end
 
-                # High Balance
-                jumbo_high_balance = false
-                if @title.include?("High Balance")
-                  jumbo_high_balance = true
-                end
-                
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                @programs_ids << @program.id
-                  # Loan Limit Type
-                if @title.include?("Non-Conforming")
-                  @program.loan_limit_type << "Non-Conforming"
-                end
-                if @title.include?("Conforming")
-                  @program.loan_limit_type << "Conforming"
-                end
-                if @title.include?("Jumbo")
-                  @program.loan_limit_type << "Jumbo"
-                end
-                if @title.include?("High Balance")
-                  @program.loan_limit_type << "High Balance"
-                end
-                @program.save
-                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",streamline: streamline, fha: fha, va: va, usda: usda, full_doc: full_doc, jumbo_high_balance: jumbo_high_balance,sheet_name: sheet, arm_basic: arm_basic)
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                if @program.fha
-                  gov_key = "FHA"
-                elsif @program.va
-                  gov_key = "VA"
-                elsif @program.usda
-                  gov_key = "USDA"
-                end
-                if @program.term.present?
-                  term = @program.term
-                end
-                if @program.loan_type.present?
-                  loan_type = @program.loan_type
-                end
+              # High Balance
+              jumbo_high_balance = false
+              if @title.include?("High Balance")
+                jumbo_high_balance = true
+              end
+
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+              @programs_ids << @program.id
+                # Loan Limit Type
+              if @title.include?("Non-Conforming")
+                @program.loan_limit_type << "Non-Conforming"
+              end
+              if @title.include?("Conforming")
+                @program.loan_limit_type << "Conforming"
+              end
+              if @title.include?("Jumbo")
+                @program.loan_limit_type << "Jumbo"
+              end
+              if @title.include?("High Balance")
+                @program.loan_limit_type << "High Balance"
+              end
+              @program.save
+              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",streamline: streamline, fha: fha, va: va, usda: usda, full_doc: full_doc, jumbo_high_balance: jumbo_high_balance,sheet_name: sheet, arm_basic: arm_basic)
+              @program.adjustments.destroy_all
+              @block_hash = {}
+              key = ''
+              if @program.fha
+                gov_key = "FHA"
+              elsif @program.va
+                gov_key = "VA"
+              elsif @program.usda
+                gov_key = "USDA"
+              end
+              if @program.term.present?
+                term = @program.term
+              end
+              if @program.loan_type.present?
+                loan_type = @program.loan_type
+              end
 
                 (1..50).each do |max_row|
                   @data = []
@@ -2456,7 +2456,7 @@ class ImportFilesController < ApplicationController
                     if @ltv_data[cc-1].include?("<")
                       ltv_key = "0-"+@ltv_data[cc-1].tr('<= ','')
                     else
-                      ltv_key = @ltv_data[cc-1]  
+                      ltv_key = @ltv_data[cc-1]
                     end
                     @adjustment_hash["LoanAmount/FICO/LTV"]["0-1,000,000"][primary_key][ltv_key] = {}
                     @adjustment_hash["LoanAmount/FICO/LTV"]["0-1,000,000"][primary_key][ltv_key] = value
@@ -2496,7 +2496,7 @@ class ImportFilesController < ApplicationController
                     if @ltv_data[cc-1].include?("<")
                       ltv_key = "0-"+@ltv_data[cc-1].tr('<= ','')
                     else
-                      ltv_key = @ltv_data[cc-1]  
+                      ltv_key = @ltv_data[cc-1]
                     end
                     @adjustment_hash["LoanAmount/FICO/LTV"]["1,000,000-Inf"][primary_key][ltv_key] = {}
                     @adjustment_hash["LoanAmount/FICO/LTV"]["1,000,000-Inf"][primary_key][ltv_key] = value
@@ -2531,7 +2531,7 @@ class ImportFilesController < ApplicationController
                     if @ltv_data[cc-1].include?("<")
                       ltv_key = "0-"+@ltv_data[cc-1].tr('<= ','')
                     else
-                      ltv_key = @ltv_data[cc-1]  
+                      ltv_key = @ltv_data[cc-1]
                     end
                     @property_hash["PropertyType/LTV"][primary_key][ltv_key] = {}
                     @property_hash["PropertyType/LTV"][primary_key][ltv_key] = value
@@ -2544,7 +2544,7 @@ class ImportFilesController < ApplicationController
                     if @ltv_data[cc-1].include?("<")
                       ltv_key = "0-"+@ltv_data[cc-1].tr('<= ','')
                     else
-                      ltv_key = @ltv_data[cc-1]  
+                      ltv_key = @ltv_data[cc-1]
                     end
                     @property_hash["RefinanceOption/LTV"]["Cash Out"][ltv_key] = {}
                     @property_hash["RefinanceOption/LTV"]["Cash Out"][ltv_key] = value
@@ -2557,7 +2557,7 @@ class ImportFilesController < ApplicationController
                     if @ltv_data[cc-1].include?("<")
                       ltv_key = "0-"+@ltv_data[cc-1].tr('<= ','')
                     else
-                      ltv_key = @ltv_data[cc-1]  
+                      ltv_key = @ltv_data[cc-1]
                     end
                     @property_hash["PropertyType/LTV"][primary_key][ltv_key] = {}
                     @property_hash["PropertyType/LTV"][primary_key][ltv_key] = value
@@ -2570,7 +2570,7 @@ class ImportFilesController < ApplicationController
                     if @ltv_data[cc-1].include?("<")
                       ltv_key = "0-"+@ltv_data[cc-1].tr('<= ','')
                     else
-                      ltv_key = @ltv_data[cc-1]  
+                      ltv_key = @ltv_data[cc-1]
                     end
                     @property_hash["MiscAdjuster/LTV"]["Escrow Waiver - except CA"][ltv_key] = {}
                     @property_hash["MiscAdjuster/LTV"]["Escrow Waiver - except CA"][ltv_key] = value
@@ -3611,45 +3611,56 @@ class ImportFilesController < ApplicationController
             (index..xlsx.sheet(sheet).last_row).each do |adj_row|
               # First Adjustment
               if xlsx.sheet(sheet).row(adj_row).include?("State Adjustments")
-                
-                  key_array = ""
-                  rr = adj_row
-                  cc = 12
-                  @state_hash = {}
-                  main_key = "State"
-                  @state_hash[main_key] = {}
-                  @right_adj = {}
-                  key = ''
-                  (1..11).each do |max_row|
-                    column_count = 1
-                    rrr = rr + max_row
-                    row = xlsx.sheet(sheet).row(rrr)
-                    if row.include?("State")
-                      key_array = row.compact[5..12]
-                    end
-                    (0..8).each do |max_column|
-                      ccc = cc + max_column
-                      begin
-                        value = xlsx.sheet(sheet).cell(rrr,ccc)
-                        if !(row.include?("State"))
-                          if (ccc == 12)
-                            key = value
-                            @state_hash[main_key][key] = {}
+                key_array = ""
+                rr = adj_row
+                cc = 12
+                @state_hash = {}
+                main_key = "State"
+                @state_hash[main_key] = {}
+                @right_adj = {}
+                key = ''
+                (1..11).each do |max_row|
+                  column_count = 1
+                  rrr = rr + max_row
+                  row = xlsx.sheet(sheet).row(rrr)
+                  if row.include?("State")
+                    key_array = row.compact[5..12]
+                  end
+                  (0..8).each do |max_column|
+                    ccc = cc + max_column
+                    value = xlsx.sheet(sheet).cell(rrr,ccc)
+                    if !(row.include?("State"))
+                      if (ccc == 12)
+                        key = value
+                        @state_hash[main_key][key] = {}
+                        @state_hash[main_key][key]["LoanType/Term"] = {}
+                      else
+                        if value != nil
+                          arr = key_array[column_count].split(' ')
+                          if arr.include?('Fixed')
+                            begin
+                              @state_hash[main_key][key]["LoanType/Term"]["Fixed"][arr[0]] = value
+                            rescue
+                              @state_hash[main_key][key]["LoanType/Term"]["Fixed"]= {}
+                              @state_hash[main_key][key]["LoanType/Term"]["Fixed"][arr[0]] = value
+                            end
                           else
-                            if value != nil
-                              @state_hash[main_key][key][key_array[column_count]] = value
-                              column_count = column_count + 1
+                            begin
+                              @state_hash[main_key][key]["LoanType/Term"]["ARM"][arr[0]] = value
+                            rescue
+                              @state_hash[main_key][key]["LoanType/Term"]["ARM"] = {}
+                              @state_hash[main_key][key]["LoanType/Term"]["ARM"][arr[0]] = value
                             end
                           end
+
+                          # @state_hash[main_key][key][key_array[column_count]] = value
+                          column_count = column_count + 1
                         end
-                      rescue Exception => e
-                        error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet, sheet_id: @sheet_obj)
-                        error_log.save
                       end
                     end
                   end
-                  make_adjust(@state_hash, @program_ids)
-                
+                end
+                make_adjust(@state_hash, @program_ids)
               end
 
               # Second Adjustment
@@ -3659,20 +3670,19 @@ class ImportFilesController < ApplicationController
                   rr = adj_row
                   cc = 12
                   @credit_score = {}
-                  main_key = "Credit Score"
+                  main_key = "FICO/CLTV"
                   @credit_score[main_key] = {}
                   (1..7).each do |max_row|
                     column_count = 0
                     rrr = rr + max_row
                     row = xlsx.sheet(sheet).row(rrr)
-
                     if row.include?("CLTV -->")
                       row.compact[5..9].each do |row_val|
                         val = row_val.split
                         if val.include?("≤") && !val.include?("CLTV")
-                          key_array << 0
+                          key_array << set_range(row_val) || get_value(row_val)
                         elsif !val.include?("CLTV")
-                          key_array << row_val.split("-")[0].to_i.round
+                          key_array << row_val
                         end
                       end
                     end
@@ -3682,7 +3692,8 @@ class ImportFilesController < ApplicationController
                       value = xlsx.sheet(sheet).cell(rrr,ccc)
                       if !row.include?("CLTV -->")
                         if ccc == 12
-                          key = value.split("-")[0]
+                          key = value
+                          key = set_range(value) || get_value(value) if value.include?('+')
                           @credit_score[main_key][key] = {}
                         else
                           @credit_score[main_key][key][key_array[column_count]] = value if value != nil
@@ -3739,7 +3750,6 @@ class ImportFilesController < ApplicationController
                 end
               end
 
-
               # Fourth Adjustment
               if xlsx.sheet(sheet).row(adj_row).include?("Cash Out Refi")
                 if adj_row == 95
@@ -3748,7 +3758,7 @@ class ImportFilesController < ApplicationController
                     cc = 15
                     @data_hash = {}
                     main_key = "LoanPurpose/RefinanceOption/LTV"
-                    key = "True"
+                    key = "Purpose"
                     key1 = "Cash Out"
                     @data_hash[main_key] = {}
                     @data_hash[main_key][key] = {}
@@ -3758,8 +3768,12 @@ class ImportFilesController < ApplicationController
                       rrr = rr + max_row
                       row = xlsx.sheet(sheet).row(rrr)
                       cell_value = xlsx.sheet(sheet).cell(rrr,cc)
-
-                      key2 = get_value(cell_value)
+                      if cell_value.include?('LTV')
+                        cell_value = cell_value.gsub('LTV', '')
+                        key2 = set_range(cell_value)
+                      else
+                        key2 = get_value(cell_value)
+                      end
                       value = xlsx.sheet(sheet).cell(rrr,cc+2)
 
                       @data_hash[main_key][key][key1][key2] = {}
@@ -7525,7 +7539,7 @@ class ImportFilesController < ApplicationController
       value = "0-"+value.split("MM")[0].split("$")[-1] + "000000"
     elsif value.include?("-") && value.include?("MM") && value.include?("$")
       if value.split(" - ")[-1].split("MM")[0].split("$")[-1].include?(".")
-        value = value.split(" - ")[0].split("MM")[0].split("$")[-1] + "000000" + "-" + value.split(" - ")[-1].split("MM")[0].split("$")[-1].gsub(".", "") + "000000" 
+        value = value.split(" - ")[0].split("MM")[0].split("$")[-1] + "000000" + "-" + value.split(" - ")[-1].split("MM")[0].split("$")[-1].gsub(".", "") + "000000"
       else
         value = value.split(" - ")[0].split("MM")[0].split("$")[-1].gsub(".", "") + "000000" + "-" + value.split(" - ")[-1].split("MM")[0].split("$")[-1] + "000000" if value.split(" - ")[0].split("MM")[0].split("$")[-1].include?(".")
       end
