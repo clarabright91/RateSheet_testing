@@ -2188,6 +2188,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               new_val = sheet_data.cell(r,cc)
               @property_hash["LoanType/CLTV"]["Fixed"][primary_key] = new_val
             end
+
             if r == 172 && cc == 4
               @property_hash["LoanType/Term"] = {}
               @property_hash["LoanType/Term"]["Fixed"] = {}
