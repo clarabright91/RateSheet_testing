@@ -33,6 +33,58 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
         num2 = 4
         make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2
       end
+      # adjustments
+      if (sheet == "Conv Adjustments")
+        sheet_data = @xlsx.sheet(sheet)
+        @adjustment_hash = {}
+        @cash_out = {}
+        @other_adjustment = {}
+        @loan_amount = {}
+        secondary_key = ''
+        ltv_key = ''
+        (8..56).each do |r|
+          row = sheet_data.row(r)
+          @ltv_data = sheet_data.row(8)
+          if row.compact.count > 1
+            (0..17).each do |cc|
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "Credit Score / LTV"
+                  @adjustment_hash["Term/FICO/LTV"] = {}
+                  @adjustment_hash["Term/FICO/LTV"]["15-Inf"] = {}
+                end
+                if value == "Cash Out       All Loan Terms     "
+                  @cash_out["RefinanceOption/FICO/LTV"] = {}
+                  @cash_out["RefinanceOption/FICO/LTV"]["Cash Out"] = {}
+                end
+
+                # Credit Score
+                if r >= 9 && r <= 14 && cc == 1
+                  secondary_key = get_value value
+                  @adjustment_hash["Term/FICO/LTV"]["15-Inf"][secondary_key] = {}
+                end
+                if r >= 9 && r <= 14 && cc >= 9 && cc <= 17
+                  ltv_key = get_value @ltv_data[cc-1]
+                  @adjustment_hash["Term/FICO/LTV"]["15-Inf"][secondary_key][ltv_key] = {}
+                  @adjustment_hash["Term/FICO/LTV"]["15-Inf"][secondary_key][ltv_key] = value
+                end
+                # Cash Out
+                if r >= 16 && r <= 21 && cc == 1
+                  secondary_key = get_value value
+                  @cash_out["RefinanceOption/FICO/LTV"]["Cash Out"][secondary_key] = {}
+                end
+                if r >= 16 && r <= 21 && cc >= 9 && cc <= 17
+                  ltv_key = get_value @ltv_data[cc-1]
+                  @cash_out["RefinanceOption/FICO/LTV"]["Cash Out"][secondary_key][ltv_key] = {}
+                  @cash_out["RefinanceOption/FICO/LTV"]["Cash Out"][secondary_key][ltv_key] = value
+                end
+              end
+            end
+          end
+        end
+        adjustment = [@adjustment_hash,@cash_out]
+        make_adjust(adjustment,sheet)
+      end
     end
     redirect_to programs_ob_united_wholesale_mortgage4892_path(@sheet_obj)
 	end
@@ -102,8 +154,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
               value = sheet_data.cell(r,cc)
               if value.present?
                 if value == "GOVERNMENT PRICE ADJUSTMENTS"
-                  primary_key = "LoanAmount"
-                  @adjustment_hash[primary_key] = {}
+                  @adjustment_hash["LoanAmount"] = {}
                 end
                 if value == "Credit Score Adjustors:  (lowest middle score)"
                   primary_key = "FICO"
@@ -111,11 +162,11 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 end
                 # Loan Size Adjustors
                 if r >= 80 && r <= 82 && cc == 9
-                  secondary_key = get_value value
-                  @adjustment_hash[primary_key][secondary_key] = {}
+                  secondary_key = value.tr('A-Za-z<:$ ','')
+                  @adjustment_hash["LoanAmount"][secondary_key] = {}
                 end
                 if r >= 80 && r <= 82 && cc == 16
-                  @adjustment_hash[primary_key][secondary_key] = value
+                  @adjustment_hash["LoanAmount"][secondary_key] = value
                 end
                 # Credit Score Adjustors
                 if r >= 84 && r <= 85 && cc == 9
@@ -405,10 +456,14 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 # if r == 59 && cc == 13
                 #   @loan_amount[primary_key] = value
                 # end
-                # if r == 60 && cc == 4
-                #   primary_key = "LoanPurpose/LockDay"
-                #   @loan_amount[primary_key] = {}
-                # end
+                if r == 60 && cc == 4
+                  @loan_amount["LoanPurpose/LockDay"] = {}
+                  @loan_amount["LoanPurpose/LockDay"]["Purchase"] = {}
+                  @loan_amount["LoanPurpose/LockDay"]["Purchase"]["45"] = {}
+                  cc = cc + 9
+                  new_val = sheet_data.cell(r,cc)
+                  @loan_amount["LoanPurpose/LockDay"]["Purchase"]["45"] = new_val
+                end
                 # if r == 60 && cc == 13
                 #   @loan_amount[primary_key] = value
                 # end
@@ -614,24 +669,28 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
               value = sheet_data.cell(r,cc)
               if value.present?
                 if value == "Credit Score"
-                  primary_key = "LoanType/FICO/CLTV"
+                  primary_key = "FICO/CLTV"
                   @adjustment_hash[primary_key] = {}
                 end
                 if value == "Loan Amount:"
-                  primary_key = "LoanType/LoanAmount/CLTV"
+                  primary_key = "LoanAmount/CLTV"
                   @loan_amount[primary_key] = {}
                 end
                 if value == "Cash Out"
-                  primary_key = "RefinanceOption/LTV"
-                  @other_adjustment[primary_key] = {}
+                  @other_adjustment["RefinanceOption/LTV"] = {}
+                  @other_adjustment["RefinanceOption/LTV"]["Cash Out"] = {}
+                  @other_adjustment["PropertyType/LTV"] = {}
                 end
                 if value == "Purchase"
-                  primary_key = "LoanPurpose"
-                  @other_adjustment[primary_key] = {}
+                  @other_adjustment["LoanPurpose/LTV"] = {}
+                  @other_adjustment["LoanPurpose/LTV"]["Purchase"] = {}
                 end
                 if value == "Escrow Waiver (LTVs >80%; CA only)"
-                  primary_key = "Escrow Waiver"
-                  @other_adjustment[primary_key] = {}
+                  primary_key = value
+                  @other_adjustment["MiscAdjuster/State/LTV/CLTV"] = {}
+                  @other_adjustment["MiscAdjuster/State/LTV/CLTV"][primary_key] = {}
+                  @other_adjustment["MiscAdjuster/State/LTV/CLTV"][primary_key]["CA"] = {}
+                  @other_adjustment["MiscAdjuster/State/LTV/CLTV"][primary_key]["CA"]["80-Inf"] = {}
                 end
                 # Credit Score
                 if r >= 70 && r <= 75 && cc == 5
@@ -656,27 +715,48 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 # Other Adjustment
                 if r == 83 && cc >= 8 && cc <= 14
                   ltv_key = get_value @ltv_data[cc-1]
-                  @other_adjustment[primary_key][ltv_key] = {}
-                  @other_adjustment[primary_key][ltv_key] = value
+                  @other_adjustment["RefinanceOption/LTV"]["Cash Out"][ltv_key] = {}
+                  @other_adjustment["RefinanceOption/LTV"]["Cash Out"][ltv_key] = value
                 end
                 if r >= 84 && r <= 88 && cc == 3
-                  primary_key = value
-                  @other_adjustment[primary_key] = {}
+                  if value.include?("Units")
+                    primary_key = value.tr('s','')
+                  elsif value.include?("Investment")
+                    primary_key = "Investment Property"
+                  else
+                    primary_key = value
+                  end
+                  @other_adjustment["PropertyType/LTV"][primary_key] = {}
                 end
                 if r >= 84 && r <= 88 && cc >= 8 && cc <= 14
                   ltv_key = get_value @ltv_data[cc-1]
-                  @other_adjustment[primary_key][ltv_key] = {}
-                  @other_adjustment[primary_key][ltv_key] = value
+                  @other_adjustment["PropertyType/LTV"][primary_key][ltv_key] = {}
+                  @other_adjustment["PropertyType/LTV"][primary_key][ltv_key] = value
                 end
                 if r == 89 && cc >= 8 && cc <= 14
                   ltv_key = get_value @ltv_data[cc-1]
-                  @other_adjustment[primary_key][ltv_key] = {}
-                  @other_adjustment[primary_key][ltv_key] = value
+                  @other_adjustment["LoanPurpose/LTV"]["Purchase"][ltv_key] = {}
+                  @other_adjustment["LoanPurpose/LTV"]["Purchase"][ltv_key] = value
                 end
                 if r == 90 && cc >= 8 && cc <= 14
                   ltv_key = get_value @ltv_data[cc-1]
-                  @other_adjustment[primary_key][ltv_key] = {}
-                  @other_adjustment[primary_key][ltv_key] = value
+                  @other_adjustment["MiscAdjuster/State/LTV/CLTV"][primary_key]["CA"]["80-Inf"][ltv_key] = {}
+                  @other_adjustment["MiscAdjuster/State/LTV/CLTV"][primary_key]["CA"]["80-Inf"][ltv_key] = value
+                end
+                if r == 91 && cc == 3
+                  @other_adjustment["ArmBasic/LTV"] = {}
+                  @other_adjustment["ArmBasic/LTV"]["5/1"] = {}
+                  @other_adjustment["ArmBasic/LTV"]["7/1"] = {}
+                  @other_adjustment["ArmBasic/LTV"]["10/1"] = {}
+                end
+                if r == 91 && cc >= 8 && cc <= 14
+                  ltv_key = get_value @ltv_data[cc-1]
+                  @other_adjustment["ArmBasic/LTV"]["5/1"][ltv_key] = {}
+                  @other_adjustment["ArmBasic/LTV"]["7/1"][ltv_key] = {}
+                  @other_adjustment["ArmBasic/LTV"]["10/1"][ltv_key] = {}
+                  @other_adjustment["ArmBasic/LTV"]["5/1"][ltv_key] = value
+                  @other_adjustment["ArmBasic/LTV"]["7/1"][ltv_key] = value
+                  @other_adjustment["ArmBasic/LTV"]["10/1"][ltv_key] = value
                 end
               end
             end
@@ -770,14 +850,10 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
 
     def get_value value1
       if value1.present?
-        if value1.include?("CLTV  <")
-          value1 = "0"+value1.split("CLTV").last
-        elsif value1.include?("<=") || value1.include?("<")
-          value1 = "0-"+ value1.tr('^0-9', '')
-        elsif value1.include?("CLTV")
-          value1 = value1.split("CLTV ").last.first(9)
-        elsif value1.include?("-")
-          value1.gsub(/[^0-9-]/, "")
+        if value1.include?("<=") || value1.include?("<")
+          value1 = "0-"+value1.split("<=").last.tr('A-Za-z%$><= ','')
+        elsif value1.include?(">") || value1.include?("+")
+          value1 = value1.split(">").last.tr('^0-9 ', '')+"-Inf"
         else
           value1
         end
@@ -786,7 +862,13 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
 
     def make_adjust(block_hash, sheet)
       block_hash.each do |hash|
-        Adjustment.create(data: hash,sheet_name: sheet)
+        if hash.present?
+          hash.each do |key|
+            data = {}
+            data[key[0]] = key[1]
+            Adjustment.create(data: data,sheet_name: sheet)
+          end
+        end
       end
     end
 
