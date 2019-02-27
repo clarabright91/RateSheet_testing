@@ -201,7 +201,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                   cc = cc + 2
                   new_value = sheet_data.cell(r,cc)
                   @multiunit_hash["PropertyType/LTV"]["3-4 Unit"]["0-75"] = (new_value*100).to_s
-                end 
+                end
                 if r == 113 && cc == 6
                   primary_key = "PropertyType"
                   new_key = "Manufactured Home"
@@ -1008,7 +1008,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                   @property_hash["PropertyType/LTV"] = {}
                   @property_hash["PropertyType/LTV"]["2 Unit"] = {}
                   @property_hash["PropertyType/LTV"]["2 Unit"]["0-85"] = {}
-                  cc = cc + 2 
+                  cc = cc + 2
                   new_value = sheet_data.cell(r,cc)
                   @property_hash["PropertyType/LTV"]["2 Unit"]["0-85"] = new_value*100
                 end
@@ -1114,7 +1114,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                   if ltv_key.include?("%")
                     ltv_key = ltv_key.tr('% ','')
                   else
-                    ltv_key  
+                    ltv_key
                   end
                   @adjustment_hash["PropertyType/LTV"]["Investment Property"][ltv_key] = (value.class == Float ? value*100 : value)
                 end
@@ -1128,7 +1128,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                   if ltv_key.include?("%")
                     ltv_key = ltv_key.tr('% ','')
                   else
-                    ltv_key  
+                    ltv_key
                   end
                   @adjustment_hash["Term/FICO/LTV"]["15-Inf"][secondary_key][ltv_key] = {}
                   @adjustment_hash["Term/FICO/LTV"]["15-Inf"][secondary_key][ltv_key] = (value.class == Float ? value*100 : value)
@@ -1139,7 +1139,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                   if secondary_key.include?("%")
                     secondary_key = secondary_key.tr('% ','')
                   else
-                    secondary_key  
+                    secondary_key
                   end
                   @sub_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"][secondary_key] = {}
                 end
@@ -1148,7 +1148,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                   if ltv_key.include?("%")
                     ltv_key = ltv_key.tr('% ','')
                   else
-                    ltv_key  
+                    ltv_key
                   end
                   @sub_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"][secondary_key][ltv_key] = {}
                 end
@@ -1183,7 +1183,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                 if r == 60 && cc == 5
                   @property_hash["PropertyType"] = {}
                   @property_hash["PropertyType"]["Manufactured Home"] = {}
-                  cc = cc + 3 
+                  cc = cc + 3
                   new_value = sheet_data.cell(r,cc)
                   @property_hash["PropertyType"]["Manufactured Home"] = new_value*100
                 end
