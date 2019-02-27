@@ -9,20 +9,24 @@ class ControllerMethodCallingService
 	def invoke_method
 		# check controller name is exists or not
     if @controllers_names.include?(@class)
-      @class = Object.const_get(@class, Class.new(StandardError))
-      action = @action.tableize.singularize
-      controller = @class.new
+      # @class     = Object.const_get(@class, Class.new(StandardError))
+      # action     = @action.tableize.singularize
+      sheet      = find_sheet(@action)
+      # controller = @class.new(sheet.id)
+      # controller = sheet ? @class.new(sheet.id) : @class.new
       # check methods is present or not in controller
-      if controller.methods.include?(@action.downcase.to_sym)
-      	sheet = find_sheet(@action)
-      	if sheet
-      		controller.send(action, sheet.id)
-    		else
-    			controller.send(:index)
-    			sheet = find_sheet(@action)
-    			controller.send(action, sheet.id)
-    		end
-    	end
+     #  if controller.methods.include?(@action.downcase.to_sym)
+     #    if sheet
+     #      controller.send(action)
+    	# 	else
+    	# 		controller.send(:index)
+    	# 		sheet      = find_sheet(@action)
+     #      controller = @class.new(sheet.id)
+    	# 		controller.send(action)
+    	# 	end
+    	# end
+      app2 = ActionDispatch::Integration::Session.new(Rails.application)
+      app2.get("http://localhost:3000/ob_allied_mortgage_group_wholesale8570/#{sheet.id}/fha")
     end
   end
 
