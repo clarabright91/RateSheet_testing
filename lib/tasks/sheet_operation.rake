@@ -36,26 +36,24 @@ namespace :sheet_operation do
       sheet_links = Bank::SHEET_LINKS
       # traverse each link one by one and download file inside folder
       sheet_links.each do |link|
-				if link == "https://www.loansifter.com/DownloadFile.aspx?RateSheetID=8570"
-          open(link) do |remote_file|
-            file_name = remote_file.meta["content-disposition"].gsub("attachment;filename=", "")
-            # unless File.exists?(Rails.root.join('remote_files', file_name))
+        open(link) do |remote_file|
+          file_name = remote_file.meta["content-disposition"].gsub("attachment;filename=", "")
+          # unless File.exists?(Rails.root.join('remote_files', file_name))
             File.open("remote_files/" + file_name, "wb") do |local_file|
               # save file
               local_file.write(remote_file.read)
               # file name
               filename = local_file.to_path.split("/")[-1]
               # call rake task to upload data on database
-              Rake::Task["sheet_operation:import_sheet_data"].invoke(filename)
             end
-          end
+          # end
         end
       end
 
       # set validation to download files from remote
       # $redis.set(today_download, "done")
       # call rake task to upload sheets on google drive
-      # Rake::Task["sheet_operation:upload_on_drive"].invoke
+      Rake::Task["sheet_operation:upload_on_drive"].invoke
     # end
   end
 
@@ -70,22 +68,8 @@ namespace :sheet_operation do
         end
       end
 
+      ControllerMethodCallingService.new().invoke_method
       # $redis.set(today_uploaded, "done")
     # end
-  end
-
-  task :import_sheet_data, [:filename] => :environment do |task, args|
-    # collect file
-    file   = File.join(Rails.root.join('remote_files', args[:filename]))
-    # open file
-    xlsx   = Roo::Spreadsheet.open(file)
-    # change file name in camel case
-    class_name = args[:filename].split(".").first.camelize + "Controller"
-    #  get sheets names of file
-    sheets = xlsx.sheets
-    sheets.each do |sheet|
-			# get sheet from data
-      ControllerMethodCallingService.new(class_name, sheet).invoke_method
-    end
   end
 end
