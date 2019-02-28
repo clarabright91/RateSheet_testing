@@ -1,6 +1,6 @@
 class ObAmericanFinancialResourcesWholesale5513Controller < ApplicationController
   before_action :get_sheet, only: [:programs, :gnma, :gnma_hb, :fnma, :fhlmc, :hp, :jumbo]
-  before_action :read_sheet, only: [:gnma, :gnma_hb, :fnma, :fhlmc, :hp, :jumbo]
+  before_action :read_sheet, only: [:index, :gnma, :gnma_hb, :fnma, :fhlmc, :hp, :jumbo]
   before_action :get_program, only: [:single_program, :program_property]
 
   def index
@@ -10,7 +10,7 @@ class ObAmericanFinancialResourcesWholesale5513Controller < ApplicationControlle
       xlsx.sheets.each do |sheet|
         if (sheet == "GNMA")
           headers = ["Phone", "General Contacts", "Mortgagee Clause (Wholesale)"]
-          @name = "Cardinal Financial"
+          @name = "American Financial Resource"
           @bank = Bank.find_or_create_by(name: @name)
         end
         @sheet = @bank.sheets.find_or_create_by(name: sheet)
@@ -20,6 +20,7 @@ class ObAmericanFinancialResourcesWholesale5513Controller < ApplicationControlle
     end
   end
 
+  # #multiple program with same name issue
   def gnma
     @xlsx.sheets.each do |sheet|
       if (sheet == "GNMA")
@@ -128,6 +129,17 @@ class ObAmericanFinancialResourcesWholesale5513Controller < ApplicationControlle
     redirect_to programs_ob_american_financial_resources_wholesale5513_path(@sheet_obj)
   end
 
+  def programs
+    @programs = @sheet_obj.programs
+  end
+
+  def single_program
+  end
+
+  def get_program
+    @program = Program.find(params[:id])
+  end
+
   private
     def get_sheet
       @sheet_obj = Sheet.find(params[:id])
@@ -149,7 +161,6 @@ class ObAmericanFinancialResourcesWholesale5513Controller < ApplicationControlle
             begin
               cc = num1 * max_column + num2
               @title = sheet_data.cell(r,cc)
-              # @title.present? && !@title.include?("Rate") && !@title.include?("All-in") && !@title.include?("FICO") && !@title.include?("Lender") && !@title.include?("GOVERNMENT") && !@title.include?("NY")
               if @title.present? && !@title.include?("Rate") && !@title.include?("All-in") && !@title.include?("GOVERNMENT")
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
@@ -229,7 +240,6 @@ class ObAmericanFinancialResourcesWholesale5513Controller < ApplicationControlle
                     break # terminate the loop
                   end
                 end
-                debugger
                 @program.update(base_rate: @block_hash)
               end
             rescue Exception => e
