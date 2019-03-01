@@ -83,7 +83,7 @@ class ImportFilesController < ApplicationController
                   term = nil
                 end
 
-                 # rate arm
+                # rate arm
                 if @title.include?("Fixed")
                   loan_type = "Fixed"
                 elsif @title.include?("ARM")
@@ -127,45 +127,45 @@ class ImportFilesController < ApplicationController
                   arm_basic = @title.scan(/\d+/)[0].to_i
                 end
 
-              # High Balance
-              jumbo_high_balance = false
-              if @title.include?("High Balance")
-                jumbo_high_balance = true
-              end
+                # High Balance
+                jumbo_high_balance = false
+                if @title.include?("High Balance")
+                  jumbo_high_balance = true
+                end
 
-              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-              @programs_ids << @program.id
-                # Loan Limit Type
-              if @title.include?("Non-Conforming")
-                @program.loan_limit_type << "Non-Conforming"
-              end
-              if @title.include?("Conforming")
-                @program.loan_limit_type << "Conforming"
-              end
-              if @title.include?("Jumbo")
-                @program.loan_limit_type << "Jumbo"
-              end
-              if @title.include?("High Balance")
-                @program.loan_limit_type << "High Balance"
-              end
-              @program.save
-              @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",streamline: streamline, fha: fha, va: va, usda: usda, full_doc: full_doc, jumbo_high_balance: jumbo_high_balance,sheet_name: sheet, arm_basic: arm_basic)
-              @program.adjustments.destroy_all
-              @block_hash = {}
-              key = ''
-              if @program.fha
-                gov_key = "FHA"
-              elsif @program.va
-                gov_key = "VA"
-              elsif @program.usda
-                gov_key = "USDA"
-              end
-              if @program.term.present?
-                term = @program.term
-              end
-              if @program.loan_type.present?
-                loan_type = @program.loan_type
-              end
+                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                @programs_ids << @program.id
+                  # Loan Limit Type
+                if @title.include?("Non-Conforming")
+                  @program.loan_limit_type << "Non-Conforming"
+                end
+                if @title.include?("Conforming")
+                  @program.loan_limit_type << "Conforming"
+                end
+                if @title.include?("Jumbo")
+                  @program.loan_limit_type << "Jumbo"
+                end
+                if @title.include?("High Balance")
+                  @program.loan_limit_type << "High Balance"
+                end
+                @program.save
+                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",streamline: streamline, fha: fha, va: va, usda: usda, full_doc: full_doc, jumbo_high_balance: jumbo_high_balance,sheet_name: sheet, arm_basic: arm_basic)
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+                if @program.fha
+                  gov_key = "FHA"
+                elsif @program.va
+                  gov_key = "VA"
+                elsif @program.usda
+                  gov_key = "USDA"
+                end
+                if @program.term.present?
+                  term = @program.term
+                end
+                if @program.loan_type.present?
+                  loan_type = @program.loan_type
+                end
 
                 (1..50).each do |max_row|
                   @data = []
