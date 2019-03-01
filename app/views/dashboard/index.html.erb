@@ -6,6 +6,18 @@
             <div class="row">
               <div class="col-md-2">
                 <div class="form-group">
+                  <label>Bank Name</label>
+                  <%= select_tag 'bank_name', options_for_select(Bank.all.map{|n| [n.name] }.unshift(["All"]), (params[:bank_name] rescue nil)), { :class=> "form-control"} %>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Program Name</label>
+                  <%= select_tag 'program_name', options_for_select(Program.all.map{|n| [n.program_name] }, (params[:program_name] rescue nil)), { prompt: 'All', :class=> "form-control"} %>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
                   <label>Loan Type</label>
                   <% @loan_type_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"]]%>
                   <%= select_tag 'loan_type', options_for_select(@loan_type_list, (params[:loan_type] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control"} %>
@@ -79,8 +91,6 @@
                   </div>
                 </div>
               </div>
-
-
 
               <div class="col-md-2">
                 <div class="form-group">
@@ -233,6 +243,7 @@
               </div>
 
             </div>
+
           <% end %>
       </div>
       <!-- end searching form -->
@@ -261,6 +272,10 @@
           <td><%= program[:adj_points] %></td>
         </tr>
       <%end%>
+    <% else%>
+    <tr>
+      <td colspan="5">Data Not Found...</td>
+    </tr>
     <%end%>
     </tbody>
   </table>
@@ -345,6 +360,23 @@
 
 <script type="text/javascript">
   $(document).ready(function(){
+
+    $('#bank_name').change(function(){
+      var bank_name =  $(this).val();      
+      $.ajax({
+        type:'GET',
+        url:'/dashboard/fetch_programs_by_bank',
+        data: {bank_name : bank_name },
+        success:function(response){
+          var selectBox = document.getElementById('program_name');
+          selectBox.options.length = 0
+          selectBox.options.add( new Option('All', 'All'));
+          response.program_list.map((program)=>{
+            selectBox.options.add( new Option(program.program_name, program.program_name));
+          });
+        }
+      });
+    });
 
     $(".alert-error" ).fadeOut(3000);
 
