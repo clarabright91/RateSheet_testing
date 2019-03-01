@@ -9,6 +9,18 @@ class DashboardController < ApplicationController
     end
   end
 
+  def fetch_programs_by_bank
+    program_list = []
+    if params[:bank_name].present?
+      if (params[:bank_name] == "All")
+        program_list = Program.all
+      else
+        program_list = Program.where(bank_name: params[:bank_name])
+      end
+    end
+    render json: {program_list: program_list.map{ |n| {program_name: n.program_name} }}
+  end
+
   def set_default
     @base_rate = 0.0
     @filter_data = {}
@@ -72,7 +84,19 @@ class DashboardController < ApplicationController
     @loan_amount = params[:loan_amount].to_i if params[:loan_amount].present?
     @program_category = params[:program_category] if params[:program_category].present?
 
-    if params[:loan_type].present?
+    if params[:bank_name].present?
+      unless (params[:bank_name] == "All")
+        @filter_data[:bank_name] = params[:bank_name]
+      end
+    end
+
+    if params[:program_name].present?
+      unless (params[:program_name] == "All")
+        @filter_data[:program_name] = params[:program_name]
+      end
+    end
+
+   if params[:loan_type].present?
       @loan_type = params[:loan_type]
       @filter_data[:loan_type] = params[:loan_type]
       if params[:loan_type] =="ARM" && params[:arm_basic].present?
@@ -2194,7 +2218,7 @@ class DashboardController < ApplicationController
               end
             end
           end
-          adj_key_hash.keys.each do |hash_key, index|            
+          adj_key_hash.keys.each do |hash_key, index|
             if hash_key==0 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key]]
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A"))
@@ -2213,25 +2237,25 @@ class DashboardController < ApplicationController
                 hash_obj[:adj_points] << point
               end
             end
-            if hash_key==3 && adj_key_hash.keys.count-1==hash_key              
+            if hash_key==3 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A"))
                 hash_obj[:adj_points] << point
               end
             end
-            if hash_key==4 && adj_key_hash.keys.count-1==hash_key              
+            if hash_key==4 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-4]][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A"))
                 hash_obj[:adj_points] << point
               end
             end
-            if hash_key==5 && adj_key_hash.keys.count-1==hash_key              
+            if hash_key==5 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-5]][adj_key_hash[hash_key-4]][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A"))
                 hash_obj[:adj_points] << point
               end
             end
-            if hash_key==6 && adj_key_hash.keys.count-1==hash_key              
+            if hash_key==6 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-6]][adj_key_hash[hash_key-5]][adj_key_hash[hash_key-4]][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A"))
                 hash_obj[:adj_points] << point
