@@ -83,7 +83,7 @@ class ImportFilesController < ApplicationController
                   term = nil
                 end
 
-                 # rate arm
+                # rate arm
                 if @title.include?("Fixed")
                   loan_type = "Fixed"
                 elsif @title.include?("ARM")
@@ -132,7 +132,7 @@ class ImportFilesController < ApplicationController
                 if @title.include?("High Balance")
                   jumbo_high_balance = true
                 end
-                
+
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
                   # Loan Limit Type
