@@ -72,7 +72,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   @program.update(base_rate: @block_hash, sheet_name: sheet)
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: @sheet, sheet_id: @sheet_obj)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
                 error_log.save
               end
             end
@@ -276,7 +276,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   @program.update(base_rate: @block_hash, sheet_name: sheet)
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: @sheet, sheet_id: @sheet_obj)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
                 error_log.save
               end
             end
@@ -363,7 +363,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: @sheet, sheet_id: @sheet_obj)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
                 error_log.save
               end
             end
@@ -533,7 +533,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 end
                 @program.update(base_rate: @block_hash, sheet_name: sheet)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: @sheet, sheet_id: @sheet_obj)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet)
                 error_log.save
               end
             end
@@ -730,7 +730,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: @sheet, sheet_id: @sheet_obj)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
                 error_log.save
               end
             end

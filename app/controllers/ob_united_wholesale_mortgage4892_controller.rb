@@ -47,37 +47,42 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
           @ltv_data = sheet_data.row(8)
           if row.compact.count > 1
             (0..17).each do |cc|
-              value = sheet_data.cell(r,cc)
-              if value.present?
-                if value == "Credit Score / LTV"
-                  @adjustment_hash["Term/FICO/LTV"] = {}
-                  @adjustment_hash["Term/FICO/LTV"]["15-Inf"] = {}
-                end
-                if value == "Cash Out       All Loan Terms     "
-                  @cash_out["RefinanceOption/FICO/LTV"] = {}
-                  @cash_out["RefinanceOption/FICO/LTV"]["Cash Out"] = {}
-                end
+              begin
+                value = sheet_data.cell(r,cc)
+                if value.present?
+                  if value == "Credit Score / LTV"
+                    @adjustment_hash["Term/FICO/LTV"] = {}
+                    @adjustment_hash["Term/FICO/LTV"]["15-Inf"] = {}
+                  end
+                  if value == "Cash Out       All Loan Terms     "
+                    @cash_out["RefinanceOption/FICO/LTV"] = {}
+                    @cash_out["RefinanceOption/FICO/LTV"]["Cash Out"] = {}
+                  end
 
-                # Credit Score
-                if r >= 9 && r <= 14 && cc == 1
-                  secondary_key = get_value value
-                  @adjustment_hash["Term/FICO/LTV"]["15-Inf"][secondary_key] = {}
+                  # Credit Score
+                  if r >= 9 && r <= 14 && cc == 1
+                    secondary_key = get_value value
+                    @adjustment_hash["Term/FICO/LTV"]["15-Inf"][secondary_key] = {}
+                  end
+                  if r >= 9 && r <= 14 && cc >= 9 && cc <= 17
+                    ltv_key = get_value @ltv_data[cc-1]
+                    @adjustment_hash["Term/FICO/LTV"]["15-Inf"][secondary_key][ltv_key] = {}
+                    @adjustment_hash["Term/FICO/LTV"]["15-Inf"][secondary_key][ltv_key] = value
+                  end
+                  # Cash Out
+                  if r >= 16 && r <= 21 && cc == 1
+                    secondary_key = get_value value
+                    @cash_out["RefinanceOption/FICO/LTV"]["Cash Out"][secondary_key] = {}
+                  end
+                  if r >= 16 && r <= 21 && cc >= 9 && cc <= 17
+                    ltv_key = get_value @ltv_data[cc-1]
+                    @cash_out["RefinanceOption/FICO/LTV"]["Cash Out"][secondary_key][ltv_key] = {}
+                    @cash_out["RefinanceOption/FICO/LTV"]["Cash Out"][secondary_key][ltv_key] = value
+                  end
                 end
-                if r >= 9 && r <= 14 && cc >= 9 && cc <= 17
-                  ltv_key = get_value @ltv_data[cc-1]
-                  @adjustment_hash["Term/FICO/LTV"]["15-Inf"][secondary_key][ltv_key] = {}
-                  @adjustment_hash["Term/FICO/LTV"]["15-Inf"][secondary_key][ltv_key] = value
-                end
-                # Cash Out
-                if r >= 16 && r <= 21 && cc == 1
-                  secondary_key = get_value value
-                  @cash_out["RefinanceOption/FICO/LTV"]["Cash Out"][secondary_key] = {}
-                end
-                if r >= 16 && r <= 21 && cc >= 9 && cc <= 17
-                  ltv_key = get_value @ltv_data[cc-1]
-                  @cash_out["RefinanceOption/FICO/LTV"]["Cash Out"][secondary_key][ltv_key] = {}
-                  @cash_out["RefinanceOption/FICO/LTV"]["Cash Out"][secondary_key][ltv_key] = value
-                end
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log.save
               end
             end
           end
@@ -112,35 +117,40 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
               cc = 4*max_column + 1
-              @title = sheet_data.cell(r,cc)
-              if @title.present? && @title != "GOVERNMENT PRICE ADJUSTMENTS"
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                @programs_ids << @program.id
-                program_property
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present? && @title != "GOVERNMENT PRICE ADJUSTMENTS"
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  @programs_ids << @program.id
+                  program_property
 
-                @block_hash = {}
-                key = ''
-                (1..14).each do |max_row|
-                  @data = []
-                  (0..3).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+                  @block_hash = {}
+                  key = ''
+                  (1..14).each do |max_row|
+                    @data = []
+                    (0..3).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log.save
               end
             end
           end
@@ -266,35 +276,40 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
               cc = 4*max_column + 1 # 3 / 7 / 11
-              @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                @programs_ids << @program.id
-                program_property
-              end
-              @block_hash = {}
-              key = ''
-              (1..4).each do |max_row|
-                @data = []
-                (0..3).each_with_index do |index, c_i|
-                  rrr = rr + max_row
-                  ccc = cc + c_i
-                  value = sheet_data.cell(rrr,ccc)
-                  if value.present?
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[key] = {}
-                    else
-                      @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  @programs_ids << @program.id
+                  program_property
+                end
+                @block_hash = {}
+                key = ''
+                (1..4).each do |max_row|
+                  @data = []
+                  (0..3).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        @block_hash[key][15*c_i] = value
+                      end
+                      @data << value
                     end
-                    @data << value
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
                   end
                 end
-                if @data.compact.reject { |c| c.blank? }.length == 0
-                  break # terminate the loop
-                end
+                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log.save
               end
-              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -305,36 +320,41 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
               cc = 4*max_column + 1 # 3 / 7 / 11
-              @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                @programs_ids << @program.id
-                program_property
-              end
-              # @program.adjustments.destroy_all
-              @block_hash = {}
-              key = ''
-              (1..11).each do |max_row|
-                @data = []
-                (0..3).each_with_index do |index, c_i|
-                  rrr = rr + max_row
-                  ccc = cc + c_i
-                  value = sheet_data.cell(rrr,ccc)
-                  if value.present?
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[key] = {}
-                    else
-                      @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  @programs_ids << @program.id
+                  program_property
+                end
+                # @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+                (1..11).each do |max_row|
+                  @data = []
+                  (0..3).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        @block_hash[key][15*c_i] = value
+                      end
+                      @data << value
                     end
-                    @data << value
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
                   end
                 end
-                if @data.compact.reject { |c| c.blank? }.length == 0
-                  break # terminate the loop
-                end
+                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log.save
               end
-              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -345,35 +365,40 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
               cc = 4*max_column + 1 # 3 / 7 / 11
-              @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                @programs_ids << @program.id
-                program_property
-              end
-              @block_hash = {}
-              key = ''
-              (1..4).each do |max_row|
-                @data = []
-                (0..3).each_with_index do |index, c_i|
-                  rrr = rr + max_row
-                  ccc = cc + c_i
-                  value = sheet_data.cell(rrr,ccc)
-                  if value.present?
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[key] = {}
-                    else
-                      @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  @programs_ids << @program.id
+                  program_property
+                end
+                @block_hash = {}
+                key = ''
+                (1..4).each do |max_row|
+                  @data = []
+                  (0..3).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        @block_hash[key][15*c_i] = value
+                      end
+                      @data << value
                     end
-                    @data << value
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
                   end
                 end
-                if @data.compact.reject { |c| c.blank? }.length == 0
-                  break # terminate the loop
-                end
+                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log.save
               end
-              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -384,36 +409,41 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
               cc = 4*max_column + 1 # 3 / 7 / 11
-              @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                @programs_ids << @program.id
-                program_property
-              end
-              # @program.adjustments.destroy_all
-              @block_hash = {}
-              key = ''
-              (1..11).each do |max_row|
-                @data = []
-                (0..3).each_with_index do |index, c_i|
-                  rrr = rr + max_row
-                  ccc = cc + c_i
-                  value = sheet_data.cell(rrr,ccc)
-                  if value.present?
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[key] = {}
-                    else
-                      @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  @programs_ids << @program.id
+                  program_property
+                end
+                # @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+                (1..11).each do |max_row|
+                  @data = []
+                  (0..3).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        @block_hash[key][15*c_i] = value
+                      end
+                      @data << value
                     end
-                    @data << value
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
                   end
                 end
-                if @data.compact.reject { |c| c.blank? }.length == 0
-                  break # terminate the loop
-                end
+                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log.save
               end
-              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -423,97 +453,102 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
           row = sheet_data.row(r)
           if row.compact.count >= 1
             (0..13).each do |cc|
-              value = sheet_data.cell(r,cc)
-              if value.present?
-                if value == "GOVERNMENT PRICE ADJUSTMENTS"
-                  primary_key = "LoanAmount"
-                  @adjustment_hash[primary_key] = {}
+              begin
+                value = sheet_data.cell(r,cc)
+                if value.present?
+                  if value == "GOVERNMENT PRICE ADJUSTMENTS"
+                    primary_key = "LoanAmount"
+                    @adjustment_hash[primary_key] = {}
+                  end
+                  if value == "Credit Score Adjustors:  (lowest middle score)"
+                    primary_key = "FICO"
+                    @loan_amount[primary_key] = {}
+                  end
+                  # Loan Size Adjustors
+                  if r >= 53 && r <= 55 && cc == 4
+                    secondary_key = get_value value
+                    @adjustment_hash[primary_key][secondary_key] = {}
+                  end
+                  if r >= 53 && r <= 55 && cc == 13
+                    @adjustment_hash[primary_key][secondary_key] = value
+                  end
+                  # Credit Score Adjustors
+                  if r >= 57 && r <= 58 && cc == 4
+                    secondary_key = value
+                    @loan_amount[primary_key][secondary_key] = {}
+                  end
+                  if r >= 57 && r <= 58 && cc == 13
+                    @loan_amount[primary_key][secondary_key] = value
+                  end
+                  # if r == 59 && cc == 4
+                  #   primary_key = "0<$125,000"
+                  #   @loan_amount[primary_key] = {}
+                  # end
+                  # if r == 59 && cc == 13
+                  #   @loan_amount[primary_key] = value
+                  # end
+                  if r == 60 && cc == 4
+                    @loan_amount["LoanPurpose/LockDay"] = {}
+                    @loan_amount["LoanPurpose/LockDay"]["Purchase"] = {}
+                    @loan_amount["LoanPurpose/LockDay"]["Purchase"]["45"] = {}
+                    cc = cc + 9
+                    new_val = sheet_data.cell(r,cc)
+                    @loan_amount["LoanPurpose/LockDay"]["Purchase"]["45"] = new_val
+                  end
+                  # if r == 60 && cc == 13
+                  #   @loan_amount[primary_key] = value
+                  # end
+                  # if r == 62 && cc == 4
+                  #   primary_key = "LoanType/Term"
+                  #   @loan_amount[primary_key] = {}
+                  #   if @loan_amount[primary_key] = {}
+                  #     cc = cc + 9
+                  #     new_value = sheet_data.cell(r,cc)
+                  #     @loan_amount[primary_key] = new_value
+                  #   end
+                  # end
+                  # if r == 63 && cc == 4
+                  #   primary_key = "Term"
+                  #   @loan_amount[primary_key] = {}
+                  #   if @loan_amount[primary_key] = {}
+                  #     cc = cc + 9
+                  #     new_value = sheet_data.cell(r,cc)
+                  #     @loan_amount[primary_key] = new_value
+                  #   end
+                  # end
+                  # if r == 64 && cc == 4
+                  #   primary_key = "Streamline"
+                  #   @loan_amount[primary_key] = {}
+                  #   if @loan_amount[primary_key] = {}
+                  #     cc = cc + 9
+                  #     new_value = sheet_data.cell(r,cc)
+                  #     @loan_amount[primary_key] = new_value
+                  #   end
+                  # end
+                  # if r == 65 && cc == 4
+                  #   primary_key = "VA/LoanType/RefinanceOption"
+                  #   secondary_key = "115.01-125%"
+                  #   @loan_amount[primary_key] = {}
+                  #   @loan_amount[primary_key][secondary_key] = {}
+                  #   if @loan_amount[primary_key][secondary_key] = {}
+                  #     cc = cc + 9
+                  #     new_value = sheet_data.cell(r,cc)
+                  #     @loan_amount[primary_key][secondary_key] = new_value
+                  #   end
+                  # end
+                  # if r == 66 && cc == 4
+                  #   secondary_key = "125.01-150%"
+                  #   @loan_amount[primary_key][secondary_key] = {}
+                  #   if @loan_amount[primary_key][secondary_key] = {}
+                  #     cc = cc + 9
+                  #     new_value = sheet_data.cell(r,cc)
+                  #     @loan_amount[primary_key][secondary_key] = new_value
+                  #   end
+                  # end
                 end
-                if value == "Credit Score Adjustors:  (lowest middle score)"
-                  primary_key = "FICO"
-                  @loan_amount[primary_key] = {}
-                end
-                # Loan Size Adjustors
-                if r >= 53 && r <= 55 && cc == 4
-                  secondary_key = get_value value
-                  @adjustment_hash[primary_key][secondary_key] = {}
-                end
-                if r >= 53 && r <= 55 && cc == 13
-                  @adjustment_hash[primary_key][secondary_key] = value
-                end
-                # Credit Score Adjustors
-                if r >= 57 && r <= 58 && cc == 4
-                  secondary_key = value
-                  @loan_amount[primary_key][secondary_key] = {}
-                end
-                if r >= 57 && r <= 58 && cc == 13
-                  @loan_amount[primary_key][secondary_key] = value
-                end
-                # if r == 59 && cc == 4
-                #   primary_key = "0<$125,000"
-                #   @loan_amount[primary_key] = {}
-                # end
-                # if r == 59 && cc == 13
-                #   @loan_amount[primary_key] = value
-                # end
-                if r == 60 && cc == 4
-                  @loan_amount["LoanPurpose/LockDay"] = {}
-                  @loan_amount["LoanPurpose/LockDay"]["Purchase"] = {}
-                  @loan_amount["LoanPurpose/LockDay"]["Purchase"]["45"] = {}
-                  cc = cc + 9
-                  new_val = sheet_data.cell(r,cc)
-                  @loan_amount["LoanPurpose/LockDay"]["Purchase"]["45"] = new_val
-                end
-                # if r == 60 && cc == 13
-                #   @loan_amount[primary_key] = value
-                # end
-                # if r == 62 && cc == 4
-                #   primary_key = "LoanType/Term"
-                #   @loan_amount[primary_key] = {}
-                #   if @loan_amount[primary_key] = {}
-                #     cc = cc + 9
-                #     new_value = sheet_data.cell(r,cc)
-                #     @loan_amount[primary_key] = new_value
-                #   end
-                # end
-                # if r == 63 && cc == 4
-                #   primary_key = "Term"
-                #   @loan_amount[primary_key] = {}
-                #   if @loan_amount[primary_key] = {}
-                #     cc = cc + 9
-                #     new_value = sheet_data.cell(r,cc)
-                #     @loan_amount[primary_key] = new_value
-                #   end
-                # end
-                # if r == 64 && cc == 4
-                #   primary_key = "Streamline"
-                #   @loan_amount[primary_key] = {}
-                #   if @loan_amount[primary_key] = {}
-                #     cc = cc + 9
-                #     new_value = sheet_data.cell(r,cc)
-                #     @loan_amount[primary_key] = new_value
-                #   end
-                # end
-                # if r == 65 && cc == 4
-                #   primary_key = "VA/LoanType/RefinanceOption"
-                #   secondary_key = "115.01-125%"
-                #   @loan_amount[primary_key] = {}
-                #   @loan_amount[primary_key][secondary_key] = {}
-                #   if @loan_amount[primary_key][secondary_key] = {}
-                #     cc = cc + 9
-                #     new_value = sheet_data.cell(r,cc)
-                #     @loan_amount[primary_key][secondary_key] = new_value
-                #   end
-                # end
-                # if r == 66 && cc == 4
-                #   secondary_key = "125.01-150%"
-                #   @loan_amount[primary_key][secondary_key] = {}
-                #   if @loan_amount[primary_key][secondary_key] = {}
-                #     cc = cc + 9
-                #     new_value = sheet_data.cell(r,cc)
-                #     @loan_amount[primary_key][secondary_key] = new_value
-                #   end
-                # end
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log.save
               end
             end
           end
@@ -545,35 +580,40 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
               cc = 4*max_column + 3 # 3 / 7 / 11
-              @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                @programs_ids << @program.id
-                program_property
-              end
-              @block_hash = {}
-              key = ''
-              (1..11).each do |max_row|
-                @data = []
-                (0..3).each_with_index do |index, c_i|
-                  rrr = rr + max_row
-                  ccc = cc + c_i
-                  value = sheet_data.cell(rrr,ccc)
-                  if value.present?
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[key] = {}
-                    else
-                      @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  @programs_ids << @program.id
+                  program_property
+                end
+                @block_hash = {}
+                key = ''
+                (1..11).each do |max_row|
+                  @data = []
+                  (0..3).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        @block_hash[key][15*c_i] = value
+                      end
+                      @data << value
                     end
-                    @data << value
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
                   end
                 end
-                if @data.compact.reject { |c| c.blank? }.length == 0
-                  break # terminate the loop
-                end
+                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log.save
               end
-              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -584,37 +624,42 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
               cc = 4*max_column + 5 # 3 / 7 / 11
-              @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                @programs_ids << @program.id
-                program_property
-              end
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  @programs_ids << @program.id
+                  program_property
+                end
 
-              # @program.adjustments.destroy_all
-              @block_hash = {}
-              key = ''
-              (1..11).each do |max_row|
-                @data = []
-                (0..3).each_with_index do |index, c_i|
-                  rrr = rr + max_row
-                  ccc = cc + c_i
-                  value = sheet_data.cell(rrr,ccc)
-                  if value.present?
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[key] = {}
-                    else
-                      @block_hash[key][15*c_i] = value
+                # @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+                (1..11).each do |max_row|
+                  @data = []
+                  (0..3).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        @block_hash[key][15*c_i] = value
+                      end
+                      @data << value
                     end
-                    @data << value
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
                   end
                 end
-                if @data.compact.reject { |c| c.blank? }.length == 0
-                  break # terminate the loop
-                end
+                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log.save
               end
-              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -625,37 +670,42 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
               cc = 4*max_column + 3 # 3 / 7 / 11
-              @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                @programs_ids << @program.id
-                program_property
-              end
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  @programs_ids << @program.id
+                  program_property
+                end
 
-              # @program.adjustments.destroy_all
-              @block_hash = {}
-              key = ''
-              (1..11).each do |max_row|
-                @data = []
-                (0..3).each_with_index do |index, c_i|
-                  rrr = rr + max_row
-                  ccc = cc + c_i
-                  value = sheet_data.cell(rrr,ccc)
-                  if value.present?
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[key] = {}
-                    else
-                      @block_hash[key][15*c_i] = value
+                # @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+                (1..11).each do |max_row|
+                  @data = []
+                  (0..3).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        @block_hash[key][15*c_i] = value
+                      end
+                      @data << value
                     end
-                    @data << value
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
                   end
                 end
-                if @data.compact.reject { |c| c.blank? }.length == 0
-                  break # terminate the loop
-                end
+                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log.save
               end
-              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -666,98 +716,103 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
           @ltv_data = sheet_data.row(69)
           if row.compact.count > 1
             (0..14).each do |cc|
-              value = sheet_data.cell(r,cc)
-              if value.present?
-                if value == "Credit Score"
-                  primary_key = "FICO/CLTV"
-                  @adjustment_hash[primary_key] = {}
-                end
-                if value == "Loan Amount:"
-                  primary_key = "LoanAmount/CLTV"
-                  @loan_amount[primary_key] = {}
-                end
-                if value == "Cash Out"
-                  @other_adjustment["RefinanceOption/LTV"] = {}
-                  @other_adjustment["RefinanceOption/LTV"]["Cash Out"] = {}
-                  @other_adjustment["PropertyType/LTV"] = {}
-                end
-                if value == "Purchase"
-                  @other_adjustment["LoanPurpose/LTV"] = {}
-                  @other_adjustment["LoanPurpose/LTV"]["Purchase"] = {}
-                end
-                if value == "Escrow Waiver (LTVs >80%; CA only)"
-                  primary_key = value
-                  @other_adjustment["MiscAdjuster/State/LTV/CLTV"] = {}
-                  @other_adjustment["MiscAdjuster/State/LTV/CLTV"][primary_key] = {}
-                  @other_adjustment["MiscAdjuster/State/LTV/CLTV"][primary_key]["CA"] = {}
-                  @other_adjustment["MiscAdjuster/State/LTV/CLTV"][primary_key]["CA"]["80-Inf"] = {}
-                end
-                # Credit Score
-                if r >= 70 && r <= 75 && cc == 5
-                  secondary_key = get_value value
-                  @adjustment_hash[primary_key][secondary_key] = {}
-                end
-                if r >= 70 && r <= 75 && cc >= 8 && cc <= 14
-                  ltv_key = get_value @ltv_data[cc-1]
-                  @adjustment_hash[primary_key][secondary_key][ltv_key] = {}
-                  @adjustment_hash[primary_key][secondary_key][ltv_key] = value
-                end
-                # Loan Amount:
-                if r >= 76 && r <= 82 && cc == 5
-                  secondary_key = get_value value
-                  @loan_amount[primary_key][secondary_key] = {}
-                end
-                if r >= 76 && r <= 82 && cc >= 8 && cc <= 14
-                  ltv_key = get_value @ltv_data[cc-1]
-                  @loan_amount[primary_key][secondary_key][ltv_key] = {}
-                  @loan_amount[primary_key][secondary_key][ltv_key] = value
-                end
-                # Other Adjustment
-                if r == 83 && cc >= 8 && cc <= 14
-                  ltv_key = get_value @ltv_data[cc-1]
-                  @other_adjustment["RefinanceOption/LTV"]["Cash Out"][ltv_key] = {}
-                  @other_adjustment["RefinanceOption/LTV"]["Cash Out"][ltv_key] = value
-                end
-                if r >= 84 && r <= 88 && cc == 3
-                  if value.include?("Units")
-                    primary_key = value.tr('s','')
-                  elsif value.include?("Investment")
-                    primary_key = "Investment Property"
-                  else
-                    primary_key = value
+              begin
+                value = sheet_data.cell(r,cc)
+                if value.present?
+                  if value == "Credit Score"
+                    primary_key = "FICO/CLTV"
+                    @adjustment_hash[primary_key] = {}
                   end
-                  @other_adjustment["PropertyType/LTV"][primary_key] = {}
+                  if value == "Loan Amount:"
+                    primary_key = "LoanAmount/CLTV"
+                    @loan_amount[primary_key] = {}
+                  end
+                  if value == "Cash Out"
+                    @other_adjustment["RefinanceOption/LTV"] = {}
+                    @other_adjustment["RefinanceOption/LTV"]["Cash Out"] = {}
+                    @other_adjustment["PropertyType/LTV"] = {}
+                  end
+                  if value == "Purchase"
+                    @other_adjustment["LoanPurpose/LTV"] = {}
+                    @other_adjustment["LoanPurpose/LTV"]["Purchase"] = {}
+                  end
+                  if value == "Escrow Waiver (LTVs >80%; CA only)"
+                    primary_key = value
+                    @other_adjustment["MiscAdjuster/State/LTV/CLTV"] = {}
+                    @other_adjustment["MiscAdjuster/State/LTV/CLTV"][primary_key] = {}
+                    @other_adjustment["MiscAdjuster/State/LTV/CLTV"][primary_key]["CA"] = {}
+                    @other_adjustment["MiscAdjuster/State/LTV/CLTV"][primary_key]["CA"]["80-Inf"] = {}
+                  end
+                  # Credit Score
+                  if r >= 70 && r <= 75 && cc == 5
+                    secondary_key = get_value value
+                    @adjustment_hash[primary_key][secondary_key] = {}
+                  end
+                  if r >= 70 && r <= 75 && cc >= 8 && cc <= 14
+                    ltv_key = get_value @ltv_data[cc-1]
+                    @adjustment_hash[primary_key][secondary_key][ltv_key] = {}
+                    @adjustment_hash[primary_key][secondary_key][ltv_key] = value
+                  end
+                  # Loan Amount:
+                  if r >= 76 && r <= 82 && cc == 5
+                    secondary_key = get_value value
+                    @loan_amount[primary_key][secondary_key] = {}
+                  end
+                  if r >= 76 && r <= 82 && cc >= 8 && cc <= 14
+                    ltv_key = get_value @ltv_data[cc-1]
+                    @loan_amount[primary_key][secondary_key][ltv_key] = {}
+                    @loan_amount[primary_key][secondary_key][ltv_key] = value
+                  end
+                  # Other Adjustment
+                  if r == 83 && cc >= 8 && cc <= 14
+                    ltv_key = get_value @ltv_data[cc-1]
+                    @other_adjustment["RefinanceOption/LTV"]["Cash Out"][ltv_key] = {}
+                    @other_adjustment["RefinanceOption/LTV"]["Cash Out"][ltv_key] = value
+                  end
+                  if r >= 84 && r <= 88 && cc == 3
+                    if value.include?("Units")
+                      primary_key = value.tr('s','')
+                    elsif value.include?("Investment")
+                      primary_key = "Investment Property"
+                    else
+                      primary_key = value
+                    end
+                    @other_adjustment["PropertyType/LTV"][primary_key] = {}
+                  end
+                  if r >= 84 && r <= 88 && cc >= 8 && cc <= 14
+                    ltv_key = get_value @ltv_data[cc-1]
+                    @other_adjustment["PropertyType/LTV"][primary_key][ltv_key] = {}
+                    @other_adjustment["PropertyType/LTV"][primary_key][ltv_key] = value
+                  end
+                  if r == 89 && cc >= 8 && cc <= 14
+                    ltv_key = get_value @ltv_data[cc-1]
+                    @other_adjustment["LoanPurpose/LTV"]["Purchase"][ltv_key] = {}
+                    @other_adjustment["LoanPurpose/LTV"]["Purchase"][ltv_key] = value
+                  end
+                  if r == 90 && cc >= 8 && cc <= 14
+                    ltv_key = get_value @ltv_data[cc-1]
+                    @other_adjustment["MiscAdjuster/State/LTV/CLTV"][primary_key]["CA"]["80-Inf"][ltv_key] = {}
+                    @other_adjustment["MiscAdjuster/State/LTV/CLTV"][primary_key]["CA"]["80-Inf"][ltv_key] = value
+                  end
+                  if r == 91 && cc == 3
+                    @other_adjustment["ArmBasic/LTV"] = {}
+                    @other_adjustment["ArmBasic/LTV"]["5/1"] = {}
+                    @other_adjustment["ArmBasic/LTV"]["7/1"] = {}
+                    @other_adjustment["ArmBasic/LTV"]["10/1"] = {}
+                  end
+                  if r == 91 && cc >= 8 && cc <= 14
+                    ltv_key = get_value @ltv_data[cc-1]
+                    @other_adjustment["ArmBasic/LTV"]["5/1"][ltv_key] = {}
+                    @other_adjustment["ArmBasic/LTV"]["7/1"][ltv_key] = {}
+                    @other_adjustment["ArmBasic/LTV"]["10/1"][ltv_key] = {}
+                    @other_adjustment["ArmBasic/LTV"]["5/1"][ltv_key] = value
+                    @other_adjustment["ArmBasic/LTV"]["7/1"][ltv_key] = value
+                    @other_adjustment["ArmBasic/LTV"]["10/1"][ltv_key] = value
+                  end
                 end
-                if r >= 84 && r <= 88 && cc >= 8 && cc <= 14
-                  ltv_key = get_value @ltv_data[cc-1]
-                  @other_adjustment["PropertyType/LTV"][primary_key][ltv_key] = {}
-                  @other_adjustment["PropertyType/LTV"][primary_key][ltv_key] = value
-                end
-                if r == 89 && cc >= 8 && cc <= 14
-                  ltv_key = get_value @ltv_data[cc-1]
-                  @other_adjustment["LoanPurpose/LTV"]["Purchase"][ltv_key] = {}
-                  @other_adjustment["LoanPurpose/LTV"]["Purchase"][ltv_key] = value
-                end
-                if r == 90 && cc >= 8 && cc <= 14
-                  ltv_key = get_value @ltv_data[cc-1]
-                  @other_adjustment["MiscAdjuster/State/LTV/CLTV"][primary_key]["CA"]["80-Inf"][ltv_key] = {}
-                  @other_adjustment["MiscAdjuster/State/LTV/CLTV"][primary_key]["CA"]["80-Inf"][ltv_key] = value
-                end
-                if r == 91 && cc == 3
-                  @other_adjustment["ArmBasic/LTV"] = {}
-                  @other_adjustment["ArmBasic/LTV"]["5/1"] = {}
-                  @other_adjustment["ArmBasic/LTV"]["7/1"] = {}
-                  @other_adjustment["ArmBasic/LTV"]["10/1"] = {}
-                end
-                if r == 91 && cc >= 8 && cc <= 14
-                  ltv_key = get_value @ltv_data[cc-1]
-                  @other_adjustment["ArmBasic/LTV"]["5/1"][ltv_key] = {}
-                  @other_adjustment["ArmBasic/LTV"]["7/1"][ltv_key] = {}
-                  @other_adjustment["ArmBasic/LTV"]["10/1"][ltv_key] = {}
-                  @other_adjustment["ArmBasic/LTV"]["5/1"][ltv_key] = value
-                  @other_adjustment["ArmBasic/LTV"]["7/1"][ltv_key] = value
-                  @other_adjustment["ArmBasic/LTV"]["10/1"][ltv_key] = value
-                end
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log.save
               end
             end
           end
@@ -795,35 +850,40 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
               else
                 cc = 4*max_column + 1
               end
-              @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                @programs_ids << @program.id
-                program_property
-              end
-              @block_hash = {}
-              key = ''
-              (1..12).each do |max_row|
-                @data = []
-                (0..3).each_with_index do |index, c_i|
-                  rrr = rr + max_row
-                  ccc = cc + c_i
-                  value = sheet_data.cell(rrr,ccc)
-                  if value.present?
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[key] = {}
-                    else
-                      @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  @programs_ids << @program.id
+                  program_property
+                end
+                @block_hash = {}
+                key = ''
+                (1..12).each do |max_row|
+                  @data = []
+                  (0..3).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        @block_hash[key][15*c_i] = value
+                      end
+                      @data << value
                     end
-                    @data << value
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
                   end
                 end
-                if @data.compact.reject { |c| c.blank? }.length == 0
-                  break # terminate the loop
-                end
+                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log.save
               end
-              @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -970,81 +1030,86 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
           max_column_section = row.compact.count - 1
           (0..max_column_section).each do |max_column|
             cc = num1 + max_column*num2
-            @title = sheet_data.cell(r,cc)
-            if @title.present?
-              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-              @programs_ids << @program.id
-              # term
-              if @title.scan(/\d+/).count == 1
-                term = @title.scan(/\d+/)[0]
-              else
-                term = (@title.scan(/\d+/)[0]+ @title.scan(/\d+/)[1]).to_i
-              end
-              # High Balance
-              if @title.include?("HIGH BAL") || @title.include?("HIGH BALANCE")
-                loan_size = "High Balance"
-                jumbo_high_balance = true
-              end
-              # Loan-Type
-              if @title.include?("Fixed")
-                loan_type = "Fixed"
-              elsif @title.include?("ARM")
-                loan_type = "ARM"
-              elsif @title.include?("Floating")
-                loan_type = "Floating"
-              elsif @title.include?("Variable")
-                loan_type = "Variable"
-              else
-                loan_type = nil
-              end
+            begin
+              @title = sheet_data.cell(r,cc)
+              if @title.present?
+                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                @programs_ids << @program.id
+                # term
+                if @title.scan(/\d+/).count == 1
+                  term = @title.scan(/\d+/)[0]
+                else
+                  term = (@title.scan(/\d+/)[0]+ @title.scan(/\d+/)[1]).to_i
+                end
+                # High Balance
+                if @title.include?("HIGH BAL") || @title.include?("HIGH BALANCE")
+                  loan_size = "High Balance"
+                  jumbo_high_balance = true
+                end
+                # Loan-Type
+                if @title.include?("Fixed")
+                  loan_type = "Fixed"
+                elsif @title.include?("ARM")
+                  loan_type = "ARM"
+                elsif @title.include?("Floating")
+                  loan_type = "Floating"
+                elsif @title.include?("Variable")
+                  loan_type = "Variable"
+                else
+                  loan_type = nil
+                end
 
-              # Streamline Vha, Fha, Usda
-              fha = false
-              va = false
-              usda = false
-              streamline = false
-              full_doc = false
-              if @title.include?("FHA")
-                streamline = true
-                fha = true
-                full_doc = true
-              elsif @title.include?("VA")
-                streamline = true
-                va = true
-                full_doc = true
-              elsif @title.include?("USDA")
-                streamline = true
-                usda = true
-                full_doc = true
-              end
+                # Streamline Vha, Fha, Usda
+                fha = false
+                va = false
+                usda = false
+                streamline = false
+                full_doc = false
+                if @title.include?("FHA")
+                  streamline = true
+                  fha = true
+                  full_doc = true
+                elsif @title.include?("VA")
+                  streamline = true
+                  va = true
+                  full_doc = true
+                elsif @title.include?("USDA")
+                  streamline = true
+                  usda = true
+                  full_doc = true
+                end
 
-              # Update Program
-              @program.update(term: term, loan_size: loan_size, jumbo_high_balance: jumbo_high_balance,loan_type: loan_type,fha: fha, va: va, usda: usda, streamline: streamline, full_doc: full_doc)
-              # Base rate
-              @program.adjustments.destroy_all
-              @block_hash = {}
-              key = ''
-              (1..row_count).each do |max_row|
-                @data = []
-                (0..column_count).each_with_index do |index, c_i|
-                  rrr = rr + max_row
-                  ccc = cc + c_i
-                  value = sheet_data.cell(rrr,ccc)
-                  if value.present?
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[key] = {}
-                    else
-                      @block_hash[key][15*c_i] = value
+                # Update Program
+                @program.update(term: term, loan_size: loan_size, jumbo_high_balance: jumbo_high_balance,loan_type: loan_type,fha: fha, va: va, usda: usda, streamline: streamline, full_doc: full_doc)
+                # Base rate
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+                (1..row_count).each do |max_row|
+                  @data = []
+                  (0..column_count).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        @block_hash[key][15*c_i] = value
+                      end
+                      @data << value
                     end
-                    @data << value
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
                   end
                 end
-                if @data.compact.reject { |c| c.blank? }.length == 0
-                  break # terminate the loop
-                end
+                @program.update(base_rate: @block_hash)
               end
-              @program.update(base_rate: @block_hash)
+            rescue Exception => e
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+              error_log.save
             end
           end
         end
