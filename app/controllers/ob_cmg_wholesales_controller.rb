@@ -1,5 +1,5 @@
 class ObCmgWholesalesController < ApplicationController
-  before_action :get_sheet, only: [:gov, :agency, :durp, :oa, :jumbo_700,:jumbo_7200_6700, :jumbo_6600, :jumbo_6200, :jumbo_7600, :jumbo_6800, :jumbo_6900_7900, :programs, :jumbo_6400, :mi_llpas]
+  before_action :get_sheet, only: [:gov, :agency, :durp, :oa, :jumbo_700,:jumbo_7200_6700, :jumbo_6600, :jumbo_6200, :jumbo_7600, :jumbo_6800, :jumbo_6900_7900, :programs, :jumbo_6400, :mi_llpas, :program_property]
   before_action :get_program, only: [:single_program, :program_property]
   before_action :read_sheet, only: [:index,:gov, :agency, :durp, :oa, :jumbo_700,:jumbo_7200_6700, :jumbo_6600, :jumbo_6200, :jumbo_7600, :jumbo_6800, :jumbo_6900_7900, :programs, :jumbo_6400,:mi_llpas]
 
@@ -3819,6 +3819,9 @@ class ObCmgWholesalesController < ApplicationController
       else
         loan_type = nil
       end
+      #Set Bank Name
+      bank_name = @sheet_obj.bank.name
+
       # streamline
       streamline = false
       fha = false
@@ -3871,7 +3874,7 @@ class ObCmgWholesalesController < ApplicationController
       end
       
       @program.save 
-      @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",program_category: program_category, jumbo_high_balance: jumbo_high_balance, streamline: streamline,fha: fha, va: va, usda: usda, full_doc: full_doc, arm_basic: arm_basic, sheet_name: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product, loan_size: loan_size)
+      @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",program_category: program_category, jumbo_high_balance: jumbo_high_balance, streamline: streamline,fha: fha, va: va, usda: usda, full_doc: full_doc, arm_basic: arm_basic, sheet_name: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product, loan_size: loan_size, bank_name: bank_name)
     end
 
     def make_adjust(block_hash, sheet)
