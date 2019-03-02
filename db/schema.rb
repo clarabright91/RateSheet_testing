@@ -10,7 +10,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_05_080327) do
+ActiveRecord::Schema.define(version: 2019_02_26_121700) do
+
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -34,6 +35,17 @@ ActiveRecord::Schema.define(version: 2019_02_05_080327) do
     t.string "state_code"
     t.string "zip"
     t.string "state_eligibility"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "error_logs", force: :cascade do |t|
+    t.text "details"
+    t.integer "column"
+    t.integer "row"
+    t.string "sheet_name"
+    t.integer "sheet_id"
+    t.boolean "status", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
