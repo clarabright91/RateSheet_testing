@@ -28,285 +28,27 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         @ltv_data = []
         @sub_data = []
         @lpmi_data = []
-        primary_key = ''
-        secondary_key = ''
-        main_key = ''
         ltv_key = ''
-        cltv_key = ''
-        new_key = ''
-        term_key = ''
+        primary_key = ''
         @adjustment_hash = {}
         @cashout_adjustment = {}
+        @cashout_hash = {}
         @product_hash = {}
         @subordinate_hash = {}
+        @sub_hash = {}
         @additional_hash = {}
         @lpmi_hash = {}
         @freddie_adjustment_hash = {}
         @relief_cashout_adjustment = {}
+        @property_hash = {}
+        @jumbo_hash = {}
+        @non_jumbo_hash = {}
         # Fannie Mae Programs
         (71..298).each do |r|
           row = sheet_data.row(r)
-          if ((row.compact.count > 1) && (row.compact.count <= 4))
-            rr = r + 1 
-            max_column_section = row.compact.count - 1
-            (0..max_column_section).each_with_index do |max_column, index|
-              index = index +1
-              cc = 1 + max_column*10 + index# (2 / 13 / 24 / 35)
-              begin
-                @title = sheet_data.cell(r,cc)
-                if @title.present?
-                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @programs_ids << @program.id
-                  # Program Property
-                  program_property @title
-                  @program.adjustments.destroy_all
-                  @block_hash = {}
-                  key = ''
-                  (1..50).each do |max_row|
-                    @data = []
-                    (0..8).each_with_index do |index, c_i|
-                      rrr = rr + max_row +1
-                      ccc = cc + c_i
-                      value = sheet_data.cell(rrr,ccc)
-                      if value.present?
-                        if (c_i == 0)
-                          key = value
-                          @block_hash[key] = {}
-                        else
-                          @block_hash[key][15*(c_i/2)] = value unless @block_hash[key].nil?
-                        end
-                        @data << value
-                      end
-                    end
-                    if @data.compact.reject { |c| c.blank? }.length == 0
-                      break # terminate the loop
-                    end
-                  end
-                  @program.update(base_rate: @block_hash)
-                end
-              rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
-                error_log.save
-              end
-            end
-          end
-        end
-
-        # Fannie Mae Adjustments
-        (353..429).each do |r|
-          row = sheet_data.row(r)
-          @ltv_data = sheet_data.row(356)
-          @sub_data = sheet_data.row(386)
-          @lpmi_data = sheet_data.row(410)
-          if row.compact.count >= 1
-            (2..42).each do |max_column|
-              cc = max_column
-              begin
-                value = sheet_data.cell(r,cc)
-                if value.present?
-                  if value == "Fannie Mae Loan Level Price Adjustments"
-                    primary_key = "FannieMae"
-                  elsif value == "Lender Paid Mortgage Insurance"
-                    primary_key = "LPMI"
-                  end
-                  if value == "All Eligible Mortgages - LLPAs for Terms > 15 Years"
-                    secondary_key = "RateType/Term/FICO/LTV"
-                    main_key = primary_key + "/" + secondary_key
-                    @adjustment_hash[main_key] = {}
-                  elsif value == "All Eligible Mortgages  Cash-Out Refinance  LLPAs"
-                    secondary_key = "Cashout/FICO/LTV"
-                    main_key = primary_key + "/" + secondary_key
-                    @cashout_adjustment[main_key] = {}
-                  elsif value == "All Eligible Mortgages Product Feature  LLPAs"
-                    secondary_key = "Cashput/Feature/LTV"
-                    main_key = primary_key + "/" + secondary_key
-                    @product_hash[main_key] = {}
-                  elsif value == "Mortgages with Subordinate Financing4"
-                    secondary_key = "FinancingType/FICO/LTV/CLTV"
-                    main_key = primary_key + "/" + secondary_key
-                    @subordinate_hash[main_key] = {}
-                  elsif value == "State Adjustment"
-                    secondary_key = "State"
-                    main_key = primary_key + "/" + secondary_key
-                    @additional_hash[main_key] = {}
-                  elsif value == "LPMI Adj. >20yr Term"
-                    secondary_key = "Term/LTV"
-                    term_key = ">20"
-                    main_key = primary_key + "/" + secondary_key
-                    @lpmi_hash[main_key] = {}
-                    @lpmi_hash[main_key][term_key] = {}
-                  elsif value == "LPMI Adj. ≤ 20yr Term"
-                    secondary_key = "Term/LTV"
-                    term_key = "≤ 20"
-                    main_key = primary_key + "/" + secondary_key
-                    @lpmi_hash[main_key] = {}
-                    @lpmi_hash[main_key][term_key] = {}
-                  end
-
-                  # All Eligible Mortgages - LLPAs for Terms > 15 Years
-                  if r >= 357 && r <= 365 && cc == 9
-                    ltv_key = get_value value
-                    @adjustment_hash[main_key][ltv_key] = {}
-                  end
-                  if r >= 357 && r <= 365 && cc >= 18 && cc <= 44
-                    ltv_data =  get_value @ltv_data[cc-2]
-                    @adjustment_hash[main_key][ltv_key][ltv_data] = {}
-                    @adjustment_hash[main_key][ltv_key][ltv_data] = value
-                  end
-
-                  # All Eligible Mortgages  Cash-Out Refinance  LLPAs
-                  if r >= 367 && r <= 373 && cc == 9
-                    ltv_key = get_value value
-                    @cashout_adjustment[main_key][ltv_key] = {}
-                  end
-                  if r >= 367 && r <= 373 && cc >= 18 && cc <= 44
-                    ltv_data =  get_value @ltv_data[cc-2]
-                    @cashout_adjustment[main_key][ltv_key][ltv_data] = {}
-                    @cashout_adjustment[main_key][ltv_key][ltv_data] = value
-                  end
-
-                  # All Eligible Mortgages Product Feature  LLPAs
-                  if r >= 375 && r <= 382 && cc == 9
-                    if value == "High Balance Purchase or Rate/Term Refi"
-                      secondary_key = "HighBalance/LoanPurpose/Feature/LTV"
-                      main_key = primary_key + "/" + secondary_key
-                      ltv_key = get_value value
-                      @product_hash[main_key] = {}  
-                      @product_hash[main_key][ltv_key] = {}
-                    elsif value == "High Balance Cash-Out Refi"
-                      secondary_key = "HighBalance/Cashout/Feature/LTV"
-                      main_key = primary_key + "/" + secondary_key
-                      ltv_key = get_value value
-                      @product_hash[main_key] = {}  
-                      @product_hash[main_key][ltv_key] = {}
-                    elsif value == "High Balance ARM2"
-                      secondary_key = "HighBalance/LoanType"    
-                      main_key = primary_key + "/" + secondary_key
-                      ltv_key = get_value value
-                      @product_hash[main_key] = {}  
-                      @product_hash[main_key][ltv_key] = {}
-                    else
-                      ltv_key = get_value value
-                      @product_hash[main_key][ltv_key] = {}
-                    end
-                  end
-                  if r >= 375 && r <= 382 && cc >= 18 && cc <= 44
-                    ltv_data =  get_value @ltv_data[cc-2]
-                    @product_hash[main_key][ltv_key][ltv_data] = {}
-                    @product_hash[main_key][ltv_key][ltv_data] = value
-                  end
-
-                  # subordinate adjustment
-                  if r == 387 && cc == 6
-                    new_key = value
-                    @subordinate_hash[main_key][new_key] = {}
-                  end
-                  if r == 387 && cc == 12
-                    @subordinate_hash[main_key][new_key] = value
-                  end
-                  if r >= 388 && r <= 392 && cc == 6
-                    ltv_key = get_value value
-                    @subordinate_hash[main_key][ltv_key] = {}
-                  end
-                  if r >= 388 && r <= 392 && cc == 9
-                    cltv_key = get_value value
-                    @subordinate_hash[main_key][ltv_key][cltv_key] = {}
-                  end
-                  if r >= 388 && r <= 392 && cc >= 12 && cc <= 15
-                    sub_data = get_value @sub_data[cc-2]
-                    @subordinate_hash[main_key][ltv_key][cltv_key][sub_data] = {}
-                    @subordinate_hash[main_key][ltv_key][cltv_key][sub_data] = value
-                  end
-
-                  # Additional Adjustments5
-                  if r >= 394 && r <= 398 && cc == 6
-                    if value == "R/T or CO Refinance"
-                      secondary_key = "LoanType/RefinanceOption/LTV"
-                      main_key = primary_key + "/" + secondary_key
-                      @additional_hash[main_key] = {}
-                    elsif value == "Escrow Waiver FICO < 700"
-                      secondary_key = "EscrowWaiver/FICO"
-                      main_key = primary_key + "/" + secondary_key
-                      @additional_hash[main_key] = {}
-                    elsif value == "Escrow Waiver CA FICO < 700"
-                      secondary_key = "CA/EscrowWaiver/FICO"
-                      main_key = primary_key + "/" + secondary_key
-                      @additional_hash[main_key] = {}
-                    elsif value == "ARM > 90 LTV"
-                      secondary_key = "LoanType/LTV"     
-                      main_key = primary_key + "/" + secondary_key
-                      @additional_hash[main_key] = {}
-                    elsif value == "90 Day (Add to 60 Day)"
-                      secondary_key = "LockPeriod"
-                      main_key = primary_key + "/" + secondary_key
-                      @additional_hash[main_key] = {}
-                    end
-                  end
-                  if r >= 394 && r <= 398 && cc == 14
-                    @additional_hash[main_key] = value
-                  end
-                  if r == 400 && cc == 2
-                    if value == "Max Net Rebate"
-                      secondary_key = "Max/Net/Rebate"
-                      main_key = primary_key + "/" + secondary_key
-                      @additional_hash[main_key] = {}
-                    end
-                  end
-                  if r == 401 && cc == 2
-                    @additional_hash[main_key] = value
-                  end
-                  if r == 404 && cc == 2
-                    ltv_key = value
-                    @additional_hash[main_key][ltv_key] = {}
-                  end
-                  if r == 404 && cc == 10
-                    @additional_hash[main_key][ltv_key] = value
-                  end
-
-                  # Lender Paid Mortgage Insurance
-                  if r >= 411 && r <= 416 && cc == 7
-                    ltv_key = get_value value
-                    # @lpmi_hash[main_key][term_key] = {}
-                    @lpmi_hash[main_key][term_key][ltv_key] = {}
-                  end
-                  if r >= 411 && r <= 416 && cc == 11
-                    cltv_key = get_value value.to_s
-                    @lpmi_hash[main_key][term_key][ltv_key][cltv_key] = {}
-                  end
-                  if r >= 411 && r <= 416 && cc >= 15 && cc <= 33
-                    lpmi_key = get_value @lpmi_data[cc-2]
-                    @lpmi_hash[main_key][term_key][ltv_key][cltv_key][lpmi_key] = {}
-                    @lpmi_hash[main_key][term_key][ltv_key][cltv_key][lpmi_key] = value
-                  end
-                  # if r >= 418 && r <= 422 && cc == 7
-                  #   term_key = "≤20" 
-                  #   ltv_key = get_value value
-                  #   @lpmi_hash[main_key][term_key] = {}
-                  #   @lpmi_hash[main_key][term_key][ltv_key] = {}
-                  # end
-                  # if r >= 418 && r <= 422 && cc == 11
-                  #   cltv_key = get_value value.to_s
-                  #   @lpmi_hash[main_key][term_key][ltv_key][cltv_key] = {}
-                  # end
-                  # if r >= 418 && r <= 422 && cc >= 15 && cc <= 33
-                  #   lpmi_key = get_value @lpmi_data[cc-2]
-                  #   @lpmi_hash[main_key][term_key][ltv_key][cltv_key][lpmi_key] = {}
-                  #   @lpmi_hash[main_key][term_key][ltv_key][cltv_key][lpmi_key] = value
-                  # end
-                end
-              rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
-                error_log.save
-              end
-            end
-          end
-        end
-        adjustment = [@adjustment_hash,@cashout_adjustment,@product_hash,@subordinate_hash,@subordinate_hash, @additional_hash,@lpmi_hash]
-        make_adjust(adjustment,sheet)
-        
-        # Freddie programs
-        (458..684).each do |r|
-          row = sheet_data.row(r)
+          @sheet_name = "Fannie Mae Products"
+          @bank = @sheet_obj.bank
+          @sheet_obj = @bank.sheets.find_or_create_by(name: @sheet_name)
           if ((row.compact.count > 1) && (row.compact.count <= 4))
             rr = r + 1 
             max_column_section = row.compact.count - 1
@@ -315,356 +57,11 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
               cc = 1 + max_column*10 + index# (2 / 13 / 24 / 35)
               @title = sheet_data.cell(r,cc)
               if @title.present?
-                begin
-                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @programs_ids << @program.id
-                  # Program Property
-                  program_property @title
-                  @program.adjustments.destroy_all
-                  @block_hash = {}
-                  key = ''
-                rescue Exception => e
-                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
-                  error_log.save
-                end
-
-                (1..50).each do |max_row|
-                  @data = []
-                  (0..8).each_with_index do |index, c_i|
-                    rrr = rr + max_row +1
-                    ccc = cc + c_i
-                    begin
-                      value = sheet_data.cell(rrr,ccc)
-                      if value.present?
-                        if (c_i == 0)
-                          key = value
-                          @block_hash[key] = {}
-                        else
-                          if @program.lock_period.length <= 3
-                            @program.lock_period << 15*(c_i/2)
-                            @program.save
-                          end
-                          @block_hash[key][15*(c_i/2)] = value unless @block_hash[key].nil?
-                        end
-                        @data << value
-                      end
-                    rescue Exception => e
-                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
-                      error_log.save
-                    end
-                  end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
-                end
-                @program.update(base_rate: @block_hash)
-              end
-            end
-          end
-        end
-
-        # Freddie Adjustments
-        (740..835).each do |r|
-          row = sheet_data.row(r)
-          @ltv_data = sheet_data.row(743)
-          @sub_data = sheet_data.row(785)
-          @lpmi_data = sheet_data.row(816)
-          if row.compact.count >= 1
-            (2..42).each do |max_column|
-              cc = max_column
-              begin
-                value = sheet_data.cell(r,cc)
-                if value.present?
-                  if value == "Freddie Mac Loan Level Price Adjustments"
-                    primary_key = "FreddieMac"
-                  elsif value == "Lender Paid Mortgage Insurance"
-                    primary_key = "LPMI"
-                  end
-                  if value == "All Eligible Mortgages - Other Than Relief Refinance Mortgages - LLPAs for Terms > 15 Years"
-                    secondary_key = "RateType/Term/FICO/LTV"
-                    main_key = primary_key + "/" + secondary_key
-                    @freddie_adjustment_hash[main_key] = {}
-                  elsif value == "All Eligible Mortgages - Relief Refinance Mortgages - LLPAs for Terms > 15 Years"
-                    secondary_key = "Relief/Cashout/FICO/LTV"
-                    main_key = primary_key + "/" + secondary_key
-                    @relief_cashout_adjustment[main_key] = {}
-                  elsif value == "All Eligible Mortgages  Cash-Out Refinance  LLPAs"
-                    secondary_key = "Cashout/FICO/LTV"
-                    main_key = primary_key + "/" + secondary_key
-                    @cashout_adjustment[main_key] = {}
-                  elsif value == "All Eligible Mortgages Product Feature  LLPAs"
-                    secondary_key = "Cashput/Feature/LTV"
-                    main_key = primary_key + "/" + secondary_key
-                    @product_hash[main_key] = {}
-                  elsif value == "Mortgages with Subordinate Financing5 - Other Than Relief Refinance Mortgages"
-                    secondary_key = "FinancingType/FICO/LTV/CLTV"
-                    main_key = primary_key + "/" + secondary_key
-                    @subordinate_hash[main_key] = {}
-                  elsif value == "Mortgages with Subordinate Financing5 - Other Than Relief Refinance Mortgages"
-                    secondary_key = "Relief/FinancingType/FICO/LTV/CLTV"
-                    main_key = primary_key + "/" + secondary_key
-                    @additional_hash[main_key] = {}
-                  elsif value == "State Adjustment"
-                    secondary_key = "State"
-                    main_key = primary_key + "/" + secondary_key
-                    @additional_hash[main_key] = {}
-                  elsif value == "LPMI Adj. >20yr Term"
-                    secondary_key = "Term/LTV"
-                    term_key = ">20"
-                    main_key = primary_key + "/" + secondary_key
-                    @lpmi_hash[main_key] = {}
-                    @lpmi_hash[main_key][term_key] = {}
-                  elsif value == "LPMI Adj. ≤ 20yr Term"
-                    secondary_key = "Term/LTV"
-                    term_key = "≤ 20"
-                    main_key = primary_key + "/" + secondary_key
-                    @lpmi_hash[main_key] = {}
-                    @lpmi_hash[main_key][term_key] = {}
-                  end
-
-                  # All Eligible Mortgages - Other Than Relief Refinance Mortgages - LLPAs for Terms > 15 Years
-                  if r >= 744 && r <= 750 && cc == 10
-                    ltv_key = get_value value
-                    @freddie_adjustment_hash[main_key][ltv_key] = {}
-                  end
-                  if r >= 744 && r <= 750 && cc >= 21 && cc <= 42
-                    ltv_data =  get_value @ltv_data[cc-2]
-                    @freddie_adjustment_hash[main_key][ltv_key][ltv_data] = {}
-                    @freddie_adjustment_hash[main_key][ltv_key][ltv_data] = value
-                  end
-
-                  # All Eligible Mortgages - Relief Refinance Mortgages - LLPAs for Terms > 15 Years
-                  if r >= 752 && r <= 760 && cc == 10
-                    ltv_key = get_value value
-                    @relief_cashout_adjustment[main_key][ltv_key] = {}
-                  end
-                  if r >= 752 && r <= 760 && cc >= 21 && cc <= 42
-                    ltv_data =  get_value @ltv_data[cc-2]
-                    @relief_cashout_adjustment[main_key][ltv_key][ltv_data] = {}
-                    @relief_cashout_adjustment[main_key][ltv_key][ltv_data] = value
-                  end
-
-                  # All Eligible Mortgages  Cash-Out Refinance  LLPAs
-                  if r >= 762 && r <= 768 && cc == 10
-                    ltv_key = get_value value
-                    @cashout_adjustment[main_key][ltv_key] = {}
-                  end
-                  if r >= 762 && r <= 768 && cc >= 21 && cc <= 42
-                    ltv_data =  get_value @ltv_data[cc-2]
-                    @cashout_adjustment[main_key][ltv_key][ltv_data] = {}
-                    @cashout_adjustment[main_key][ltv_key][ltv_data] = value
-                  end
-
-                  # # All Eligible Mortgages Product Feature  LLPAs
-                  # if r >= 375 && r <= 382 && cc == 9
-                  #   if value == "High Balance Purchase or Rate/Term Refi"
-                  #     secondary_key = "HighBalance/LoanPurpose/Feature/LTV"
-                  #     main_key = primary_key + "/" + secondary_key
-                  #     ltv_key = get_value value
-                  #     @product_hash[main_key] = {}  
-                  #     @product_hash[main_key][ltv_key] = {}
-                  #   elsif value == "High Balance Cash-Out Refi"
-                  #     secondary_key = "HighBalance/Cashout/Feature/LTV"
-                  #     main_key = primary_key + "/" + secondary_key
-                  #     ltv_key = get_value value
-                  #     @product_hash[main_key] = {}  
-                  #     @product_hash[main_key][ltv_key] = {}
-                  #   elsif value == "High Balance ARM2"
-                  #     secondary_key = "HighBalance/LoanType"    
-                  #     main_key = primary_key + "/" + secondary_key
-                  #     ltv_key = get_value value
-                  #     @product_hash[main_key] = {}  
-                  #     @product_hash[main_key][ltv_key] = {}
-                  #   else
-                  #     ltv_key = get_value value
-                  #     @product_hash[main_key][ltv_key] = {}
-                  #   end
-                  # end
-                  # if r >= 375 && r <= 382 && cc >= 18 && cc <= 44
-                  #   ltv_data =  get_value @ltv_data[cc-2]
-                  #   @product_hash[main_key][ltv_key][ltv_data] = {}
-                  #   @product_hash[main_key][ltv_key][ltv_data] = value
-                  # end
-
-                  # # subordinate adjustment
-                  # if r == 387 && cc == 6
-                  #   new_key = value
-                  #   @subordinate_hash[main_key][new_key] = {}
-                  # end
-                  # if r == 387 && cc == 12
-                  #   @subordinate_hash[main_key][new_key] = value
-                  # end
-                  # if r >= 388 && r <= 392 && cc == 6
-                  #   ltv_key = get_value value
-                  #   @subordinate_hash[main_key][ltv_key] = {}
-                  # end
-                  # if r >= 388 && r <= 392 && cc == 9
-                  #   cltv_key = get_value value
-                  #   @subordinate_hash[main_key][ltv_key][cltv_key] = {}
-                  # end
-                  # if r >= 388 && r <= 392 && cc >= 12 && cc <= 15
-                  #   sub_data = get_value @sub_data[cc-2]
-                  #   @subordinate_hash[main_key][ltv_key][cltv_key][sub_data] = {}
-                  #   @subordinate_hash[main_key][ltv_key][cltv_key][sub_data] = value
-                  # end
-
-                  # # Additional Adjustments5
-                  # if r >= 394 && r <= 398 && cc == 6
-                  #   if value == "R/T or CO Refinance"
-                  #     secondary_key = "LoanType/RefinanceOption/LTV"
-                  #     main_key = primary_key + "/" + secondary_key
-                  #     @additional_hash[main_key] = {}
-                  #   elsif value == "Escrow Waiver FICO < 700"
-                  #     secondary_key = "EscrowWaiver/FICO"
-                  #     main_key = primary_key + "/" + secondary_key
-                  #     @additional_hash[main_key] = {}
-                  #   elsif value == "Escrow Waiver CA FICO < 700"
-                  #     secondary_key = "CA/EscrowWaiver/FICO"
-                  #     main_key = primary_key + "/" + secondary_key
-                  #     @additional_hash[main_key] = {}
-                  #   elsif value == "ARM > 90 LTV"
-                  #     secondary_key = "LoanType/LTV"     
-                  #     main_key = primary_key + "/" + secondary_key
-                  #     @additional_hash[main_key] = {}
-                  #   elsif value == "90 Day (Add to 60 Day)"
-                  #     secondary_key = "LockPeriod"
-                  #     main_key = primary_key + "/" + secondary_key
-                  #     @additional_hash[main_key] = {}
-                  #   end
-                  # end
-                  # if r >= 394 && r <= 398 && cc == 14
-                  #   @additional_hash[main_key] = value
-                  # end
-                  # if r == 400 && cc == 2
-                  #   if value == "Max Net Rebate"
-                  #     secondary_key = "Max/Net/Rebate"
-                  #     main_key = primary_key + "/" + secondary_key
-                  #     @additional_hash[main_key] = {}
-                  #   end
-                  # end
-                  # if r == 401 && cc == 2
-                  #   @additional_hash[main_key] = value
-                  # end
-                  # if r == 404 && cc == 2
-                  #   ltv_key = value
-                  #   @additional_hash[main_key][ltv_key] = {}
-                  # end
-                  # if r == 404 && cc == 10
-                  #   @additional_hash[main_key][ltv_key] = value
-                  # end
-
-                  # # Lender Paid Mortgage Insurance
-                  # if r >= 411 && r <= 416 && cc == 7
-                  #   ltv_key = get_value value
-                  #   # @lpmi_hash[main_key][term_key] = {}
-                  #   @lpmi_hash[main_key][term_key][ltv_key] = {}
-                  # end
-                  # if r >= 411 && r <= 416 && cc == 11
-                  #   cltv_key = get_value value.to_s
-                  #   @lpmi_hash[main_key][term_key][ltv_key][cltv_key] = {}
-                  # end
-                  # if r >= 411 && r <= 416 && cc >= 15 && cc <= 33
-                  #   lpmi_key = get_value @lpmi_data[cc-2]
-                  #   @lpmi_hash[main_key][term_key][ltv_key][cltv_key][lpmi_key] = {}
-                  #   @lpmi_hash[main_key][term_key][ltv_key][cltv_key][lpmi_key] = value
-                  # end
-                  # # if r >= 418 && r <= 422 && cc == 7
-                  # #   term_key = "≤20" 
-                  # #   ltv_key = get_value value
-                  # #   @lpmi_hash[main_key][term_key] = {}
-                  # #   @lpmi_hash[main_key][term_key][ltv_key] = {}
-                  # # end
-                  # # if r >= 418 && r <= 422 && cc == 11
-                  # #   cltv_key = get_value value.to_s
-                  # #   @lpmi_hash[main_key][term_key][ltv_key][cltv_key] = {}
-                  # # end
-                  # # if r >= 418 && r <= 422 && cc >= 15 && cc <= 33
-                  # #   lpmi_key = get_value @lpmi_data[cc-2]
-                  # #   @lpmi_hash[main_key][term_key][ltv_key][cltv_key][lpmi_key] = {}
-                  # #   @lpmi_hash[main_key][term_key][ltv_key][cltv_key][lpmi_key] = value
-                  # # end
-                end
-              rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
-                error_log.save
-              end
-            end
-          end
-        end
-        adjustment = [@freddie_adjustment_hash,@relief_cashout_adjustment,@cashout_adjustment,@product_hash,@subordinate_hash,@subordinate_hash, @additional_hash,@lpmi_hash]
-        make_adjust(adjustment,sheet)
-
-        # FHA Va Usda programs
-        (844..1006).each do |r|
-          row = sheet_data.row(r)
-          if ((row.compact.count > 1) && (row.compact.count <= 4)) 
-            rr = r + 1 
-            max_column_section = row.compact.count - 1
-            (0..max_column_section).each_with_index do |max_column, index|
-              index = index +1
-              cc = 1 + max_column*10 + index# (2 / 13 / 24 / 35)
-              begin
-                @title = sheet_data.cell(r,cc)
-                if @title.present?
-                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @programs_ids << @program.id
-                  # Program Property
-                  program_property @title
-                  @program.adjustments.destroy_all
-                  @block_hash = {}
-                  key = ''
-                  (1..50).each do |max_row|
-                    @data = []
-                    (0..8).each_with_index do |index, c_i|
-                      rrr = rr + max_row +1
-                      ccc = cc + c_i
-                      value = sheet_data.cell(rrr,ccc)
-                      if value.present?
-                        if (c_i == 0)
-                          key = value
-                          @block_hash[key] = {}
-                        else
-                          if @program.lock_period.length <= 3
-                            @program.lock_period << 15*(c_i/2)
-                            @program.save
-                          end
-                          @block_hash[key][15*(c_i/2)] = value unless @block_hash[key].nil?
-                        end
-                        @data << value
-                      end
-                    end
-                    if @data.compact.reject { |c| c.blank? }.length == 0
-                      break # terminate the loop
-                    end
-                  end
-                  @program.update(base_rate: @block_hash)
-                end
-              rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
-                error_log.save
-              end
-            end
-          end
-        end
-
-        # Non Conforming programs
-        (1126..1145).each do |r|
-          row = sheet_data.row(r)
-          if ((row.compact.count > 1) && (row.compact.count <= 3)) 
-            rr = r + 1 
-            max_column_section = row.compact.count - 1
-            (0..max_column_section).each_with_index do |max_column, index|
-              index = index +1
-              cc = 1 + max_column*10 + index# (2 / 13 / 24 / 35)
-              begin
-                @title = sheet_data.cell(r,cc)
-                if @title.present?
-                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @programs_ids << @program.id
-                  # Program Property
-                  program_property @title
-                  @program.adjustments.destroy_all
-                end
+                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                @programs_ids << @program.id
+                # Program Property
+                program_property @title
+                @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
                 (1..50).each do |max_row|
@@ -689,57 +86,998 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
           end
         end
 
+        # Fannie Mae Adjustments
+        (353..429).each do |r|
+          row = sheet_data.row(r)
+          @ltv_data = sheet_data.row(356)
+          @sub_data = sheet_data.row(386)
+          @lpmi_data = sheet_data.row(410)
+          if row.compact.count >= 1
+            (2..42).each do |max_column|
+              cc = max_column
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "Fannie Mae Loan Level Price Adjustments"
+                  @adjustment_hash["FannieMae/Term/FICO/LTV"] = {}
+                  @adjustment_hash["FannieMae/Term/FICO/LTV"][true] = {}
+                  @adjustment_hash["FannieMae/Term/FICO/LTV"][true]["15-Inf"] = {}
+                end
+                if value == "Lender Paid Mortgage Insurance"
+                  @lpmi_hash["LPMI/Term/FICO/LTV"] = {}
+                  @lpmi_hash["LPMI/Term/FICO/LTV"][true] = {}
+                  @lpmi_hash["LPMI/Term/FICO/LTV"][true]["20-Inf"] = {}
+                end
+                if value == "All Eligible Mortgages  Cash-Out Refinance  LLPAs"
+                  @cashout_adjustment["FannieMae/RefinanceOption/FICO/LTV"] = {}
+                  @cashout_adjustment["FannieMae/RefinanceOption/FICO/LTV"][true] = {}
+                  @cashout_adjustment["FannieMae/RefinanceOption/FICO/LTV"][true]["Cash Out"] = {}
+                end
+                if value == "All Eligible Mortgages Product Feature  LLPAs"
+                  @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"] = {}
+                  @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"][true] = {}
+                  @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"][true]["High-Balance"] = {}
+                  @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"][true]["High-Balance"]["Rate and Term"] = {}
+                  @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"][true]["High-Balance"]["Cash Out"] = {}
+                end
+                if value == "Mortgages with Subordinate Financing4"
+                  @subordinate_hash["FinancingType/LTV/CLTV/FICO"] = {}
+                  @subordinate_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"] = {}
+                end
+
+                # All Eligible Mortgages - LLPAs for Terms > 15 Years
+                if r >= 357 && r <= 365 && cc == 9
+                  ltv_key = get_value value
+                  @adjustment_hash["FannieMae/Term/FICO/LTV"][true]["15-Inf"][ltv_key] = {}
+                end
+                if r >= 357 && r <= 365 && cc >= 18 && cc <= 44
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @adjustment_hash["FannieMae/Term/FICO/LTV"][true]["15-Inf"][ltv_key][ltv_data] = {}
+                  @adjustment_hash["FannieMae/Term/FICO/LTV"][true]["15-Inf"][ltv_key][ltv_data] = value
+                end
+
+                # All Eligible Mortgages  Cash-Out Refinance  LLPAs
+                if r >= 367 && r <= 373 && cc == 9
+                  ltv_key = get_value value
+                  @cashout_adjustment["FannieMae/RefinanceOption/FICO/LTV"][true]["Cash Out"][ltv_key] = {}
+                end
+                if r >= 367 && r <= 373 && cc >= 18 && cc <= 44
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @cashout_adjustment["FannieMae/RefinanceOption/FICO/LTV"][true]["Cash Out"][ltv_key][ltv_data] = {}
+                  @cashout_adjustment["FannieMae/RefinanceOption/FICO/LTV"][true]["Cash Out"][ltv_key][ltv_data] = value
+                end
+
+                # All Eligible Mortgages Product Feature  LLPAs
+                if r == 375 && cc == 9
+                  @product_hash["FannieMae/LoanType/LTV"] = {}
+                  @product_hash["FannieMae/LoanType/LTV"][true] = {}
+                  @product_hash["FannieMae/LoanType/LTV"][true]["ARM"] = {}
+                end
+                if r == 375 && cc >= 18 && cc <= 44
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @product_hash["FannieMae/LoanType/LTV"][true]["ARM"][ltv_data] = {}
+                  @product_hash["FannieMae/LoanType/LTV"][true]["ARM"][ltv_data] = value
+                end
+                if r == 376 && cc == 9
+                  @product_hash["FannieMae/PropertyType/LTV"] = {}
+                  @product_hash["FannieMae/PropertyType/LTV"][true] = {}
+                  @product_hash["FannieMae/PropertyType/LTV"][true]["Manufactured Home"] = {}
+                end
+                if r == 376 && cc >= 18 && cc <= 44
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @product_hash["FannieMae/PropertyType/LTV"][true]["Manufactured Home"][ltv_data] = {}
+                  @product_hash["FannieMae/PropertyType/LTV"][true]["Manufactured Home"][ltv_data] = value
+                end
+                if r == 377 && cc == 9
+                  @product_hash["FannieMae/PropertyType/LTV"][true]["Investment Property"] = {}
+                end
+                if r == 377 && cc >= 18 && cc <= 44
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @product_hash["FannieMae/PropertyType/LTV"][true]["Investment Property"][ltv_data] = {}
+                  @product_hash["FannieMae/PropertyType/LTV"][true]["Investment Property"][ltv_data] = value
+                end
+                if r == 378 && cc >= 18 && cc <= 44
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"][true]["High-Balance"]["Rate and Term"][ltv_data] = {}
+                  @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"][true]["High-Balance"]["Rate and Term"][ltv_data] = value
+                end
+                if r == 379 && cc >= 18 && cc <= 44
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"][true]["High-Balance"]["Cash Out"][ltv_data] = {}
+                  @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"][true]["High-Balance"]["Cash Out"][ltv_data] = value
+                end
+                if r == 380 && cc == 9
+                  @product_hash["FannieMae/LoanSize/LoanType/LTV"] = {}
+                  @product_hash["FannieMae/LoanSize/LoanType/LTV"][true] = {}
+                  @product_hash["FannieMae/LoanSize/LoanType/LTV"][true]["High-Balance"] = {}
+                  @product_hash["FannieMae/LoanSize/LoanType/LTV"][true]["High-Balance"]["ARM"] = {}
+                end
+                if r == 380 && cc >= 18 && cc <= 44
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @product_hash["FannieMae/LoanSize/LoanType/LTV"][true]["High-Balance"]["ARM"][ltv_data] = {}
+                  @product_hash["FannieMae/LoanSize/LoanType/LTV"][true]["High-Balance"]["ARM"][ltv_data] = value
+                end
+                if r == 381 && cc == 9
+                  @product_hash["FannieMae/PropertyType/LTV"][true]["2-4 Unit"] = {}
+                end
+                if r == 381 && cc >= 18 && cc <= 44
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @product_hash["FannieMae/PropertyType/LTV"][true]["2-4 Unit"][ltv_data] = {}
+                  @product_hash["FannieMae/PropertyType/LTV"][true]["2-4 Unit"][ltv_data] = value
+                end
+                if r == 382 && cc == 9
+                  @product_hash["FannieMae/PropertyType/LTV"][true]["Condo"] = {}
+                end
+                if r == 382 && cc >= 18 && cc <= 44
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @product_hash["FannieMae/PropertyType/LTV"][true]["Condo"][ltv_data] = {}
+                  @product_hash["FannieMae/PropertyType/LTV"][true]["Condo"][ltv_data] = value
+                end
+
+                # subordinate adjustment
+                if r == 387 && cc == 6
+                  @subordinate_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"]["0-Inf"] = {}
+                  @subordinate_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"]["0-Inf"]["0-Inf"] = {}
+                  @subordinate_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"]["0-Inf"]["0-Inf"]["0-720"] = {}
+                  @subordinate_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"]["0-Inf"]["0-Inf"]["720-Inf"] = {}
+                end
+                if r == 387 && cc >= 12 && cc <= 15
+                  @subordinate_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"]["0-Inf"]["0-Inf"]["0-720"] = value
+                  @subordinate_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"]["0-Inf"]["0-Inf"]["720-Inf"] = value
+                end
+                if r >= 388 && r <= 392 && cc == 6
+                  primary_key = get_value value
+                  @subordinate_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"][primary_key] = {}
+                end
+                if r >= 388 && r <= 392 && cc == 9
+                  ltv_key = get_value value
+                  @subordinate_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"][primary_key][ltv_key] = {}
+                end
+                if r >= 388 && r <= 392 && cc >= 12 && cc <= 15
+                  sub_data = get_value @sub_data[cc-2]
+                  @subordinate_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"][primary_key][ltv_key][sub_data] = {}
+                  @subordinate_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"][primary_key][ltv_key][sub_data] = value
+                end
+                # Additional Adjustments5
+                if r == 394 && cc == 6
+                  @additional_hash["RefinanceOption"] = {}
+                  @additional_hash["RefinanceOption"]["Cash Out"] = {}
+                  cc = cc + 8
+                  new_val = sheet_data.cell(r,cc)
+                  @additional_hash["RefinanceOption"]["Cash Out"] = new_val
+                end
+                if r == 395 && cc == 6
+                  @additional_hash["MiscAdjuster/FICO"] = {}
+                  @additional_hash["MiscAdjuster/FICO"]["Escrow Waiver"] = {}
+                  @additional_hash["MiscAdjuster/FICO"]["Escrow Waiver"]["0-700"] = {}
+                  cc = cc + 8
+                  new_val = sheet_data.cell(r,cc)
+                  @additional_hash["MiscAdjuster/FICO"]["Escrow Waiver"]["0-700"] = new_val
+                end
+                if r == 396 && cc == 6
+                  @additional_hash["MiscAdjuster/State/FICO"] = {}
+                  @additional_hash["MiscAdjuster/State/FICO"]["Escrow Waiver"] = {}
+                  @additional_hash["MiscAdjuster/State/FICO"]["Escrow Waiver"]["CA"] = {}
+                  @additional_hash["MiscAdjuster/State/FICO"]["Escrow Waiver"]["CA"]["0-700"] = {}
+                  cc = cc + 8
+                  new_val = sheet_data.cell(r,cc)
+                  @additional_hash["MiscAdjuster/State/FICO"]["Escrow Waiver"]["CA"]["0-700"] = new_val
+                end
+                if r == 397 && cc == 6
+                  @additional_hash["LoanType/LTV"] = {}
+                  @additional_hash["LoanType/LTV"]["ARM"] = {}
+                  @additional_hash["LoanType/LTV"]["ARM"]["90-Inf"] = {}
+                  cc = cc + 8
+                  new_val = sheet_data.cell(r,cc)
+                  @additional_hash["LoanType/LTV"]["ARM"]["90-Inf"] = new_val
+                end
+                if r == 397 && cc == 6
+                  @additional_hash["LockDay"] = {}
+                  @additional_hash["LockDay"]["90"] = {}
+                  cc = cc + 8
+                  new_val = sheet_data.cell(r,cc)
+                  @additional_hash["LockDay"]["90"] = new_val
+                end
+                if r == 404 && cc == 2
+                  @additional_hash["State"] = {}
+                  cc = cc + 8
+                  new_val = sheet_data.cell(r,cc)
+                  @additional_hash["State"] = new_val
+                end
+                if r == 396 && cc == 37
+                  @additional_hash["FICO/LTV"] = {}
+                  @additional_hash["FICO/LTV"]["680-inf"] = {}
+                  @additional_hash["FICO/LTV"]["680-inf"]["80-Inf"] = {}
+                  @additional_hash["FICO/LTV"]["680-inf"]["80-Inf"] = value
+                end
+                if r == 397 && cc == 37
+                  @additional_hash["FICO/LTV"]["0-680"] = {}
+                  @additional_hash["FICO/LTV"]["0-680"]["0-80"] = {}
+                  @additional_hash["FICO/LTV"]["0-680"]["0-80"] = value
+                end
+                # Lender Paid Mortgage Insurance
+                if r == 424 && cc == 7
+                  @lpmi_hash["LPMI/Term/LTV"] = {}
+                  @lpmi_hash["LPMI/Term/LTV"][true] = {}
+                  @lpmi_hash["LPMI/Term/LTV"][true]["0-25"] = {}
+                end
+                if r == 424 && cc >= 15 && cc <= 33
+                  lpmi_key = get_value @lpmi_data[cc-2]
+                  @lpmi_hash["LPMI/Term/LTV"][true]["0-25"][lpmi_key] = {}
+                  @lpmi_hash["LPMI/Term/LTV"][true]["0-25"][lpmi_key] = value
+                end
+                if r == 425 && cc == 7
+                  @lpmi_hash["LPMI/RefinanceOption/LTV"] = {}
+                  @lpmi_hash["LPMI/RefinanceOption/LTV"][true] = {}
+                  @lpmi_hash["LPMI/RefinanceOption/LTV"][true]["Cash Out"] = {}
+                end
+                if r == 425 && cc >= 15 && cc <= 33
+                  lpmi_key = get_value @lpmi_data[cc-2]
+                  @lpmi_hash["LPMI/RefinanceOption/LTV"][true]["Cash Out"][lpmi_key] = {}
+                  @lpmi_hash["LPMI/RefinanceOption/LTV"][true]["Cash Out"][lpmi_key] = value
+                end
+                if r == 426 && cc == 7
+                  @lpmi_hash["LPMI/PropertyType/LTV"] = {}
+                  @lpmi_hash["LPMI/PropertyType/LTV"][true] = {}
+                  @lpmi_hash["LPMI/PropertyType/LTV"][true]["Investment Property"] = {}
+                end
+                if r == 426 && cc >= 15 && cc <= 33
+                  lpmi_key = get_value @lpmi_data[cc-2]
+                  @lpmi_hash["LPMI/PropertyType/LTV"][true]["Investment Property"][lpmi_key] = {}
+                  @lpmi_hash["LPMI/PropertyType/LTV"][true]["Investment Property"][lpmi_key] = value
+                end
+                if r == 427 && cc == 7
+                  @lpmi_hash["LPMI/LoanAmount/LTV"] = {}
+                  @lpmi_hash["LPMI/LoanAmount/LTV"][true] = {}
+                  @lpmi_hash["LPMI/LoanAmount/LTV"][true]["484350-Inf"] = {}
+                end
+                if r == 427 && cc >= 15 && cc <= 33
+                  lpmi_key = get_value @lpmi_data[cc-2]
+                  @lpmi_hash["LPMI/LoanAmount/LTV"][true]["484350-Inf"][lpmi_key] = {}
+                  @lpmi_hash["LPMI/LoanAmount/LTV"][true]["484350-Inf"][lpmi_key] = value
+                end
+                if r == 428 && cc == 7
+                  @lpmi_hash["LPMI/RefinanceOption/LTV"][true]["Rate and Term"] = {}
+                end
+                if r == 428 && cc >= 15 && cc <= 33
+                  lpmi_key = get_value @lpmi_data[cc-2]
+                  @lpmi_hash["LPMI/RefinanceOption/LTV"][true]["Rate and Term"][lpmi_key] = {}
+                  @lpmi_hash["LPMI/RefinanceOption/LTV"][true]["Rate and Term"][lpmi_key] = value
+                end
+                if r == 429 && cc == 7
+                  @lpmi_hash["LPMI/PropertyType/LTV"][true]["2nd Home"] = {}
+                end
+                if r == 429 && cc >= 15 && cc <= 33
+                  lpmi_key = get_value @lpmi_data[cc-2]
+                  @lpmi_hash["LPMI/PropertyType/LTV"][true]["2nd Home"][lpmi_key] = {}
+                  @lpmi_hash["LPMI/PropertyType/LTV"][true]["2nd Home"][lpmi_key] = value
+                end
+              end
+            end
+          end
+        end
+        adjustment = [@adjustment_hash,@cashout_adjustment,@product_hash,@subordinate_hash,@additional_hash,@lpmi_hash]
+        make_adjust(adjustment,@sheet_name)
+        
+        # Freddie programs
+        (458..684).each do |r|
+          row = sheet_data.row(r)
+          @sheet_name = "Freddie Mac Products"
+          @bank = @sheet_obj.bank
+          @sheet_obj = @bank.sheets.find_or_create_by(name: @sheet_name)
+          if ((row.compact.count > 1) && (row.compact.count <= 4))
+            rr = r + 1 
+            max_column_section = row.compact.count - 1
+            (0..max_column_section).each_with_index do |max_column, index|
+              index = index +1
+              cc = 1 + max_column*10 + index# (2 / 13 / 24 / 35)
+              @title = sheet_data.cell(r,cc)
+              if @title.present?
+                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                @programs_ids << @program.id
+                # Program Property
+                program_property @title
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+                (1..50).each do |max_row|
+                  @data = []
+                  (0..8).each_with_index do |index, c_i|
+                    rrr = rr + max_row +1
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        if @program.lock_period.length <= 3
+                          @program.lock_period << 15*(c_i/2)
+                          @program.save
+                        end
+                        @block_hash[key][15*(c_i/2)] = value unless @block_hash[key].nil?
+                      end
+                      @data << value
+                    end
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
+                  end
+                end
+                @program.update(base_rate: @block_hash)
+              end
+            end
+          end
+        end
+        # Freddie Adjustments
+        (740..835).each do |r|
+          row = sheet_data.row(r)
+          @ltv_data = sheet_data.row(743)
+          @sub_data = sheet_data.row(785)
+          @lpmi_data = sheet_data.row(816)
+          if row.compact.count >= 1
+            (2..42).each do |max_column|
+              cc = max_column
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "Freddie Mac Loan Level Price Adjustments"
+                  @freddie_adjustment_hash["FreddieMac/Term/FICO/LTV"] = {}
+                  @freddie_adjustment_hash["FreddieMac/Term/FICO/LTV"][true] = {}
+                  @freddie_adjustment_hash["FreddieMac/Term/FICO/LTV"][true]["15-Inf"] = {}
+                end
+                if value == "All Eligible Mortgages - Relief Refinance Mortgages - LLPAs for Terms > 15 Years"
+                  @freddie_adjustment_hash["FreddieMac/LoanPurpose/Term/FICO/LTV"] = {}
+                  @freddie_adjustment_hash["FreddieMac/LoanPurpose/Term/FICO/LTV"][true] = {}
+                  @freddie_adjustment_hash["FreddieMac/LoanPurpose/Term/FICO/LTV"][true]["Refinance"] = {}
+                  @freddie_adjustment_hash["FreddieMac/LoanPurpose/Term/FICO/LTV"][true]["Refinance"]["15-Inf"] = {}
+                end
+                if value == "All Eligible Mortgages  Cash-Out Refinance  LLPAs"
+                  @cashout_hash["FreddieMac/RefinanceOption/FICO/LTV"] = {}
+                  @cashout_hash["FreddieMac/RefinanceOption/FICO/LTV"][true] = {}
+                  @cashout_hash["FreddieMac/RefinanceOption/FICO/LTV"][true]["Cash Out"] = {}
+                end
+                if value == "Mortgages with Subordinate Financing5 - Other Than Relief Refinance Mortgages"
+                  @sub_hash["FinancingType/FreddieMacProduct/LTV/CLTV/FICO"] = {}
+                  @sub_hash["FinancingType/FreddieMacProduct/LTV/CLTV/FICO"]["Subordinate Financing"] = {}
+                  @sub_hash["FinancingType/FreddieMacProduct/LTV/CLTV/FICO"]["Subordinate Financing"]["Home Possible"] = {}
+                end
+                if value == "Mortgages with Subordinate Financing7- Relief Refinance Mortgages"
+                  @sub_hash["FinancingType/LTV/CLTV/FICO"] = {}
+                  @sub_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"] = {}
+                end             
+
+                # All Eligible Mortgages - Other Than Relief Refinance Mortgages - LLPAs for Terms > 15 Years
+                if r >= 744 && r <= 750 && cc == 10
+                  ltv_key = get_value value
+                  @freddie_adjustment_hash["FreddieMac/Term/FICO/LTV"][true]["15-Inf"][ltv_key] = {}
+                end
+                if r >= 744 && r <= 750 && cc >= 21 && cc <= 42
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @freddie_adjustment_hash["FreddieMac/Term/FICO/LTV"][true]["15-Inf"][ltv_key][ltv_data] = {}
+                  @freddie_adjustment_hash["FreddieMac/Term/FICO/LTV"][true]["15-Inf"][ltv_key][ltv_data] = value
+                end
+
+                # All Eligible Mortgages - Relief Refinance Mortgages - LLPAs for Terms > 15 Years
+                if r >= 752 && r <= 760 && cc == 10
+                  ltv_key = get_value value
+                  @freddie_adjustment_hash["FreddieMac/LoanPurpose/Term/FICO/LTV"][true]["Refinance"]["15-Inf"][ltv_key] = {}
+                end
+                if r >= 752 && r <= 760 && cc >= 21 && cc <= 42
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @freddie_adjustment_hash["FreddieMac/LoanPurpose/Term/FICO/LTV"][true]["Refinance"]["15-Inf"][ltv_key][ltv_data] = {}
+                  @freddie_adjustment_hash["FreddieMac/LoanPurpose/Term/FICO/LTV"][true]["Refinance"]["15-Inf"][ltv_key][ltv_data] = value
+                end
+
+                # All Eligible Mortgages  Cash-Out Refinance  LLPAs
+                if r >= 762 && r <= 768 && cc == 10
+                  ltv_key = get_value value
+                  @cashout_hash["FreddieMac/RefinanceOption/FICO/LTV"][true]["Cash Out"][ltv_key] = {}
+                end
+                if r >= 762 && r <= 768 && cc >= 21 && cc <= 42
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @cashout_hash["FreddieMac/RefinanceOption/FICO/LTV"][true]["Cash Out"][ltv_key][ltv_data] = {}
+                  @cashout_hash["FreddieMac/RefinanceOption/FICO/LTV"][true]["Cash Out"][ltv_key][ltv_data] = value
+                end
+
+                # # All Eligible Mortgages Product Feature  LLPAs
+                if r == 770 && cc == 10
+                  @property_hash["FreddieMac/LoanType/LTV"] = {}
+                  @property_hash["FreddieMac/LoanType/LTV"][true] = {}
+                  @property_hash["FreddieMac/LoanType/LTV"][true]["ARM"] = {}
+                end
+                if r == 770 && cc >= 21 && cc <= 42
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @property_hash["FreddieMac/LoanType/LTV"][true]["ARM"][ltv_data] = {}
+                  @property_hash["FreddieMac/LoanType/LTV"][true]["ARM"][ltv_data] = value
+                end
+                if r == 771 && cc == 10
+                  @property_hash["FreddieMac/PropertyType/LTV"] = {}
+                  @property_hash["FreddieMac/PropertyType/LTV"][true] = {}
+                  @property_hash["FreddieMac/PropertyType/LTV"][true]["Manufactured Home"] = {}
+                end
+                if r == 771 && cc >= 21 && cc <= 42
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @property_hash["FreddieMac/PropertyType/LTV"][true]["Manufactured Home"][ltv_data] = {}
+                  @property_hash["FreddieMac/PropertyType/LTV"][true]["Manufactured Home"][ltv_data] = value
+                end
+                if r == 772 && cc == 10
+                  @property_hash["FreddieMac/PropertyType/LTV"][true]["Condo"] = {}
+                end
+                if r == 772 && cc >= 21 && cc <= 42
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @property_hash["FreddieMac/PropertyType/LTV"][true]["Condo"][ltv_data] = {}
+                  @property_hash["FreddieMac/PropertyType/LTV"][true]["Condo"][ltv_data] = value
+                end
+                if r == 773 && cc == 10
+                  @property_hash["FreddieMac/PropertyType/LTV"][true]["Investment Property"] = {}
+                end
+                if r == 773 && cc >= 21 && cc <= 42
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @property_hash["FreddieMac/PropertyType/LTV"][true]["Investment Property"][ltv_data] = {}
+                  @property_hash["FreddieMac/PropertyType/LTV"][true]["Investment Property"][ltv_data] = value
+                end
+                if r == 774 && cc == 10
+                  @property_hash["FreddieMac/PropertyType/LTV"][true]["2nd Home"] = {}
+                end
+                if r == 774 && cc >= 21 && cc <= 42
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @property_hash["FreddieMac/PropertyType/LTV"][true]["2nd Home"][ltv_data] = {}
+                  @property_hash["FreddieMac/PropertyType/LTV"][true]["2nd Home"][ltv_data] = value
+                end
+                if r == 775 && cc == 10
+                  @property_hash["FreddieMac/PropertyType/LTV"][true]["2 Unit"] = {}
+                end
+                if r == 775 && cc >= 21 && cc <= 42
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @property_hash["FreddieMac/PropertyType/LTV"][true]["2 Unit"][ltv_data] = {}
+                  @property_hash["FreddieMac/PropertyType/LTV"][true]["2 Unit"][ltv_data] = value
+                end
+                if r == 776 && cc == 10
+                  @property_hash["FreddieMac/PropertyType/LTV"][true]["3-4 Unit"] = {}
+                end
+                if r == 776 && cc >= 21 && cc <= 42
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @property_hash["FreddieMac/PropertyType/LTV"][true]["3-4 Unit"][ltv_data] = {}
+                  @property_hash["FreddieMac/PropertyType/LTV"][true]["3-4 Unit"][ltv_data] = value
+                end
+                if r == 777 && cc == 10
+                  @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"] = {}
+                  @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true] = {}
+                  @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true]["Purchase"] = {}
+                  @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true]["Purchase"]["Fixed"] = {}
+                  @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true]["Purchase"]["Fixed"]["Conforming"] = {}
+                  @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true]["Purchase"]["Fixed"]["Conforming"]["Rate and Term"] = {}
+                end
+                if r == 777 && cc >= 21 && cc <= 42
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true]["Purchase"]["Fixed"]["Conforming"]["Rate and Term"][ltv_data] = {}
+                  @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true]["Purchase"]["Fixed"]["Conforming"]["Rate and Term"][ltv_data] = value
+                end
+                if r == 778 && cc == 10
+                  @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"] = {}
+                  @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"][true] = {}
+                  @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"][true]["Fixed"] = {}
+                  @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"][true]["Fixed"]["Conforming"] = {}
+                  @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"][true]["Fixed"]["Conforming"]["Cash Out"] = {}
+                end
+                if r == 778 && cc >= 21 && cc <= 42
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"][true]["Fixed"]["Conforming"]["Cash Out"][ltv_data] = {}
+                  @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"][true]["Fixed"]["Conforming"]["Cash Out"][ltv_data] = value
+                end
+                if r == 779 && cc == 10
+                  @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true]["Purchase"]["ARM"] = {}
+                  @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true]["Purchase"]["ARM"]["Conforming"] = {}
+                  @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true]["Purchase"]["ARM"]["Conforming"]["Rate and Term"] = {}
+                end
+                if r == 779 && cc >= 21 && cc <= 42
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true]["Purchase"]["ARM"]["Conforming"]["Rate and Term"][ltv_data] = {}
+                  @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true]["Purchase"]["ARM"]["Conforming"]["Rate and Term"][ltv_data] = value
+                end
+                if r == 780 && cc == 10
+                  @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"][true]["ARM"] = {}
+                  @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"][true]["ARM"]["Conforming"] = {}
+                  @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"][true]["ARM"]["Conforming"]["Cash Out"] = {}
+                end
+                if r == 780 && cc >= 21 && cc <= 42
+                  ltv_data =  get_value @ltv_data[cc-2]
+                  @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"][true]["ARM"]["Conforming"]["Cash Out"][ltv_data] = {}
+                  @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"][true]["ARM"]["Conforming"]["Cash Out"][ltv_data] = value
+                end
+                # # subordinate adjustment
+                if r == 786 && cc == 7
+                  @sub_hash["FinancingType/FreddieMacProduct/LTV/CLTV/FICO"]["Subordinate Financing"]["Home Possible"]["0-Inf"] = {}
+                  @sub_hash["FinancingType/FreddieMacProduct/LTV/CLTV/FICO"]["Subordinate Financing"]["Home Possible"]["0-Inf"]["0-Inf"] = {}
+                end
+                if r == 786 && cc == 15
+                  @sub_hash["FinancingType/FreddieMacProduct/LTV/CLTV/FICO"]["Subordinate Financing"]["Home Possible"]["0-Inf"]["0-Inf"]["0-720"] = {}
+                  @sub_hash["FinancingType/FreddieMacProduct/LTV/CLTV/FICO"]["Subordinate Financing"]["Home Possible"]["0-Inf"]["0-Inf"]["720-Inf"] = {}
+                  @sub_hash["FinancingType/FreddieMacProduct/LTV/CLTV/FICO"]["Subordinate Financing"]["Home Possible"]["0-Inf"]["0-Inf"]["0-720"] = value
+                  @sub_hash["FinancingType/FreddieMacProduct/LTV/CLTV/FICO"]["Subordinate Financing"]["Home Possible"]["0-Inf"]["0-Inf"]["720-Inf"] = value
+                end
+                if r >= 787 && r <= 790 && cc == 7
+                  primary_key = get_value value
+                  @sub_hash["FinancingType/FreddieMacProduct/LTV/CLTV/FICO"]["Subordinate Financing"]["Home Possible"][primary_key] = {}
+                end
+                if r >= 787 && r <= 790 && cc == 11
+                  ltv_key = get_value value
+                  @sub_hash["FinancingType/FreddieMacProduct/LTV/CLTV/FICO"]["Subordinate Financing"]["Home Possible"][primary_key][ltv_key] = {}
+                end
+                if r >= 787 && r <= 790 && cc >= 15 && cc <= 18
+                  sub_data = get_value @sub_data[cc-2]
+                  @sub_hash["FinancingType/FreddieMacProduct/LTV/CLTV/FICO"]["Subordinate Financing"]["Home Possible"][primary_key][ltv_key][sub_data] = {}
+                  @sub_hash["FinancingType/FreddieMacProduct/LTV/CLTV/FICO"]["Subordinate Financing"]["Home Possible"][primary_key][ltv_key][sub_data] = value
+                end
+                if r >= 791 && r <= 792 && cc == 7
+                  primary_key = get_value value
+                  ltv_key = get_value value
+                  @sub_hash["FinancingType/FreddieMacProduct/LTV/CLTV/FICO"]["Subordinate Financing"]["Home Possible"][primary_key] = {}
+                  @sub_hash["FinancingType/FreddieMacProduct/LTV/CLTV/FICO"]["Subordinate Financing"]["Home Possible"][primary_key][ltv_key] = {}
+                end
+                if r >= 791 && r <= 792 && cc == 15
+                  @sub_hash["FinancingType/FreddieMacProduct/LTV/CLTV/FICO"]["Subordinate Financing"]["Home Possible"][primary_key][ltv_key]["0-720"] = {}
+                  @sub_hash["FinancingType/FreddieMacProduct/LTV/CLTV/FICO"]["Subordinate Financing"]["Home Possible"][primary_key][ltv_key]["720-Inf"] = {}
+                  @sub_hash["FinancingType/FreddieMacProduct/LTV/CLTV/FICO"]["Subordinate Financing"]["Home Possible"][primary_key][ltv_key]["0-720"] = value
+                  @sub_hash["FinancingType/FreddieMacProduct/LTV/CLTV/FICO"]["Subordinate Financing"]["Home Possible"][primary_key][ltv_key]["720-Inf"] = value
+                end
+                # Mortgages with Subordinate Financing7- Relief Refinance Mortgages
+                if r >= 796 && r <= 802 && cc == 7
+                  primary_key = get_value value
+                  @sub_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"][primary_key] = {}
+                end
+                if r >= 796 && r <= 802 && cc == 11
+                  ltv_key = get_value value
+                  @sub_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"][primary_key][ltv_key] = {}
+                end
+                if r >= 796 && r <= 802 && cc >= 15 && cc <= 18
+                  sub_data = get_value @sub_data[cc-2]
+                  @sub_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"][primary_key][ltv_key][sub_data] = {}
+                  @sub_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"][primary_key][ltv_key][sub_data] = value
+                end
+                # Add Adj9
+                if r == 808 && cc == 37
+                  @sub_hash["RefinanceOption"] = {}
+                  @sub_hash["RefinanceOption"]["Rate and Term"] = {}
+                  cc = cc + 6
+                  new_val = sheet_data.cell(r,cc)
+                  @sub_hash["RefinanceOption"]["Rate and Term"] = new_val
+                end
+                if r == 809 && cc == 37
+                  @sub_hash["MiscAdjuster/FICO"] = {}
+                  @sub_hash["MiscAdjuster/FICO"]["Escrow Waiver"] = {}
+                  @sub_hash["MiscAdjuster/FICO"]["Escrow Waiver"]["0-700"] = {}
+                  cc = cc + 6
+                  new_val = sheet_data.cell(r,cc)
+                  @sub_hash["MiscAdjuster/FICO"]["Escrow Waiver"]["0-700"] = new_val
+                end
+                if r == 810 && cc == 37
+                  @sub_hash["MiscAdjuster/State/FICO"] = {}
+                  @sub_hash["MiscAdjuster/State/FICO"]["Escrow Waiver"] = {}
+                  @sub_hash["MiscAdjuster/State/FICO"]["Escrow Waiver"]["CA"] = {}
+                  @sub_hash["MiscAdjuster/State/FICO"]["Escrow Waiver"]["CA"]["0-700"] = {}
+                  cc = cc + 6
+                  new_val = sheet_data.cell(r,cc)
+                  @sub_hash["MiscAdjuster/State/FICO"]["Escrow Waiver"]["CA"]["0-700"] = new_val
+                end
+                if r == 811 && cc == 37
+                  @sub_hash["LockDay"] = {}
+                  @sub_hash["LockDay"]["90"] = {}
+                  cc = cc + 6
+                  new_val = sheet_data.cell(r,cc)
+                  @sub_hash["LockDay"]["90"] = new_val
+                end
+                if r == 812 && cc == 37
+                  @sub_hash["LoanType/LTV"] = {}
+                  @sub_hash["LoanType/LTV"]["ARM"] = {}
+                  @sub_hash["LoanType/LTV"]["ARM"]["90-Inf"] = {}
+                  cc = cc + 6
+                  new_val = sheet_data.cell(r,cc)
+                  @sub_hash["LoanType/LTV"]["ARM"]["90-Inf"] = new_val
+                end
+              end
+            end
+          end
+        end
+        adjustment = [@freddie_adjustment_hash,@cashout_hash,@sub_hash,@property_hash,@sub_hash]
+        make_adjust(adjustment,sheet)
+        # FHA Va Usda programs
+        (844..1006).each do |r|
+          row = sheet_data.row(r)
+          @sheet_name = "FHA, VA, and USDA Products"
+          @bank = @sheet_obj.bank
+          @sheet_obj = @bank.sheets.find_or_create_by(name: @sheet_name)
+          if ((row.compact.count > 1) && (row.compact.count <= 4)) 
+            rr = r + 1 
+            max_column_section = row.compact.count - 1
+            (0..max_column_section).each_with_index do |max_column, index|
+              index = index +1
+              cc = 1 + max_column*10 + index# (2 / 13 / 24 / 35)
+              @title = sheet_data.cell(r,cc)
+              if @title.present?
+                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                @programs_ids << @program.id
+                # Program Property
+                program_property @title
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+                (1..50).each do |max_row|
+                  @data = []
+                  (0..8).each_with_index do |index, c_i|
+                    rrr = rr + max_row +1
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        if @program.lock_period.length <= 3
+                          @program.lock_period << 15*(c_i/2)
+                          @program.save
+                        end
+                        @block_hash[key][15*(c_i/2)] = value unless @block_hash[key].nil?
+                      end
+                      @data << value
+                    end
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
+                  end
+                end
+                @program.update(base_rate: @block_hash)
+              end
+            end
+          end
+        end
+        # FHA Va Usda Adjustments
+        (1032..1054).each do |r|
+          row = sheet_data.row(r)
+          if row.compact.count >= 1
+            (2..43).each do |cc|
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "FHA, VA, and USDA Loan Level Price Adjustments"
+                  @relief_cashout_adjustment["FHA/FICO"] = {}
+                  @relief_cashout_adjustment["FHA/FICO"][true] = {}
+                  @relief_cashout_adjustment["USDA/FICO"] = {}
+                  @relief_cashout_adjustment["USDA/FICO"][true] = {}
+                  @relief_cashout_adjustment["VA/FICO"] = {}
+                  @relief_cashout_adjustment["VA/FICO"][true] = {}
+                end
+                # FHA, VA, and USDA Loan Level Price Adjustments
+                if r >= 1036 && r <= 1045 && cc == 8
+                  if value == "*No Credit or Mortgage History Only"
+                    primary_key = "0-579"
+                  else
+                    primary_key = get_value value
+                  end
+                  @relief_cashout_adjustment["FHA/FICO"][true][primary_key] = {}
+                  @relief_cashout_adjustment["USDA/FICO"][true][primary_key] = {}
+                  @relief_cashout_adjustment["VA/FICO"][true][primary_key] = {}
+                  cc1 = cc + 13
+                  cc2 = cc + 19
+                  cc = cc + 7
+                  new_val = sheet_data.cell(r,cc)
+                  new_val1 = sheet_data.cell(r,cc1)
+                  new_val2 = sheet_data.cell(r,cc2)
+                  @relief_cashout_adjustment["FHA/FICO"][true][primary_key] = new_val
+                  @relief_cashout_adjustment["USDA/FICO"][true][primary_key] = new_val1
+                  @relief_cashout_adjustment["VA/FICO"][true][primary_key] = new_val2
+                end
+                if r == 1048 && cc == 8
+                  @relief_cashout_adjustment["VA/PropertyType"] = {}
+                  @relief_cashout_adjustment["VA/PropertyType"][true] = {}
+                  @relief_cashout_adjustment["VA/PropertyType"][true]["Non-Owner Occupied"] = {}
+                  cc = cc + 7
+                  new_val = sheet_data.cell(r,cc)
+                  @relief_cashout_adjustment["VA/PropertyType"][true]["Non-Owner Occupied"] = new_val
+                end
+                if r == 1049 && cc == 8
+                  @relief_cashout_adjustment["PropertyType"] = {}
+                  @relief_cashout_adjustment["PropertyType"]["Manufactured Home"] = {}
+                  cc = cc + 7
+                  new_val = sheet_data.cell(r,cc)
+                  @relief_cashout_adjustment["PropertyType"]["Manufactured Home"] = new_val
+                end
+                if r == 1050 && cc == 8
+                  @relief_cashout_adjustment["PropertyType"]["2 Unit"] = {}
+                  cc = cc + 7
+                  new_val = sheet_data.cell(r,cc)
+                  @relief_cashout_adjustment["PropertyType"]["2 Unit"] = new_val
+                end
+                if r == 1051 && cc == 8
+                  @relief_cashout_adjustment["PropertyType"]["3-4 Unit"] = {}
+                  cc = cc + 7
+                  new_val = sheet_data.cell(r,cc)
+                  @relief_cashout_adjustment["PropertyType"]["3-4 Unit"] = new_val
+                end
+                if r == 1052 && cc == 8
+                  @relief_cashout_adjustment["VA/RefinanceOption/LTV"] = {}
+                  @relief_cashout_adjustment["VA/RefinanceOption/LTV"][true] = {}
+                  @relief_cashout_adjustment["VA/RefinanceOption/LTV"][true]["Cash Out"] = {}
+                  @relief_cashout_adjustment["VA/RefinanceOption/LTV"][true]["Cash Out"]["95-Inf"] = {}
+                  cc = cc + 7
+                  new_val = sheet_data.cell(r,cc)
+                  @relief_cashout_adjustment["VA/RefinanceOption/LTV"][true]["Cash Out"]["95-Inf"] = new_val
+                end
+                if r == 1053 && cc == 8
+                  @relief_cashout_adjustment["FHA"] = {}
+                  @relief_cashout_adjustment["FHA"][true] = {}
+                  cc = cc + 7
+                  new_val = sheet_data.cell(r,cc)
+                  @relief_cashout_adjustment["FHA"][true] = new_val
+                end
+                if r == 1054 && cc == 8
+                  @relief_cashout_adjustment["LockDay"] = {}
+                  @relief_cashout_adjustment["LockDay"][90] = {}
+                  cc = cc + 7
+                  new_val = sheet_data.cell(r,cc)
+                  @relief_cashout_adjustment["LockDay"][90] = new_val
+                end
+              end
+            end
+          end
+        end
+        adjustment = [@relief_cashout_adjustment]
+        make_adjust(adjustment,sheet)
+        # Non Conforming programs
+        (1126..1145).each do |r|
+          row = sheet_data.row(r)
+          @sheet_name = "Non-Conforming Jumbo CORE"
+          @bank = @sheet_obj.bank
+          @sheet_obj = @bank.sheets.find_or_create_by(name: @sheet_name)
+          if ((row.compact.count > 1) && (row.compact.count <= 3)) 
+            rr = r + 1 
+            max_column_section = row.compact.count - 1
+            (0..max_column_section).each_with_index do |max_column, index|
+              index = index +1
+              cc = 1 + max_column*10 + index# (2 / 13 / 24 / 35)
+              @title = sheet_data.cell(r,cc)
+              if @title.present?
+                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                @programs_ids << @program.id
+                # Program Property
+                program_property @title
+                @program.adjustments.destroy_all
+              end
+              @block_hash = {}
+              key = ''
+              (1..50).each do |max_row|
+                @data = []
+                (0..8).each_with_index do |index, c_i|
+                  rrr = rr + max_row +1
+                  ccc = cc + c_i
+                  value = sheet_data.cell(rrr,ccc)
+                  if value.present?
+                    if (c_i == 0)
+                      key = value
+                      @block_hash[key] = {}
+                    else
+                      @block_hash[key][15*(c_i/2)] = value unless @block_hash[key].nil?
+                    end
+                    @data << value
+                  end
+                end
+                if @data.compact.reject { |c| c.blank? }.length == 0
+                  break # terminate the loop
+                end
+              end
+              @program.update(base_rate: @block_hash)
+            end
+          end
+        end
+        # Non Conforming Adjustments
+        (1154..1189).each do |r|
+          row = sheet_data.row(r)
+          @jumbo_data = sheet_data.row(1157)
+          if row.compact.count >= 1
+            (2..43).each do |cc|
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "Non-Conforming Jumbo CORE Loan Level Price Adjustments"
+                  @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"] = {}
+                  @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true] = {}
+                  @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"] = {}
+                  @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1,000,000"] = {}
+                  @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1,000,000-Inf"] = {}
+                end
+                if value == "Other Specific Adjustments"
+                  @jumbo_hash["PropertyType/LTV"] = {}
+                end
+                # Non-Conforming Jumbo CORE Loan Level Price Adjustments
+                if r >= 1158 && r <= 1164 && cc == 8
+                  primary_key = get_value value
+                  @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1,000,000"][primary_key] = {}
+                end
+                if r >= 1158 && r <= 1164 && cc >= 15 && cc <= 39
+                  ltv_key = get_value @jumbo_data[cc-2]
+                  @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1,000,000"][primary_key][ltv_key] = {}
+                  @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1,000,000"][primary_key][ltv_key] = value
+                end
+                if r >= 1167 && r <= 1173 && cc == 8
+                  primary_key = get_value value
+                  @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1,000,000-Inf"][primary_key] = {}
+                end
+                if r >= 1167 && r <= 1173 && cc >= 15 && cc <= 39
+                  ltv_key = get_value @jumbo_data[cc-2]
+                  @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1,000,000-Inf"][primary_key][ltv_key] = {}
+                  @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1,000,000-Inf"][primary_key][ltv_key] = value
+                end
+                # Other Specific Adjustments
+                if r == 1176 && cc == 8
+                  @jumbo_hash["PropertyType/LTV"]["Condo"] = {}
+                end
+                if r == 1176 && cc >= 15 && cc <= 39
+                  ltv_key = get_value @jumbo_data[cc-2]
+                  @jumbo_hash["PropertyType/LTV"]["Condo"][ltv_key] = {}
+                  @jumbo_hash["PropertyType/LTV"]["Condo"][ltv_key] = value
+                end
+                if r == 1177 && cc == 8
+                  @jumbo_hash["PropertyType/LTV"]["2nd Home"] = {}
+                end
+                if r == 1177 && cc >= 15 && cc <= 39
+                  ltv_key = get_value @jumbo_data[cc-2]
+                  @jumbo_hash["PropertyType/LTV"]["2nd Home"][ltv_key] = {}
+                  @jumbo_hash["PropertyType/LTV"]["2nd Home"][ltv_key] = value
+                end
+                if r == 1178 && cc == 8
+                  @jumbo_hash["PropertyType/LTV"]["Investment Property"] = {}
+                end
+                if r == 1178 && cc >= 15 && cc <= 39
+                  ltv_key = get_value @jumbo_data[cc-2]
+                  @jumbo_hash["PropertyType/LTV"]["Investment Property"][ltv_key] = {}
+                  @jumbo_hash["PropertyType/LTV"]["Investment Property"][ltv_key] = value
+                end
+                if r == 1179 && cc == 8
+                  @jumbo_hash["PropertyType/LTV"]["Cash Out"] = {}
+                end
+                if r == 1179 && cc >= 15 && cc <= 39
+                  ltv_key = get_value @jumbo_data[cc-2]
+                  @jumbo_hash["PropertyType/LTV"]["Cash Out"][ltv_key] = {}
+                  @jumbo_hash["PropertyType/LTV"]["Cash Out"][ltv_key] = value
+                end
+                if r == 1180 && cc == 8
+                  @jumbo_hash["PropertyType/LTV"]["2 Unit"] = {}
+                end
+                if r == 1180 && cc >= 15 && cc <= 39
+                  ltv_key = get_value @jumbo_data[cc-2]
+                  @jumbo_hash["PropertyType/LTV"]["2 Unit"][ltv_key] = {}
+                  @jumbo_hash["PropertyType/LTV"]["2 Unit"][ltv_key] = value
+                end
+                if r == 1181 && cc == 8
+                  @jumbo_hash["PropertyType/LTV"]["3-4 Unit"] = {}
+                end
+                if r == 1181 && cc >= 15 && cc <= 39
+                  ltv_key = get_value @jumbo_data[cc-2]
+                  @jumbo_hash["PropertyType/LTV"]["3-4 Unit"][ltv_key] = {}
+                  @jumbo_hash["PropertyType/LTV"]["3-4 Unit"][ltv_key] = value
+                end
+                if r == 1182 && cc == 8
+                  @jumbo_hash["MiscAdjuster/State"] = {}
+                  @jumbo_hash["MiscAdjuster/State"]["Escrow Waiver"] = {}
+                  @jumbo_hash["MiscAdjuster/State"]["Escrow Waiver"]["CA"] = {}
+                end
+                if r == 1182 && cc >= 15 && cc <= 39
+                  ltv_key = get_value @jumbo_data[cc-2]
+                  @jumbo_hash["MiscAdjuster/State"]["Escrow Waiver"]["CA"][ltv_key] = {}
+                  @jumbo_hash["MiscAdjuster/State"]["Escrow Waiver"]["CA"][ltv_key] = value
+                end
+              end
+            end
+          end
+        end
+        adjustment = [@jumbo_hash]
+        make_adjust(adjustment,sheet)
         # Jumbo Non Conforming programs
         (1220..1260).each do |r|
           row = sheet_data.row(r)
+          @sheet_name = "Non-Conforming Jumbo X"
+          @bank = @sheet_obj.bank
+          @sheet_obj = @bank.sheets.find_or_create_by(name: @sheet_name)
           if ((row.compact.count >= 1) && (row.compact.count <= 4))
             rr = r + 1 
             max_column_section = row.compact.count - 1
             (0..max_column_section).each_with_index do |max_column, index|
               index = index +1
               cc = 1 + max_column*10 + index# (2 / 13 / 24 / 35)
-              begin
-                @title = sheet_data.cell(r,cc)
-                if @title.present?
-                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @programs_ids << @program.id
-                  # Program Property
-                  program_property @title
-                  @program.adjustments.destroy_all
-                  @block_hash = {}
-                  key = ''
-                  (1..50).each do |max_row|
-                    @data = []
-                    (0..8).each_with_index do |index, c_i|
-                      rrr = rr + max_row +1
-                      ccc = cc + c_i
-                      value = sheet_data.cell(rrr,ccc)
-                      if value.present?
-                        if (c_i == 0)
-                          key = value
-                          @block_hash[key] = {}
-                        else
-                          if @program.lock_period.length <= 3
-                            @program.lock_period << 15*(c_i/2)
-                            @program.save
-                          end
-                          @block_hash[key][15*(c_i/2)] = value unless @block_hash[key].nil?
+              @title = sheet_data.cell(r,cc)
+              if @title.present?
+                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                @programs_ids << @program.id
+                # Program Property
+                program_property @title
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+                (1..50).each do |max_row|
+                  @data = []
+                  (0..8).each_with_index do |index, c_i|
+                    rrr = rr + max_row +1
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        if @program.lock_period.length <= 3
+                          @program.lock_period << 15*(c_i/2)
+                          @program.save
                         end
-                        @data << value
+                        @block_hash[key][15*(c_i/2)] = value unless @block_hash[key].nil?
                       end
-                    end
-                    if @data.compact.reject { |c| c.blank? }.length == 0
-                      break # terminate the loop
+                      @data << value
                     end
                   end
-                  @program.update(base_rate: @block_hash)
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
+                  end
+                end
+                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
+              end
+            end
+          end
+        end
+        # Jumbo Non Conforming Adjustments
+        (1271..1294).each do |r|
+          row = sheet_data.row(r)
+          @non_jumbo = sheet_data.row(1274)
+          if row.compact.count >= 1
+            (2..43).each do |cc|
+              value = sheet_data.cell(r,cc)
+              if value.present?
+                if value == "Non-Conforming Jumbo X Loan Level Price Adjustments"
+                  @non_jumbo_hash["Jumbo/LoanSize/FICO/LTV"] = {}
+                  @non_jumbo_hash["Jumbo/LoanSize/FICO/LTV"][true] = {}
+                  @non_jumbo_hash["Jumbo/LoanSize/FICO/LTV"][true]["Non-Conforming"] = {}
+                end
+                # Non-Conforming Jumbo X Loan Level Price Adjustments
+                if r >= 1275 && r <= 1281 && cc == 8
+                  primary_key = get_value value
+                  @non_jumbo_hash["Jumbo/LoanSize/FICO/LTV"][true]["Non-Conforming"][primary_key] = {}
+                end
+                if r >= 1275 && r <= 1281 && cc >= 13 && cc <= 41
+                  ltv_key = get_value @non_jumbo[cc-2]
+                  @non_jumbo_hash["Jumbo/LoanSize/FICO/LTV"][true]["Non-Conforming"][primary_key][ltv_key] = {}
+                  @non_jumbo_hash["Jumbo/LoanSize/FICO/LTV"][true]["Non-Conforming"][primary_key][ltv_key] = value
+                end
+                if r == 1284 && cc == 6
+                  @non_jumbo_hash["RefinanceOption/LTV"] = {}
+                  @non_jumbo_hash["RefinanceOption/LTV"]["Cash Out"] = {}
+                end
+                if r == 1284 && cc >= 13 && cc <= 41
+                  ltv_key = get_value @non_jumbo[cc-2]
+                  @non_jumbo_hash["RefinanceOption/LTV"]["Cash Out"][ltv_key] = {}
+                  @non_jumbo_hash["RefinanceOption/LTV"]["Cash Out"][ltv_key] = value
+                end
+                if r == 1285 && cc == 6
+                  @non_jumbo_hash["LoanPurpose/LTV"] = {}
+                  @non_jumbo_hash["LoanPurpose/LTV"]["Purchase"] = {}
+                end
+                if r == 1285 && cc >= 13 && cc <= 41
+                  ltv_key = get_value @non_jumbo[cc-2]
+                  @non_jumbo_hash["LoanPurpose/LTV"]["Purchase"][ltv_key] = {}
+                  @non_jumbo_hash["LoanPurpose/LTV"]["Purchase"][ltv_key] = value
+                end
+                if r == 1287 && cc == 6
+                  @non_jumbo_hash["PropertyType/LTV"] = {}
+                  @non_jumbo_hash["PropertyType/LTV"]["Non-Owner Occupied"] = {}
+                end
+                if r == 1287 && cc >= 13 && cc <= 41
+                  ltv_key = get_value @non_jumbo[cc-2]
+                  @non_jumbo_hash["PropertyType/LTV"]["Non-Owner Occupied"][ltv_key] = {}
+                  @non_jumbo_hash["PropertyType/LTV"]["Non-Owner Occupied"][ltv_key] = value
                 end
               rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
@@ -748,6 +1086,9 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
             end
           end
         end
+        adjustment = [@non_jumbo_hash]
+        make_adjust(adjustment,sheet)
+
       end
     end
     redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
@@ -761,20 +1102,18 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
   end
 
   def get_value value1
-    if value1.present?
-      if value1.include?("FICO <")
-        value1 = "0"+value1.split("FICO").last
-      elsif value1.include?("<") || value1.include?("≤")
-        value1 = "0"+value1.first(5)
-      elsif value1.include?("FICO")
-        value1 = value1.split("FICO ").last.first(5)
-      elsif value1 == "Investment Property"
-        value1 = "Property/Type"
-      else
-        value1
+      if value1.present?
+        if value1.include?("<=") || value1.include?("<") || value1.include?("≤")
+          value1 = "0-"+value1.split("<=").last.tr('A-Za-z%$><=≤ ','')
+        elsif value1.include?(">") || value1.include?("+")
+          value1 = value1.split(">").last.tr('A-Za-z+ ','')+"-Inf"
+        elsif value1.include?("≥")
+          value1 = value1.split("≥").last.tr('A-Za-z ','')+"-Inf"
+        else
+          value1 = value1.tr(' ','')
+        end
       end
     end
-  end
 
   private
     def get_sheet
@@ -851,12 +1190,18 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         @program.loan_limit_type << "High Balance"
       end
       @program.save
-      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, jumbo_high_balance: jumbo_high_balance)
+      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, jumbo_high_balance: jumbo_high_balance, sheet_name: @sheet_name)
     end
 
     def make_adjust(block_hash, sheet)
       block_hash.each do |hash|
-        Adjustment.create(data: hash,sheet_name: sheet)
+        if hash.present?
+          hash.each do |key|
+            data = {}
+            data[key[0]] = key[1]
+            Adjustment.create(data: data,sheet_name: sheet)
+          end
+        end
       end
     end
 end

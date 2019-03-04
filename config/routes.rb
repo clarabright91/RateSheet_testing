@@ -198,6 +198,14 @@ Rails.application.routes.draw do
       get :single_program
     end
   end
+  
+  resources :ob_m_t_bank_wholesale9996, only: [:index] do
+    member do
+      get :programs
+      get :single_program
+      get :rates
+    end
+  end
 
   resources :ob_direct_mortgage_corp_wholesale8443, only: [:index] do
     member do
