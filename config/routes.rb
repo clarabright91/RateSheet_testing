@@ -199,6 +199,14 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :ob_direct_mortgage_corp_wholesale8443, only: [:index] do
+    member do
+      get :programs
+      get '/ratesheet-singlepageexcel' => 'ob_direct_mortgage_corp_wholesale8443#rate_sheet_single_page_excel'
+      get :single_program
+    end
+  end
+
   match "dashboard/index", to: 'dashboard#index', via: [:get, :post]
   get 'dashboard/fetch_programs_by_bank', to: 'dashboard#fetch_programs_by_bank'
   # mount Sidekiq::Web => '/sidekiq'

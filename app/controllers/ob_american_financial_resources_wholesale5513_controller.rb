@@ -1,7 +1,7 @@
 class ObAmericanFinancialResourcesWholesale5513Controller < ApplicationController
   before_action :get_sheet, only: [:programs, :gnma, :gnma_hb, :fnma, :fhlmc, :hp, :jumbo]
   before_action :read_sheet, only: [:index, :gnma, :gnma_hb, :fnma, :fhlmc, :hp, :jumbo]
-  before_action :get_program, only: [:single_program, :program_property]
+  before_action :get_program, only: [:single_program]
 
   def index
     file = File.join(Rails.root, 'OB_American_Financial_Resources_Wholesale5513.xls')
