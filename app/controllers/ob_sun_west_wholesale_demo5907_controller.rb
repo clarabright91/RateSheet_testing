@@ -143,7 +143,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -247,7 +247,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 @home_adjustment[primary_key][value] = c_val
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -307,7 +307,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -367,7 +367,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
               end
               # ADJUSTMENT CAPS end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -427,7 +427,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -489,7 +489,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 ltv_adjustment range1_b, range2_b, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row, primary_key
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -549,7 +549,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -591,7 +591,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 ltv_adjustment range1_c, range2_c, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row, primary_key
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -651,7 +651,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -696,7 +696,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 @gov_adustment[primary_key][ltv_key][c_val] = value
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -744,7 +744,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                   @program.update(base_rate: @block_hash)
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -807,7 +807,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 @spec_adjustment4[primary_key][ltv_key][c_val] = value
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -853,7 +853,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                   @program.update(base_rate: @block_hash)
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -916,7 +916,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 @spec_adjustment6[primary_key][ltv_key][c_val] = value
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -962,7 +962,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                   @program.update(base_rate: @block_hash)
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1028,7 +1028,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 @day_adjustment[primary_key][value] = c_val
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -1074,7 +1074,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                   @program.update(base_rate: @block_hash)
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1125,7 +1125,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 ltv_adjustment range1_g, range2_g, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -1171,7 +1171,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                   @program.update(base_rate: @block_hash)
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1244,7 +1244,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 ltv_adjustment range1_h, range2_h, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -1290,7 +1290,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                   @program.update(base_rate: @block_hash)
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1349,7 +1349,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 ltv_adjustment range1_i, range2_i, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -1395,7 +1395,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                   @program.update(base_rate: @block_hash)
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1445,7 +1445,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 ltv_adjustment range1_j, range2_j, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
               error_log.save
             end
             # PREPAYMENT PENALTY #adjustment remaining
@@ -1492,7 +1492,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                   @program.update(base_rate: @block_hash)
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1541,7 +1541,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
               #   ltv_adjustment range1_k, range2_k, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
               # end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -1697,7 +1697,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
               error_log.save
             end
           end

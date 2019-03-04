@@ -244,7 +244,7 @@ class ObAmericanFinancialResourcesWholesale5513Controller < ApplicationControlle
               @program.update(base_rate: @block_hash)
             end
           rescue Exception => e
-            error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet)
+            error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
             error_log.save
           end
         end

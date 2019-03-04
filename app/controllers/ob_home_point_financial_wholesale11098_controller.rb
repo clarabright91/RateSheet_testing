@@ -40,36 +40,40 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
               elsif r >= 55 && 11 <= 76
                 cc = 5
               end
-              @title = sheet_data.cell(r,cc)
-
-              if @title.present? && @title != "Margin 2.25%; Caps 2/2/5, index Libor"
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..6).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present? && @title != "Margin 2.25%; Caps 2/2/5, index Libor"
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..6).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -97,35 +101,40 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
             max_column_section = row.compact.count
             (0..max_column_section).each do |max_column|
               cc = 6*max_column + 2 # 2 /8
-              @title = sheet_data.cell(r,cc)
-              if @title.present? && @title != "Margin 2.25%; Caps 2/2/5, index Libor"
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..8).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present? && @title != "Margin 2.25%; Caps 2/2/5, index Libor"
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..8).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -152,35 +161,40 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
             max_column_section = row.compact.count
             (0..max_column_section).each do |max_column|
               cc = 7*max_column + 1 # 1 / 8 / 15
-              @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..7).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..7).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -208,35 +222,40 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
             max_column_section = row.compact.count
             (0..max_column_section).each do |max_column|
               cc = 12*max_column + 1 # 1 /13
-              @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..8).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..8).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -264,35 +283,40 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
             max_column_section = row.compact.count
             (0..max_column_section).each do |max_column|
               cc = 7*max_column + 2 #2/9/16
-              @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..6).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..6).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -320,35 +344,40 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
             max_column_section = row.compact.count
             (0..max_column_section).each do |max_column|
               cc = 8*max_column + 2 #2/10/18
-              @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..6).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..6).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -376,35 +405,40 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
             max_column_section = row.compact.count
             (0..max_column_section).each do |max_column|
               cc = 5
-              @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..8).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..8).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -431,35 +465,40 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
             max_column_section = row.compact.count
             (0..max_column_section).each do |max_column|
               cc = 7*max_column + 2 #2/9/16
-              @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..6).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..6).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -486,35 +525,40 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
             max_column_section = row.compact.count
             (0..max_column_section).each do |max_column|
               cc = 7*max_column + 2 #2/9/16
-              @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..6).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..6).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -545,36 +589,40 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
               elsif r >= 80
                 cc = 8*max_column + 3 # 3 / 11 / 19
               end
-              @title = sheet_data.cell(r,cc)
-
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..6).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..6).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -601,35 +649,40 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
             max_column_section = row.compact.count
             (0..max_column_section).each do |max_column|
               cc = 7*max_column + 1 #1/8/15
-              @title = sheet_data.cell(r,cc)
-              if @title.present? && @title != "Margin 2.25%; Caps 2/2/5" && @title != "Margin 2.25%; Caps 5/2/5"
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..6).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present? && @title != "Margin 2.25%; Caps 2/2/5" && @title != "Margin 2.25%; Caps 5/2/5"
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..6).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -660,36 +713,40 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
               elsif r >= 33
                 cc = 7*max_column + 1 # 1 / 7 / 14
               end
-              @title = sheet_data.cell(r,cc)
-
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..6).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..6).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -720,36 +777,40 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
               elsif r >= 33
                 cc = 7*max_column + 1 # 1 / 8 / 15
               end
-              @title = sheet_data.cell(r,cc)
-
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..6).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..6).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -776,35 +837,40 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
             max_column_section = row.compact.count
             (0..max_column_section).each do |max_column|
               cc = 6*max_column + 2 # 2 /8
-              @title = sheet_data.cell(r,cc)
-              if @title.present? && @title != "Margin 2.25%; Caps 2/2/5, index Libor"
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..8).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present? && @title != "Margin 2.25%; Caps 2/2/5, index Libor"
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..8).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -831,35 +897,40 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
             max_column_section = row.compact.count
             (0..max_column_section).each do |max_column|
               cc = 7*max_column + 1 # 1 / 8 / 15
-              @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..7).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..7).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -887,35 +958,40 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
             max_column_section = row.compact.count
             (0..max_column_section).each do |max_column|
               cc = 12*max_column + 1 # 1 /13
-              @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..8).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..8).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -1055,35 +1131,40 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
             max_column_section = row.compact.count
             (0..max_column_section).each do |max_column|
               cc = 5
-              @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..8).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..8).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -1110,35 +1191,40 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
             max_column_section = row.compact.count
             (0..max_column_section).each do |max_column|
               cc = 7*max_column + 2 #2/9/16
-              @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..6).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..6).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -1165,35 +1251,40 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
             max_column_section = row.compact.count
             (0..max_column_section).each do |max_column|
               cc = 7*max_column + 2 #2/9/16
-              @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..6).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..6).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -1225,35 +1316,39 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 cc = 8*max_column + 3 # 3 / 11 / 19
               end
               @title = sheet_data.cell(r,cc)
-
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..6).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+              begin
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..6).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -1280,35 +1375,40 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
             max_column_section = row.compact.count
             (0..max_column_section).each do |max_column|
               cc = 7*max_column + 1 #1/8/15
-              @title = sheet_data.cell(r,cc)
-              if @title.present? && @title != "Margin 2.25%; Caps 2/2/5" && @title != "Margin 2.25%; Caps 5/2/5"
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..6).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present? && @title != "Margin 2.25%; Caps 2/2/5" && @title != "Margin 2.25%; Caps 5/2/5"
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..6).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -1339,36 +1439,41 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
               elsif r >= 33
                 cc = 7*max_column + 1 # 1 / 7 / 14
               end
-              @title = sheet_data.cell(r,cc)
+              begin
+                @title = sheet_data.cell(r,cc)
 
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..6).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..6).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -1399,36 +1504,41 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
               elsif r >= 33
                 cc = 7*max_column + 1 # 1 / 8 / 15
               end
-              @title = sheet_data.cell(r,cc)
+              begin
+                @title = sheet_data.cell(r,cc)
 
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program
-                @programs_ids << @program.id
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..20).each do |max_row|
-                  @data = []
-                  (0..6).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (1..20).each do |max_row|
+                    @data = []
+                    (0..6).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end

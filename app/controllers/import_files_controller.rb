@@ -189,7 +189,7 @@ class ImportFilesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -233,7 +233,7 @@ class ImportFilesController < ApplicationController
                       @right_adj[right_adj_key] = right_adj_value
                     end
                   rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet)
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
                     error_log.save
                   end
                 end
@@ -270,7 +270,7 @@ class ImportFilesController < ApplicationController
                       @loan_size[main_key]["Refinance"][key] = value1
                     end
                   rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet)
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                     error_log.save
                   end
                 end
@@ -308,7 +308,7 @@ class ImportFilesController < ApplicationController
                       @loan_size_va_bpc[main_key]["Refinance"][key] = value1
                     end
                   rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet)
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
                     error_log.save
                   end
                 end
@@ -449,7 +449,7 @@ class ImportFilesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -749,7 +749,7 @@ class ImportFilesController < ApplicationController
                         end
                       end
                     rescue Exception => e
-                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc)
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc,sheet_name: sheet, error_detail: e.message)
                       error_log.save
                     end
                   end
@@ -764,7 +764,7 @@ class ImportFilesController < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -916,7 +916,7 @@ class ImportFilesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1187,7 +1187,7 @@ class ImportFilesController < ApplicationController
                         end
                       end
                     rescue Exception => e
-                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: @sheet, sheet_id: @sheet_obj)
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: @sheet, error_detail: e.message)
                       error_log.save
                     end
                   end
@@ -1204,7 +1204,7 @@ class ImportFilesController < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -1462,7 +1462,7 @@ class ImportFilesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1726,7 +1726,7 @@ class ImportFilesController < ApplicationController
                       @block_hash["LockDay"]["60"] = value
                     end
                   rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet)
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
                     error_log.save
                   end
                 end
@@ -1897,7 +1897,7 @@ class ImportFilesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1980,7 +1980,7 @@ class ImportFilesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -2032,7 +2032,7 @@ class ImportFilesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet, sheet_id: @sheet_obj)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -2183,7 +2183,7 @@ class ImportFilesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -2275,7 +2275,7 @@ class ImportFilesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -2329,7 +2329,7 @@ class ImportFilesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -2425,7 +2425,7 @@ class ImportFilesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -2586,7 +2586,7 @@ class ImportFilesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet, sheet_id: @sheet_obj)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -2741,7 +2741,7 @@ class ImportFilesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -2838,7 +2838,7 @@ class ImportFilesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -2892,7 +2892,7 @@ class ImportFilesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -3024,7 +3024,7 @@ class ImportFilesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -3173,7 +3173,7 @@ class ImportFilesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -3330,7 +3330,7 @@ class ImportFilesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -3408,7 +3408,7 @@ class ImportFilesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -3453,7 +3453,7 @@ class ImportFilesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -3606,7 +3606,7 @@ class ImportFilesController < ApplicationController
                   @program.update(base_rate: @block_hash)
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -3672,7 +3672,7 @@ class ImportFilesController < ApplicationController
                         end
                       end
                     rescue Exception => e
-                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet)
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
                       error_log.save
                     end
                   end
@@ -3720,7 +3720,7 @@ class ImportFilesController < ApplicationController
                         end
                       end
                     rescue Exception => e
-                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet)
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
                       error_log.save
                     end
                   end
@@ -3763,7 +3763,7 @@ class ImportFilesController < ApplicationController
                     make_adjust(second_home, @program_ids)
                   end
                   rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet)
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                     error_log.save
                   end
                 end
@@ -3801,7 +3801,7 @@ class ImportFilesController < ApplicationController
                     end
                     make_adjust(@data_hash, @program_ids)
                   rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet)
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                     error_log.save
                   end
                 end
@@ -3939,7 +3939,7 @@ class ImportFilesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -3992,7 +3992,7 @@ class ImportFilesController < ApplicationController
                         end
                       end
                     rescue Exception => e
-                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet)
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
                       error_log.save
                     end
                   end
@@ -4032,7 +4032,7 @@ class ImportFilesController < ApplicationController
                         end
                       end
                     rescue Exception => e
-                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                       error_log.save
                     end
                   end
@@ -4052,7 +4052,7 @@ class ImportFilesController < ApplicationController
                   @max_ysp_hash[main_key] = row.compact[5]
                   make_adjust(@max_ysp_hash, @program_ids)
                 rescue Exception => e
-                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet)
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                   error_log.save
                 end
               end
@@ -4085,7 +4085,7 @@ class ImportFilesController < ApplicationController
                       @loan_size[main_key][key] = value
                     end
                   rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet)
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
                     error_log.save
                   end
                 end
@@ -4127,7 +4127,7 @@ class ImportFilesController < ApplicationController
                       @cando_hash[main_key][key1][key2] = value
                     end
                   rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet)
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
                     error_log.save
                   end
                 end
@@ -4155,7 +4155,7 @@ class ImportFilesController < ApplicationController
                   end
                   make_adjust(@unit_hash, @program_ids)
                 rescue Exception => e
-                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet)
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
                   error_log.save
                 end
               end
@@ -4184,7 +4184,7 @@ class ImportFilesController < ApplicationController
                   end
                   make_adjust(@data_hash, @program_ids)
                 rescue Exception => e
-                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet)
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
                   error_log.save
                 end
               end
@@ -4212,7 +4212,7 @@ class ImportFilesController < ApplicationController
                       @ltv_hash[main_key][key1][key2] = value
                     end
                   rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet)
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
                     error_log.save
                   end
                 end
@@ -4241,7 +4241,7 @@ class ImportFilesController < ApplicationController
                   end
                   make_adjust(@misc_adjuster, @program_ids)
                 rescue Exception => e
-                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet)
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
                   error_log.save
                 end
               end
@@ -4278,7 +4278,7 @@ class ImportFilesController < ApplicationController
                   end
                   make_adjust(@subordinate_hash, @program_ids)
                 rescue Exception => e
-                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                   error_log.save
                 end
               end
@@ -4411,7 +4411,7 @@ class ImportFilesController < ApplicationController
                   @program.update(base_rate: @block_hash)
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -4620,7 +4620,7 @@ class ImportFilesController < ApplicationController
                 @adjustment_hash["LoanType/Term"]["ARM"]["5"] = value if column == 17
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: column, sheet_name: sheet)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: column, sheet_name: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -4764,7 +4764,7 @@ class ImportFilesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -4841,7 +4841,7 @@ class ImportFilesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -4895,7 +4895,7 @@ class ImportFilesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -5029,7 +5029,7 @@ class ImportFilesController < ApplicationController
                   @program.update(base_rate: @block_hash)
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -5167,7 +5167,7 @@ class ImportFilesController < ApplicationController
                   end
                 end
               rescue
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -5301,7 +5301,7 @@ class ImportFilesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -5467,7 +5467,7 @@ class ImportFilesController < ApplicationController
                   end
                 end
               rescue
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -5606,7 +5606,7 @@ class ImportFilesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -5697,7 +5697,7 @@ class ImportFilesController < ApplicationController
                   end
                 end
               rescue
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -5838,7 +5838,7 @@ class ImportFilesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -6111,7 +6111,7 @@ class ImportFilesController < ApplicationController
                       end
                     end
                   rescue
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet, sheet_id: @sheet_obj)
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet, error_detail: e.message)
                     error_log.save
                   end
                 end
@@ -6273,7 +6273,7 @@ class ImportFilesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -6553,7 +6553,7 @@ class ImportFilesController < ApplicationController
                 end
               end
             rescue
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet, sheet_id: @sheet_obj)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -6697,7 +6697,7 @@ class ImportFilesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -6983,7 +6983,7 @@ class ImportFilesController < ApplicationController
                 end
               end
             rescue
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -7111,7 +7111,7 @@ class ImportFilesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -7381,7 +7381,7 @@ class ImportFilesController < ApplicationController
                         @block_hash["LockDay"]["60"] = value
                       end
                     rescue
-                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet, sheet_id: @sheet_obj)
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet, error_detail: e.message)
                       error_log.save
                     end
                   end
@@ -7397,7 +7397,7 @@ class ImportFilesController < ApplicationController
                 end
               end
             rescue
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
               error_log.save
             end
           end

@@ -1,0 +1,30 @@
+<div class="container">
+  <div class="row ">
+    <table class="table ">
+      <thead>
+      <h2>Error Description</h2>
+      <tr>
+        <th>Controller Line</th>
+        <th>Sheet Name</th>
+        <th>Sheet Row</th>
+        <th class="text-center">Sheet Column</th>
+        <th class="text-center">Description</th>
+      </tr>
+      </thead>
+      <% @error_logs.each do |log| %>
+        <tr>
+          <td><%= log.details.split(":")[1] %></td>
+          <td><%= log.sheet_name %></td>
+          <td><%= log.row %></td>
+          <td><%= log.column %></td>
+          <td>Sheet Errors</td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
+<style type="text/css">
+  .table thead th{
+    text-align: left !important;
+  }
+</style>

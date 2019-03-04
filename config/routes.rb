@@ -1,8 +1,10 @@
 require 'sidekiq/web'
 Rails.application.routes.draw do
+  # get 'error_logs/index'
   # get 'ob_american_financial_resources_wholesale5513/index'
   root :to => "dashboard#index"
   # root :to => "import_files#index"
+  get 'error_logs/*name', to: 'error_logs#display_logs', as: :display_logs
   resources :import_files, :only => [:index] do
     member do
       get :programs

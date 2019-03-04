@@ -78,6 +78,9 @@ class ObNewfiWholesale7019Controller < ApplicationController
                         @block_hash[key][15*c_i] = value
                       end
                       @data << value
+                    rescue Exception => e
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                      error_log.save
                     end
                   end
                   if @data.compact.reject { |c| c.blank? }.length == 0
@@ -226,6 +229,9 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @highAdjustment2["LoanPurpose/CLTV"]["Purchase"][cltv_key] = {}
                 @highAdjustment2["LoanPurpose/CLTV"]["Purchase"][cltv_key] = value
               end
+            rescue Exception => e
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log.save
             end
           end
         end
@@ -254,11 +260,27 @@ class ObNewfiWholesale7019Controller < ApplicationController
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
               cc = 5*max_column + (3+max_column) # 3 / 9 / 15
+
               @title = sheet_data.cell(r,cc)
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_property @program, sheet
                 @programs_ids << @program.id
+
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program, sheet
+                  @programs_ids << @program.id
+                end
+
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
 
               @program.adjustments.destroy_all
@@ -288,6 +310,9 @@ class ObNewfiWholesale7019Controller < ApplicationController
                       @block_hash[key][15*c_i] = value
                     end
                     @data << value
+                  rescue Exception => e
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                    error_log.save
                   end
                 end
                 if @data.compact.reject { |c| c.blank? }.length == 0
@@ -332,6 +357,20 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_property @program, sheet
                 @programs_ids << @program.id
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program, sheet
+                  @programs_ids << @program.id
+                end
+
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
 
               @program.adjustments.destroy_all
@@ -361,6 +400,9 @@ class ObNewfiWholesale7019Controller < ApplicationController
                       @block_hash[key][15*c_i] = value
                     end
                     @data << value
+                  rescue Exception => e
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                    error_log.save
                   end
                 end
                 if @data.compact.reject { |c| c.blank? }.length == 0
@@ -421,6 +463,20 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_property @program, sheet
                 @programs_ids << @program.id
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program, sheet
+                  @programs_ids << @program.id
+                end
+
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
 
               @program.adjustments.destroy_all
@@ -445,6 +501,9 @@ class ObNewfiWholesale7019Controller < ApplicationController
                       @block_hash[key][15*c_i] = value
                     end
                     @data << value
+                  rescue Exception => e
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                    error_log.save
                   end
                 end
                 if @data.compact.reject { |c| c.blank? }.length == 0
@@ -510,7 +569,9 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @other_adjustment1["LoanAmount/LTV"][primary_key][secondary_key] = {}
                   @other_adjustment1["LoanAmount/LTV"][primary_key][secondary_key] = value
                 end
-
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end         
@@ -567,7 +628,11 @@ class ObNewfiWholesale7019Controller < ApplicationController
                       else
                         @block_hash[key][15*c_i] = value
                       end
+
                       @data << value
+                    rescue Exception => e
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                      error_log.save
                     end
                   end
                   if @data.compact.reject { |c| c.blank? }.length == 0
@@ -645,6 +710,9 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   new_value = sheet_data.cell(r,cc)
                   @other_adjustment1["LoanAmount"]["0-"+primary_key] = new_value
                 end
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -678,6 +746,20 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_property @program, sheet
                 @programs_ids << @program.id
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program, sheet
+                  @programs_ids << @program.id
+                end
+
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
 
               @program.adjustments.destroy_all
@@ -708,6 +790,9 @@ class ObNewfiWholesale7019Controller < ApplicationController
                       @block_hash[key][15*c_i] = value
                     end
                     @data << value
+                  rescue Exception => e
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                    error_log.save
                   end
                 end
                 if @data.compact.reject { |c| c.blank? }.length == 0
@@ -783,6 +868,9 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @block_hash.shift
                 end
                 @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
             end
           end
@@ -889,6 +977,9 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @high_adjustment["LoanType/RefinanceOption"]["Fixed"][ltv_key] = new_val
                 @high_adjustment["LoanType/RefinanceOption"]["ARM"][ltv_key] = new_val
               end
+            rescue Exception => e
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log.save
             end
           end
         end
@@ -929,6 +1020,20 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_property @program, sheet
                 @programs_ids << @program.id
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program, sheet
+                  @programs_ids << @program.id
+                end
+
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
 
               @program.adjustments.destroy_all
@@ -959,6 +1064,9 @@ class ObNewfiWholesale7019Controller < ApplicationController
                       @block_hash[key][15*c_i] = value
                     end
                     @data << value
+                  rescue Exception => e
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                    error_log.save
                   end
                 end
                 if @data.compact.reject { |c| c.blank? }.length == 0
@@ -1052,6 +1160,82 @@ class ObNewfiWholesale7019Controller < ApplicationController
               cc = cc + 4
               new_value = sheet_data.cell(r,cc)
               @other_adjustment["LoanAmount"]["0-150,000"] = new_value
+            begin
+              if value == "LTV / FICO (Terms > 15 years only)"
+                first_row = 105
+                end_row = 108
+                last_column = 13
+                first_column = 5
+                ltv_row = 104
+                num = 3
+                ltv_adjustment range1, range2, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row,num
+              end
+              # Loans With Secondary Financing
+              if value == "Loans With Secondary Financing"
+                primary_key = "LTV/CLTV/FICO"
+                @secondary_hash[primary_key] = {}
+              end
+              if r >= 118 && r <= 122 && cc == 4
+                ltv_key = get_value value
+                @secondary_hash[primary_key][ltv_key] = {}
+              end
+              if r >= 118 && r <= 122 && cc == 5
+                cltv_key = get_value value
+                @secondary_hash[primary_key][ltv_key][cltv_key] = {}
+              end
+              if r >= 118 && r <= 122 && cc > 5 && cc <= 7
+                ltv_data = get_value @ltv_data[cc-3]
+                ltv_data = ltv_data.tr(')( ','')
+                @secondary_hash[primary_key][ltv_key][cltv_key][ltv_data] = {}
+                @secondary_hash[primary_key][ltv_key][cltv_key][ltv_data] = value
+              end
+              # Other Adjustments
+              if r == 108 && cc == 15
+                @other_adjustment["PropertyType"] = {}
+                @other_adjustment["PropertyType"]["2-4 Unit"] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment["PropertyType"]["2-4 Unit"] = new_value
+              end
+              if r == 109 && cc == 15
+                @other_adjustment["PropertyType/Term/LTV"] = {}
+                @other_adjustment["PropertyType/Term/LTV"]["Condo"] = {}
+                @other_adjustment["PropertyType/Term/LTV"]["Condo"]["15-Inf"] = {}
+                @other_adjustment["PropertyType/Term/LTV"]["Condo"]["15-Inf"]["75-Inf"] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment["PropertyType/Term/LTV"]["Condo"]["15-Inf"]["75-Inf"] = new_value
+              end
+              if r == 110 && cc == 15
+                @other_adjustment["LoanSize/RefinanceOption"] = {}
+                @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"] = {}
+                @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Cash Out"] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Cash Out"] = new_value
+              end
+              if r == 111 && cc == 15
+                @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Rate and Term"] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Rate and Term"] = new_value
+              end
+              if r == 130 && cc == 14
+                @other_adjustment["MiscAdjuster"] = {}
+                @other_adjustment["MiscAdjuster"]["Escrow Waiver Fee"] = {}
+                cc = cc + 4
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment["MiscAdjuster"]["Escrow Waiver Fee"] = new_value
+              end
+              if r == 131 && cc == 14
+                @other_adjustment["LoanAmount"] = {}
+                cc = cc + 4
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment["LoanAmount"]["0-150,000"] = new_value
+              end
+            rescue Exception => e
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log.save
             end
           end
         end
@@ -1129,6 +1313,10 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 if @data.compact.reject { |c| c.blank? }.length == 0
                   break # terminate the loop
                 end
+                @program.update(base_rate: @block_hash)
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
               # if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
               #   @block_hash.values.first.shift
@@ -1342,6 +1530,15 @@ class ObNewfiWholesale7019Controller < ApplicationController
               ltv_data = ltv_data.tr('() ','')
               @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = {}
               @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = value
+              if r >= 154 && r <= 158 && cc > 13 && cc <= 15
+                ltv_data = get_value @ltv_data[cc-1]
+                ltv_data = ltv_data.tr('() ','')
+                @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = {}
+                @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = value
+              end
+            rescue Exception => e
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log.save
             end
           end
         end
@@ -1384,6 +1581,20 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_property @program, sheet
                 @programs_ids << @program.id
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program, sheet
+                  @programs_ids << @program.id
+                end
+
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
 
               @program.adjustments.destroy_all
@@ -1403,6 +1614,9 @@ class ObNewfiWholesale7019Controller < ApplicationController
                       @block_hash[key][15*c_i] = value
                     end
                     @data << value
+                  rescue Exception => e
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                    error_log.save
                   end
                 end
                 if @data.compact.reject { |c| c.blank? }.length == 0
@@ -1599,6 +1813,27 @@ class ObNewfiWholesale7019Controller < ApplicationController
               ltv_data = ltv_data.tr('() ','')
               @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = {}
               @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = value
+              # Loans With Secondary Financing
+              if value == "Loans With Secondary Financing"
+                @secondary_hash["LTV/CLTV/FICO"] = {}
+              end
+              if r >= 154 && r <= 158 && cc == 12
+                ltv_key = get_value value
+                @secondary_hash["LTV/CLTV/FICO"][ltv_key] = {}
+              end
+              if r >= 154 && r <= 158 && cc == 13
+                cltv_key = get_value value
+                @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key] = {}
+              end
+              if r >= 154 && r <= 158 && cc > 13 && cc <= 15
+                ltv_data = get_value @ltv_data[cc-1]
+                ltv_data = ltv_data.tr('() ','')
+                @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = {}
+                @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = value
+              end
+            rescue Exception => e
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log.save
             end
           end
         end
@@ -1640,6 +1875,20 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_property @program, sheet
                 @programs_ids << @program.id
+              begin
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program, sheet
+                  @programs_ids << @program.id
+                end
+
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+                lock_hash = {}
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
 
               @program.adjustments.destroy_all
@@ -1665,6 +1914,9 @@ class ObNewfiWholesale7019Controller < ApplicationController
                       @block_hash[key][15*c_i] = value
                     end
                     @data << value
+                  rescue Exception => e
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                    error_log.save
                   end
                 end
                 if @data.compact.reject { |c| c.blank? }.length == 0
@@ -1849,6 +2101,27 @@ class ObNewfiWholesale7019Controller < ApplicationController
               ltv_data = ltv_data.tr('() ','')
               @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = {}
               @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = value
+              # Loans With Secondary Financing
+              if value == "Loan With Secondary Financing"
+                @secondary_hash["LTV/CLTV/FICO"] = {}
+              end
+              if r >= 155 && r <= 159 && cc == 12
+                ltv_key = get_value value
+                @secondary_hash["LTV/CLTV/FICO"][ltv_key] = {}
+              end
+              if r >= 155 && r <= 159 && cc == 13
+                cltv_key = get_value value
+                @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key] = {}
+              end
+              if r >= 155 && r <= 159 && cc > 13 && cc <= 15
+                ltv_data = get_value @ltv_data[cc-1]
+                ltv_data = ltv_data.tr('() ','')
+                @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = {}
+                @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = value
+              end
+            rescue Exception => e
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log.save
             end
           end
         end
@@ -1891,6 +2164,20 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_property @program, sheet
                 @programs_ids << @program.id
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program, sheet
+                  @programs_ids << @program.id
+                end
+
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
 
               @program.adjustments.destroy_all
@@ -1915,6 +2202,9 @@ class ObNewfiWholesale7019Controller < ApplicationController
                       @block_hash[key][15*c_i] = value
                     end
                     @data << value
+                  rescue Exception => e
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                    error_log.save
                   end
                 end
                 if @data.compact.reject { |c| c.blank? }.length == 0
@@ -2049,6 +2339,38 @@ class ObNewfiWholesale7019Controller < ApplicationController
               cc = cc + 1
               new_value = sheet_data.cell(r,cc)
               @other_adjustment["LoanAmount"]["0-150,000"] = new_value
+              if r >= 155 && r <= 158 && cc == 12
+                ltv_key = get_value value
+                @secondary_hash["LTV/CLTV/FICO"][ltv_key] = {}
+              end
+              if r >= 155 && r <= 158 && cc == 13
+                cltv_key = get_value value
+                @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key] = {}
+              end
+              if r >= 155 && r <= 158 && cc > 13 && cc <= 15
+                ltv_data =  get_value @ltv_data[cc-1]
+                ltv_data = ltv_data.tr('() ','')
+                @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = {}
+                @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = value
+              end
+              # Other Adjustments
+              if r == 168 && cc == 12
+                @other_adjustment["MiscAdjuster"] = {}
+                @other_adjustment["MiscAdjuster"]["Escrow Waiver Fee"] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment["MiscAdjuster"]["Escrow Waiver Fee"] = new_value
+              end
+              if r == 169 && cc == 12
+                @other_adjustment["LoanAmount"] = {}
+                @other_adjustment["LoanAmount"]["0-150,000"] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment["LoanAmount"]["0-150,000"] = new_value
+              end
+            rescue Exception => e
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log.save
             end
           end
         end
@@ -2090,6 +2412,20 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_property @program, sheet
                 @programs_ids << @program.id
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program, sheet
+                  @programs_ids << @program.id
+                end
+
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
 
               @program.adjustments.destroy_all
@@ -2114,6 +2450,9 @@ class ObNewfiWholesale7019Controller < ApplicationController
                       @block_hash[key][15*c_i] = value
                     end
                     @data << value
+                  rescue Exception => e
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                    error_log.save
                   end
                 end
                 if @data.compact.reject { |c| c.blank? }.length == 0
@@ -2253,6 +2592,127 @@ class ObNewfiWholesale7019Controller < ApplicationController
               ltv_data = ltv_data.tr('() ','')
               @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = {}
               @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = value
+            begin
+              if value == "LTV / FICO (Terms > 15 years only)"
+                first_row = 141
+                end_row = 144
+                last_column = 8
+                first_column = 4
+                ltv_row = 140
+                num = 1
+                ltv_adjustment range1, range2, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row,num
+              end
+              if value == "Cash Out Refinance"
+                @cashout_hash["RefinanceOption/FICO/LTV"] = {}
+                @cashout_hash["RefinanceOption/FICO/LTV"]["Cash Out"] = {}
+              end
+              if value == "OLYMPIC FIXED 2ND MORTGAGE"
+                @property_hash["LoanType/CLTV"] = {}
+                @property_hash["LoanType/CLTV"]["Fixed"] = {}
+              end
+              # Cash Out Refinance
+              if r >= 154 && r <= 157 && cc == 4
+                primary_key = get_value value
+                @cashout_hash["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key] = {}
+              end
+              if r >= 154 && r <= 157 && cc >= 5 && cc <= 8
+                ltv_key = get_value @ltv_data[cc-1]
+                @cashout_hash["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key][ltv_key] = {}
+                @cashout_hash["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key][ltv_key] = value
+              end
+              # OLYMPIC FIXED 2ND MORTGAGE
+              if r == 166 && cc == 4
+                @property_hash["LoanType/RefinanceOption/LTV"] = {}
+                @property_hash["LoanType/RefinanceOption/LTV"]["Fixed"] = {}
+                @property_hash["LoanType/RefinanceOption/LTV"]["Fixed"]["Cash Out"] = {}
+                @property_hash["LoanType/RefinanceOption/LTV"]["Fixed"]["Cash Out"]["100,000"] = {}
+                cc = cc + 2
+                new_val = sheet_data.cell(r,cc)
+                @property_hash["LoanType/RefinanceOption/LTV"]["Fixed"]["Cash Out"]["100,000"] = new_val
+              end
+              if r == 167 && cc == 4
+                @property_hash["LoanType/PropertyType"] = {}
+                @property_hash["LoanType/PropertyType"]["Fixed"] = {}
+                @property_hash["LoanType/PropertyType"]["Fixed"]["2nd Home"] = {}
+                cc = cc + 2
+                new_val = sheet_data.cell(r,cc)
+                @property_hash["LoanType/PropertyType"]["Fixed"]["2nd Home"] = new_val
+              end
+              if r >= 168 && r <= 171 && cc == 4
+                primary_key = value.tr('A-Z% ','')
+                @property_hash["LoanType/CLTV"]["Fixed"][primary_key] = {}
+                cc = cc + 2
+                new_val = sheet_data.cell(r,cc)
+                @property_hash["LoanType/CLTV"]["Fixed"][primary_key] = new_val
+              end
+              if r == 172 && cc == 4
+                @property_hash["LoanType/Term"] = {}
+                @property_hash["LoanType/Term"]["Fixed"] = {}
+                @property_hash["LoanType/Term"]["Fixed"]["15"] = {}
+                cc = cc + 2
+                new_val = sheet_data.cell(r,cc)
+                @property_hash["LoanType/Term"]["Fixed"]["15"] = new_val
+              end
+               # Other Adjustments
+              if r == 145 && cc == 14
+                @other_adjustment["PropertyType/Term/LTV"] = {}
+                @other_adjustment["PropertyType/Term/LTV"]["Condo"] = {}
+                @other_adjustment["PropertyType/Term/LTV"]["Condo"]["15-Inf"] = {}
+                @other_adjustment["PropertyType/Term/LTV"]["Condo"]["15-Inf"]["75-Inf"] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment["PropertyType/Term/LTV"]["Condo"]["15-Inf"]["75-Inf"] = new_value
+              end
+              if r == 146 && cc == 14
+                @other_adjustment["LoanSize/RefinanceOption"] = {}
+                @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"] = {}
+                @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Cash Out"] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Cash Out"] = new_value
+              end
+              if r == 147 && cc == 14
+                @other_adjustment["LoanSize/RefinanceOption"]["Rate and Term"] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment["LoanSize/RefinanceOption"]["Rate and Term"] = new_value
+              end
+              # Other Adjustments
+              if r == 166 && cc == 12
+                @other_adjustment["MiscAdjuster"] = {}
+                @other_adjustment["MiscAdjuster"]["Escrow Waiver Fee"] = {}
+                cc = cc + 1
+                new_val = sheet_data.cell(r,cc)
+                @other_adjustment["MiscAdjuster"]["Escrow Waiver Fee"] = new_val
+              end
+              if r == 167 && cc == 12
+                @other_adjustment["LoanAmount"] = {}
+                @other_adjustment["LoanAmount"]["0-100,000"] = {}
+                cc = cc + 1
+                new_val = sheet_data.cell(r,cc)
+                @other_adjustment["LoanAmount"]["0-100,000"] = new_val
+              end
+              # Loans With Secondary Financing
+              if value == "Loans With Secondary Financing"
+                @secondary_hash["LTV/CLTV/FICO"] = {}
+              end
+              if r >= 154 && r <= 157 && cc == 12
+                ltv_key = get_value value
+                @secondary_hash["LTV/CLTV/FICO"][ltv_key] = {}
+              end
+              if r >= 154 && r <= 157 && cc == 13
+                cltv_key = get_value value
+                @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key] = {}
+              end
+              if r >= 154 && r <= 157 && cc > 13 && cc <= 15
+                ltv_data = get_value @ltv_data[cc-1]
+                ltv_data = ltv_data.tr('() ','')
+                @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = {}
+                @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = value
+              end
+            rescue Exception => e
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log.save
             end
           end
         end
@@ -2294,6 +2754,20 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_property @program, sheet
                 @programs_ids << @program.id
+              begin
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  program_property @program, sheet
+                  @programs_ids << @program.id
+                end
+
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log.save
               end
 
               @program.adjustments.destroy_all
@@ -2318,6 +2792,9 @@ class ObNewfiWholesale7019Controller < ApplicationController
                       @block_hash[key][15*c_i] = value
                     end
                     @data << value
+                  rescue Exception => e
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                    error_log.save
                   end
                 end
                 if @data.compact.reject { |c| c.blank? }.length == 0
@@ -2472,6 +2949,9 @@ class ObNewfiWholesale7019Controller < ApplicationController
               ltv_data = ltv_data.tr('() ','')
               @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = {}
               @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = value
+            rescue Exception => e
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log.save
             end
           end
         end
@@ -2636,6 +3116,10 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @adjustment_hash["Term/FICO/LTV"]["15-Inf"][ltv_key][cltv_key] = {}
                 @adjustment_hash["Term/FICO/LTV"]["15-Inf"][ltv_key][cltv_key] = value
               end
+
+            rescue Exception => e
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log.save
             end
           end
         end
