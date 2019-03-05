@@ -294,7 +294,7 @@
         <tr>
           <td>1</td>
           <td>New Penn Financial</td>
-          <td class="text-center"><a class='btn btn-info btn-xs' href="<%=import_files_path%>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
+          <td class="text-center"><a class='btn btn-info btn-xs' href="<%=ob_new_rez_wholesale5806_index_path %>"><span class="glyphicon glyphicon-edit"></span> View</a></td>
         </tr>
         <tr>
           <td>2</td>
@@ -367,7 +367,7 @@
   $(document).ready(function(){
 
     $('#bank_name').change(function(){
-      var bank_name =  $(this).val();      
+      var bank_name =  $(this).val();
       $.ajax({
         type:'GET',
         url:'/dashboard/fetch_programs_by_bank',
