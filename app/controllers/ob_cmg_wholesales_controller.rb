@@ -53,8 +53,8 @@ class ObCmgWholesalesController < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_property sheet
-                
-                @programs_ids << @program.id              
+
+                @programs_ids << @program.id
                 # @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -64,7 +64,7 @@ class ObCmgWholesalesController < ApplicationController
                     rrr = rr + max_row -1
                     ccc = cc + c_i
                     value = sheet_data.cell(rrr,ccc)
-                    
+
                     if value.present?
                       if (c_i == 0)
                         key = value
@@ -217,7 +217,7 @@ class ObCmgWholesalesController < ApplicationController
                     c_val = sheet_data.cell(r,ccc)
                     @misc_hash["MiscAdjuster/RefinanceOption/VA/FICO"]["Miscellaneous"]["Cash Out"][true] = c_val
                   end
-                  if r == 76 && cc == 10 
+                  if r == 76 && cc == 10
                     @misc_hash["MiscAdjuster/LoanType"] = {}
                     @misc_hash["MiscAdjuster/LoanType"]["Miscellaneous"] = {}
                     @misc_hash["MiscAdjuster/LoanType"]["Miscellaneous"]["Fixed"] = {}
@@ -265,7 +265,6 @@ class ObCmgWholesalesController < ApplicationController
 
   def agency
     @programs_ids = []
-    begin
     @xlsx.sheets.each do |sheet|
       # Programs
       if (sheet == "AGENCY")
@@ -518,7 +517,7 @@ class ObCmgWholesalesController < ApplicationController
                 end
 
                 # High Balance Adjustments
-                if r == 33 && cc == 1 
+                if r == 33 && cc == 1
                   cltv_key = "Standard Cash Out"
                   @cashout_adjustment[cash_key][secondary_key][cash_key1][cltv_key] = {}
                 end
@@ -732,7 +731,7 @@ class ObCmgWholesalesController < ApplicationController
                   elsif value.include?("Loan Amount")
                     secondary_key1 = value.split("Loan Amount").last.tr('$><= ', '')
                   else
-                    secondary_key1 = get_value value 
+                    secondary_key1 = get_value value
                   end
                   @loan_adjustment[primary_key1][secondary_key1] = {}
                 end
@@ -952,7 +951,7 @@ class ObCmgWholesalesController < ApplicationController
                     if value.include?("-")
                       secondary_key = value.tr('%$' , '')
                     elsif value.include?("All")
-                      secondary_key = "0-Inf"  
+                      secondary_key = "0-Inf"
                     else
                       secondary_key = get_value value
                     end
@@ -976,7 +975,7 @@ class ObCmgWholesalesController < ApplicationController
                     if value == "Primary / Second Home"
                       secondary_key = "2nd Home"
                     elsif value.include?("All")
-                      secondary_key = "0-Inf"  
+                      secondary_key = "0-Inf"
                     else
                       secondary_key = value
                     end
@@ -995,7 +994,7 @@ class ObCmgWholesalesController < ApplicationController
                     cltv_key = get_value value
                     @adjustment_cap[primary_key][true][secondary_key][cltv_key] = {}
                   end
-                  if r == 83 && cc >= 5 && cc <= 7 
+                  if r == 83 && cc >= 5 && cc <= 7
                     cap_key = get_value @cap_data[cc-1]
                     @adjustment_cap[primary_key][true][secondary_key][cltv_key][cap_key] = {}
                     @adjustment_cap[primary_key][true][secondary_key][cltv_key][cap_key] = value
@@ -1188,7 +1187,7 @@ class ObCmgWholesalesController < ApplicationController
                     @adjustment_hash["FHLMC/PropertyType/Term/LTV"][true]["Condo"] = {}
                     @adjustment_hash["FHLMC/PropertyType/Term/LTV"][true]["Condo"]["15-Inf"] = {}
                   end
-                  if r == 61 && cc >= 8 && cc <= 16 
+                  if r == 61 && cc >= 8 && cc <= 16
                     fnma_key = get_value @fnma_data[cc-1]
                     @adjustment_hash["FHLMC/PropertyType/Term/LTV"][true]["Condo"]["15-Inf"][fnma_key] = {}
                     @adjustment_hash["FHLMC/PropertyType/Term/LTV"][true]["Condo"]["15-Inf"][fnma_key] = value
@@ -1196,7 +1195,7 @@ class ObCmgWholesalesController < ApplicationController
                   if r == 62 && cc == 1
                     @adjustment_hash["FHLMC/PropertyType/LTV"]["CA"] = {}
                   end
-                  if r == 62 && cc >= 8 && cc <= 16 
+                  if r == 62 && cc >= 8 && cc <= 16
                     fnma_key = get_value @fnma_data[cc-1]
                     @adjustment_hash["FHLMC/PropertyType/LTV"]["CA"][fnma_key] = {}
                     @adjustment_hash["FHLMC/PropertyType/LTV"]["CA"][fnma_key] = value
@@ -1211,7 +1210,7 @@ class ObCmgWholesalesController < ApplicationController
                     end
                     @adjustment_hash["FHLMC/Term/FICO/LTV"][true]["15-Inf"][secondary_key] = {}
                   end
-                  if r >= 63 && r <= 69 && cc >= 8 && cc <= 16 
+                  if r >= 63 && r <= 69 && cc >= 8 && cc <= 16
                     fnma_key = get_value @fnma_data[cc-1]
                     @adjustment_hash["FHLMC/Term/FICO/LTV"][true]["15-Inf"][secondary_key][fnma_key] = {}
                     @adjustment_hash["FHLMC/Term/FICO/LTV"][true]["15-Inf"][secondary_key][fnma_key] = value
@@ -1220,7 +1219,7 @@ class ObCmgWholesalesController < ApplicationController
                     @adjustment_hash["LoanSize/LTV"] = {}
                     @adjustment_hash["LoanSize/LTV"]["High Balance"] = {}
                   end
-                  if r == 70 && cc >= 8 && cc <= 16 
+                  if r == 70 && cc >= 8 && cc <= 16
                     fnma_key = get_value @fnma_data[cc-1]
                     @adjustment_hash["LoanSize/LTV"]["High Balance"][fnma_key] = {}
                     @adjustment_hash["LoanSize/LTV"]["High Balance"][fnma_key] = value
@@ -1270,7 +1269,7 @@ class ObCmgWholesalesController < ApplicationController
                     cltv_key = get_value value
                     @adjustment_cap[primary_key][true][secondary_key][cltv_key] = {}
                   end
-                  if r == 85 && cc >= 5 && cc <= 7 
+                  if r == 85 && cc >= 5 && cc <= 7
                     cap_key = get_value @cap_data[cc-1]
                     @adjustment_cap[primary_key][true][secondary_key][cltv_key][cap_key] = {}
                     @adjustment_cap[primary_key][true][secondary_key][cltv_key][cap_key] = value
@@ -1313,7 +1312,7 @@ class ObCmgWholesalesController < ApplicationController
                     @misc_adjustment["State"] = {}
                     @misc_adjustment["State"]["NY"] = {}
                   end
-                  if r == 74 && cc == 16 
+                  if r == 74 && cc == 16
                     @misc_adjustment["State"]["NY"] = value
                   end
                   # LOAN AMOUNT ADJUSTMENT
@@ -2247,11 +2246,11 @@ class ObCmgWholesalesController < ApplicationController
                     if @data.compact.reject { |c| c.blank? }.length == 0
                       break # terminate the loop
                     end
-                  end            
+                  end
                   if @block_hash.keys.first.nil?|| @block_hash.keys.first == "Rate"
                     @block_hash.shift
                   end
-                  
+
                   @program.update(base_rate: @block_hash)
                 end
                 @program.update(base_rate: @block_hash)
@@ -3387,7 +3386,7 @@ class ObCmgWholesalesController < ApplicationController
     # redirect_to programs_import_file_path(@bank)
     redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
   end
- 
+
   def jumbo_6800
     @programs_ids = []
     @xlsx.sheets.each do |sheet|
@@ -3407,7 +3406,6 @@ class ObCmgWholesalesController < ApplicationController
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
               cc = 4*max_column + 1
-              begin
               @title = sheet_data.cell(r,cc)
               @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               program_property sheet
@@ -3512,7 +3510,6 @@ class ObCmgWholesalesController < ApplicationController
 
         create_program_association_with_adjustment(sheet)
       end
-
     end
     # redirect_to programs_import_file_path(@bank)
     redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
@@ -3546,9 +3543,9 @@ class ObCmgWholesalesController < ApplicationController
               cc = 4*max_column + 1
 
               @title = sheet_data.cell(r,cc)
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property sheet
-                @programs_ids << @program.id
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+              program_property sheet
+              @programs_ids << @program.id
               if @title.present?
                 # @program.adjustments.destroy_all
                 @block_hash = {}
@@ -3935,109 +3932,109 @@ class ObCmgWholesalesController < ApplicationController
   end
 
   private
-    def get_sheet
-      @sheet_obj = Sheet.find(params[:id])
+  def get_sheet
+    @sheet_obj = Sheet.find(params[:id])
+  end
+
+  def read_sheet
+    file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
+    @xlsx = Roo::Spreadsheet.open(file)
+  end
+
+  def get_program
+    @program = Program.find(params[:id])
+  end
+
+  def program_property sheet
+    # term
+    if (@program.program_name.split("Year").count > 1)
+      term = @program.program_name.split("Year").first.tr('^0-9><%', '')
+    elsif (@program.program_name.split("Yr").count > 1)
+      term = @program.program_name.split("Yr").first.tr('^0-9><%', '')
+    end
+    # Arm Basic
+    if @program.program_name.split("ARM").count > 1
+      arm_basic = @program.program_name.split("ARM").first.split("/").first
+    end
+      # loan type
+    if @program.program_name.include?("Fixed")
+      loan_type = "Fixed"
+    elsif @program.program_name.include?("ARM")
+      loan_type = "ARM"
+    elsif @program.program_name.include?("Floating")
+      loan_type = "Floating"
+    elsif @program.program_name.include?("Variable")
+      loan_type = "Variable"
+    else
+      loan_type = nil
+    end
+    #Set Bank Name
+    bank_name = @sheet_obj.bank.name
+
+    # streamline
+    streamline = false
+    fha = false
+    va = false
+    usda = false
+    full_doc = false
+    if @program.program_name.include?("FHA")
+      streamline = true
+      fha = true
+      full_doc = true
+    elsif @program.program_name.include?("VA")
+      streamline = true
+      va = true
+      full_doc = true
+    elsif @program.program_name.include?("USDA")
+      streamline = true
+      usda = true
+      full_doc = true
+    end
+    # High Balance
+    jumbo_high_balance = false
+    if @program.program_name.include?("High Bal") || @program.program_name.include?("HIGH BAL")
+      jumbo_high_balance = true
+      loan_size = "High Balance"
+    end
+     # Fannie mae Product
+    if @program.program_name.include?("HomeReady")
+      fannie_mae_product = "HomeReady"
+    end
+    # Freddie mac product
+    if @program.program_name.include?("Home Possible")
+      freddie_mac_product = "Home Possible"
+    end
+    # Program Property
+    if @program.program_name.split("-").count > 1
+      program_category = @program.program_name.split.last
+    end
+       # Loan Limit Type
+    if @program.program_name.include?("Non-Conforming")
+      @program.loan_limit_type << "Non-Conforming"
+    end
+    if @program.program_name.include?("Conforming")
+      @program.loan_limit_type << "Conforming"
+    end
+    if @program.program_name.include?("Jumbo")
+      @program.loan_limit_type << "Jumbo"
+    end
+    if @program.program_name.include?("High Balance")
+      @program.loan_limit_type << "High Balance"
     end
 
-    def read_sheet
-      file = File.join(Rails.root,  'OB_CMG_Wholesale7575.xls')
-      @xlsx = Roo::Spreadsheet.open(file)
-    end
+    @program.save
+    @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",program_category: program_category, jumbo_high_balance: jumbo_high_balance, streamline: streamline,fha: fha, va: va, usda: usda, full_doc: full_doc, arm_basic: arm_basic, sheet_name: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product, loan_size: loan_size, bank_name: bank_name)
+  end
 
-    def get_program
-      @program = Program.find(params[:id])
-    end
-
-    def program_property sheet
-      # term
-      if (@program.program_name.split("Year").count > 1) 
-        term = @program.program_name.split("Year").first.tr('^0-9><%', '')
-      elsif (@program.program_name.split("Yr").count > 1)
-        term = @program.program_name.split("Yr").first.tr('^0-9><%', '')  
-      end
-      # Arm Basic
-      if @program.program_name.split("ARM").count > 1
-        arm_basic = @program.program_name.split("ARM").first.split("/").first
-      end
-        # loan type
-      if @program.program_name.include?("Fixed")
-        loan_type = "Fixed"
-      elsif @program.program_name.include?("ARM")
-        loan_type = "ARM"
-      elsif @program.program_name.include?("Floating")
-        loan_type = "Floating"
-      elsif @program.program_name.include?("Variable")
-        loan_type = "Variable"
-      else
-        loan_type = nil
-      end
-      #Set Bank Name
-      bank_name = @sheet_obj.bank.name
-
-      # streamline
-      streamline = false
-      fha = false
-      va = false
-      usda = false
-      full_doc = false
-      if @program.program_name.include?("FHA")
-        streamline = true
-        fha = true
-        full_doc = true
-      elsif @program.program_name.include?("VA")
-        streamline = true
-        va = true
-        full_doc = true
-      elsif @program.program_name.include?("USDA")
-        streamline = true
-        usda = true
-        full_doc = true
-      end
-      # High Balance
-      jumbo_high_balance = false
-      if @program.program_name.include?("High Bal") || @program.program_name.include?("HIGH BAL")
-        jumbo_high_balance = true
-        loan_size = "High Balance"
-      end
-       # Fannie mae Product
-      if @program.program_name.include?("HomeReady")
-        fannie_mae_product = "HomeReady"
-      end
-      # Freddie mac product
-      if @program.program_name.include?("Home Possible")
-        freddie_mac_product = "Home Possible"
-      end
-      # Program Property  
-      if @program.program_name.split("-").count > 1
-        program_category = @program.program_name.split.last
-      end
-         # Loan Limit Type
-      if @program.program_name.include?("Non-Conforming")
-        @program.loan_limit_type << "Non-Conforming"
-      end
-      if @program.program_name.include?("Conforming")
-        @program.loan_limit_type << "Conforming"
-      end
-      if @program.program_name.include?("Jumbo")
-        @program.loan_limit_type << "Jumbo"
-      end
-      if @program.program_name.include?("High Balance")
-        @program.loan_limit_type << "High Balance"
-      end
-      
-      @program.save 
-      @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",program_category: program_category, jumbo_high_balance: jumbo_high_balance, streamline: streamline,fha: fha, va: va, usda: usda, full_doc: full_doc, arm_basic: arm_basic, sheet_name: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product, loan_size: loan_size, bank_name: bank_name)
-    end
-
-    def make_adjust(block_hash, sheet)
-      block_hash.each do |hash|
-        if hash.present?
-          hash.each do |key|
-            data = {}
-            data[key[0]] = key[1]
-            Adjustment.create(data: data,sheet_name: sheet)
-          end
+  def make_adjust(block_hash, sheet)
+    block_hash.each do |hash|
+      if hash.present?
+        hash.each do |key|
+          data = {}
+          data[key[0]] = key[1]
+          Adjustment.create(data: data,sheet_name: sheet)
         end
       end
     end
+  end
 end
