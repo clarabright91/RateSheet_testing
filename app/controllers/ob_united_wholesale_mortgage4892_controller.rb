@@ -904,253 +904,253 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
   end
 
   private
-    def get_sheet
-      @sheet_obj = Sheet.find(params[:id])
-    end
+  def get_sheet
+    @sheet_obj = Sheet.find(params[:id])
+  end
 
-    def get_value value1
-      if value1.present?
-        if value1.include?("<=") || value1.include?("<")
-          value1 = "0-"+value1.split("<=").last.tr('A-Za-z%$><= ','')
-        elsif value1.include?(">") || value1.include?("+")
-          value1 = value1.split(">").last.tr('^0-9 ', '')+"-Inf"
-        else
-          value1
-        end
-      end
-    end
-
-    def make_adjust(block_hash, sheet)
-      block_hash.each do |hash|
-        if hash.present?
-          hash.each do |key|
-            data = {}
-            data[key[0]] = key[1]
-            Adjustment.create(data: data,sheet_name: sheet)
-          end
-        end
-      end
-    end
-
-    def read_sheet
-      file = File.join(Rails.root,  'OB_United_Wholesale_Mortgage4892.xls')
-      @xlsx = Roo::Spreadsheet.open(file)
-    end
-
-    def program_property
-      if @program.program_name.include?("30") || @program.program_name.include?("30/25 Year")
-        term = 30
-      elsif @program.program_name.include?("20")
-        term = 20
-      elsif @program.program_name.include?("15")
-        term = 15
-      elsif @program.program_name.include?("10 Year")
-        term = 10
+  def get_value value1
+    if value1.present?
+      if value1.include?("<=") || value1.include?("<")
+        value1 = "0-"+value1.split("<=").last.tr('A-Za-z%$><= ','')
+      elsif value1.include?(">") || value1.include?("+")
+        value1 = value1.split(">").last.tr('^0-9 ', '')+"-Inf"
       else
-        term = nil
+        value1
       end
-
-      # Loan-Type
-      if @program.program_name.include?("Fixed") || @program.program_name.include?("FIXED")
-        loan_type = "Fixed"
-      elsif @program.program_name.include?("ARM")
-        loan_type = "ARM"
-      elsif @program.program_name.include?("Floating")
-        loan_type = "Floating"
-      elsif @program.program_name.include?("Variable")
-        loan_type = "Variable"
-      else
-        loan_type = nil
-      end
-
-      # Streamline Vha, Fha, Usda
-      fha = false
-      va = false
-      usda = false
-      streamline = false
-      full_doc = false
-      if @program.program_name.include?("FHA")
-        streamline = true
-        fha = true
-        full_doc = true
-      elsif @program.program_name.include?("VA")
-        streamline = true
-        va = true
-        full_doc = true
-      elsif @program.program_name.include?("USDA")
-        streamline = true
-        usda = true
-        full_doc = true
-      end
-
-      # High Balance
-      jumbo_high_balance = false
-      if @program.program_name.include?("High Bal") || @program.program_name.include?("High Balance")
-        jumbo_high_balance = true
-      end
-
-      # Arm Basic
-      if @program.program_name.include?("3/1") || @program.program_name.include?("3 / 1")
-        arm_basic = 3
-      elsif @program.program_name.include?("5/1") || @program.program_name.include?("5 / 1")
-        arm_basic = 5
-      elsif @program.program_name.include?("7/1") || @program.program_name.include?("7 / 1")
-        arm_basic = 7
-      elsif @program.program_name.include?("10/1") || @program.program_name.include?("10 / 1")
-        arm_basic = 10
-      end
-
-      # Arm Advanced
-      if @program.program_name.include?("2-2-5 ")
-        arm_advanced = "2-2-5"
-      end
-      # Loan Limit Type
-      if @program.program_name.include?("Non-Conforming")
-        @program.loan_limit_type << "Non-Conforming"
-      end
-      if @program.program_name.include?("Conforming")
-        @program.loan_limit_type << "Conforming"
-      end
-      if @program.program_name.include?("Jumbo")
-        @program.loan_limit_type << "Jumbo"
-      end
-      if @program.program_name.include?("High Balance")
-        @program.loan_limit_type << "High Balance"
-      end
-      @program.save
-      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, jumbo_high_balance: jumbo_high_balance, arm_basic: arm_basic, arm_advanced: arm_advanced)
     end
+  end
 
-    # create programs
-    def make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2
-      (start_range..end_range).each do |r|
-        row = sheet_data.row(r)
-        if ((row.compact.count > 1) && (row.compact.count <= 4)) && (!row.compact.include?("GOVERNMENT PRICE ADJUSTMENTS"))
-          rr = r + 1
-          max_column_section = row.compact.count - 1
-          (0..max_column_section).each do |max_column|
-            cc = num1 + max_column*num2
-            begin
-              @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                @programs_ids << @program.id
-                # term
-                if @title.scan(/\d+/).count == 1
-                  term = @title.scan(/\d+/)[0]
-                else
-                  term = (@title.scan(/\d+/)[0]+ @title.scan(/\d+/)[1]).to_i
-                end
-                # High Balance
-                if @title.include?("HIGH BAL") || @title.include?("HIGH BALANCE")
-                  loan_size = "High Balance"
-                  jumbo_high_balance = true
-                end
-                # Loan-Type
-                if @title.include?("Fixed")
-                  loan_type = "Fixed"
-                elsif @title.include?("ARM")
-                  loan_type = "ARM"
-                elsif @title.include?("Floating")
-                  loan_type = "Floating"
-                elsif @title.include?("Variable")
-                  loan_type = "Variable"
-                else
-                  loan_type = nil
-                end
-
-                # Streamline Vha, Fha, Usda
-                fha = false
-                va = false
-                usda = false
-                streamline = false
-                full_doc = false
-                if @title.include?("FHA")
-                  streamline = true
-                  fha = true
-                  full_doc = true
-                elsif @title.include?("VA")
-                  streamline = true
-                  va = true
-                  full_doc = true
-                elsif @title.include?("USDA")
-                  streamline = true
-                  usda = true
-                  full_doc = true
-                end
-
-                # Update Program
-                @program.update(term: term, loan_size: loan_size, jumbo_high_balance: jumbo_high_balance,loan_type: loan_type,fha: fha, va: va, usda: usda, streamline: streamline, full_doc: full_doc)
-                # Base rate
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                (1..row_count).each do |max_row|
-                  @data = []
-                  (0..column_count).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
-                      end
-                      @data << value
-                    end
-                  end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
-                end
-                @program.update(base_rate: @block_hash)
-              end
-            rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
-              error_log.save
-            end
-          end
+  def make_adjust(block_hash, sheet)
+    block_hash.each do |hash|
+      if hash.present?
+        hash.each do |key|
+          data = {}
+          data[key[0]] = key[1]
+          Adjustment.create(data: data,sheet_name: sheet)
         end
       end
     end
+  end
 
-    def create_program_association_with_adjustment(sheet)
-      adjustment_list = Adjustment.where(sheet_name: sheet)
-      program_list = Program.where(sheet_name: sheet)
+  def read_sheet
+    file = File.join(Rails.root,  'OB_United_Wholesale_Mortgage4892.xls')
+    @xlsx = Roo::Spreadsheet.open(file)
+  end
 
-      adjustment_list.each_with_index do |adj_ment, index|
-        key_list = adj_ment.data.keys.first.split("/")
-        program_filter1={}
-        program_filter2={}
-        include_in_input_values = false
-        if key_list.present?
-          key_list.each_with_index do |key_name, key_index|
-            if (Program.column_names.include?(key_name.underscore))
-              unless (Program.column_for_attribute(key_name.underscore).type.to_s == "boolean")
-                program_filter1[key_name.underscore] = nil
+  def program_property
+    if @program.program_name.include?("30") || @program.program_name.include?("30/25 Year")
+      term = 30
+    elsif @program.program_name.include?("20")
+      term = 20
+    elsif @program.program_name.include?("15")
+      term = 15
+    elsif @program.program_name.include?("10 Year")
+      term = 10
+    else
+      term = nil
+    end
+
+    # Loan-Type
+    if @program.program_name.include?("Fixed") || @program.program_name.include?("FIXED")
+      loan_type = "Fixed"
+    elsif @program.program_name.include?("ARM")
+      loan_type = "ARM"
+    elsif @program.program_name.include?("Floating")
+      loan_type = "Floating"
+    elsif @program.program_name.include?("Variable")
+      loan_type = "Variable"
+    else
+      loan_type = nil
+    end
+
+    # Streamline Vha, Fha, Usda
+    fha = false
+    va = false
+    usda = false
+    streamline = false
+    full_doc = false
+    if @program.program_name.include?("FHA")
+      streamline = true
+      fha = true
+      full_doc = true
+    elsif @program.program_name.include?("VA")
+      streamline = true
+      va = true
+      full_doc = true
+    elsif @program.program_name.include?("USDA")
+      streamline = true
+      usda = true
+      full_doc = true
+    end
+
+    # High Balance
+    jumbo_high_balance = false
+    if @program.program_name.include?("High Bal") || @program.program_name.include?("High Balance")
+      jumbo_high_balance = true
+    end
+
+    # Arm Basic
+    if @program.program_name.include?("3/1") || @program.program_name.include?("3 / 1")
+      arm_basic = 3
+    elsif @program.program_name.include?("5/1") || @program.program_name.include?("5 / 1")
+      arm_basic = 5
+    elsif @program.program_name.include?("7/1") || @program.program_name.include?("7 / 1")
+      arm_basic = 7
+    elsif @program.program_name.include?("10/1") || @program.program_name.include?("10 / 1")
+      arm_basic = 10
+    end
+
+    # Arm Advanced
+    if @program.program_name.include?("2-2-5 ")
+      arm_advanced = "2-2-5"
+    end
+    # Loan Limit Type
+    if @program.program_name.include?("Non-Conforming")
+      @program.loan_limit_type << "Non-Conforming"
+    end
+    if @program.program_name.include?("Conforming")
+      @program.loan_limit_type << "Conforming"
+    end
+    if @program.program_name.include?("Jumbo")
+      @program.loan_limit_type << "Jumbo"
+    end
+    if @program.program_name.include?("High Balance")
+      @program.loan_limit_type << "High Balance"
+    end
+    @program.save
+    @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, jumbo_high_balance: jumbo_high_balance, arm_basic: arm_basic, arm_advanced: arm_advanced)
+  end
+
+  # create programs
+  def make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2
+    (start_range..end_range).each do |r|
+      row = sheet_data.row(r)
+      if ((row.compact.count > 1) && (row.compact.count <= 4)) && (!row.compact.include?("GOVERNMENT PRICE ADJUSTMENTS"))
+        rr = r + 1
+        max_column_section = row.compact.count - 1
+        (0..max_column_section).each do |max_column|
+          cc = num1 + max_column*num2
+          begin
+            @title = sheet_data.cell(r,cc)
+            if @title.present?
+              @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+              @programs_ids << @program.id
+              # term
+              if @title.scan(/\d+/).count == 1
+                term = @title.scan(/\d+/)[0]
               else
-                if (Program.column_for_attribute(key_name.underscore).type.to_s == "boolean")
-                  program_filter2[key_name.underscore] = true
+                term = (@title.scan(/\d+/)[0]+ @title.scan(/\d+/)[1]).to_i
+              end
+              # High Balance
+              if @title.include?("HIGH BAL") || @title.include?("HIGH BALANCE")
+                loan_size = "High Balance"
+                jumbo_high_balance = true
+              end
+              # Loan-Type
+              if @title.include?("Fixed")
+                loan_type = "Fixed"
+              elsif @title.include?("ARM")
+                loan_type = "ARM"
+              elsif @title.include?("Floating")
+                loan_type = "Floating"
+              elsif @title.include?("Variable")
+                loan_type = "Variable"
+              else
+                loan_type = nil
+              end
+
+              # Streamline Vha, Fha, Usda
+              fha = false
+              va = false
+              usda = false
+              streamline = false
+              full_doc = false
+              if @title.include?("FHA")
+                streamline = true
+                fha = true
+                full_doc = true
+              elsif @title.include?("VA")
+                streamline = true
+                va = true
+                full_doc = true
+              elsif @title.include?("USDA")
+                streamline = true
+                usda = true
+                full_doc = true
+              end
+
+              # Update Program
+              @program.update(term: term, loan_size: loan_size, jumbo_high_balance: jumbo_high_balance,loan_type: loan_type,fha: fha, va: va, usda: usda, streamline: streamline, full_doc: full_doc)
+              # Base rate
+              @program.adjustments.destroy_all
+              @block_hash = {}
+              key = ''
+              (1..row_count).each do |max_row|
+                @data = []
+                (0..column_count).each_with_index do |index, c_i|
+                  rrr = rr + max_row
+                  ccc = cc + c_i
+                  value = sheet_data.cell(rrr,ccc)
+                  if value.present?
+                    if (c_i == 0)
+                      key = value
+                      @block_hash[key] = {}
+                    else
+                      @block_hash[key][15*c_i] = value
+                    end
+                    @data << value
+                  end
+                end
+                if @data.compact.reject { |c| c.blank? }.length == 0
+                  break # terminate the loop
                 end
               end
-            else
-              if(Adjustment::INPUT_VALUES.include?(key_name))
-                include_in_input_values = true
-              end
+              @program.update(base_rate: @block_hash)
             end
-          end
-
-          if (include_in_input_values)
-            program_list1 = program_list.where.not(program_filter1)
-            program_list2 = program_list1.where(program_filter2)
-
-            if program_list2.present?
-              program_list2.map{ |program| program.adjustments << adj_ment unless program.adjustments.include?(adj_ment) }
-            end
+          rescue Exception => e
+            error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+            error_log.save
           end
         end
       end
     end
+  end
+
+  def create_program_association_with_adjustment(sheet)
+    adjustment_list = Adjustment.where(sheet_name: sheet)
+    program_list = Program.where(sheet_name: sheet)
+
+    adjustment_list.each_with_index do |adj_ment, index|
+      key_list = adj_ment.data.keys.first.split("/")
+      program_filter1={}
+      program_filter2={}
+      include_in_input_values = false
+      if key_list.present?
+        key_list.each_with_index do |key_name, key_index|
+          if (Program.column_names.include?(key_name.underscore))
+            unless (Program.column_for_attribute(key_name.underscore).type.to_s == "boolean")
+              program_filter1[key_name.underscore] = nil
+            else
+              if (Program.column_for_attribute(key_name.underscore).type.to_s == "boolean")
+                program_filter2[key_name.underscore] = true
+              end
+            end
+          else
+            if(Adjustment::INPUT_VALUES.include?(key_name))
+              include_in_input_values = true
+            end
+          end
+        end
+
+        if (include_in_input_values)
+          program_list1 = program_list.where.not(program_filter1)
+          program_list2 = program_list1.where(program_filter2)
+
+          if program_list2.present?
+            program_list2.map{ |program| program.adjustments << adj_ment unless program.adjustments.include?(adj_ment) }
+          end
+        end
+      end
+    end
+  end
 end
