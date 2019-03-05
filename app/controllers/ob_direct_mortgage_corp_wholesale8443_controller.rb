@@ -26,7 +26,6 @@ class ObDirectMortgageCorpWholesale8443Controller < ApplicationController
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         start_range = 7
-        # end_range = 23
         end_range = 596
         row_count = 14
         column_count = 3
