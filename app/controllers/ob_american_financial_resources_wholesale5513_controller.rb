@@ -51,7 +51,7 @@ class ObAmericanFinancialResourcesWholesale5513Controller < ApplicationControlle
         num1 = 4
         num2 = 1
         inc_row = 1
-        make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2, inc_row
+        make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2, inc_row, sheet
       end
     end
     redirect_to programs_ob_american_financial_resources_wholesale5513_path(@sheet_obj)
@@ -69,7 +69,7 @@ class ObAmericanFinancialResourcesWholesale5513Controller < ApplicationControlle
         num1 = 4
         num2 = 1
         inc_row = 1
-        make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2, inc_row
+        make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2, inc_row, sheet
       end
     end
     redirect_to programs_ob_american_financial_resources_wholesale5513_path(@sheet_obj)
@@ -87,7 +87,7 @@ class ObAmericanFinancialResourcesWholesale5513Controller < ApplicationControlle
         num1 = 4
         num2 = 1
         inc_row = 1
-        make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2, inc_row
+        make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2, inc_row, sheet
       end
     end
     redirect_to programs_ob_american_financial_resources_wholesale5513_path(@sheet_obj)
@@ -105,7 +105,7 @@ class ObAmericanFinancialResourcesWholesale5513Controller < ApplicationControlle
         num1 = 4
         num2 = 1
         inc_row = 1
-        make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2, inc_row
+        make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2, inc_row, sheet
       end
     end
     redirect_to programs_ob_american_financial_resources_wholesale5513_path(@sheet_obj)
@@ -123,7 +123,7 @@ class ObAmericanFinancialResourcesWholesale5513Controller < ApplicationControlle
         num1 = 5
         num2 = 1
         inc_row = 3
-        make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2, inc_row
+        make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2, inc_row, sheet
       end
     end
     redirect_to programs_ob_american_financial_resources_wholesale5513_path(@sheet_obj)
