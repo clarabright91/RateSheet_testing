@@ -33,7 +33,7 @@ class ObAmericanFinancialResourcesWholesale5513Controller < ApplicationControlle
         num1 = 4
         num2 = 1
         inc_row = 1
-        make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2, inc_row
+        make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2, inc_row, sheet
       end
     end
     redirect_to programs_ob_american_financial_resources_wholesale5513_path(@sheet_obj)
@@ -151,7 +151,7 @@ class ObAmericanFinancialResourcesWholesale5513Controller < ApplicationControlle
   end
 
   # create programs
-  def make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2, inc_row
+  def make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2, inc_row, sheet
     (start_range..end_range).each do |r|
       row = sheet_data.row(r)
       if ((row.compact.count >= 1) && (row.compact.count <= 6)) && (!row.compact.include?("GOVERNMENT PRICE ADJUSTMENTS"))
@@ -217,6 +217,7 @@ class ObAmericanFinancialResourcesWholesale5513Controller < ApplicationControlle
 
               # Update Program
               @program.update(arm_basic: arm_basic,term: term, loan_size: loan_size, jumbo_high_balance: jumbo_high_balance,loan_type: loan_type,fha: fha, va: va, usda: usda, streamline: streamline, full_doc: full_doc)
+
               # Base rate
               @program.adjustments.destroy_all
               @block_hash = {}

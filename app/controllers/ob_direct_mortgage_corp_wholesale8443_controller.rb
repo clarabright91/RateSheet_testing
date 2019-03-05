@@ -33,7 +33,7 @@ class ObDirectMortgageCorpWholesale8443Controller < ApplicationController
         num1 = 4
         num2 = 1
         inc_row = 1
-        make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2, inc_row
+        make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2, inc_row, sheet
       end
     end
     redirect_to programs_ob_direct_mortgage_corp_wholesale8443_path(@sheet_obj)
@@ -61,17 +61,17 @@ class ObDirectMortgageCorpWholesale8443Controller < ApplicationController
     end
 
     # create programs
-    def make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2, inc_row
+    def make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2, inc_row, sheet
       (start_range..end_range).each do |r|
         row = sheet_data.row(r)
         if ((row.compact.count >= 1) && (row.compact.count <= 4))
           rr = r + inc_row
           max_column_section = row.compact.count - 1
           (0..max_column_section).each do |max_column|
+            cc = num1 * max_column + num2
+            cc = 15 if max_column > 2
+            @title = sheet_data.cell(r,cc)
             begin
-              cc = num1 * max_column + num2
-              cc = 15 if max_column > 2
-              @title = sheet_data.cell(r,cc)
               if @title.present? && @title.length >= 10 && !@title.include?("Program") && @title != "LP Single Life of Loan Lender Paid MI" && @title != "DU Single Life of Loan Lender Paid MI" && @title != "6228 DU 5-10 Properties Financed" && @title != "LP Single Life of Loan Borrower Paid MI" && @title != "DU Single Life of Loan Borrower Paid MI" && !@title.include?("Margin")
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
@@ -196,7 +196,8 @@ class ObDirectMortgageCorpWholesale8443Controller < ApplicationController
                 @program.update(base_rate: @block_hash)
               end
             rescue Exception => e
-              puts "Row: #{r} and Column: #{max_column}"
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log.save
             end
           end
         end
