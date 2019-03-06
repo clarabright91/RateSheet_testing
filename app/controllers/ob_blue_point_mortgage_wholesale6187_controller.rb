@@ -22,12 +22,37 @@ class ObBluePointMortgageWholesale6187Controller < ApplicationController
   def fha_standard_programs
     file = File.join('/home/yuva/Downloads/sheetsfor3rdmilestone/OB_BluePoint_Mortgage_Wholesale6187.xls')
     xlsx = Roo::Spreadsheet.open(file)
+    @sheet_data = {}
     xlsx.sheets.each do |sheet|
       sheet_data = xlsx.sheet(sheet)
-      (104..136).each do |r|
+      main_key = nil
+      (101..136).each do |r|
         row = sheet_data.row(r)
-        (1..3).each do |col|
-          @title = sheet_data.cell(r,col)
+
+        # find sub sheet according to sheet name
+        if(get_sheets_names.include?(row.first))
+          @sub_sheet = SubSheet.find_by_name(row.first)
+        end
+
+        if (r > 103) && @sub_sheet.present?
+          [2, 6, 10].each do |c|
+            @title = sheet_data.cell(r,c)
+            (c..c+3).each do |col|
+              value = sheet_data.cell(r,col)
+              if(r > 106) && (c.eql?(col))
+                unless @sheet_data.has_key?(@title)
+                  @sheet_data[@title] = {}
+                  main_key = @title
+                end
+              elsif r > 106 && col > c && col <= c + 3
+                secondary_key = sheet_data.cell(106,col)
+                @sheet_data[main_key][secondary_key.to_i] = value
+              end
+
+              if r > 106 && c+3 == col
+              end
+            end
+          end
         end
       end
     end
