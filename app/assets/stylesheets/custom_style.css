@@ -1,0 +1,18 @@
+.col-md-6{
+  max-width: 71% !important;
+}
+i {
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 3px;
+}
+.down {
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
+#sub_sheets{
+  display: none;
+}
+h4#sheet-title{
+  display: none;
+}

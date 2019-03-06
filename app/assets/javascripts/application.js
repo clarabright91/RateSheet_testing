@@ -19,7 +19,6 @@
 //= require bootstrap
 //= require select2
 //= require select2-full
-
 //= require_tree .
 
 $(document).ready(function() {
@@ -39,3 +38,18 @@ $(document).ready(function() {
 // 		$(this).val()
 // 	});
 // });
+
+function myFunction(){
+  if($("#sub_sheets").is(':visible')){
+    $("#sub_sheets").hide();
+    $("h4#sheet-title").hide();
+    $("#indication-arrow").removeClass("fa-caret-up");
+    $("#indication-arrow").addClass("fa-caret-down");
+  }
+  else{
+    $("#sub_sheets").show();
+    $("h4#sheet-title").show();
+    $("#indication-arrow").removeClass("fa-caret-down");
+    $("#indication-arrow").addClass("fa-caret-up");
+  }
+}

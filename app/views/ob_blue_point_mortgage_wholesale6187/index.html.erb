@@ -1,10 +1,9 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <div class="container">
   <div class="row col-md-6 col-md-offset-2 custyle">
     <table class="table table-striped custab">
       <thead>
         <h4>Sheet</h4>
-        <tr onclick="myFunction()"><th><%= @sheet.name %><i class="fa fa-caret-down"></i></th></tr>
+        <tr onclick="myFunction()"><th><%= @sheet.name %><i class="fa fa-caret-down" id="indication-arrow"></i></th></tr>
       </thead>
     </table>
     <table class="table table-striped custab" id="sub_sheets">
@@ -32,36 +31,3 @@
     </table>
   </div>
 </div>
-<style type="text/css">
-  .col-md-6{
-    max-width: 71% !important;
-  }
-  i {
-    /*border: solid black;*/
-    border-width: 0 3px 3px 0;
-    display: inline-block;
-    padding: 3px;
-  }
-  .down {
-    transform: rotate(45deg);
-    -webkit-transform: rotate(45deg);
-  }
-  #sub_sheets{
-    display: none;
-  }
-  h4#sheet-title{
-    display: none;
-  }
-</style>
-<script type="text/javascript">
-  function myFunction(){
-    if($("#sub_sheets").is(':visible')){
-      $("#sub_sheets").hide();
-      $("h4#sheet-title").hide();
-    }
-    else{
-      $("#sub_sheets").show();
-      $("h4#sheet-title").show();
-    }
-  }
-</script>
