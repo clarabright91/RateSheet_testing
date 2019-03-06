@@ -1,0 +1,2 @@
+module ObBluePointMortgageWholesale6187Helper
+end

@@ -320,8 +320,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
       end
     end
     # create_program_association_with_adjustment(sheet)
-    # redirect_to programs_import_file_path(@bank)
-    redirect_to programs_import_file_path(@sheet_obj)
+    # redirect_to programs_ob_new_rez_wholesale5806_path(@bank)
+    redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
   def freddie_fixed_rate
@@ -783,7 +783,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     # create adjustment for each program
     make_adjust(@allAdjustments, @sheet)
     create_program_association_with_adjustment(@sheet)
-    redirect_to programs_import_file_path(@sheet_obj)
+    redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
   def conforming_fixed_rate
@@ -1223,7 +1223,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     # create adjustment for each program
     make_adjust(@allAdjustments, @sheet)
     create_program_association_with_adjustment(@sheet)
-    redirect_to programs_import_file_path(@sheet_obj)
+    redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
   def home_possible
@@ -1754,7 +1754,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     # create adjustment for each program
     make_adjust(@allAdjustments, @sheet)
     create_program_association_with_adjustment(@sheet)
-    redirect_to programs_import_file_path(@sheet_obj)
+    redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
   def lp_open_acces_arms
@@ -2043,7 +2043,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
         create_program_association_with_adjustment(@sheet)
       end
     end
-    redirect_to programs_import_file_path(@sheet_obj)
+    redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
   def lp_open_access_105
@@ -2339,7 +2339,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
         create_program_association_with_adjustment(@sheet)
       end
     end
-    redirect_to programs_import_file_path(@sheet_obj)
+    redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
   def jumbo_series_d
@@ -2597,7 +2597,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
       end
     end
     # create adjustment for each program
-    redirect_to programs_import_file_path(@sheet_obj)
+    redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
   def lp_open_access
@@ -2902,7 +2902,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
         create_program_association_with_adjustment(@sheet)
       end
     end
-    redirect_to programs_import_file_path(@sheet_obj)
+    redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
   def jumbo_series_f
@@ -3183,7 +3183,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
         create_adjust(adjustment,sheet)
       end
     end
-    redirect_to programs_import_file_path(@sheet_obj)
+    redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
   def du_refi_plus_arms
@@ -3463,7 +3463,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
         create_program_association_with_adjustment(@sheet)
       end
     end
-    redirect_to programs_import_file_path(@sheet_obj)
+    redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
   def jumbo_series_h
@@ -3811,7 +3811,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
         end
       end
     end
-    redirect_to programs_import_file_path(@sheet_obj)
+    redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
   def du_refi_plus_fixed_rate_105
@@ -4288,7 +4288,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
       end
     end
     create_program_association_with_adjustment(@sheet)
-    redirect_to programs_import_file_path(@sheet_obj)
+    redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
   def jumbo_series_i
@@ -4629,7 +4629,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
         create_program_association_with_adjustment(@sheet)
       end
     end
-    redirect_to programs_import_file_path(@sheet_obj)
+    redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
   def du_refi_plus_fixed_rate
@@ -4905,7 +4905,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
         create_program_association_with_adjustment(@sheet)
       end
     end
-    redirect_to programs_import_file_path(@sheet_obj)
+    redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
   def jumbo_series_jqm
@@ -5178,7 +5178,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
         create_program_association_with_adjustment(@sheet)
       end
     end
-    redirect_to programs_import_file_path(@sheet_obj)
+    redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
   def dream_big
@@ -5478,7 +5478,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
         create_program_association_with_adjustment(@sheet)
       end
     end
-    redirect_to programs_import_file_path(@sheet_obj)
+    redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
   def high_balance_extra
@@ -5708,7 +5708,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
         create_program_association_with_adjustment(@sheet)
       end
     end
-    redirect_to programs_import_file_path(@sheet_obj)
+    redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
   def freddie_arms
@@ -6143,7 +6143,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     # create adjustment for each program
     make_adjust(@allAdjustments, @sheet)
     create_program_association_with_adjustment(@sheet)
-    redirect_to programs_import_file_path(@sheet_obj)
+    redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
   def conforming_arms
@@ -6572,7 +6572,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     # create adjustment for each program
     make_adjust(@allAdjustments, @sheet)
     create_program_association_with_adjustment(@sheet)
-    redirect_to programs_import_file_path(@sheet_obj)
+    redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
   def homeready
@@ -7002,7 +7002,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     # create adjustment for each program
     make_adjust(@allAdjustments, @sheet)
     create_program_association_with_adjustment(@sheet)
-    redirect_to programs_import_file_path(@sheet_obj)
+    redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
   def homeready_hb
@@ -7416,7 +7416,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     # create adjustment for each program
     make_adjust(@allAdjustments, @sheet)
     create_program_association_with_adjustment(@sheet)
-    redirect_to programs_import_file_path(@sheet_obj)
+    redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
   def programs
