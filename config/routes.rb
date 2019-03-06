@@ -198,7 +198,7 @@ Rails.application.routes.draw do
       get :single_program
     end
   end
-  
+
   resources :ob_m_t_bank_wholesale9996, only: [:index] do
     member do
       get :programs
@@ -211,6 +211,14 @@ Rails.application.routes.draw do
     member do
       get :programs
       get '/ratesheet-singlepageexcel' => 'ob_direct_mortgage_corp_wholesale8443#rate_sheet_single_page_excel'
+      get :single_program
+    end
+  end
+
+  resources :ob_royal_pacific_funding_wholesale8409, only: [:index] do
+    member do
+      get :programs
+      get :royal_pfc#Royal PFC
       get :single_program
     end
   end
