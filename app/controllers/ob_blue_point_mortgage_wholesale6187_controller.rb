@@ -2,7 +2,7 @@ class ObBluePointMortgageWholesale6187Controller < ApplicationController
 
   def index
     sub_sheet_names = get_sheets_names
-    file = File.join('/home/yuva/Downloads/sheets_of_remote_url/OB_BluePoint_Mortgage_Wholesale6187.xls')
+    file = File.join('/home/yuva/Downloads/sheetsfor3rdmilestone/OB_BluePoint_Mortgage_Wholesale6187.xls')
     xlsx = Roo::Spreadsheet.open(file)
     begin
       xlsx.sheets.each do |sheet|

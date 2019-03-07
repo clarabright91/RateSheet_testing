@@ -228,6 +228,13 @@ Rails.application.routes.draw do
       get :single_program
     end
   end
+  resources :wholesale_rate_sheet_home_bridge_wholesale, only: [:index] do
+    member do
+      get :programs
+      get :single_program
+      get :rate_sheet
+    end 
+  end
 
   match "dashboard/index", to: 'dashboard#index', via: [:get, :post]
   get 'dashboard/fetch_programs_by_bank', to: 'dashboard#fetch_programs_by_bank'
