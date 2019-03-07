@@ -265,165 +265,140 @@ class ObNewfiWholesale7019Controller < ApplicationController
             (0..max_column_section).each do |max_column|
               cc = 5*max_column + (3+max_column) # 3 / 9 / 15
               begin
-                @title = sheet_data.cell(r,cc)
-                if @title.present?
-                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  program_property @program, sheet
-                  @programs_ids << @program.id
-
-                  begin
-                    @title = sheet_data.cell(r,cc)
-                    if @title.present?
-                      @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                      program_property @program, sheet
-                      @programs_ids << @program.id
-                    end
-
-                    @program.adjustments.destroy_all
-                    @block_hash = {}
-                    key = ''
-                  rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
-                    error_log.save
+                begin
+                  @title = sheet_data.cell(r,cc)
+                  if @title.present?
+                    @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                    program_property @program, sheet
+                    @programs_ids << @program.id
                   end
 
                   @program.adjustments.destroy_all
                   @block_hash = {}
                   key = ''
-                  # if @program.term.present?
-                  #   main_key = "Term/LoanType/InterestRate/LockPeriod"
-                  # else
-                  #   main_key = "InterestRate/LockPeriod"
-                  # end
-                  # @block_hash[main_key] = {}
-                  (1..50).each do |max_row|
-                    @data = []
-                    (0..4).each_with_index do |index, c_i|
-                      rrr = rr + max_row
-                      ccc = cc + c_i
-                      value = sheet_data.cell(rrr,ccc)
-                      begin
-                        if value.present?
-                          if (c_i == 0)
-                            key = value
-                            @block_hash[key] = {}
-                          else
-                            if @program.lock_period.length <= 3
-                              @program.lock_period << 15*c_i
-                              @program.save
-                            end
-                            @block_hash[key][15*c_i] = value
-                          end
-                          @data << value
-                        end
-                      rescue Exception => e
-                        error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
-                        error_log.save
-                      end
-                    end
-                    if @data.compact.reject { |c| c.blank? }.length == 0
-                      break # terminate the loop
-                    end
-                  end
-                  # if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-                  #   @block_hash.values.first.shift
-                  # end
-                  if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
-                    @block_hash.shift
-                  end
-                  @program.update(base_rate: @block_hash)
+                rescue Exception => e
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                  error_log.save
                 end
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+                (1..50).each do |max_row|
+                  @data = []
+                  (0..4).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    begin
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          if @program.lock_period.length <= 3
+                            @program.lock_period << 15*c_i
+                            @program.save
+                          end
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
+                      end
+                    rescue Exception => e
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                      error_log.save
+                    end
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
+                  end
+                end
+                if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
+                  @block_hash.shift
+                end
+                @program.update(base_rate: @block_hash)
+              end
               rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
             end
           end
-        end
-        # Adjustments
-
       end
     end
     redirect_to programs_ob_newfi_wholesale7019_path(@sheet_obj)
   end
 
-  # def sequoia_expanded_products
-  #   file = File.join(Rails.root,  'OB_Newfi_Wholesale7019.xls')
-  #   xlsx = Roo::Spreadsheet.open(file)
-  #   xlsx.sheets.each do |sheet|
-  #     if (sheet == "SEQUOIA EXPANDED PRODUCTS")
-  #       sheet_data = xlsx.sheet(sheet)
-  #       @programs_ids = []
+  def sequoia_expanded_products
+    file = File.join(Rails.root,  'OB_Newfi_Wholesale7019.xls')
+    xlsx = Roo::Spreadsheet.open(file)
+    xlsx.sheets.each do |sheet|
+      if (sheet == "SEQUOIA EXPANDED PRODUCTS")
+        sheet_data = xlsx.sheet(sheet)
+        @programs_ids = []
 
-  #       #program
-  #       (51..92).each do |r|
-  #         row = sheet_data.row(r)
-  #         if ((row.compact.count > 1) && (row.compact.count <= 4))
-  #           rr = r + 1
-  #           max_column_section = row.compact.count - 1
-  #           (0..max_column_section).each do |max_column|
-  #             cc = 5*max_column + (3+max_column) # 3 / 9 / 15
-  #             @title = sheet_data.cell(r,cc)
-  #             if @title.present?
-  #               @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-  #               program_property @program, sheet
-  #               @programs_ids << @program.id
-  #               begin
-  #                 @title = sheet_data.cell(r,cc)
-  #                 if @title.present?
-  #                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-  #                   program_property @program, sheet
-  #                   @programs_ids << @program.id
-  #                 end
+        #program
+        (51..92).each do |r|
+          row = sheet_data.row(r)
+          if ((row.compact.count > 1) && (row.compact.count <= 4))
+            rr = r + 1
+            max_column_section = row.compact.count - 1
+            (0..max_column_section).each do |max_column|
+              cc = 5*max_column + (3+max_column) # 3 / 9 / 15
+              @title = sheet_data.cell(r,cc)
+                begin
+                  @title = sheet_data.cell(r,cc)
+                  if @title.present?
+                    @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                    program_property @program, sheet
+                    @programs_ids << @program.id
+                  end
 
-  #                 @program.adjustments.destroy_all
-  #                 @block_hash = {}
-  #                 key = ''
-  #               rescue Exception => e
-  #                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
-  #                 error_log.save
-  #               end
-
-  #               @program.adjustments.destroy_all
-  #               @block_hash = {}
-  #               key = ''
-  #               (1..50).each do |max_row|
-  #                 @data = []
-  #                 (0..4).each_with_index do |index, c_i|
-  #                   rrr = rr + max_row
-  #                   ccc = cc + c_i
-  #                   value = sheet_data.cell(rrr,ccc)
-  #                   begin
-  #                     if value.present?
-  #                       if (c_i == 0)
-  #                         key = value
-  #                         @block_hash[key] = {}
-  #                       else
-  #                         @block_hash[key][15*c_i] = value
-  #                       end
-  #                       @data << value
-  #                     end
-  #                   rescue Exception => e
-  #                     error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
-  #                     error_log.save
-  #                   end
-  #                 end
-  #                 if @data.compact.reject { |c| c.blank? }.length == 0
-  #                   break # terminate the loop
-  #                 end
-  #               end
-  #               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
-  #                 @block_hash.shift
-  #               end
-  #               @program.update(base_rate: @block_hash)
-  #             end
-  #           end
-  #         end
-  #       end
-  #     end
-  #   end
-  #   redirect_to programs_ob_newfi_wholesale7019_path(@sheet_obj)
-  # end
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                rescue Exception => e
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                  error_log.save
+                end
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
+                (1..50).each do |max_row|
+                  @data = []
+                  (0..4).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    begin
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
+                      end
+                    rescue Exception => e
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                      error_log.save
+                    end
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
+                  end
+                end
+                if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
+                  @block_hash.shift
+                end
+                @program.update(base_rate: @block_hash)
+            end
+          end
+        end
+      end
+    end
+    redirect_to programs_ob_newfi_wholesale7019_path(@sheet_obj)
+  end
 
   def sequoia_investor_pro
     file = File.join(Rails.root,  'OB_Newfi_Wholesale7019.xls')
@@ -438,7 +413,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
         primary_key = ''
         secondary_key = ''
 
-        #program
+        # programs
         (51..92).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 4))
@@ -448,25 +423,20 @@ class ObNewfiWholesale7019Controller < ApplicationController
               cc = 5*max_column + (3+max_column) # 3 / 9 / 15
               @title = sheet_data.cell(r,cc)
               if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program, sheet
-                @programs_ids << @program.id
-              begin
-                @title = sheet_data.cell(r,cc)
-                if @title.present?
+                begin
+                  @title = sheet_data.cell(r,cc)
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   program_property @program, sheet
                   @programs_ids << @program.id
+
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                rescue Exception => e
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                  error_log.save
                 end
-
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-              rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
-                error_log.save
               end
-
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -482,11 +452,6 @@ class ObNewfiWholesale7019Controller < ApplicationController
                         key = value
                         @block_hash[key] = {}
                       else
-
-                        if @program.lock_period.length <= 3
-                          @program.lock_period << 15*c_i
-                          @program.save
-                        end
                         @block_hash[key][15*c_i] = value
                       end
                       @data << value
@@ -507,7 +472,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
             end
           end
         end
-        #Adjustments
+        # Adjustments
         (77..105).each do |r|
           row = sheet_data.row(r)
           @ltv_data = sheet_data.row(81)
@@ -613,7 +578,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                     rrr = rr + max_row
                     ccc = cc + c_i
                     value = sheet_data.cell(rrr,ccc)
-                    begins
+                    begin
                       if value.present?
                         if (c_i == 0)
                           key = value
@@ -738,69 +703,59 @@ class ObNewfiWholesale7019Controller < ApplicationController
             (0..max_column_section).each do |max_column|
               cc = 5*max_column + (3+max_column) # 3 / 9 / 15
               @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program, sheet
-                @programs_ids << @program.id
-              begin
-                @title = sheet_data.cell(r,cc)
-                if @title.present?
-                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  program_property @program, sheet
-                  @programs_ids << @program.id
+                begin
+                  @title = sheet_data.cell(r,cc)
+                  if @title.present?
+                    @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                    program_property @program, sheet
+                    @programs_ids << @program.id
+                  end
+
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                rescue Exception => e
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                  error_log.save
                 end
 
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
-              rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
-                error_log.save
-              end
+                (1..50).each do |max_row|
+                  @data = []
+                  (0..4).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    value = sheet_data.cell(rrr,ccc)
+                    begin
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
 
-              @program.adjustments.destroy_all
-              @block_hash = {}
-              key = ''
-              # if @program.term.present?
-              #   main_key = "Term/LoanType/InterestRate/LockPeriod"
-              # else
-              #   main_key = "InterestRate/LockPeriod"
-              # end
-              # @block_hash[main_key] = {}
-              (1..50).each do |max_row|
-                @data = []
-                (0..4).each_with_index do |index, c_i|
-                  rrr = rr + max_row
-                  ccc = cc + c_i
-                  value = sheet_data.cell(rrr,ccc)
-                  begin
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-
-                        if @program.lock_period.length <= 3
-                          @program.lock_period << 15*c_i
-                          @program.save
+                          if @program.lock_period.length <= 3
+                            @program.lock_period << 15*c_i
+                            @program.save
+                          end
+                          @block_hash[key][15*c_i] = value
                         end
-                        @block_hash[key][15*c_i] = value
+                        @data << value
                       end
-                      @data << value
+                    rescue Exception => e
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                      error_log.save
                     end
-                  rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
-                    error_log.save
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
                   end
                 end
-                if @data.compact.reject { |c| c.blank? }.length == 0
-                  break # terminate the loop
+                if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
+                  @block_hash.shift
                 end
-              end
-              if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
-                @block_hash.shift
-              end
-              @program.update(base_rate: @block_hash)
+                @program.update(base_rate: @block_hash)
             end
           end
         end
@@ -1018,68 +973,53 @@ class ObNewfiWholesale7019Controller < ApplicationController
             (0..max_column_section).each do |max_column|
               cc = 5*max_column + (3+max_column) # 3 / 9 / 15
               @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program, sheet
-                @programs_ids << @program.id
-              begin
-                @title = sheet_data.cell(r,cc)
-                if @title.present?
+                begin
+                  @title = sheet_data.cell(r,cc)
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   program_property @program, sheet
                   @programs_ids << @program.id
+
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                rescue Exception => e
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                  error_log.save
                 end
 
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
-              rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
-                error_log.save
-              end
+                (1..50).each do |max_row|
+                  @data = []
+                  (0..4).each_with_index do |index, c_i|
+                    rrr = rr + max_row
+                    ccc = cc + c_i
+                    begin
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
 
-              @program.adjustments.destroy_all
-              @block_hash = {}
-              key = ''
-              # if @program.term.present?
-              #   main_key = "Term/LoanType/InterestRate/LockPeriod"
-              # else
-              #   main_key = "InterestRate/LockPeriod"
-              # end
-              # @block_hash[main_key] = {}
-              (1..50).each do |max_row|
-                @data = []
-                (0..4).each_with_index do |index, c_i|
-                  rrr = rr + max_row
-                  ccc = cc + c_i
-                  begin
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-
-                        if @program.lock_period.length <= 3
-                          @program.lock_period << 15*c_i
-                          @program.save
+                          if @program.lock_period.length <= 3
+                            @program.lock_period << 15*c_i
+                            @program.save
+                          end
+                          @block_hash[key][15*c_i] = value
                         end
-                        @block_hash[key][15*c_i] = value
+                        @data << value
                       end
-                      @data << value
+                    rescue Exception => e
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                      error_log.save
                     end
-                  rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
-                    error_log.save
+                  end
+                  if @data.compact.reject { |c| c.blank? }.length == 0
+                    break # terminate the loop
                   end
                 end
-                if @data.compact.reject { |c| c.blank? }.length == 0
-                  break # terminate the loop
-                end
-              end
-              # if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-              #   @block_hash.values.first.shift
-              # end
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
@@ -1093,78 +1033,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
           @ltv_data = sheet_data.row(117)
           (0..sheet_data.last_column).each do |cc|
             value = sheet_data.cell(r,cc)
-            if value == "LTV / FICO (Terms > 15 years only)"
-              first_row = 105
-              end_row = 108
-              last_column = 13
-              first_column = 5
-              ltv_row = 104
-              num = 3
-              ltv_adjustment range1, range2, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row,num
-            end
-            # Loans With Secondary Financing
-            if value == "Loans With Secondary Financing"
-              primary_key = "LTV/CLTV/FICO"
-              @secondary_hash[primary_key] = {}
-            end
-            if r >= 118 && r <= 122 && cc == 4
-              ltv_key = get_value value
-              @secondary_hash[primary_key][ltv_key] = {}
-            end
-            if r >= 118 && r <= 122 && cc == 5
-              cltv_key = get_value value
-              @secondary_hash[primary_key][ltv_key][cltv_key] = {}
-            end
-            if r >= 118 && r <= 122 && cc > 5 && cc <= 7
-              ltv_data = get_value @ltv_data[cc-3]
-              ltv_data = ltv_data.tr(')( ','')
-              @secondary_hash[primary_key][ltv_key][cltv_key][ltv_data] = {}
-              @secondary_hash[primary_key][ltv_key][cltv_key][ltv_data] = value
-            end
-            # Other Adjustments
-            if r == 108 && cc == 15
-              @other_adjustment["PropertyType"] = {}
-              @other_adjustment["PropertyType"]["2-4 Unit"] = {}
-              cc = cc + 1
-              new_value = sheet_data.cell(r,cc)
-              @other_adjustment["PropertyType"]["2-4 Unit"] = new_value
-            end
-            if r == 109 && cc == 15
-              @other_adjustment["PropertyType/Term/LTV"] = {}
-              @other_adjustment["PropertyType/Term/LTV"]["Condo"] = {}
-              @other_adjustment["PropertyType/Term/LTV"]["Condo"]["15-Inf"] = {}
-              @other_adjustment["PropertyType/Term/LTV"]["Condo"]["15-Inf"]["75-Inf"] = {}
-              cc = cc + 1
-              new_value = sheet_data.cell(r,cc)
-              @other_adjustment["PropertyType/Term/LTV"]["Condo"]["15-Inf"]["75-Inf"] = new_value
-            end
-            if r == 110 && cc == 15
-              @other_adjustment["LoanSize/RefinanceOption"] = {}
-              @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"] = {}
-              @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Cash Out"] = {}
-              cc = cc + 1
-              new_value = sheet_data.cell(r,cc)
-              @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Cash Out"] = new_value
-            end
-            if r == 111 && cc == 15
-              @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Rate and Term"] = {}
-              cc = cc + 1
-              new_value = sheet_data.cell(r,cc)
-              @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Rate and Term"] = new_value
-            end
-            if r == 130 && cc == 14
-              @other_adjustment["MiscAdjuster"] = {}
-              @other_adjustment["MiscAdjuster"]["Escrow Waiver Fee"] = {}
-              cc = cc + 4
-              new_value = sheet_data.cell(r,cc)
-              @other_adjustment["MiscAdjuster"]["Escrow Waiver Fee"] = new_value
-            end
-            if r == 131 && cc == 14
-              @other_adjustment["LoanAmount"] = {}
-              cc = cc + 4
-              new_value = sheet_data.cell(r,cc)
-              @other_adjustment["LoanAmount"]["0-150,000"] = new_value
-            begin
+            if value.present?
               if value == "LTV / FICO (Terms > 15 years only)"
                 first_row = 105
                 end_row = 108
@@ -1237,9 +1106,78 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 new_value = sheet_data.cell(r,cc)
                 @other_adjustment["LoanAmount"]["0-150,000"] = new_value
               end
-            rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
-              error_log.save
+              if value == "LTV / FICO (Terms > 15 years only)"
+                first_row = 105
+                end_row = 108
+                last_column = 13
+                first_column = 5
+                ltv_row = 104
+                num = 3
+                ltv_adjustment range1, range2, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row,num
+              end
+              # Loans With Secondary Financing
+              if value == "Loans With Secondary Financing"
+                primary_key = "LTV/CLTV/FICO"
+                @secondary_hash[primary_key] = {}
+              end
+              if r >= 118 && r <= 122 && cc == 4
+                ltv_key = get_value value
+                @secondary_hash[primary_key][ltv_key] = {}
+              end
+              if r >= 118 && r <= 122 && cc == 5
+                cltv_key = get_value value
+                @secondary_hash[primary_key][ltv_key][cltv_key] = {}
+              end
+              if r >= 118 && r <= 122 && cc > 5 && cc <= 7
+                ltv_data = get_value @ltv_data[cc-3]
+                ltv_data = ltv_data.tr(')( ','')
+                @secondary_hash[primary_key][ltv_key][cltv_key][ltv_data] = {}
+                @secondary_hash[primary_key][ltv_key][cltv_key][ltv_data] = value
+              end
+              # Other Adjustments
+              if r == 108 && cc == 15
+                @other_adjustment["PropertyType"] = {}
+                @other_adjustment["PropertyType"]["2-4 Unit"] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment["PropertyType"]["2-4 Unit"] = new_value
+              end
+              if r == 109 && cc == 15
+                @other_adjustment["PropertyType/Term/LTV"] = {}
+                @other_adjustment["PropertyType/Term/LTV"]["Condo"] = {}
+                @other_adjustment["PropertyType/Term/LTV"]["Condo"]["15-Inf"] = {}
+                @other_adjustment["PropertyType/Term/LTV"]["Condo"]["15-Inf"]["75-Inf"] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment["PropertyType/Term/LTV"]["Condo"]["15-Inf"]["75-Inf"] = new_value
+              end
+              if r == 110 && cc == 15
+                @other_adjustment["LoanSize/RefinanceOption"] = {}
+                @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"] = {}
+                @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Cash Out"] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Cash Out"] = new_value
+              end
+              if r == 111 && cc == 15
+                @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Rate and Term"] = {}
+                cc = cc + 1
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Rate and Term"] = new_value
+              end
+              if r == 130 && cc == 14
+                @other_adjustment["MiscAdjuster"] = {}
+                @other_adjustment["MiscAdjuster"]["Escrow Waiver Fee"] = {}
+                cc = cc + 4
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment["MiscAdjuster"]["Escrow Waiver Fee"] = new_value
+              end
+              if r == 131 && cc == 14
+                @other_adjustment["LoanAmount"] = {}
+                cc = cc + 4
+                new_value = sheet_data.cell(r,cc)
+                @other_adjustment["LoanAmount"]["0-150,000"] = new_value
+              end
             end
           end
         end
@@ -1287,12 +1225,6 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
-              # if @program.term.present?
-              #   main_key = "Term/LoanType/InterestRate/LockPeriod"
-              # else
-              #   main_key = "InterestRate/LockPeriod"
-              # end
-              # @block_hash[main_key] = {}
               (1..50).each do |max_row|
                 @data = []
                 (0..4).each_with_index do |index, c_i|
@@ -1322,9 +1254,6 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
-              # if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-              #   @block_hash.values.first.shift
-              # end
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
@@ -1583,26 +1512,21 @@ class ObNewfiWholesale7019Controller < ApplicationController
             (0..max_column_section).each do |max_column|
               cc = 5*max_column + (3+max_column) # 3 / 9 / 15
               @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program, sheet
-                @programs_ids << @program.id
-              begin
-                @title = sheet_data.cell(r,cc)
-                if @title.present?
-                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  program_property @program, sheet
-                  @programs_ids << @program.id
+                begin
+                  @title = sheet_data.cell(r,cc)
+                  if @title.present?
+                    @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                    program_property @program, sheet
+                    @programs_ids << @program.id
+                  end
+
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                rescue Exception => e
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                  error_log.save
                 end
-
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-              rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
-                error_log.save
-              end
-
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -1881,26 +1805,21 @@ class ObNewfiWholesale7019Controller < ApplicationController
             (0..max_column_section).each do |max_column|
               cc = 5*max_column + (3+max_column) # 3 / 9 / 15
               @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program, sheet
-                @programs_ids << @program.id
-              begin
-                if @title.present?
-                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  program_property @program, sheet
-                  @programs_ids << @program.id
+                begin
+                  if @title.present?
+                    @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                    program_property @program, sheet
+                    @programs_ids << @program.id
+                  end
+
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  lock_hash = {}
+                rescue Exception => e
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                  error_log.save
                 end
-
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                lock_hash = {}
-              rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
-                error_log.save
-              end
-
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -2174,26 +2093,22 @@ class ObNewfiWholesale7019Controller < ApplicationController
             (0..max_column_section).each do |max_column|
               cc = 5*max_column + (3+max_column) # 3 / 9 / 15
               @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program, sheet
-                @programs_ids << @program.id
-              begin
-                @title = sheet_data.cell(r,cc)
-                if @title.present?
-                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  program_property @program, sheet
-                  @programs_ids << @program.id
+                begin
+                  @title = sheet_data.cell(r,cc)
+                  if @title.present?
+                    @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                    program_property @program, sheet
+                    @programs_ids << @program.id
+                  end
+
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                rescue Exception => e
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                  error_log.save
                 end
-
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-              rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
-                error_log.save
-              end
-
+              
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
@@ -2442,7 +2357,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
                   error_log.save
                 end
-
+              end
                 (1..50).each do |max_row|
                   @data = []
                   (0..4).each_with_index do |index, c_i|
@@ -2763,26 +2678,21 @@ class ObNewfiWholesale7019Controller < ApplicationController
             (0..max_column_section).each do |max_column|
               cc = 5*max_column + (3+max_column) # 3 / 9 / 15
               @title = sheet_data.cell(r,cc)
-              if @title.present?
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                program_property @program, sheet
-                @programs_ids << @program.id
-              begin
-                @title = sheet_data.cell(r,cc)
-                if @title.present?
-                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  program_property @program, sheet
-                  @programs_ids << @program.id
+                begin
+                  @title = sheet_data.cell(r,cc)
+                  if @title.present?
+                    @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                    program_property @program, sheet
+                    @programs_ids << @program.id
+                  end
+
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                rescue Exception => e
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                  error_log.save
                 end
-
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-              rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
-                error_log.save
-              end
-
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
