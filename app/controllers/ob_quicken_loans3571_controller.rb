@@ -130,8 +130,8 @@ class ObQuickenLoans3571Controller < ApplicationController
                   end
                   if value == "High Balance & ARMs"
                     @other_adjustment["LoanSize/LoanType/LTV"] = {}
-                    @other_adjustment["LoanSize/LoanType/LTV"]["High Balance"] = {}
-                    @other_adjustment["LoanSize/LoanType/LTV"]["High Balance"]["ARM"] = {}
+                    @other_adjustment["LoanSize/LoanType/LTV"]["High-Balance"] = {}
+                    @other_adjustment["LoanSize/LoanType/LTV"]["High-Balance"]["ARM"] = {}
                   end
                   
                   # DU & LP LTV/FICO; Terms > 15 Years, Including ARMs
@@ -249,18 +249,19 @@ class ObQuickenLoans3571Controller < ApplicationController
                   end
                   if r >= 64 && r <= 65 && cc == 13
                     secondary_key = get_value value
-                    @other_adjustment["LoanSize/LoanType/LTV"]["High Balance"]["ARM"][secondary_key] = {}
+                    @other_adjustment["LoanSize/LoanType/LTV"]["High-Balance"]["ARM"][secondary_key] = {}
                     cc = cc + 8
                     new_value = sheet_data.cell(r,cc)
-                    @other_adjustment["LoanSize/LoanType/LTV"]["High Balance"]["ARM"][secondary_key] = new_value
+                    @other_adjustment["LoanSize/LoanType/LTV"]["High-Balance"]["ARM"][secondary_key] = new_value
                   end
                   if r == 66 && cc == 13
                     @other_adjustment["LoanSize/LoanType/LTV"] = {}
-                    @other_adjustment["LoanSize/LoanType/LTV"]["High Balance"] = {}
-                    @other_adjustment["LoanSize/LoanType/LTV"]["High Balance"]["ARM"] = {}
+                    @other_adjustment["LoanSize/LoanType/LTV"]["High-Balance"] = {}
+                    @other_adjustment["LoanSize/LoanType/LTV"]["High-Balance"]["ARM"] = {}
+                    @other_adjustment["LoanSize/LoanType/LTV"]["High-Balance"]["ARM"]["90-Inf"] = {}
                     cc = cc + 8
                     new_value = sheet_data.cell(r,cc)
-                    @other_adjustment["LoanSize/LoanType/LTV"]["High Balance"]["ARM"] = new_value
+                    @other_adjustment["LoanSize/LoanType/LTV"]["High-Balance"]["ARM"]["90-Inf"] = new_value
                   end
                   # Cash Out
                   if r >= 39 && r <= 45 && cc == 13
@@ -348,7 +349,6 @@ class ObQuickenLoans3571Controller < ApplicationController
             end
           end
         end
-
         adjustment = [@adjustment_hash,@subordinate_hash,@property_hash,@cashout_hash,@other_adjustment]
         make_adjust(adjustment,sheet)
         create_program_association_with_adjustment(sheet)
@@ -485,13 +485,13 @@ class ObQuickenLoans3571Controller < ApplicationController
                   end
                   if value == "High Balance & ARMs"
                     @other_adjustment["LoanSize/LoanType/LTV"] = {}
-                    @other_adjustment["LoanSize/LoanType/LTV"]["High Balance"] = {}
-                    @other_adjustment["LoanSize/LoanType/LTV"]["High Balance"]["ARM"] = {}
+                    @other_adjustment["LoanSize/LoanType/LTV"]["High-Balance"] = {}
+                    @other_adjustment["LoanSize/LoanType/LTV"]["High-Balance"]["ARM"] = {}
                   end
                   if value == "High LTV"
-                    @other_adjustment["FannieMae/FreddieMac//LTV"] = {}
-                    @other_adjustment["FannieMae/FreddieMac//LTV"][true] = {}
-                    @other_adjustment["FannieMae/FreddieMac//LTV"][true][true] = {}
+                    @other_adjustment["FannieMae/FreddieMac/LTV"] = {}
+                    @other_adjustment["FannieMae/FreddieMac/LTV"][true] = {}
+                    @other_adjustment["FannieMae/FreddieMac/LTV"][true][true] = {}
                     @other_adjustment["FannieMae/Term/LTV"] = {}
                     @other_adjustment["FannieMae/Term/LTV"][true] = {}
                   end
@@ -642,10 +642,10 @@ class ObQuickenLoans3571Controller < ApplicationController
                   end
                   if r >= 61 && r <= 63 && cc == 16
                     secondary_key = get_value value
-                    @other_adjustment["LoanSize/LoanType/LTV"]["High Balance"]["ARM"][secondary_key] = {}
+                    @other_adjustment["LoanSize/LoanType/LTV"]["High-Balance"]["ARM"][secondary_key] = {}
                     cc = cc + 9 
                     new_value = sheet_data.cell(r,cc)
-                    @other_adjustment["LoanSize/LoanType/LTV"]["High Balance"]["ARM"][secondary_key] = new_value
+                    @other_adjustment["LoanSize/LoanType/LTV"]["High-Balance"]["ARM"][secondary_key] = new_value
                   end
                   if r == 64 && cc == 16
                     @other_adjustment["FreddieMac/LoanType"] = {}
@@ -658,10 +658,10 @@ class ObQuickenLoans3571Controller < ApplicationController
                   # High LTV
                   if r >= 67 && r <= 68 && cc == 16
                     secondary_key = get_value value
-                    @other_adjustment["FannieMae/FreddieMac//LTV"][true][true][secondary_key] = {}
+                    @other_adjustment["FannieMae/FreddieMac/LTV"][true][true][secondary_key] = {}
                     cc = cc + 9
                     new_value = sheet_data.cell(r,cc)
-                    @other_adjustment["FannieMae/FreddieMac//LTV"][true][true][secondary_key] = new_value
+                    @other_adjustment["FannieMae/FreddieMac/LTV"][true][true][secondary_key] = new_value
                   end
                   if r >= 69 && r <= 70 && cc == 16
                     secondary_key = value.split("DU").last.tr('A-Za-z) ','')
@@ -1418,7 +1418,7 @@ class ObQuickenLoans3571Controller < ApplicationController
         elsif value1.include?("-")
           value1 = value1.tr('A-Z<>$%= ','')
         else
-          value1
+          value1.tr('()&% ','')
         end
       end
     end
