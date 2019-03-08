@@ -10,20 +10,20 @@ class Program < ApplicationRecord
   end
 
   def update_fields p_name
-    set_load_type(p_name) if ["Fixed", "ARM", "Hybrid", "Floating", "Variable"].any? { |word| p_name.include?(word) }
-    set_fha   if ["FHA"].any? { |word| p_name.include?(word) }
-    set_va    if ["VA"].any? { |word| p_name.include?(word) }
-    set_usda  if ["USDA"].any? { |word| p_name.include?(word) }
-    set_loan_purpose(p_name) if ["Purchase", "Refinance"].any? { |word| p_name.include?(word) }
-    set_arm_basic(p_name) if ["1/1", "2/1", "3/1", "7/1", "10/1", "5-1", "5/1"].any? { |word| p_name.include?(word) }
-    set_loan_size(p_name) if ["Non-Conforming", "Conforming", "Jumbo", "High-Balance"].any? { |word| p_name.include?(word) }
-    set_arm_advanced(p_name) if ["10/5", "5/1 3-2-5"].any? { |word| p_name.include?(word) }
-    set_fannie_mae   if ["Fannie Mae, DU"].any? { |word| p_name.include?(word) }
-    set_freddie_mac  if ["Freddie Mac, LP"].any? { |word| p_name.include?(word) }
+    set_load_type(p_name)           if ["Fixed", "ARM", "Hybrid", "Floating", "Variable"].any? { |word| p_name.include?(word) }
+    set_fha                         if ["FHA"].any? { |word| p_name.include?(word) }
+    set_va                          if ["VA"].any? { |word| p_name.include?(word) }
+    set_usda                        if ["USDA"].any? { |word| p_name.include?(word) }
+    set_loan_purpose(p_name)        if ["Purchase", "Refinance"].any? { |word| p_name.include?(word) }
+    set_arm_basic(p_name)           if ["1/1", "2/1", "3/1", "7/1", "10/1", "5-1", "5/1"].any? { |word| p_name.include?(word) }
+    set_loan_size(p_name)           if ["Non-Conforming", "Conforming", "Jumbo", "High-Balance"].any? { |word| p_name.include?(word) }
+    set_arm_advanced(p_name)        if ["10/5", "5/1 3-2-5"].any? { |word| p_name.include?(word) }
+    set_fannie_mae                  if ["Fannie Mae, DU"].any? { |word| p_name.include?(word) }
+    set_freddie_mac                 if ["Freddie Mac, LP"].any? { |word| p_name.include?(word) }
     set_freddie_mac_product(p_name) if ["Home Possible"].any? { |word| p_name.include?(word) }
   end
 
-  def set_load_type prog_name
+  def set_load_type p_name
     present_word = nil
     ["Fixed", "ARM", "Hybrid", "Floating", "Variable"].any? { |word|
       present_word = word if p_name.include?(word)
@@ -43,7 +43,7 @@ class Program < ApplicationRecord
     self.usda = true
   end
 
-  def set_loan_purpose
+  def set_loan_purpose p_name
     present_word = nil
     ["Purchase", "Refinance"].any? { |word|
       present_word = word if p_name.include?(word)
@@ -51,7 +51,7 @@ class Program < ApplicationRecord
     self.loan_purpose = present_word
   end
 
-  def set_arm_basic
+  def set_arm_basic p_name
     present_word = nil
     ["1/1", "2/1", "3/1", "7/1", "10/1", "5-1", "5/1"].any? { |word|
       present_word = word if p_name.include?(word)
@@ -60,7 +60,7 @@ class Program < ApplicationRecord
     self.arm_basic = present_word.to_i unless present_word.eql?("5-1")
   end
 
-  def set_loan_size
+  def set_loan_size p_name
     present_word = nil
     ["Non-Conforming", "Conforming", "Jumbo", "High-Balance"].any? { |word|
       present_word = word if p_name.include?(word)
@@ -68,7 +68,7 @@ class Program < ApplicationRecord
     self.loan_size = present_word
   end
 
-  def set_arm_advanced
+  def set_arm_advanced p_name
     present_word = nil
     ["10/5", "5/1 3-2-5"].any? { |word|
       present_word = word if p_name.include?(word)

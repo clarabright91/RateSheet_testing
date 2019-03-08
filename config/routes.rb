@@ -39,6 +39,7 @@ Rails.application.routes.draw do
   resources :ob_blue_point_mortgage_wholesale6187, :only => [:index] do
     member do
       get :fha_standard_programs
+      get :fha_streamline_programs
     end
   end
 
