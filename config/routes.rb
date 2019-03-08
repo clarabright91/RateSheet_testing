@@ -226,6 +226,20 @@ Rails.application.routes.draw do
       get :programs
       get :royal_pfc#Royal PFC
       get :single_program
+      get :fha_standard_programs
+      get :fha_streamline_programs
+      get :va_standard_programs
+      get :va_streamline_programs
+      get :conventional_fixed_programs
+      get :conventional_arm_programs
+      get :freddie_mac_programs
+      get '/core_jumbo_-_minimum_loan_amount_$1.00_above_agency_limit' => 'ob_royal_pacific_funding_wholesale8409#core_jumbo_minimum_loan_amount_above_agency_limit'
+      get :choice_advantage_plus
+      get :choice_advantage
+      get :choice_alternative
+      get :choice_ascent
+      get :choice_investor
+      get :pivot_prime_jumbo
     end
   end
   resources :wholesale_rate_sheet_home_bridge_wholesale, only: [:index] do
@@ -242,7 +256,7 @@ Rails.application.routes.draw do
       get :elite_plus_programs
       get :expanded_plus_programs
       get :simple_access_programs
-    end 
+    end
   end
 
   match "dashboard/index", to: 'dashboard#index', via: [:get, :post]
