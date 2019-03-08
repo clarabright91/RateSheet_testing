@@ -21,14 +21,24 @@ class Program < ApplicationRecord
     set_fannie_mae                  if ["Fannie Mae, DU"].any? { |word| p_name.include?(word) }
     set_freddie_mac                 if ["Freddie Mac, LP"].any? { |word| p_name.include?(word) }
     set_freddie_mac_product(p_name) if ["Home Possible"].any? { |word| p_name.include?(word) }
+    set_term(p_name) if (7..50).to_a.collect{|n| n.to_s}.any? { |word| p_name.include?(word) }
   end
 
-  def set_load_type p_name
+
+  def set_load_type(prog_name)
     present_word = nil
     ["Fixed", "ARM", "Hybrid", "Floating", "Variable"].any? { |word|
       present_word = word if p_name.include?(word)
     }
     self.loan_type = present_word
+  end
+
+  def set_term(prog_name)
+    if prog_name.scan(/\d+/).count == 1
+      term = prog_name.scan(/\d+/)[0]
+    elsif prog_name.scan(/\d+/).count > 1 && !prog_name.include?("ARM")
+      term = (prog_name.scan(/\d+/)[0]+ prog_name.scan(/\d+/)[1]).to_i
+    end
   end
 
   def set_fha

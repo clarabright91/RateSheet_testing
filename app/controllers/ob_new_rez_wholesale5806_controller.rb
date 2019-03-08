@@ -3720,7 +3720,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         end
                       end
                     rescue Exception => e
-                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: ccc, sheet_name: sheet, error_detail: e.message)
                       error_log.save
                     end
                   end

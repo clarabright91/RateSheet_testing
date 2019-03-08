@@ -259,6 +259,19 @@ Rails.application.routes.draw do
       get :simple_access_programs
     end
   end
+  resources :ob_lakeview_wholesale8393, only: [:index] do
+    member do
+      get :programs
+      get :single_program
+      get :early_access
+      get :asset_inclusion
+      get :expanded_ratio
+      get :alternative_income_calculation
+      get :investor_product_no_prepayment_penalty
+      get :bayview_portfolio_products
+      get :piggy_back_second_lien_prepayment
+    end
+  end
 
   match "dashboard/index", to: 'dashboard#index', via: [:get, :post]
   get 'dashboard/fetch_programs_by_bank', to: 'dashboard#fetch_programs_by_bank'

@@ -1219,7 +1219,8 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         @program.loan_limit_type << "High Balance"
       end
       @program.save
-      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, jumbo_high_balance: jumbo_high_balance, sheet_name: @sheet_name)
+      bank_name = @bank.name
+      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, jumbo_high_balance: jumbo_high_balance, sheet_name: @sheet_name,bank_name: bank_name)
     end
 
     def make_adjust(block_hash, sheet)
