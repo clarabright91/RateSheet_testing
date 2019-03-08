@@ -10,7 +10,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_26_121700) do
+ActiveRecord::Schema.define(version: 2019_03_06_120308) do
+
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -91,11 +92,19 @@ ActiveRecord::Schema.define(version: 2019_02_26_121700) do
     t.string "loan_size"
     t.string "fannie_mae_product"
     t.string "freddie_mac_product"
+    t.integer "sub_sheet_id"
   end
 
   create_table "sheets", force: :cascade do |t|
     t.string "name"
     t.integer "bank_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "sub_sheets", force: :cascade do |t|
+    t.string "name"
+    t.integer "sheet_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
