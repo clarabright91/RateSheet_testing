@@ -1,8 +1,7 @@
+# this service will be use for next two tables of blue point bank mortgage sheet
 class BluePointService
-
   def initialize
     @sheet_data          = {}
-    @sub_sheet           = nil
     @program_name        = nil
     @primary_key         = ""
     @program_names       = {}
@@ -11,23 +10,16 @@ class BluePointService
     @main_key            = nil
   end
 
-  def implement_programs init_row, last_row, row_start_after, strict_rows, main_row, table_first_row, table_last_row, max_column, sheet_data
-    # init_row, last_row
-    (init_row..last_row).each do |r|
+  def execute init_row, final_row, col_start_points, col_head, max_column, sheet_data, sub_sheet
+    (init_row..final_row).each do |r|
       row = sheet_data.row(r)
 
-      # find sub sheet according to sheet name
-      if !@sub_sheet.present? && (SubSheet::SUBSHEETS.include?(row.first))
-        @sub_sheet = SubSheet.find_by_name(row.first)
-      end
-
-      # row_start_after
-      if (r > row_start_after) && @sub_sheet.present?
-        # strict_rows
-        strict_rows.each do |c|
+      if (r > (init_row - 1)) && sub_sheet.present?
+        row = sheet_data.row(r)
+        col_start_points.each do |c|
           @program_base_rates[c] = {}
 
-          if r == table_first_row && strict_rows.include?(c) #table_first_row
+          if r == init_row && col_start_points.include?(c)
             @title = sheet_data.cell(r,c)
             unless @sheet_data.has_key?(@title)
               @sheet_data[@title] = {}
@@ -36,14 +28,15 @@ class BluePointService
           end
 
           @main_key = @program_names[c]
-          for col in c..c+3
+
+          for col in c..c+2
             value = sheet_data.cell(r,col)
 
             # main_row
-            if r > main_row && col >= c && col < c + 3
-              if strict_rows.include?(c)
+            if r > col_head && col >= c && col < c + 2
+              if col_start_points.include?(c)
                 @program_name = @program_names[c]
-                @program = @sub_sheet.programs.new(program_name: @program_name)
+                @program = sub_sheet.programs.new(program_name: @program_name)
                 @program.update_fields(@program_name)
                 @initialize_programs[c] = @program
               end
@@ -52,17 +45,17 @@ class BluePointService
                 @primary_key = sheet_data.cell(r,col)
                 @sheet_data[@main_key][@primary_key] = {}
               elsif col > c && (col < c+3)
-                secondary_key = sheet_data.cell(main_row,col)
+                secondary_key = sheet_data.cell(col_head,col)
                 @sheet_data[@main_key][@primary_key][secondary_key.to_i] = value
               end
             end
 
-            if c+3 == col
+            if c+2 == col
               @program_base_rates[c][@program_names[c]] = @sheet_data[@program_names[c]]
             end
           end
 
-          if c+3 == max_column && r == table_last_row # table_last_row for 119
+          if c+2 == max_column && r == final_row # table_last_row for 119
             @initialize_programs.keys.each do |key|
               program = @initialize_programs[key]
               program.base_rate = @program_base_rates[key][program.program_name]
