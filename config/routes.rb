@@ -233,6 +233,15 @@ Rails.application.routes.draw do
       get :programs
       get :single_program
       get :rate_sheet
+      get :conventional_fixed_rate_products
+      get :conventional_arm_products
+      get :government_products
+      get :high_ltv_refinance
+      get :jumbo_products
+      get :jumbo_flex_product
+      get :elite_plus_programs
+      get :expanded_plus_programs
+      get :simple_access_programs
     end 
   end
 

@@ -20,7 +20,7 @@ class ObBluePointMortgageWholesale6187Controller < ApplicationController
   end
 
   def fha_standard_programs
-    file = File.join('/home/yuva/Downloads/sheets_of_remote_url/OB_BluePoint_Mortgage_Wholesale6187.xls')
+    file = File.join('/home/yuva/Downloads/sheetsfor3rdmilestone/OB_BluePoint_Mortgage_Wholesale6187.xls')
     xlsx = Roo::Spreadsheet.open(file)
     xlsx.sheets.each do |sheet|
       sheet_data = xlsx.sheet(sheet)
