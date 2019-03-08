@@ -252,12 +252,13 @@
 <div class="row col-md-6 col-md-offset-2 custyle">
   <table class="table table-striped custab">
     <thead>
-      <h2>Programs</h2>
+      <h2>Searched Programs</h2>
       <tr>
         <th>No.</th>
         <th>Program Name</th>
         <th>Base Rate</th>
         <th>Sheet Name</th>
+        <th>Bank Name</th>
         <th>Adjustments Points</th>
       </tr>
     </thead>
@@ -269,21 +270,21 @@
           <td><%= program[:program_name] %></td>
           <td><%= program[:base_rate] %></td>
           <td><%= program[:sheet_name] %></td>
+          <td><%= program[:bank_name] %></td>
           <td><%= program[:adj_points] %></td>
         </tr>
       <%end%>
-    <% else%>
-    <tr>
-      <td colspan="5">Data Not Found...</td>
-    </tr>
     <%end%>
     </tbody>
   </table>
 </div>
+<br>
+  <hr style="border-top: 3px double #8c8b8b;">
+<br>
   <div class="row col-md-6 col-md-offset-2 custyle">
     <table class="table table-striped custab">
       <thead>
-      <h2>Banks</h2>
+      <h2>Present Banks</h2>
       <tr>
         <th>No.</th>
         <th>Name</th>
