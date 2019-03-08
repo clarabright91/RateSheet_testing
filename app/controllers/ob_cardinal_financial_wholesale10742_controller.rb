@@ -50,7 +50,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
           @bank = @sheet_obj.bank
           @sheet_obj = @bank.sheets.find_or_create_by(name: @sheet_name)
           if ((row.compact.count > 1) && (row.compact.count <= 4))
-            rr = r + 1 
+            rr = r + 1
             max_column_section = row.compact.count - 1
             (0..max_column_section).each_with_index do |max_column, index|
               index = index +1
@@ -370,7 +370,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@cashout_adjustment,@product_hash,@subordinate_hash,@additional_hash,@lpmi_hash]
         make_adjust(adjustment,@sheet_name)
-        
+
         # Freddie programs
         (458..684).each do |r|
           row = sheet_data.row(r)
@@ -378,7 +378,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
           @bank = @sheet_obj.bank
           @sheet_obj = @bank.sheets.find_or_create_by(name: @sheet_name)
           if ((row.compact.count > 1) && (row.compact.count <= 4))
-            rr = r + 1 
+            rr = r + 1
             max_column_section = row.compact.count - 1
             (0..max_column_section).each_with_index do |max_column, index|
               index = index +1
@@ -461,7 +461,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                   if value == "Mortgages with Subordinate Financing7- Relief Refinance Mortgages"
                     @sub_hash["FinancingType/LTV/CLTV/FICO"] = {}
                     @sub_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"] = {}
-                  end             
+                  end
 
                   # All Eligible Mortgages - Other Than Relief Refinance Mortgages - LLPAs for Terms > 15 Years
                   if r >= 744 && r <= 750 && cc == 10
@@ -708,8 +708,8 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
           @sheet_name = "FHA, VA, and USDA Products"
           @bank = @sheet_obj.bank
           @sheet_obj = @bank.sheets.find_or_create_by(name: @sheet_name)
-          if ((row.compact.count > 1) && (row.compact.count <= 4)) 
-            rr = r + 1 
+          if ((row.compact.count > 1) && (row.compact.count <= 4))
+            rr = r + 1
             max_column_section = row.compact.count - 1
             (0..max_column_section).each_with_index do |max_column, index|
               index = index +1
@@ -859,8 +859,8 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
           @sheet_name = "Non-Conforming Jumbo CORE"
           @bank = @sheet_obj.bank
           @sheet_obj = @bank.sheets.find_or_create_by(name: @sheet_name)
-          if ((row.compact.count > 1) && (row.compact.count <= 3)) 
-            rr = r + 1 
+          if ((row.compact.count > 1) && (row.compact.count <= 3))
+            rr = r + 1
             max_column_section = row.compact.count - 1
             (0..max_column_section).each_with_index do |max_column, index|
               index = index +1
@@ -1018,7 +1018,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
           @bank = @sheet_obj.bank
           @sheet_obj = @bank.sheets.find_or_create_by(name: @sheet_name)
           if ((row.compact.count >= 1) && (row.compact.count <= 4))
-            rr = r + 1 
+            rr = r + 1
             max_column_section = row.compact.count - 1
             (0..max_column_section).each_with_index do |max_column, index|
               index = index +1
@@ -1186,7 +1186,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
       usda = false
       streamline = false
       full_doc = false
-      if @program.program_name.include?("FHA") 
+      if @program.program_name.include?("FHA")
         streamline = true
         fha = true
         full_doc = true

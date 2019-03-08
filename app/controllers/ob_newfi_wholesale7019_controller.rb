@@ -1,6 +1,6 @@
 class ObNewfiWholesale7019Controller < ApplicationController
   before_action :get_sheet, only: [:programs, :biscayne_delegated_jumbo, :sequoia_portfolio_plus_products, :sequoia_expanded_products, :sequoia_investor_pro, :fha_buydown_fixed_rate_products, :fha_fixed_arm_products, :fannie_mae_homeready_products, :fnma_buydown_products, :fnma_conventional_fixed_rate, :fnma_conventional_high_balance, :fnma_conventional_arm, :olympic_piggyback_fixed, :olympic_piggyback_high_balance, :olympic_piggyback_arm]
-  before_action :get_program, only: [:single_program]
+  # before_action :get_program, only: [:single_program]
   def index
     file = File.join(Rails.root,  'OB_Newfi_Wholesale7019.xls')
     xlsx = Roo::Spreadsheet.open(file)
@@ -2108,7 +2108,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                   error_log.save
                 end
-              
+
               @program.adjustments.destroy_all
               @block_hash = {}
               key = ''
