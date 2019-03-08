@@ -70,9 +70,10 @@ module Wholesale
       jumbo_high_balance = true
     elsif @title.include?("CONFORMING")
     	loan_size = "CONFORMING"
+    	conforming = true
     end
     # Loan-Type
-    if @title.include?("Fixed")
+    if @title.include?("Fixed") || @title.include?("FIXED")
       loan_type = "Fixed"
     elsif @title.include?("ARM")
       loan_type = "ARM"
@@ -96,5 +97,7 @@ module Wholesale
     if @title.include?("STREAMLINE")
       streamline = true
     end
+    # update program
+    @program.update(term: term, loan_type: loan_type, loan_size: loan_size, fha: fha, va: va, usda: usda, streamline: streamline, jumbo_high_balance: jumbo_high_balance, arm_basic: arm_basic, conforming: conforming)
  	end
 end
