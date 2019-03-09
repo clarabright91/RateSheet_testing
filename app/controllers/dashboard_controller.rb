@@ -292,7 +292,7 @@ class DashboardController < ApplicationController
                               adj_key_hash[key_index] = loan_amount_key
                             end
                           end
-                        end                      
+                        end
                       end
                       unless loan_amount_key2.present?
                         break
@@ -376,7 +376,7 @@ class DashboardController < ApplicationController
                               ltv_key2 = ltv_key
                               adj_key_hash[key_index] = ltv_key
                             end
-                          end                       
+                          end
                         end
                       end
                       unless ltv_key2.present?
@@ -415,7 +415,7 @@ class DashboardController < ApplicationController
                                 fico_key2 = fico_key
                                 adj_key_hash[key_index] = fico_key
                               end
-                            end                       
+                            end
                           end
                         end
                         unless fico_key2.present?
@@ -498,7 +498,7 @@ class DashboardController < ApplicationController
                               cltv_key2 = cltv_key
                               adj_key_hash[key_index] = cltv_key
                             end
-                          end                       
+                          end
                         end
                       end
                       unless cltv_key2.present?
@@ -663,7 +663,7 @@ class DashboardController < ApplicationController
                               adj_key_hash[key_index] = loan_amount_key
                             end
                           end
-                        end                      
+                        end
                       end
                       unless loan_amount_key2.present?
                         break
@@ -747,7 +747,7 @@ class DashboardController < ApplicationController
                               ltv_key2 = ltv_key
                               adj_key_hash[key_index] = ltv_key
                             end
-                          end                       
+                          end
                         end
                       end
                       unless ltv_key2.present?
@@ -786,7 +786,7 @@ class DashboardController < ApplicationController
                                 fico_key2 = fico_key
                                 adj_key_hash[key_index] = fico_key
                               end
-                            end                       
+                            end
                           end
                         end
                         unless fico_key2.present?
@@ -868,7 +868,7 @@ class DashboardController < ApplicationController
                               cltv_key2 = cltv_key
                               adj_key_hash[key_index] = cltv_key
                             end
-                          end                       
+                          end
                         end
                       end
                       unless cltv_key2.present?
@@ -1032,7 +1032,7 @@ class DashboardController < ApplicationController
                               adj_key_hash[key_index] = loan_amount_key
                             end
                           end
-                        end                      
+                        end
                       end
                       unless loan_amount_key2.present?
                         break
@@ -1116,7 +1116,7 @@ class DashboardController < ApplicationController
                               ltv_key2 = ltv_key
                               adj_key_hash[key_index] = ltv_key
                             end
-                          end                       
+                          end
                         end
                       end
                       unless ltv_key2.present?
@@ -1155,7 +1155,7 @@ class DashboardController < ApplicationController
                                 fico_key2 = fico_key
                                 adj_key_hash[key_index] = fico_key
                               end
-                            end                       
+                            end
                           end
                         end
                         unless fico_key2.present?
@@ -1236,7 +1236,7 @@ class DashboardController < ApplicationController
                               cltv_key2 = cltv_key
                               adj_key_hash[key_index] = cltv_key
                             end
-                          end                       
+                          end
                         end
                       end
                       unless cltv_key2.present?
@@ -1397,7 +1397,7 @@ class DashboardController < ApplicationController
                               adj_key_hash[key_index] = loan_amount_key
                             end
                           end
-                        end                      
+                        end
                       end
                       unless loan_amount_key2.present?
                         break
@@ -1481,7 +1481,7 @@ class DashboardController < ApplicationController
                               ltv_key2 = ltv_key
                               adj_key_hash[key_index] = ltv_key
                             end
-                          end                       
+                          end
                         end
                       end
                       unless ltv_key2.present?
@@ -1520,7 +1520,7 @@ class DashboardController < ApplicationController
                                 fico_key2 = fico_key
                                 adj_key_hash[key_index] = fico_key
                               end
-                            end                       
+                            end
                           end
                         end
                         unless fico_key2.present?
@@ -1601,7 +1601,7 @@ class DashboardController < ApplicationController
                               cltv_key2 = cltv_key
                               adj_key_hash[key_index] = cltv_key
                             end
-                          end                       
+                          end
                         end
                       end
                       unless cltv_key2.present?
@@ -1762,7 +1762,7 @@ class DashboardController < ApplicationController
                               adj_key_hash[key_index] = loan_amount_key
                             end
                           end
-                        end                      
+                        end
                       end
                       unless loan_amount_key2.present?
                         break
@@ -1846,7 +1846,7 @@ class DashboardController < ApplicationController
                               ltv_key2 = ltv_key
                               adj_key_hash[key_index] = ltv_key
                             end
-                          end                       
+                          end
                         end
                       end
                       unless ltv_key2.present?
@@ -1885,7 +1885,7 @@ class DashboardController < ApplicationController
                                 fico_key2 = fico_key
                                 adj_key_hash[key_index] = fico_key
                               end
-                            end                       
+                            end
                           end
                         end
                         unless fico_key2.present?
@@ -1965,7 +1965,7 @@ class DashboardController < ApplicationController
                               cltv_key2 = cltv_key
                               adj_key_hash[key_index] = cltv_key
                             end
-                          end                       
+                          end
                         end
                       end
                       unless cltv_key2.present?
@@ -2127,7 +2127,7 @@ class DashboardController < ApplicationController
                               adj_key_hash[key_index] = loan_amount_key
                             end
                           end
-                        end                      
+                        end
                       end
                       unless loan_amount_key2.present?
                         break
@@ -2211,7 +2211,7 @@ class DashboardController < ApplicationController
                               ltv_key2 = ltv_key
                               adj_key_hash[key_index] = ltv_key
                             end
-                          end                       
+                          end
                         end
                       end
                       unless ltv_key2.present?
@@ -2250,7 +2250,7 @@ class DashboardController < ApplicationController
                                 fico_key2 = fico_key
                                 adj_key_hash[key_index] = fico_key
                               end
-                            end                       
+                            end
                           end
                         end
                         unless fico_key2.present?
@@ -2331,7 +2331,7 @@ class DashboardController < ApplicationController
                               cltv_key2 = cltv_key
                               adj_key_hash[key_index] = cltv_key
                             end
-                          end                       
+                          end
                         end
                       end
                       unless cltv_key2.present?
@@ -2493,7 +2493,7 @@ class DashboardController < ApplicationController
                               adj_key_hash[key_index] = loan_amount_key
                             end
                           end
-                        end                      
+                        end
                       end
                       unless loan_amount_key2.present?
                         break
@@ -2577,7 +2577,7 @@ class DashboardController < ApplicationController
                               ltv_key2 = ltv_key
                               adj_key_hash[key_index] = ltv_key
                             end
-                          end                       
+                          end
                         end
                       end
                       unless ltv_key2.present?
@@ -2616,7 +2616,7 @@ class DashboardController < ApplicationController
                                 fico_key2 = fico_key
                                 adj_key_hash[key_index] = fico_key
                               end
-                            end                       
+                            end
                           end
                         end
                         unless fico_key2.present?
@@ -2699,7 +2699,7 @@ class DashboardController < ApplicationController
                               cltv_key2 = cltv_key
                               adj_key_hash[key_index] = cltv_key
                             end
-                          end                       
+                          end
                         end
                       end
                       unless cltv_key2.present?
@@ -2819,49 +2819,50 @@ class DashboardController < ApplicationController
           adj_key_hash.keys.each do |hash_key, index|
             if hash_key==0 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key]]
-              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A"))
+              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
                 hash_obj[:adj_points] << point
               end
             end
             if hash_key==1 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
-              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A"))
+              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
                 hash_obj[:adj_points] << point
               end
             end
             if hash_key==2 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
-              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A"))
+              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
                 hash_obj[:adj_points] << point
               end
             end
             if hash_key==3 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
-              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A"))
+              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
                 hash_obj[:adj_points] << point
               end
             end
             if hash_key==4 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-4]][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
-              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A"))
+              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
                 hash_obj[:adj_points] << point
               end
             end
             if hash_key==5 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-5]][adj_key_hash[hash_key-4]][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
-              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A"))
+              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
                 hash_obj[:adj_points] << point
               end
             end
             if hash_key==6 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-6]][adj_key_hash[hash_key-5]][adj_key_hash[hash_key-4]][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
-              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A"))
+              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
                 hash_obj[:adj_points] << point
               end
             end
           end
         end
-        @result << hash_obj
+      end
+      @result << hash_obj
         hash_obj = {
         :program_name => "",
         :base_rate => 0.0,
@@ -2869,8 +2870,7 @@ class DashboardController < ApplicationController
         :bank_name=> "",
         :adj_points => []
       }
-      end      
-    end    
+    end
   end
 
   render :index
