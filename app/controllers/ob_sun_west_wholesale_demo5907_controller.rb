@@ -1784,6 +1784,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #   end
         # end
       end
+      create_program_association_with_adjustment(sheet)
     end
     redirect_to programs_ob_sun_west_wholesale_demo5907_path(@sheet_obj)
   end
@@ -2060,7 +2061,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
       end
     end
 
-    def create_program_association_with_adjustment(sheet)
+    def create_program_association_with_adjustment(sheet) 
       adjustment_list = Adjustment.where(sheet_name: sheet)
       program_list = Program.where(sheet_name: sheet)
 
