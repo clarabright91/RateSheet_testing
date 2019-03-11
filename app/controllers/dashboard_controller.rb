@@ -162,7 +162,7 @@ class DashboardController < ApplicationController
       elsif params[:loan_size] == "Jumbo"
         @filter_data[:Jumbo] = true
       elsif params[:loan_size] == "High-Balance"
-        @filter_data[:jumbo_high_balance] = true
+        @filter_data[:high_balance] = true
       end
     end
 
