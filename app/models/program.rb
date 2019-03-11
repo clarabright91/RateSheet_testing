@@ -7,7 +7,8 @@ class Program < ApplicationRecord
   before_save :add_bank_name
 
   def add_bank_name
-    self.bank_name = self.sheet.bank.name
+    self.bank_name = self.sheet.bank.name if self.sheet.present?
+    self.bank_name = self.sub_sheet.sheet.bank.name if self.sub_sheet.present?
   end
 
   def get_adjustments
