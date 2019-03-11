@@ -83,6 +83,7 @@ class DashboardController < ApplicationController
     @fraddie_mac_product = params[:fraddie_mac_product] if params[:fraddie_mac_product].present?
     @loan_amount = params[:loan_amount].to_i if params[:loan_amount].present?
     @program_category = params[:program_category] if params[:program_category].present?
+    @payment_type =  params[:payment_type] if params[:payment_type].present?
 
     if params[:bank_name].present?
       unless (params[:bank_name] == "All")
@@ -93,6 +94,12 @@ class DashboardController < ApplicationController
     if params[:program_name].present?
       unless (params[:program_name] == "All")
         @filter_data[:program_name] = params[:program_name]
+      end
+    end
+
+    if params[:pro_category].present?
+      unless (params[:pro_category] == "All")
+        @filter_data[:program_category] = params[:pro_category]
       end
     end
 
@@ -109,14 +116,16 @@ class DashboardController < ApplicationController
         end
       end
       if params[:loan_type] =="ARM" && params[:arm_advanced].present?
-        @arm_advanced = params[:arm_advanced]
-        @filter_data[:arm_advanced] = params[:arm_advanced]
+        unless params[:arm_advanced] == "All"
+          @arm_advanced = params[:arm_advanced]
+          @filter_data[:arm_advanced] = params[:arm_advanced]
+        end
       end
     end
 
     if (params[:term].present? && params[:loan_type] != "ARM")
-      @filter_data[:term] = params[:term].to_i
       @term = params[:term].to_i
+      @program_term = params[:term].to_i
     end
 
     if params[:fannie_options].present?
@@ -164,10 +173,34 @@ class DashboardController < ApplicationController
   end
 
   def find_base_rate
-    @program_list = Program.where(@filter_data) 
+    @program_list = Program.where(@filter_data)
+    @program_list2 = []
     if @program_list.present?
+      if @program_term.present?
+        @program_list.each do |program|
+          if (program.term.to_s.length == 2 || program.term.to_s.length == 1)
+            if (program.term == @program_term)
+              @program_list2 << program
+            end
+          elsif (program.term.to_s.length == 4)
+            first = program.term/100
+            last = program.term%100
+            if first < last
+              if ((first..last).to_a).include?(@program_term)
+                @program_list2 << program
+              end
+            else
+              if ((last..first).to_a).include?(@program_term)
+                @program_list2 << program
+              end
+            end
+          end
+        end
+      else
+        @program_list2 = @program_list
+      end
       @programs =[]
-      @program_list.each do |program|
+      @program_list2.each do |program|
         if(program.base_rate.keys.include?(@interest.to_f.to_s))
           if(program.base_rate[@interest.to_f.to_s].keys.include?(@lock_period))
               @programs << program
@@ -514,10 +547,19 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if adj.data[first_key][@state].present?
-                      adj_key_hash[key_index] = @state
+                    if @state = "All"
+                      first_state_key = adj.data[first_key].keys.first
+                      if adj.data[first_key][first_state_key].present?
+                        adj_key_hash[key_index] = first_state_key
+                      else
+                        break
+                      end
                     else
-                      break
+                      if adj.data[first_key][@state].present?
+                        adj_key_hash[key_index] = @state
+                      else
+                        break
+                      end
                     end
                   rescue Exception
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
@@ -881,12 +923,22 @@ class DashboardController < ApplicationController
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
+
                 if key_name == "State"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-1]][@state].present?
-                      adj_key_hash[key_index] = @state
+                    if @state = "All"
+                      first_state_key = adj.data[first_key][adj_key_hash[key_index-1]].keys.first
+                      if adj.data[first_key][adj_key_hash[key_index-1]][first_state_key].present?
+                        adj_key_hash[key_index] = first_state_key
+                      else
+                        break
+                      end
                     else
-                      break
+                      if adj.data[first_key][adj_key_hash[key_index-1]][@state].present?
+                        adj_key_hash[key_index] = @state
+                      else
+                        break
+                      end
                     end
                   rescue Exception
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
@@ -1249,17 +1301,28 @@ class DashboardController < ApplicationController
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
+
                 if key_name == "State"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@state].present?
-                      adj_key_hash[key_index] = @state
+                    if @state = "All"
+                      first_state_key = adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
+                      if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][first_state_key].present?
+                        adj_key_hash[key_index] = first_state_key
+                      else
+                        break
+                      end
                     else
-                      break
+                      if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@state].present?
+                        adj_key_hash[key_index] = @state
+                      else
+                        break
+                      end
                     end
                   rescue Exception
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
+
                 if key_name == "LoanType"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_type].present?
@@ -1614,17 +1677,28 @@ class DashboardController < ApplicationController
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
+
                 if key_name == "State"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@state].present?
-                      adj_key_hash[key_index] = @state
+                    if @state = "All"
+                      first_state_key = adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
+                      if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][first_state_key].present?
+                        adj_key_hash[key_index] = first_state_key
+                      else
+                        break
+                      end
                     else
-                      break
+                      if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@state].present?
+                        adj_key_hash[key_index] = @state
+                      else
+                        break
+                      end
                     end
                   rescue Exception
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
+
                 if key_name == "LoanType"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_type].present?
@@ -1978,17 +2052,28 @@ class DashboardController < ApplicationController
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
+
                 if key_name == "State"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@state].present?
-                      adj_key_hash[key_index] = @state
+                    if @state = "All"
+                      first_state_key = adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
+                      if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][first_state_key].present?
+                        adj_key_hash[key_index] = first_state_key
+                      else
+                        break
+                      end
                     else
-                      break
+                      if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@state].present?
+                        adj_key_hash[key_index] = @state
+                      else
+                        break
+                      end
                     end
                   rescue Exception
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
+
                 if key_name == "LoanType"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_type].present?
@@ -2347,15 +2432,25 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@state].present?
-                      adj_key_hash[key_index] = @state
+                    if @state = "All"
+                      first_state_key = adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
+                      if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][first_state_key].present?
+                        adj_key_hash[key_index] = first_state_key
+                      else
+                        break
+                      end
                     else
-                      break
+                      if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@state].present?
+                        adj_key_hash[key_index] = @state
+                      else
+                        break
+                      end
                     end
                   rescue Exception
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
+
                 if key_name == "LoanType"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_type].present?
@@ -2715,15 +2810,25 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@state].present?
-                      adj_key_hash[key_index] = @state
+                    if @state = "All"
+                      first_state_key = adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
+                      if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][first_state_key].present?
+                        adj_key_hash[key_index] = first_state_key
+                      else
+                        break
+                      end
                     else
-                      break
+                      if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@state].present?
+                        adj_key_hash[key_index] = @state
+                      else
+                        break
+                      end
                     end
                   rescue Exception
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
+
                 if key_name == "LoanType"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_type].present?
