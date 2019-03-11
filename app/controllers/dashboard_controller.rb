@@ -199,14 +199,18 @@ class DashboardController < ApplicationController
       else
         @program_list2 = @program_list
       end
+
       @programs =[]
-      @program_list2.each do |program|
-        if(program.base_rate.keys.include?(@interest.to_f.to_s))
-          if(program.base_rate[@interest.to_f.to_s].keys.include?(@lock_period))
-              @programs << program
+      if @program_list2.present?
+        @program_list2.each do |program|
+          if(program.base_rate.keys.include?(@interest.to_f.to_s))
+            if(program.base_rate[@interest.to_f.to_s].keys.include?(@lock_period))
+                @programs << program
+            end
           end
         end
       end
+
       @result= []
       if @programs.present?
         find_points_of_the_loan @programs
