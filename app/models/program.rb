@@ -4,6 +4,11 @@ class Program < ApplicationRecord
   has_many :program_adjustments
   has_many :adjustments, through: :program_adjustments
   belongs_to :sub_sheet, optional: true
+  before_save :add_bank_name
+
+  def add_bank_name
+    self.bank_name = self.sheet.bank.name
+  end
 
   def get_adjustments
     Adjustment.where(sheet_name: self.sheet_name)
@@ -28,7 +33,7 @@ class Program < ApplicationRecord
   def set_load_type(prog_name)
     present_word = nil
     ["Fixed", "ARM", "Hybrid", "Floating", "Variable"].any? { |word|
-      present_word = word if p_name.include?(word)
+      present_word = word if prog_name.include?(word)
     }
     self.loan_type = present_word
   end
