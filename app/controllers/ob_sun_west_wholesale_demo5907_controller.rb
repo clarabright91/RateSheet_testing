@@ -181,6 +181,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                   new_val = sheet_data.cell(r,cc)
                   @adj_hash["PropertyType"]["2-4 Unit"] = new_val
                 end
+
                 if r == 377 && cc == 15
                   @adj_hash["PropertyType/Term/LTV"] = {}
                   @adj_hash["PropertyType/Term/LTV"]["Condo"] = {}
@@ -2057,11 +2058,19 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
 
     def make_adjust(block_hash, sheet)
       block_hash.each do |hash|
-        Adjustment.create(data: hash,sheet_name: sheet)
+        if hash.keys.count > 1
+          hash.keys.each do |key|
+            second_hash = {}
+            second_hash[key] = hash[key]
+            Adjustment.create(data: second_hash,sheet_name: sheet)
+          end
+        else
+          Adjustment.create(data: hash,sheet_name: sheet)
+        end
       end
     end
 
-    def create_program_association_with_adjustment(sheet) 
+    def create_program_association_with_adjustment(sheet)
       adjustment_list = Adjustment.where(sheet_name: sheet)
       program_list = Program.where(sheet_name: sheet)
 
