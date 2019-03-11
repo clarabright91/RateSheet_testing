@@ -273,6 +273,14 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :ob_acc_mortgage9933, only: [:index] do
+    member do
+      get :programs
+      get :single_program
+      get :expanded_prime
+    end
+  end
+
   match "dashboard/index", to: 'dashboard#index', via: [:get, :post]
   get 'dashboard/fetch_programs_by_bank', to: 'dashboard#fetch_programs_by_bank'
   # mount Sidekiq::Web => '/sidekiq'

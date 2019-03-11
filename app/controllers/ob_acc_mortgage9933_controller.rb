@@ -44,7 +44,7 @@ class ObAccMortgage9933Controller < ApplicationController
   end
 
   def read_sheet
-    file = File.join(Rails.root,  'Florida_Capital_Web5203.xls')
+    file = File.join(Rails.root,  'OB_ACC_Mortgage9933.xls')
     @xlsx = Roo::Spreadsheet.open(file)
   end
 end
