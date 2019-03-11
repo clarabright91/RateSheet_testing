@@ -41,9 +41,10 @@ class Program < ApplicationRecord
 
   def set_term(prog_name)
     if prog_name.scan(/\d+/).count == 1
-      term = prog_name.scan(/\d+/)[0]
+      self.term = prog_name.scan(/\d+/)[0]
     elsif prog_name.scan(/\d+/).count > 1 && !prog_name.include?("ARM")
-      term = (prog_name.scan(/\d+/)[0]+ prog_name.scan(/\d+/)[1]).to_i
+      self.term = (prog_name.scan(/\d+/)[0]+ prog_name.scan(/\d+/)[1]).to_i if (MatheMatics.digits(prog_name.scan(/\d+/)[1].to_i).to_i + 1) > 1
+      self.term = (prog_name.scan(/\d+/)[0]+ "0" + prog_name.scan(/\d+/)[1]).to_i unless (MatheMatics.digits(prog_name.scan(/\d+/)[1].to_i).to_i + 1) > 1
     end
   end
 
