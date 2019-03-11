@@ -19,7 +19,7 @@ module SheetOperation
   private
 
   def get_sheet
-    file   = File.join('/home/yuva/Downloads/sheets_of_remote_url/OB_BluePoint_Mortgage_Wholesale6187.xls')
+    file = File.join(Rails.root,  'OB_BluePoint_Mortgage_Wholesale6187.xls')
     @xlsx  = Roo::Spreadsheet.open(file)
   end
 end
