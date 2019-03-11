@@ -62,7 +62,7 @@
           <div class="form-group">
             <label>Loan Size</label>
             <div class="input-group">
-              <% loan_size_list =[["Non-Conforming"], ["Conforming"], ["High-Balance"]]%>
+              <% loan_size_list =[["Non-Conforming"], ["Conforming"], ["High-Balance"], ["Jumbo"]]%>
               <%= select_tag 'loan_size', options_for_select(loan_size_list, (params[:loan_size] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control" }%>
             </div>
           </div>
