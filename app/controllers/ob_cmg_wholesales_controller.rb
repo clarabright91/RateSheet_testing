@@ -632,8 +632,8 @@ class ObCmgWholesalesController < ApplicationController
                   ["25", "30"].each{|num| @lpmi_adj[first_key][primary_key1][secondary_key][num][secondary_key1] = {}}
                 end
                 if r >= 71 && r <= 74 && cc >= 6 && cc <= 14
-                  lpmi_key = get_value @lpmi_data[cc-1]
-                  unless lpmi_key.eql?("%")
+                  unless @lpmi_data[cc-1].eql?("%")
+                    lpmi_key = get_value @lpmi_data[cc-1]
                     @lpmi_hash[primary_key][primary_key1][secondary_key][secondary_key1][lpmi_key] = {}
                     @lpmi_hash[primary_key][primary_key1][secondary_key][secondary_key1][lpmi_key] = value
                     @lpmi_hash[primary_key][primary_key1][ltv_key][secondary_key1][lpmi_key] = {}
@@ -650,8 +650,8 @@ class ObCmgWholesalesController < ApplicationController
                   ["10", "15", "20"].each{|num| @lpmi_adj[first_key][primary_key1][secondary_key][num][secondary_key1] = {}}
                 end
                 if r >= 75 && r <= 78 && cc >= 6 && cc <= 14
-                  lpmi_key = get_value @lpmi_data[cc-1]
-                  unless lpmi_key.eql?("%")
+                  unless @lpmi_data[cc-1].eql?("%")
+                    lpmi_key = get_value @lpmi_data[cc-1]
                     @lpmi_adj[primary_key][primary_key1][secondary_key][secondary_key1][lpmi_key] = {}
                     @lpmi_adj[primary_key][primary_key1][secondary_key][secondary_key1][lpmi_key] = value
                     @lpmi_adj[primary_key][primary_key1][ltv_key][secondary_key1][lpmi_key] = {}
@@ -3517,7 +3517,7 @@ class ObCmgWholesalesController < ApplicationController
         create_program_association_with_adjustment(sheet)
       end
     end
-    # redirect_to programs_import_file_path(@bank)
+
     redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
   end
 
