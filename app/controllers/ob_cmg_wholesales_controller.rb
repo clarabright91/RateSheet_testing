@@ -418,6 +418,8 @@ class ObCmgWholesalesController < ApplicationController
                   primary_key1 = "LPMI/PropertyType/FICO"
                   @property_hash[primary_key] = {}
                   @property_hash[primary_key1] = {}
+                  @property_hash[primary_key][true] = {}
+                  @property_hash[primary_key1][true] = {}
                 end
                 # AGENCY FIXED AND ARM ADJUSTMENTS
                 if r == 11 && cc == 1
@@ -710,21 +712,21 @@ class ObCmgWholesalesController < ApplicationController
                 # LPMI (in addition to adjustments above)
                 if r >= 88 && r <= 89 && cc == 3
                   secondary_key = get_value value
-                  @property_hash[primary_key][secondary_key] = {}
+                  @property_hash[primary_key][true][secondary_key] = {}
                 end
                 if r >= 88 && r <= 89 && cc >= 7 && cc <= 14
                   lpmi_key = get_value @lpmi_data[cc-1]
-                  @property_hash[primary_key][secondary_key][lpmi_key] = {}
-                  @property_hash[primary_key][secondary_key][lpmi_key] = value
+                  @property_hash[primary_key][true][secondary_key][lpmi_key] = {}
+                  @property_hash[primary_key][true][secondary_key][lpmi_key] = value
                 end
                 if r >= 90 && r <= 93 && cc == 3
                   secondary_key = get_value value
-                  @property_hash[primary_key1][secondary_key] = {}
+                  @property_hash[primary_key1][true][secondary_key] = {}
                 end
                 if r >= 90 && r <= 93 && cc >= 7 && cc <= 14
                   lpmi_key = get_value @lpmi_data[cc-1]
-                  @property_hash[primary_key1][secondary_key][lpmi_key] = {}
-                  @property_hash[primary_key1][secondary_key][lpmi_key] = value
+                  @property_hash[primary_key1][true][secondary_key][lpmi_key] = {}
+                  @property_hash[primary_key1][true][secondary_key][lpmi_key] = value
                 end
               end
             rescue Exception => e
