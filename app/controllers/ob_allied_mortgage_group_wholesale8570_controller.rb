@@ -30,7 +30,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         @loan_adj = {}
         first_key = ''
         #program
-        (13..80).each do |r| 
+        (13..80).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 4))
             rr = r + 1
@@ -318,7 +318,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                     @adjustment_hash["VA/LoanSize/FICO"][true]["High-Balance"] = {}
                     @adjustment_hash["VA/LoanSize/FICO"][true]["High-Balance"]["0-680"] = {}
                     cc == cc + 3
-                    new_val = sheet_data.cell(r,cc)
+                    new_val = sheet_data.cell(r,cc+3)
                     @adjustment_hash["VA/LoanSize/FICO"][true]["High-Balance"]["0-680"] = new_val
                   end
                   if r == 23 && cc == 17
@@ -330,14 +330,14 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   if r == 24 && cc == 14
                     @adjustment_hash["VA/LTV"][true]["95-Inf"] = {}
                     cc = cc + 3
-                    new_val = sheet_data.cell(r,cc)
+                    new_val = sheet_data.cell(r,cc+3)
                     @adjustment_hash["VA/LTV"][true]["95-Inf"] = new_val
                   end
                   if r == 25 && cc == 14
                     @adjustment_hash["State"] = {}
                     @adjustment_hash["State"]["NY"] = {}
                     cc = cc + 3
-                    new_val = sheet_data.cell(r,cc)
+                    new_val = sheet_data.cell(r,cc + 3)
                     @adjustment_hash["State"]["NY"] = new_val
                   end
                   if r >= 37 && r <= 45 && cc == 17
@@ -590,11 +590,11 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                     end
                     @subordinate_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"][ltv_key] = {}
                   end
-                  if r >= 65 && r <= 69 && cc == 15 
+                  if r >= 65 && r <= 69 && cc == 15
                     if value.include?("to")
                       cltv_key = value.sub('to','-').tr('$><% ','')
                     elsif value.include?("CLTV")
-                      cltv_key = value  
+                      cltv_key = value
                     else
                       cltv_key = get_value value
                     end
@@ -859,7 +859,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
     def create_program_association_with_adjustment(sheet)
       adjustment_list = Adjustment.where(sheet_name: sheet)
       program_list = Program.where(sheet_name: sheet)
-      
+
       adjustment_list.each_with_index do |adj_ment, index|
         key_list = adj_ment.data.keys.first.split("/")
         program_filter1={}
