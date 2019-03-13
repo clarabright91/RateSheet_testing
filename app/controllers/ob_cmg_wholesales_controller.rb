@@ -324,6 +324,7 @@ class ObCmgWholesalesController < ApplicationController
           end
         end
       end
+
       # Adjustments
       if (sheet == "AGENCYLLPAS")
         sheet_data = @xlsx.sheet(sheet)
@@ -346,6 +347,7 @@ class ObCmgWholesalesController < ApplicationController
         primary_key1 = ''
         primary_key2 = ''
         primary_key3 = ''
+        first_key    = ''
         secondary_key = ''
         secondary_key1 = ''
         ltv_key = ''
@@ -361,6 +363,8 @@ class ObCmgWholesalesController < ApplicationController
           @lpmi_data = sheet_data.row(70)
           (0..16).each do |cc|
             value = sheet_data.cell(r,cc)
+            value = value
+
             begin
               if value.present?
                 if value == "AGENCY FIXED AND ARM ADJUSTMENTS"
@@ -402,8 +406,10 @@ class ObCmgWholesalesController < ApplicationController
                 if value == "LENDER PAID MI"
                   primary_key = "LPMI/LoanType/LTV/FICO"
                   cash_key = "LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"
+                  first_key = "LPMI/LoanType/Term/LTV/FICO"
                   @lpmi_hash[primary_key] = {}
                   @lpmi_adj[primary_key] = {}
+                  @lpmi_adj[first_key] = {}
                   @home_ready[cash_key] = {}
                   @home_possible[cash_key] = {}
                 end
@@ -412,6 +418,8 @@ class ObCmgWholesalesController < ApplicationController
                   primary_key1 = "LPMI/PropertyType/FICO"
                   @property_hash[primary_key] = {}
                   @property_hash[primary_key1] = {}
+                  @property_hash[primary_key][true] = {}
+                  @property_hash[primary_key1][true] = {}
                 end
                 # AGENCY FIXED AND ARM ADJUSTMENTS
                 if r == 11 && cc == 1
@@ -603,6 +611,10 @@ class ObCmgWholesalesController < ApplicationController
                   @lpmi_hash[primary_key][primary_key1] = {}
                   @lpmi_hash[primary_key][primary_key1][secondary_key] = {}
                   @lpmi_hash[primary_key][primary_key1][ltv_key] = {}
+                  # changed code on 12 march by Neeraj Pathak
+                  @lpmi_adj[first_key][primary_key1] = {}
+                  @lpmi_adj[first_key][primary_key1][secondary_key] = {}
+                  ["25", "30"].each{|num| @lpmi_adj[first_key][primary_key1][secondary_key][num] = {}}
                 end
                 if r >= 75 && r <= 78 && cc == 3
                   primary_key1 = "True"
@@ -611,30 +623,44 @@ class ObCmgWholesalesController < ApplicationController
                   @lpmi_adj[primary_key][primary_key1] = {}
                   @lpmi_adj[primary_key][primary_key1][secondary_key] = {}
                   @lpmi_adj[primary_key][primary_key1][ltv_key] = {}
+                  # changed code on 12 march by Neeraj Pathak
+                  ["10", "15", "20"].each{|num| @lpmi_adj[first_key][primary_key1][secondary_key][num] = {}}
                 end
                 if r >= 71 && r <= 74 && cc == 5
                   secondary_key1 = get_value value
                   @lpmi_hash[primary_key][primary_key1][secondary_key][secondary_key1] = {}
                   @lpmi_hash[primary_key][primary_key1][ltv_key][secondary_key1] = {}
+                  # changed code on 12 march by Neeraj Pathak
+                  ["25", "30"].each{|num| @lpmi_adj[first_key][primary_key1][secondary_key][num][secondary_key1] = {}}
                 end
                 if r >= 71 && r <= 74 && cc >= 6 && cc <= 14
-                  lpmi_key = get_value @lpmi_data[cc-1]
-                  @lpmi_hash[primary_key][primary_key1][secondary_key][secondary_key1][lpmi_key] = {}
-                  @lpmi_hash[primary_key][primary_key1][secondary_key][secondary_key1][lpmi_key] = value
-                  @lpmi_hash[primary_key][primary_key1][ltv_key][secondary_key1][lpmi_key] = {}
-                  @lpmi_hash[primary_key][primary_key1][ltv_key][secondary_key1][lpmi_key] = value
+                  unless @lpmi_data[cc-1].eql?("%")
+                    lpmi_key = get_value @lpmi_data[cc-1]
+                    @lpmi_hash[primary_key][primary_key1][secondary_key][secondary_key1][lpmi_key] = {}
+                    @lpmi_hash[primary_key][primary_key1][secondary_key][secondary_key1][lpmi_key] = value
+                    @lpmi_hash[primary_key][primary_key1][ltv_key][secondary_key1][lpmi_key] = {}
+                    @lpmi_hash[primary_key][primary_key1][ltv_key][secondary_key1][lpmi_key] = value
+                    # changed code on 12 march by Neeraj Pathak
+                    ["25", "30"].each{|num| @lpmi_adj[first_key][primary_key1][secondary_key][num][secondary_key1][lpmi_key] = value}
+                  end
                 end
                 if r >= 75 && r <= 78 && cc == 5
                   secondary_key1 = get_value value
                   @lpmi_adj[primary_key][primary_key1][secondary_key][secondary_key1] = {}
                   @lpmi_adj[primary_key][primary_key1][ltv_key][secondary_key1] = {}
+                  # changed code on 12 march by Neeraj Pathak
+                  ["10", "15", "20"].each{|num| @lpmi_adj[first_key][primary_key1][secondary_key][num][secondary_key1] = {}}
                 end
                 if r >= 75 && r <= 78 && cc >= 6 && cc <= 14
-                  lpmi_key = get_value @lpmi_data[cc-1]
-                  @lpmi_adj[primary_key][primary_key1][secondary_key][secondary_key1][lpmi_key] = {}
-                  @lpmi_adj[primary_key][primary_key1][secondary_key][secondary_key1][lpmi_key] = value
-                  @lpmi_adj[primary_key][primary_key1][ltv_key][secondary_key1][lpmi_key] = {}
-                  @lpmi_adj[primary_key][primary_key1][ltv_key][secondary_key1][lpmi_key] = value
+                  unless @lpmi_data[cc-1].eql?("%")
+                    lpmi_key = get_value @lpmi_data[cc-1]
+                    @lpmi_adj[primary_key][primary_key1][secondary_key][secondary_key1][lpmi_key] = {}
+                    @lpmi_adj[primary_key][primary_key1][secondary_key][secondary_key1][lpmi_key] = value
+                    @lpmi_adj[primary_key][primary_key1][ltv_key][secondary_key1][lpmi_key] = {}
+                    @lpmi_adj[primary_key][primary_key1][ltv_key][secondary_key1][lpmi_key] = value
+                    # changed code on 12 march by Neeraj Pathak
+                    ["10", "15", "20"].each{|num| @lpmi_adj[first_key][primary_key1][secondary_key][num][secondary_key1][lpmi_key] = value}
+                  end
                 end
                 # HomeReady & HomePossible
                 if r >= 79 && r <= 82 && cc == 3
@@ -686,21 +712,21 @@ class ObCmgWholesalesController < ApplicationController
                 # LPMI (in addition to adjustments above)
                 if r >= 88 && r <= 89 && cc == 3
                   secondary_key = get_value value
-                  @property_hash[primary_key][secondary_key] = {}
+                  @property_hash[primary_key][true][secondary_key] = {}
                 end
                 if r >= 88 && r <= 89 && cc >= 7 && cc <= 14
                   lpmi_key = get_value @lpmi_data[cc-1]
-                  @property_hash[primary_key][secondary_key][lpmi_key] = {}
-                  @property_hash[primary_key][secondary_key][lpmi_key] = value
+                  @property_hash[primary_key][true][secondary_key][lpmi_key] = {}
+                  @property_hash[primary_key][true][secondary_key][lpmi_key] = value
                 end
                 if r >= 90 && r <= 93 && cc == 3
                   secondary_key = get_value value
-                  @property_hash[primary_key1][secondary_key] = {}
+                  @property_hash[primary_key1][true][secondary_key] = {}
                 end
                 if r >= 90 && r <= 93 && cc >= 7 && cc <= 14
                   lpmi_key = get_value @lpmi_data[cc-1]
-                  @property_hash[primary_key1][secondary_key][lpmi_key] = {}
-                  @property_hash[primary_key1][secondary_key][lpmi_key] = value
+                  @property_hash[primary_key1][true][secondary_key][lpmi_key] = {}
+                  @property_hash[primary_key1][true][secondary_key][lpmi_key] = value
                 end
               end
             rescue Exception => e
@@ -748,25 +774,7 @@ class ObCmgWholesalesController < ApplicationController
                     @state_adjustments[primary_key1][key] = c_val
                   end
                 end
-                # MISCELLANEOUS
-                # if r == 55 && cc == 10
-                #   secondary_key = "60"
-                #   @other_adjustment[primary_key1][secondary_key] = {}
-                # end
-                # if r == 55 && cc == 16
-                #   @other_adjustment[primary_key1][secondary_key] = value
-                # end
-                # if r == 56 && cc == 10
-                #   primary_key1 = "MiscAdjuster/State"
-                #   adj_key = value.split('for:').last.split(',')
-                #   adj_key.each do |f_key|
-                #     key = f_key
-                #     ccc = cc + 6
-                #     c_val = sheet_data.cell(r,ccc)
-                #     @other_adjustment[primary_key1] = {}
-                #     @other_adjustment[primary_key1][key] = c_val
-                #   end
-                # end
+
                 if r >= 55 && r <= 62 && cc == 10
                   secondary_key1 = value
                   @other_adjustment[primary_key1][secondary_key1] = {}
@@ -3511,7 +3519,7 @@ class ObCmgWholesalesController < ApplicationController
         create_program_association_with_adjustment(sheet)
       end
     end
-    # redirect_to programs_import_file_path(@bank)
+
     redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
   end
 
@@ -3880,6 +3888,10 @@ class ObCmgWholesalesController < ApplicationController
         value1 = "0-"+value1.split("<=").last.tr('^0-9', '')
       elsif value1.include?(">")
         value1 = value1.split(">").last.tr('^0-9', '')+"-Inf"
+      elsif value1.include?("+")
+        value1.split("+")[0] + "-Inf"
+      elsif value1.include?("%")
+        value1.gsub("%", "")
       else
         value1
       end
@@ -3991,9 +4003,10 @@ class ObCmgWholesalesController < ApplicationController
       full_doc = true
     end
     # High Balance
-    jumbo_high_balance = false
+    high_balance = false
+    jumbo = false
     if @program.program_name.include?("High Bal") || @program.program_name.include?("HIGH BAL")
-      jumbo_high_balance = true
+      high_balance = true
       loan_size = "High Balance"
     end
      # Fannie mae Product
@@ -4016,6 +4029,7 @@ class ObCmgWholesalesController < ApplicationController
       @program.loan_limit_type << "Conforming"
     end
     if @program.program_name.include?("Jumbo")
+      jumbo = true
       @program.loan_limit_type << "Jumbo"
     end
     if @program.program_name.include?("High Balance")
@@ -4023,7 +4037,7 @@ class ObCmgWholesalesController < ApplicationController
     end
 
     @program.save
-    @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",program_category: program_category, jumbo_high_balance: jumbo_high_balance, streamline: streamline,fha: fha, va: va, usda: usda, full_doc: full_doc, arm_basic: arm_basic, sheet_name: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product, loan_size: loan_size, bank_name: bank_name)
+    @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",program_category: program_category, high_balance: high_balance, jumbo: jumbo, streamline: streamline,fha: fha, va: va, usda: usda, full_doc: full_doc, arm_basic: arm_basic, sheet_name: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product, loan_size: loan_size, bank_name: bank_name)
   end
 
   def make_adjust(block_hash, sheet)
