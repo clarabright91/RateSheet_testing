@@ -691,8 +691,8 @@ class ObCmgWholesalesController < ApplicationController
                   @home_ready[cash_key][primary_key1][cltv_key][ltv_key][secondary_key1] = {}
                 end
                 if r >= 79 && r <= 82 && cc >= 6 && cc <= 14
-                  lpmi_key = get_value @lpmi_data[cc-1]
-                  if lpmi_key
+                  unless @lpmi_data[cc-1].eql?("%")
+                    lpmi_key = get_value @lpmi_data[cc-1]
                     @home_ready[cash_key][primary_key1][secondary_key][ltv_key][secondary_key1][lpmi_key] = {}
                     @home_ready[cash_key][primary_key1][secondary_key][ltv_key][secondary_key1][lpmi_key] = value
                     @home_ready[cash_key][primary_key1][cltv_key][ltv_key][secondary_key1][lpmi_key] = {}
@@ -4041,7 +4041,7 @@ class ObCmgWholesalesController < ApplicationController
     end
 
     @program.save
-    @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",program_category: program_category, high_balance: high_balance, jumbo: jumbo, streamline: streamline,fha: fha, va: va, usda: usda, full_doc: full_doc, arm_basic: arm_basic, sheet_name: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product, loan_size: loan_size, bank_name: bank_name)
+    @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",program_category: program_category, streamline: streamline,fha: fha, va: va, usda: usda, full_doc: full_doc, arm_basic: arm_basic, sheet_name: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product, loan_size: loan_size, bank_name: bank_name)
   end
 
   def make_adjust(block_hash, sheet)
