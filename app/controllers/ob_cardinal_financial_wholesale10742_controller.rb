@@ -1,7 +1,7 @@
 class ObCardinalFinancialWholesale10742Controller < ApplicationController
-  before_action :read_sheet, only: [:index,:ak, :sheet1]
-  before_action :check_sheet_empty , only:[:ak, :sheet1]
-  before_action :get_sheet, only: [:programs, :ak, :sheet1]
+  before_action :read_sheet, only: [:index,:ak]
+  # before_action :check_sheet_empty , only:[:ak, :sheet1]
+  before_action :get_sheet, only: [:programs, :ak]
   before_action :get_program, only: [:single_program, :program_property]
 
 
@@ -1125,17 +1125,25 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
   end
 
   def sheet1
+    redirect_to ob_cardinal_financial_wholesale10742_index_path
   end
 
-  def check_sheet_empty
-    action =  params[:action]
-    sheet_data = @xlsx.sheet(action) rescue @xlsx.sheet(action.upcase) rescue @xlsx.sheet(action.downcase) rescue @xlsx.sheet(action.capitalize)
-
-    if sheet_data.first_row.blank?
-      @msg = "Sheet is empty."
-      redirect_to ob_cardinal_financial_wholesale10742_index_path
-    end
-  end
+  # def check_sheet_empty
+  #   action =  params[:action]
+  #   begin
+  #     @sheet_data = @xlsx.sheet(action)
+  #   rescue
+  #     @sheet_data = @xlsx.sheet(action.upcase)
+  #   rescue
+  #     @sheet_data = @xlsx.sheet(action.downcase)
+  #   rescue
+  #     @sheet_data = @xlsx.sheet(action.capitalize)
+  #   end
+  #   if @sheet_data.first_row.blank?
+  #     @msg = "Sheet is empty."
+  #     redirect_to ob_cardinal_financial_wholesale10742_index_path
+  #   end
+  # end
 
   def programs
     @programs = @sheet_obj.programs
@@ -1220,9 +1228,9 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         full_doc = true
       end
       # High Balance
-      jumbo_high_balance = false
+      high_balance = false
       if @program.program_name.include?("High Balance") || @program.program_name.include?("High Bal")
-        jumbo_high_balance = true
+        high_balance = true
       end
 
       # Loan Limit Type
@@ -1240,7 +1248,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
       end
       @program.save
       bank_name = @bank.name
-      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, jumbo_high_balance: jumbo_high_balance, sheet_name: @sheet_name,bank_name: bank_name)
+      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, high_balance: high_balance, sheet_name: @sheet_name,bank_name: bank_name)
     end
 
     def make_adjust(block_hash, sheet)
