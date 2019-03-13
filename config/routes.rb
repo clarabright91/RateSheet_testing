@@ -73,6 +73,8 @@ Rails.application.routes.draw do
   resources :ob_cardinal_financial_wholesale10742, only: [:index] do
     member do
       get :ak
+      get :sheet1
+      get :programs
     end
   end
 

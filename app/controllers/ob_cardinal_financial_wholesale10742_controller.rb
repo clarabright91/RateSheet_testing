@@ -1,11 +1,13 @@
 class ObCardinalFinancialWholesale10742Controller < ApplicationController
-  before_action :get_sheet, only: [:programs, :ak]
+  before_action :read_sheet, only: [:index,:ak, :sheet1]
+  before_action :check_sheet_empty , only:[:ak, :sheet1]
+  before_action :get_sheet, only: [:programs, :ak, :sheet1]
   before_action :get_program, only: [:single_program, :program_property]
+
+
   def index
-    file = File.join(Rails.root,  'OB_Cardinal_Financial_Wholesale10742.xls')
-    xlsx = Roo::Spreadsheet.open(file)
     begin
-      xlsx.sheets.each do |sheet|
+      @xlsx.sheets.each do |sheet|
         if (sheet == "AK")
           headers = ["Phone", "General Contacts", "Mortgagee Clause (Wholesale)"]
           @name = "Cardinal Financial"
@@ -19,11 +21,9 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
   end
 
   def ak
-    file = File.join(Rails.root,  'OB_Cardinal_Financial_Wholesale10742.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "AK")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @ltv_data = []
         @sub_data = []
@@ -1121,7 +1121,20 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
       end
       create_program_association_with_adjustment(sheet)
     end
-    redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
+    redirect_to programs_ob_cardinal_financial_wholesale10742_path(@sheet_obj)
+  end
+
+  def sheet1
+  end
+
+  def check_sheet_empty
+    action =  params[:action]
+    sheet_data = @xlsx.sheet(action) rescue @xlsx.sheet(action.upcase) rescue @xlsx.sheet(action.downcase) rescue @xlsx.sheet(action.capitalize)
+
+    if sheet_data.first_row.blank?
+      @msg = "Sheet is empty."
+      redirect_to ob_cardinal_financial_wholesale10742_index_path
+    end
   end
 
   def programs
@@ -1132,20 +1145,26 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
   end
 
   def get_value value1
-      if value1.present?
-        if value1.include?("<=") || value1.include?("<") || value1.include?("≤")
-          value1 = "0-"+value1.split("<=").last.tr('A-Za-z%$><=≤ ','')
-        elsif value1.include?(">") || value1.include?("+")
-          value1 = value1.split(">").last.tr('A-Za-z+ ','')+"-Inf"
-        elsif value1.include?("≥")
-          value1 = value1.split("≥").last.tr('A-Za-z ','')+"-Inf"
-        else
-          value1 = value1.tr(' ','')
-        end
+    if value1.present?
+      if value1.include?("<=") || value1.include?("<") || value1.include?("≤")
+        value1 = "0-"+value1.split("<=").last.tr('A-Za-z%$><=≤ ','')
+      elsif value1.include?(">") || value1.include?("+")
+        value1 = value1.split(">").last.tr('A-Za-z+ ','')+"-Inf"
+      elsif value1.include?("≥")
+        value1 = value1.split("≥").last.tr('A-Za-z ','')+"-Inf"
+      else
+        value1 = value1.tr(' ','')
       end
     end
+  end
 
   private
+
+    def read_sheet
+      file = File.join(Rails.root,  'OB_Cardinal_Financial_Wholesale10742.xls')
+      @xlsx = Roo::Spreadsheet.open(file)
+    end
+
     def get_sheet
       @sheet_obj = Sheet.find(params[:id])
     end

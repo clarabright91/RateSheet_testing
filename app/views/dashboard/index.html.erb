@@ -22,6 +22,17 @@
             <%= select_tag 'pro_category', options_for_select(Program.pluck(:program_category).uniq.compact.map{|c| [c]}.prepend(["All"]), (params[:pro_category] rescue nil)), { :class=> "form-control", :required => true} %>
           </div>
         </div>
+
+        <div class="col-md-2">
+          <div class="form-group">
+            <label>Loan Purpose</label>
+            <div class="input-group">
+              <% loan_purpose_list =[["Purchase"], ["Refinance"]]%>
+              <%= select_tag 'loan_purpose', options_for_select(loan_purpose_list, (params[:loan_purpose] rescue nil)), { prompt: 'Select Loan Purpose', :class=> "form-control" }%>
+            </div>
+          </div>
+        </div>
+
         <div class="col-md-2">
           <div class="form-group">
             <label>Loan Type</label>
@@ -84,16 +95,6 @@
             <div class="input-group">
               <% @gov_list =[["FHA"], ["VA"], ["USDA"], ["Streamline"]]%>
               <%= select_tag 'gov', options_for_select(@gov_list, (params[:gov] rescue nil)), { prompt: 'Select Gov', :class=> "form-control" }%>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-2">
-          <div class="form-group">
-            <label>Loan Purpose</label>
-            <div class="input-group">
-              <% loan_purpose_list =[["Purchase"], ["Refinance"]]%>
-              <%= select_tag 'loan_purpose', options_for_select(loan_purpose_list, (params[:loan_purpose] rescue nil)), { prompt: 'Select Loan Purpose', :class=> "form-control" }%>
             </div>
           </div>
         </div>
