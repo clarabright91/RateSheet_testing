@@ -6,6 +6,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
 
 
   def index
+    sub_sheet_names = get_sheets_names
     begin
       @xlsx.sheets.each do |sheet|
         if (sheet == "AK")
@@ -14,6 +15,9 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
           @bank = Bank.find_or_create_by(name: @name)
         end
         @sheet = @bank.sheets.find_or_create_by(name: sheet)
+        sub_sheet_names.each do |sub_sheet|
+          @sub_sheet = @sheet.sub_sheets.find_or_create_by(name: sub_sheet)
+        end
       end
     rescue
       # the required headers are not all present
@@ -1179,6 +1183,10 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
 
     def get_program
       @program = Program.find(params[:id])
+    end
+
+    def get_sheets_names
+      return ["Fannie Mae Products","Freddie Mac Products","FHA, VA, and USDA Products","Non-Conforming Jumbo CORE","Non-Conforming Jumbo X"]
     end
 
     def program_property value1

@@ -75,6 +75,7 @@ Rails.application.routes.draw do
       get :ak
       get :sheet1
       get :programs
+      get :single_program
     end
   end
 
