@@ -692,10 +692,12 @@ class ObCmgWholesalesController < ApplicationController
                 end
                 if r >= 79 && r <= 82 && cc >= 6 && cc <= 14
                   lpmi_key = get_value @lpmi_data[cc-1]
-                  @home_ready[cash_key][primary_key1][secondary_key][ltv_key][secondary_key1][lpmi_key] = {}
-                  @home_ready[cash_key][primary_key1][secondary_key][ltv_key][secondary_key1][lpmi_key] = value
-                  @home_ready[cash_key][primary_key1][cltv_key][ltv_key][secondary_key1][lpmi_key] = {}
-                  @home_ready[cash_key][primary_key1][cltv_key][ltv_key][secondary_key1][lpmi_key] = value
+                  if lpmi_key
+                    @home_ready[cash_key][primary_key1][secondary_key][ltv_key][secondary_key1][lpmi_key] = {}
+                    @home_ready[cash_key][primary_key1][secondary_key][ltv_key][secondary_key1][lpmi_key] = value
+                    @home_ready[cash_key][primary_key1][cltv_key][ltv_key][secondary_key1][lpmi_key] = {}
+                    @home_ready[cash_key][primary_key1][cltv_key][ltv_key][secondary_key1][lpmi_key] = value
+                  end
                 end
                 if r >= 83 && r <= 86 && cc == 5
                   secondary_key1 = get_value value
@@ -704,10 +706,12 @@ class ObCmgWholesalesController < ApplicationController
                 end
                 if r >= 83 && r <= 86 && cc >= 6 && cc <= 14
                   lpmi_key = get_value @lpmi_data[cc-1]
-                  @home_possible[cash_key][primary_key1][secondary_key][ltv_key][secondary_key1][lpmi_key] = {}
-                  @home_possible[cash_key][primary_key1][secondary_key][ltv_key][secondary_key1][lpmi_key] = value
-                  @home_possible[cash_key][primary_key1][cltv_key][ltv_key][secondary_key1][lpmi_key] = {}
-                  @home_possible[cash_key][primary_key1][cltv_key][ltv_key][secondary_key1][lpmi_key] = value
+                  if lpmi_key.present?
+                    @home_possible[cash_key][primary_key1][secondary_key][ltv_key][secondary_key1][lpmi_key] = {}
+                    @home_possible[cash_key][primary_key1][secondary_key][ltv_key][secondary_key1][lpmi_key] = value
+                    @home_possible[cash_key][primary_key1][cltv_key][ltv_key][secondary_key1][lpmi_key] = {}
+                    @home_possible[cash_key][primary_key1][cltv_key][ltv_key][secondary_key1][lpmi_key] = value
+                  end
                 end
                 # LPMI (in addition to adjustments above)
                 if r >= 88 && r <= 89 && cc == 3
@@ -753,9 +757,9 @@ class ObCmgWholesalesController < ApplicationController
                 # LOAN AMOUNT
                 if r >= 38 && r <= 42 && cc == 10
                   if value.include?("Conf Limit")
-                    secondary_key1 = value.split("Loan Amount").last.tr('$a-zA-Z><= ', '')+"Inf"
+                    secondary_key1 = value.split("Loan Amount").last.tr('$a-zA-Z><= ', '').gsub(",", "")+"Inf"
                   elsif value.include?("Loan Amount")
-                    secondary_key1 = value.split("Loan Amount").last.tr('$><= ', '')
+                    secondary_key1 = value.split("Loan Amount").last.tr('$><= ', '').gsub(",", "")
                   else
                     secondary_key1 = get_value value
                   end
