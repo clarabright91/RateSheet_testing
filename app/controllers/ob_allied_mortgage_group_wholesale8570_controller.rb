@@ -1,12 +1,11 @@
 class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
+  before_action :read_sheet, only: [:index,:fha, :va, :conf_fixed]
   before_action :get_sheet, only: [:programs, :va, :fha, :conf_fixed]
   before_action :get_program, only: [:single_program]
 
   def index
-    file = File.join(Rails.root,  'OB_Allied_Mortgage_Group_Wholesale8570.xls')
-    xlsx = Roo::Spreadsheet.open(file)
     begin
-      xlsx.sheets.each do |sheet|
+      @xlsx.sheets.each do |sheet|
         if (sheet == "Cover")
           headers = ["Phone", "General Contacts", "Mortgagee Clause (Wholesale)"]
           @name = "Allied Mortgage"
@@ -20,11 +19,10 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
   end
 
   def fha
-    file = File.join(Rails.root,  'OB_Allied_Mortgage_Group_Wholesale8570.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "FHA")
-        sheet_data = xlsx.sheet(sheet)
+        @sheet_name = sheet
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @fha_adjustment = {}
         @loan_adj = {}
@@ -41,6 +39,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != 3.125
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  @program.update(sheet_name: @sheet_name)
                   program_property @program
                   @programs_ids << @program.id
                   # @program.adjustments.destroy_all
@@ -69,8 +68,8 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                     @block_hash.shift
                   end
-                  @program.update(base_rate: @block_hash, sheet_name: sheet)
                 end
+                @program.update(base_rate: @block_hash)
               rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
@@ -225,11 +224,10 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
   end
 
   def va
-    file = File.join(Rails.root,  'OB_Allied_Mortgage_Group_Wholesale8570.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "VA")
-        sheet_data = xlsx.sheet(sheet)
+        @sheet_name = sheet
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @adjustment_hash = {}
         @loan_amount = {}
@@ -247,10 +245,11 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != 3.5 && @title != 3.125 && @title != "Loan Amount"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  @program.update(sheet_name: @sheet_name)
                   @programs_ids << @program.id
                   # Program Property
                   program_property @title
-                  @program.adjustments.destroy_all
+                  # @program.adjustments.destroy_all
                   key = ''
                   @block_hash = {}
                   (1..50).each do |max_row|
@@ -273,7 +272,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                       break # terminate the loop
                     end
                   end
-                  @program.update(base_rate: @block_hash, sheet_name: sheet)
+                  @program.update(base_rate: @block_hash)
                 end
               rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
@@ -378,11 +377,10 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
   end
 
   def conf_fixed
-    file = File.join(Rails.root,  'OB_Allied_Mortgage_Group_Wholesale8570.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "CONF FIXED")
-        sheet_data = xlsx.sheet(sheet)
+        @sheet_name = sheet
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @adjustment_hash = {}
         @cash_out = {}
@@ -476,6 +474,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 end
 
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                @program.update(sheet_name: @sheet_name)
                 @programs_ids << @program.id
                   # Loan Limit Type
                 if @title.include?("Non-Conforming")
@@ -491,7 +490,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   @program.loan_limit_type << "High Balance"
                 end
                 @program.save
-                @program.update(term: @term,loan_type: loan_type,loan_purpose: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc, sheet_name: sheet)
+                @program.update(term: @term,loan_type: loan_type,loan_purpose: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc)
                 # @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -531,7 +530,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
-                @program.update(base_rate: @block_hash, sheet_name: sheet)
+                @program.update(base_rate: @block_hash)
               rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
@@ -752,6 +751,11 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
   end
 
   private
+
+    def read_sheet
+      file = File.join(Rails.root,  'OB_Allied_Mortgage_Group_Wholesale8570.xls')
+      @xlsx = Roo::Spreadsheet.open(file)
+    end
 
     def get_value value1
       if value1.present?
