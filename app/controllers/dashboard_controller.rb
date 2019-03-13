@@ -2971,7 +2971,13 @@ class DashboardController < ApplicationController
           end
         end
       end
-      @result << hash_obj
+      if hash_obj[:adj_points].present?
+        @result << hash_obj  
+      else
+        hash_obj[:adj_points] = "Adjustment Not Present"
+        @result << hash_obj
+      end
+
         hash_obj = {
         :program_name => "",
         :base_rate => 0.0,

@@ -374,6 +374,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@cashout_adjustment,@product_hash,@subordinate_hash,@additional_hash,@lpmi_hash]
         make_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
 
         # Freddie programs
         (458..684).each do |r|
@@ -706,6 +707,8 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         end
         adjustment = [@freddie_adjustment_hash,@cashout_hash,@sub_hash,@property_hash,@sub_hash]
         make_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
+
         # FHA Va Usda programs
         (844..1006).each do |r|
           row = sheet_data.row(r)
@@ -857,6 +860,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         end
         adjustment = [@relief_cashout_adjustment]
         make_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
         # Non Conforming programs
         (1126..1145).each do |r|
           row = sheet_data.row(r)
@@ -1015,6 +1019,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         end
         adjustment = [@jumbo_hash]
         make_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
         # Jumbo Non Conforming programs
         (1220..1260).each do |r|
           row = sheet_data.row(r)
@@ -1122,8 +1127,8 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         end
         adjustment = [@non_jumbo_hash]
         make_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
-      create_program_association_with_adjustment(sheet)
     end
     redirect_to programs_ob_cardinal_financial_wholesale10742_path(@sheet_obj)
   end
