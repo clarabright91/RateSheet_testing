@@ -68,8 +68,9 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                     @block_hash.shift
                   end
+
+                  @program.update(base_rate: @block_hash)
                 end
-                @program.update(base_rate: @block_hash)
               rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
@@ -825,9 +826,15 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
       end
 
       # High Balance
-      jumbo_high_balance = false
+      high_balance = false
       if @program.program_name.include?("High Bal")
-        jumbo_high_balance = true
+        high_balance = true
+      end
+
+      # Jumbo
+      jumbo = false
+      if @program.program_name.include?("Jumbo")
+        jumbo = true
       end
 
        # Program Category
@@ -847,7 +854,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         @program.loan_limit_type << "High Balance"
       end
       @program.save
-      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, jumbo_high_balance: jumbo_high_balance, program_category: program_category)
+      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, high_balance: high_balance, jumbo: jumbo,  program_category: program_category)
     end
 
     def make_adjust(block_hash, sheet)
