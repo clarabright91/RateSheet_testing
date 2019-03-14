@@ -27,7 +27,8 @@ class Program < ApplicationRecord
     set_fannie_mae                  if ["Fannie Mae, DU"].any? { |word| p_name.include?(word) }
     set_freddie_mac                 if ["Freddie Mac, LP"].any? { |word| p_name.include?(word) }
     set_freddie_mac_product(p_name) if ["Home Possible"].any? { |word| p_name.include?(word) }
-    set_term(p_name) if (7..50).to_a.collect{|n| n.to_s}.any? { |word| p_name.include?(word) }
+    set_term(p_name) if (5..50).to_a.collect{|n| n.to_s}.any? { |word| p_name.include?(word) }
+    self.save
   end
 
 
@@ -40,8 +41,8 @@ class Program < ApplicationRecord
   end
 
   def set_term(prog_name)
-    if prog_name.scan(/\d+/).count == 1
-      self.term = prog_name.scan(/\d+/)[0]
+    if prog_name.scan(/\d+/).uniq.count == 1
+      self.term = prog_name.scan(/\d+/).uniq[0]
     elsif prog_name.scan(/\d+/).count > 1 && !prog_name.include?("ARM")
       self.term = (prog_name.scan(/\d+/)[0]+ prog_name.scan(/\d+/)[1]).to_i if (MatheMatics.digits(prog_name.scan(/\d+/)[1].to_i).to_i + 1) > 1
       self.term = (prog_name.scan(/\d+/)[0]+ "0" + prog_name.scan(/\d+/)[1]).to_i unless (MatheMatics.digits(prog_name.scan(/\d+/)[1].to_i).to_i + 1) > 1
@@ -79,7 +80,7 @@ class Program < ApplicationRecord
 
   def set_loan_size p_name
     present_word = nil
-    ["Non-Conforming", "Conforming", "Jumbo", "High-Balance"].any? { |word|
+    ["Non-Conforming", "Conforming", "Jumbo", "High-Balance", "High Bal"].any? { |word|
       present_word = word if p_name.include?(word)
     }
     self.loan_size = present_word
