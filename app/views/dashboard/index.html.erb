@@ -64,8 +64,8 @@
         <div class="col-md-2 arm-basic">
           <div class="form-group">
             <label>ARM Advance</label>
-            <%# @arm_advanced_list =[["10/5"], ["5/1 3-2-5"]]%>
-            <%= select_tag 'arm_advanced', options_for_select( Program.pluck(:arm_advanced).uniq.compact.map{|c| [c]}.prepend(["All"]), (params[:arm_advanced] rescue nil)), { :class=> "form-control"} %>
+            <% @arm_advanced_list = Program.pluck(:arm_advanced).push("10/5", "5/1 3-2-5").uniq.compact.map{|c| [c]}.prepend(["All"]) %>
+            <%= select_tag 'arm_advanced', options_for_select( @arm_advanced_list, (params[:arm_advanced] rescue nil)), { :class=> "form-control"} %>
           </div>
         </div>
 
@@ -83,7 +83,7 @@
           <div class="form-group">
             <label>Fannie Options</label>
             <div class="input-group">
-              <% @loan_limit_type_list =[["Fannie Mae"], ["Fannie Mae Home Ready"], ["Fannie Mac"], ["Fannie Mae Home Possible"]]%>
+              <% @loan_limit_type_list =[["Fannie Mae"], ["Freddie Mac"]] %>
               <%= select_tag 'fannie_options', options_for_select(@loan_limit_type_list, (params[:fannie_options] rescue nil)), { prompt: 'Select Fannie', :class=> "form-control" }%>
             </div>
           </div>
@@ -96,6 +96,22 @@
               <% @gov_list =[["FHA"], ["VA"], ["USDA"], ["Streamline"]]%>
               <%= select_tag 'gov', options_for_select(@gov_list, (params[:gov] rescue nil)), { prompt: 'Select Gov', :class=> "form-control" }%>
             </div>
+          </div>
+        </div>
+
+        <div class="col-md-2">
+          <div class="form-group">
+            <label>Fannie Mae Product</label>
+            <% @fannie_mae_product_list =[["All"], ["HomeReady"]]%>
+            <%= select_tag 'fannie_mae_product', options_for_select(@fannie_mae_product_list, (params[:fannie_mae_product] rescue nil)), { :class=> "form-control", :required => true} %>
+          </div>
+        </div>
+
+        <div class="col-md-2">
+          <div class="form-group">
+            <label>Freddie Mac Product</label>
+            <% @freddie_mac_product_list =[["All"], ["Home Possible"]]%>
+            <%= select_tag 'freddie_mac_product', options_for_select(@freddie_mac_product_list, (params[:freddie_mac_product] rescue nil)), { :class=> "form-control", :required => true} %>
           </div>
         </div>
 
@@ -157,20 +173,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-2">
-          <div class="form-group">
-            <label>Fannie Mae Product</label>
-            <% @fannie_mae_product_list =[["HomeReady"]]%>
-            <%= select_tag 'fannie_mae_product', options_for_select(@fannie_mae_product_list, (params[:fannie_mae_product] rescue nil)), { :class=> "form-control", :required => true} %>
-          </div>
-        </div>
-        <div class="col-md-2">
-          <div class="form-group">
-            <label>Fraddie Mac Product</label>
-            <% @fraddie_mac_product_list =[["Home Possible"]]%>
-            <%= select_tag 'fraddie_mac_product', options_for_select(@fraddie_mac_product_list, (params[:fraddie_mac_product] rescue nil)), { :class=> "form-control", :required => true} %>
-          </div>
-        </div>
+        
         <div class="col-md-2">
           <div class="form-group">
             <label>Loan Amount</label>
