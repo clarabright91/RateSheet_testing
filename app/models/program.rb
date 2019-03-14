@@ -15,19 +15,52 @@ class Program < ApplicationRecord
     Adjustment.where(sheet_name: self.sheet_name)
   end
 
+  def get_non_conforming
+    non_conforming = ["Non-Conforming"]
+    non_conforming += Acronym.new(non_conforming).to_a
+    non_conforming += non_conforming.map(&:downcase)
+    return non_conforming
+  end
+
+  def get_conforming
+    conforming = ["Conforming"]
+    conforming += Acronym.new(conforming).to_a
+    conforming += conforming.map(&:downcase)
+    return conforming
+  end
+
+  def get_high_balance
+    high_balance = ["High-Balance", "HIGH BAL"]
+    high_balance += Acronym.new(high_balance).to_a
+    high_balance += high_balance.map(&:downcase)
+    return high_balance
+  end
+
+  def get_jumbo
+    jumbo = ["Jumbo"]
+    jumbo += Acronym.new(jumbo).to_a
+    jumbo += jumbo.map(&:downcase)
+    return jumbo
+  end
+
+  def fetch_loan_size_fields
+    loan_size = get_conforming + get_non_conforming + get_high_balance + get_jumbo
+    return loan_size
+  end
+
   def update_fields p_name
-    set_load_type(p_name)           if ["Fixed", "ARM", "Hybrid", "Floating", "Variable"].any? { |word| p_name.include?(word) }
-    set_fha                         if ["FHA"].any? { |word| p_name.include?(word) }
-    set_va                          if ["VA"].any? { |word| p_name.include?(word) }
-    set_usda                        if ["USDA"].any? { |word| p_name.include?(word) }
-    set_loan_purpose(p_name)        if ["Purchase", "Refinance"].any? { |word| p_name.include?(word) }
-    set_arm_basic(p_name)           if ["1/1", "2/1", "3/1", "7/1", "10/1", "5-1", "5/1"].any? { |word| p_name.include?(word) }
-    set_loan_size(p_name)           if ["Non-Conforming", "Conforming", "Jumbo", "High-Balance"].any? { |word| p_name.include?(word) }
-    set_arm_advanced(p_name)        if ["10/5", "5/1 3-2-5"].any? { |word| p_name.include?(word) }
-    set_fannie_mae                  if ["Fannie Mae, DU"].any? { |word| p_name.include?(word) }
-    set_freddie_mac                 if ["Freddie Mac, LP"].any? { |word| p_name.include?(word) }
-    set_freddie_mac_product(p_name) if ["Home Possible"].any? { |word| p_name.include?(word) }
-    set_term(p_name) if (5..50).to_a.collect{|n| n.to_s}.any? { |word| p_name.include?(word) }
+    set_loan_size(p_name)           if fetch_loan_size_fields.any? { |word| p_name.downcase.include?(word.downcase) }
+    set_load_type(p_name)           if ["Fixed", "ARM", "Hybrid", "Floating", "Variable"].any? { |word| p_name.downcase.include?(word.downcase) }
+    set_fha                         if ["FHA"].any? { |word| p_name.downcase.include?(word.downcase) }
+    set_va                          if ["VA"].any? { |word| p_name.downcase.include?(word.downcase) }
+    set_usda                        if ["USDA"].any? { |word| p_name.downcase.include?(word.downcase) }
+    set_loan_purpose(p_name)        if ["Purchase", "Refinance"].any? { |word| p_name.downcase.include?(word.downcase) }
+    set_arm_basic(p_name)           if ["1/1", "2/1", "3/1", "7/1", "10/1", "5-1", "5/1"].any? { |word| p_name.downcase.include?(word.downcase) }
+    set_arm_advanced(p_name)        if ["10/5", "5/1 3-2-5"].any? { |word| p_name.downcase.include?(word.downcase) }
+    set_fannie_mae                  if ["Fannie Mae, DU"].any? { |word| p_name.downcase.include?(word.downcase) }
+    set_freddie_mac                 if ["Freddie Mac, LP"].any? { |word| p_name.downcase.include?(word.downcase) }
+    set_freddie_mac_product(p_name) if ["Home Possible"].any? { |word| p_name.downcase.include?(word.downcase) }
+    set_term(p_name) if (5..50).to_a.collect{|n| n.to_s}.any? { |word| p_name.downcase.include?(word.downcase) }
     self.save
   end
 
@@ -80,10 +113,12 @@ class Program < ApplicationRecord
 
   def set_loan_size p_name
     present_word = nil
-    ["Non-Conforming", "Conforming", "Jumbo", "High-Balance", "High Bal"].any? { |word|
+    fetch_loan_size_fields.any? { |word|
       present_word = word if p_name.include?(word)
     }
-    self.loan_size = present_word
+
+    loan_size = get_high_balance.include?(present_word) ? "High-Balance" : get_jumbo.include?(present_word) ? "Jumbo" : get_conforming.include?(present_word) ? "Conforming" : "Non-Conforming"
+    self.loan_size = loan_size
   end
 
   def set_arm_advanced p_name
