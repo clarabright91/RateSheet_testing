@@ -3,7 +3,9 @@
   <div class="">
     <br/>
     <%= form_tag('/dashboard/index', method: :get) do %>
+      <div class="input-grp"><h5>Program Info</h5></div>
       <div class="row">
+        <div class="col-md-1"></div>
         <div class="col-md-2">
           <div class="form-group">
             <label>Bank Name</label>
@@ -22,7 +24,11 @@
             <%= select_tag 'pro_category', options_for_select(Program.pluck(:program_category).uniq.compact.map{|c| [c]}.prepend(["All"]), (params[:pro_category] rescue nil)), { :class=> "form-control", :required => true} %>
           </div>
         </div>
+      </div>
 
+      <div class="input-grp"><h5>Loan Property</h5></div>
+      <div class="row">
+        <div class="col-md-1"></div>
         <div class="col-md-2">
           <div class="form-group">
             <label>Loan Purpose</label>
@@ -68,7 +74,11 @@
             <%= select_tag 'arm_advanced', options_for_select( @arm_advanced_list, (params[:arm_advanced] rescue nil)), { :class=> "form-control"} %>
           </div>
         </div>
+      </div>
 
+      <div class="input-grp"><h5>Loan Property</h5></div>
+      <div class="row">
+        <div class="col-md-1"></div>
         <div class="col-md-2">
           <div class="form-group">
             <label>Loan Size</label>
@@ -78,23 +88,17 @@
             </div>
           </div>
         </div>
+      </div>
 
+      <div class="input-grp"><h5>FM</h5></div>
+      <div class="row">
+        <div class="col-md-1"></div>
         <div class="col-md-2">
           <div class="form-group">
             <label>Fannie Options</label>
             <div class="input-group">
               <% @loan_limit_type_list =[["Fannie Mae"], ["Freddie Mac"]] %>
               <%= select_tag 'fannie_options', options_for_select(@loan_limit_type_list, (params[:fannie_options] rescue nil)), { prompt: 'Select Fannie', :class=> "form-control" }%>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-2">
-          <div class="form-group">
-            <label>Gov</label>
-            <div class="input-group">
-              <% @gov_list =[["FHA"], ["VA"], ["USDA"], ["Streamline"]]%>
-              <%= select_tag 'gov', options_for_select(@gov_list, (params[:gov] rescue nil)), { prompt: 'Select Gov', :class=> "form-control" }%>
             </div>
           </div>
         </div>
@@ -114,7 +118,23 @@
             <%= select_tag 'freddie_mac_product', options_for_select(@freddie_mac_product_list, (params[:freddie_mac_product] rescue nil)), { :class=> "form-control", :required => true} %>
           </div>
         </div>
+      </div>
 
+      <div class="input-grp"><h5>Government Program</h5></div>
+      <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <label>Gov</label>
+            <div class="input-group">
+              <% @gov_list =[["FHA"], ["VA"], ["USDA"], ["Streamline"]]%>
+              <%= select_tag 'gov', options_for_select(@gov_list, (params[:gov] rescue nil)), { prompt: 'Select Gov', :class=> "form-control" }%>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
         <div class="col-md-2">
           <div class="form-group">
             <label>Interest Rate</label>
@@ -257,7 +277,8 @@
           <th>Base Rate</th>
           <th>Sheet Name</th>
           <th>Bank Name</th>
-          <th>Adjustments Points</th>
+          <th>Adjustments</th>
+          <th>Final Rate</th>
         </tr>
       </thead>
       <tbody>
@@ -270,6 +291,7 @@
             <td><%= program[:sheet_name] %></td>
             <td><%= program[:bank_name] %></td>
             <td><%= program[:adj_points] %></td>
+            <td><%= (program[:final_rate].sum).round(3) %></td>
           </tr>
         <%end%>
       <%end%>

@@ -247,9 +247,10 @@ class DashboardController < ApplicationController
     hash_obj = {
       :program_name => "",
       :base_rate => 0.0,
-      :sheet_name=> "",
-      :bank_name=> "",
-      :adj_points => []
+      :sheet_name => "",
+      :bank_name => "",
+      :adj_points => [],
+      :final_rate => []
     }
     programs.each do |pro|
       hash_obj[:program_name] = pro.program_name.present? ? pro.program_name : ""
@@ -2955,51 +2956,60 @@ class DashboardController < ApplicationController
               point = adj.data[first_key][adj_key_hash[hash_key]]
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
                 hash_obj[:adj_points] << point
+                hash_obj[:final_rate] << point
               end
             end
             if hash_key==1 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
                 hash_obj[:adj_points] << point
+                hash_obj[:final_rate] << point
               end
             end
             if hash_key==2 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
                 hash_obj[:adj_points] << point
+                hash_obj[:final_rate] << point
               end
             end
             if hash_key==3 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
                 hash_obj[:adj_points] << point
+                hash_obj[:final_rate] << point
               end
             end
             if hash_key==4 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-4]][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
                 hash_obj[:adj_points] << point
+                hash_obj[:final_rate] << point
               end
             end
             if hash_key==5 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-5]][adj_key_hash[hash_key-4]][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
                 hash_obj[:adj_points] << point
+                hash_obj[:final_rate] << point
               end
             end
             if hash_key==6 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-6]][adj_key_hash[hash_key-5]][adj_key_hash[hash_key-4]][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
                 hash_obj[:adj_points] << point
+                hash_obj[:final_rate] << point
               end
             end
           end
         end
       end
       if hash_obj[:adj_points].present?
-        @result << hash_obj  
+        hash_obj[:final_rate] << hash_obj[:base_rate]
+        @result << hash_obj
       else
         hash_obj[:adj_points] = "Adjustment Not Present"
+        hash_obj[:final_rate] << hash_obj[:base_rate]
         @result << hash_obj
       end
 
@@ -3008,7 +3018,8 @@ class DashboardController < ApplicationController
         :base_rate => 0.0,
         :sheet_name=> "",
         :bank_name=> "",
-        :adj_points => []
+        :adj_points => [],
+        :final_rate => []
       }
     end
   end
