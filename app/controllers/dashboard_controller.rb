@@ -159,10 +159,10 @@ class DashboardController < ApplicationController
         @filter_data[:conforming] = false
       elsif params[:loan_size] == "Conforming"
         @filter_data[:conforming] = true
-      elsif params[:loan_size] == "Jumbo"
-        @filter_data[:jumbo] = true
-      elsif params[:loan_size] == "High-Balance"
-        @filter_data[:high_balance] = true
+      # elsif params[:loan_size] == "Jumbo"
+      #   @filter_data[:jumbo] = true
+      # elsif params[:loan_size] == "High-Balance"
+      #   @filter_data[:high_balance] = true
       end
     end
 
@@ -200,9 +200,24 @@ class DashboardController < ApplicationController
         @program_list2 = @program_list
       end
 
-      @programs =[]
       if @program_list2.present?
-        @program_list2.each do |program|
+        @program_list3 = []
+        if (params[:loan_size].present? && (params[:loan_size] == "Jumbo" || params[:loan_size] == "High-Balance" ))
+          # @program_list2 = @program_list2.map{|p| p  if p.loan_size!=nil }
+          @program_list2.each do |pro|
+            if(pro.loan_size == params[:loan_size])
+              @program_list3 << pro
+            end
+          end
+        else
+          @program_list3 = @program_list2
+        end
+      end
+
+
+      @programs =[]
+      if @program_list3.present?
+        @program_list3.each do |program|
           if(program.base_rate.keys.include?(@interest.to_f.to_s))
             if(program.base_rate[@interest.to_f.to_s].keys.include?(@lock_period))
                 @programs << program
