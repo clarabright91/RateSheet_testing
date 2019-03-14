@@ -400,7 +400,6 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
             rr = r + 1
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
-
               cc = 4*max_column + (2+max_column) # 2, 7, 12, 17
               begin
                 @title = sheet_data.cell(r,cc)
