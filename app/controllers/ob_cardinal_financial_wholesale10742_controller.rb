@@ -90,7 +90,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                     end
                   end
                 end
-                @program.update(base_rate: @block_hash)
+                @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
               rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
@@ -422,7 +422,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                       break # terminate the loop
                     end
                   end
-                  @program.update(base_rate: @block_hash)
+                  @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
                 end
               rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
@@ -755,7 +755,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                       break # terminate the loop
                     end
                   end
-                  @program.update(base_rate: @block_hash)
+                  @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
                 end
               rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
@@ -904,7 +904,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                     break # terminate the loop
                   end
                 end
-                @program.update(base_rate: @block_hash)
+                @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
               rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
@@ -1061,7 +1061,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                     break # terminate the loop
                   end
                 end
-                @program.update(base_rate: @block_hash)
+                @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
               end
             end
           end
