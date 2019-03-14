@@ -32,6 +32,8 @@ class DashboardController < ApplicationController
     @ltv = []
     @credit_score = []
     @cltv = []
+    @fannie_mae_product = "HomeReady"
+    @freddie_mac_product = "Home Possible"
   end
 
   def set_variable
@@ -78,12 +80,24 @@ class DashboardController < ApplicationController
     @misc_adjuster = params[:misc_adjuster] if params[:misc_adjuster].present?
     @premium_type = params[:premium_type] if params[:premium_type].present?
     @interest = params[:interest] if params[:interest].present?
-    @lock_period = params[:lock_period] if params[:lock_period].present?
-    @fannie_mae_product = params[:fannie_mae_product] if params[:fannie_mae_product].present?
-    @fraddie_mac_product = params[:fraddie_mac_product] if params[:fraddie_mac_product].present?
+    @lock_period = params[:lock_period] if params[:lock_period].present?    
     @loan_amount = params[:loan_amount].to_i if params[:loan_amount].present?
     @program_category = params[:program_category] if params[:program_category].present?
     @payment_type =  params[:payment_type] if params[:payment_type].present?
+
+    if params[:fannie_mae_product].present?
+      unless (params[:fannie_mae_product] == "All")
+        @filter_data[:fannie_mae_product] = params[:fannie_mae_product]
+        @fannie_mae_product = params[:fannie_mae_product]
+      end
+    end
+
+    if params[:freddie_mac_product].present?
+      unless (params[:freddie_mac_product] == "All")
+        @filter_data[:freddie_mac_product] = params[:freddie_mac_product]
+        @freddie_mac_product = params[:freddie_mac_product] 
+      end
+    end
 
     if params[:bank_name].present?
       unless (params[:bank_name] == "All")
@@ -131,12 +145,8 @@ class DashboardController < ApplicationController
     if params[:fannie_options].present?
       if params[:fannie_options] == "Fannie Mae"
         @filter_data[:fannie_mae] = true
-      elsif params[:fannie_options] == "Fannie Mae Home Ready"
-        @filter_data[:fannie_mae_home_ready] = true
-      elsif params[:fannie_options] == "Fannie Mac"
+      elsif params[:fannie_options] == "Freddie Mac"
         @filter_data[:freddie_mac] = true
-      elsif params[:fannie_options] == "Fannie Mae freddie_mac_home_possible Possible"
-        @filter_data[:freddie_mac_home_possible] = true
       end
     end
 
@@ -159,10 +169,10 @@ class DashboardController < ApplicationController
         @filter_data[:conforming] = false
       elsif params[:loan_size] == "Conforming"
         @filter_data[:conforming] = true
-      elsif params[:loan_size] == "Jumbo"
-        @filter_data[:jumbo] = true
-      elsif params[:loan_size] == "High-Balance"
-        @filter_data[:high_balance] = true
+      # elsif params[:loan_size] == "Jumbo"
+      #   @filter_data[:jumbo] = true
+      # elsif params[:loan_size] == "High-Balance"
+      #   @filter_data[:high_balance] = true
       end
     end
 
@@ -200,9 +210,24 @@ class DashboardController < ApplicationController
         @program_list2 = @program_list
       end
 
-      @programs =[]
       if @program_list2.present?
-        @program_list2.each do |program|
+        @program_list3 = []
+        if (params[:loan_size].present? && (params[:loan_size] == "Jumbo" || params[:loan_size] == "High-Balance" ))
+          # @program_list2 = @program_list2.map{|p| p  if p.loan_size!=nil }
+          @program_list2.each do |pro|
+            if(pro.loan_size == params[:loan_size])
+              @program_list3 << pro
+            end
+          end
+        else
+          @program_list3 = @program_list2
+        end
+      end
+
+
+      @programs =[]
+      if @program_list3.present?
+        @program_list3.each do |program|
           if(program.base_rate.keys.include?(@interest.to_f.to_s))
             if(program.base_rate[@interest.to_f.to_s].keys.include?(@lock_period))
                 @programs << program
@@ -286,7 +311,7 @@ class DashboardController < ApplicationController
                 if key_name == "FreddieMacProduct"
                   begin
                     if adj.data[first_key][@property_type].present?
-                      adj_key_hash[key_index] = @fraddie_mac_product
+                      adj_key_hash[key_index] = @freddie_mac_product
                     else
                       break
                     end
@@ -551,7 +576,7 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if @state = "All"
+                    if @state == "All"
                       first_state_key = adj.data[first_key].keys.first
                       if adj.data[first_key][first_state_key].present?
                         adj_key_hash[key_index] = first_state_key
@@ -666,7 +691,7 @@ class DashboardController < ApplicationController
                 if key_name == "FreddieMacProduct"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-1]][@property_type].present?
-                      adj_key_hash[key_index] = @fraddie_mac_product
+                      adj_key_hash[key_index] = @freddie_mac_product
                     else
                       break
                     end
@@ -930,7 +955,7 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if @state = "All"
+                    if @state == "All"
                       first_state_key = adj.data[first_key][adj_key_hash[key_index-1]].keys.first
                       if adj.data[first_key][adj_key_hash[key_index-1]][first_state_key].present?
                         adj_key_hash[key_index] = first_state_key
@@ -1045,7 +1070,7 @@ class DashboardController < ApplicationController
                 if key_name == "FreddieMacProduct"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
-                      adj_key_hash[key_index] = @fraddie_mac_product
+                      adj_key_hash[key_index] = @freddie_mac_product
                     else
                       break
                     end
@@ -1308,7 +1333,7 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if @state = "All"
+                    if @state == "All"
                       first_state_key = adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
                       if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][first_state_key].present?
                         adj_key_hash[key_index] = first_state_key
@@ -1421,7 +1446,7 @@ class DashboardController < ApplicationController
                 if key_name == "FreddieMacProduct"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
-                      adj_key_hash[key_index] = @fraddie_mac_product
+                      adj_key_hash[key_index] = @freddie_mac_product
                     else
                       break
                     end
@@ -1684,7 +1709,7 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if @state = "All"
+                    if @state == "All"
                       first_state_key = adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
                       if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][first_state_key].present?
                         adj_key_hash[key_index] = first_state_key
@@ -1797,7 +1822,7 @@ class DashboardController < ApplicationController
                 if key_name == "FreddieMacProduct"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
-                      adj_key_hash[key_index] = @fraddie_mac_product
+                      adj_key_hash[key_index] = @freddie_mac_product
                     else
                       break
                     end
@@ -2059,7 +2084,7 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if @state = "All"
+                    if @state == "All"
                       first_state_key = adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
                       if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][first_state_key].present?
                         adj_key_hash[key_index] = first_state_key
@@ -2173,7 +2198,7 @@ class DashboardController < ApplicationController
                 if key_name == "FreddieMacProduct"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
-                      adj_key_hash[key_index] = @fraddie_mac_product
+                      adj_key_hash[key_index] = @freddie_mac_product
                     else
                       break
                     end
@@ -2436,7 +2461,7 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if @state = "All"
+                    if @state == "All"
                       first_state_key = adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
                       if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][first_state_key].present?
                         adj_key_hash[key_index] = first_state_key
@@ -2549,7 +2574,7 @@ class DashboardController < ApplicationController
                 if key_name == "FreddieMacProduct"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
-                      adj_key_hash[key_index] = @fraddie_mac_product
+                      adj_key_hash[key_index] = @freddie_mac_product
                     else
                       break
                     end
@@ -2814,7 +2839,7 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if @state = "All"
+                    if @state == "All"
                       first_state_key = adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
                       if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][first_state_key].present?
                         adj_key_hash[key_index] = first_state_key

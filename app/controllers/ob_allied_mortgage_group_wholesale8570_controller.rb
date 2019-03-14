@@ -406,7 +406,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @program.update(sheet_name: @sheet_name)
-                @program.update_fields @title                 
+                @program.update_fields @title
                 @programs_ids << @program.id                
                 @program.adjustments.destroy_all
                 @block_hash = {}
@@ -423,10 +423,6 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                         key = value
                         @block_hash[key] = {}
                       else
-                        if @program.lock_period.length <= 3
-                          @program.lock_period << 15*c_i
-                          @program.save
-                        end
                         @block_hash[key][15*c_i] = value
                       end
                       @data << value

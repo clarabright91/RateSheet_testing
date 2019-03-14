@@ -2977,10 +2977,9 @@ class ObNewfiWholesale7019Controller < ApplicationController
       arm_basic = 10
     end
 
-    # High Balance
-    jumbo_high_balance = false
+    # Loan Size
     if @program.program_name.include?("High Bal")
-      jumbo_high_balance = true
+      loan_size = "High-Balance"
     end
 
     # Arm Advanced
@@ -3002,7 +3001,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
       @program.loan_limit_type << "High Balance"
     end
     @program.save
-    @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, sheet_name: sheet, jumbo_high_balance: jumbo_high_balance, arm_basic: arm_basic, arm_advanced: arm_advanced)
+    @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, sheet_name: sheet, loan_size: loan_size, arm_basic: arm_basic, arm_advanced: arm_advanced)
   end
 
   def make_adjust(block_hash, sheet)
