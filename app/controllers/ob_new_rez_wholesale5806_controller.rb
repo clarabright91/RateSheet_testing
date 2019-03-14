@@ -5262,7 +5262,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @state["State"]["NV"][secondry_key] = value
                   end
                 end
-              rescue
+              rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
@@ -5561,7 +5561,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @jumbo_adjustment["LoanType/RefinanceOption/FICO/LTV"]["ARM"]["Cash Out"][fixed_key] = value
                   end
                 end
-              rescue
+              rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
@@ -5699,7 +5699,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
                 @block_hash.delete(nil)
                 @program.update(base_rate: @block_hash,sheet_name: @sheet)
-              rescue
+              rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
@@ -5790,7 +5790,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @sub_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"][ltv_key][cltv_key][sub_data] = value
                   end
                 end
-              rescue
+              rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
@@ -5930,7 +5930,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
                 @block_hash.delete(nil)
                 @program.update(base_rate: @block_hash,sheet_name: @sheet)
-              rescue
+              rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
@@ -6203,7 +6203,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         @block_hash["LockDay"]["60"] = value
                       end
                     end
-                  rescue
+                  rescue Exception => e
                     error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet, error_detail: e.message)
                     error_log.save
                   end
@@ -6364,7 +6364,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
                 @block_hash.delete(nil)
                 @program.update(base_rate: @block_hash,sheet_name: @sheet)
-              rescue
+              rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
@@ -6644,7 +6644,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
                 end
               end
-            rescue
+            rescue Exception => e
               error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet, error_detail: e.message)
               error_log.save
             end
@@ -6787,7 +6787,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
                 @block_hash.delete(nil)
                 @program.update(base_rate: @block_hash,sheet_name: @sheet)
-              rescue
+              rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
@@ -7073,7 +7073,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
                 end
               end
-            rescue
+            rescue Exception => e
               error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
               error_log.save
             end
@@ -7200,7 +7200,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
                 @block_hash.delete(nil)
                 @program.update(base_rate: @block_hash,sheet_name: @sheet)
-              rescue
+              rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
               end
@@ -7470,7 +7470,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         @block_hash["LockDay"]["45"] = value
                         @block_hash["LockDay"]["60"] = value
                       end
-                    rescue
+                    rescue Exception => e
                       error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet, error_detail: e.message)
                       error_log.save
                     end
@@ -7486,7 +7486,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
                 end
               end
-            rescue
+            rescue Exception => e
               error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
               error_log.save
             end
