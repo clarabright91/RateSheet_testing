@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_11_131823) do
+ActiveRecord::Schema.define(version: 2019_03_13_120133) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -62,7 +62,6 @@ ActiveRecord::Schema.define(version: 2019_03_11_131823) do
   create_table "programs", force: :cascade do |t|
     t.integer "bank_id"
     t.integer "term"
-    t.boolean "jumbo", default: false
     t.boolean "conforming", default: false
     t.boolean "fannie_mae", default: false
     t.boolean "fannie_mae_home_ready", default: false
@@ -93,7 +92,6 @@ ActiveRecord::Schema.define(version: 2019_03_11_131823) do
     t.string "fannie_mae_product"
     t.string "freddie_mac_product"
     t.integer "sub_sheet_id"
-    t.boolean "high_balance", default: false
   end
 
   create_table "sheets", force: :cascade do |t|
