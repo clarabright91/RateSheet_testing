@@ -7549,28 +7549,6 @@ class ObNewRezWholesale5806Controller < ApplicationController
     return ["FICO/LTV Adjustments - Loan Amount ≤ $1MM", "State Adjustments", "FICO/LTV Adjustments - Loan Amount > $1MM", "Feature Adjustments", "Max Price"]
   end
 
-  def all_lp
-    data = Adjustment::ALL_IP
-
-    return data
-  end
-
-  def high_bal_adjustment
-    data = Adjustment::HIGH_BALANCE_ADJUSTMENT
-    return data
-  end
-
-  def jumbo_series_i_adjustment
-      data = Adjustment::JUMBO_SERIES_I_ADJUSTMENT
-    return data
-  end
-
-  def dream_big_adjustment
-    data = Adjustment::DREAM_BIG_ADJUSTMENT
-
-    return data
-  end
-
   def table_data
     hash_keys = {
       "FICO/LTV Adjustments" => "LoanAmount/FICO/LTV",
