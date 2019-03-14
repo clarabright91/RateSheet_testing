@@ -2408,123 +2408,6 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Cash Out"] = new_value
               end
               if r == 147 && cc == 14
-                @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Rate and Term"] = {}
-                cc = cc + 1
-                new_value = sheet_data.cell(r,cc)
-                @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Rate and Term"] = new_value
-              end
-              # Other Adjustments
-              if r == 166 && cc == 12
-                @other_adjustment["MiscAdjuster"] = {}
-                @other_adjustment["MiscAdjuster"]["Escrow Waiver Fee"] = {}
-                cc = cc + 1
-                new_val = sheet_data.cell(r,cc)
-                @other_adjustment["MiscAdjuster"]["Escrow Waiver Fee"] = new_val
-              end
-              if r == 167 && cc == 12
-                @other_adjustment["LoanAmount"] = {}
-                @other_adjustment["LoanAmount"]["0-100000"] = {}
-                cc = cc + 1
-                new_val = sheet_data.cell(r,cc)
-                @other_adjustment["LoanAmount"]["0-100000"] = new_val
-              end
-              # Loans With Secondary Financing
-              if value == "Loans With Secondary Financing"
-                @secondary_hash["LTV/CLTV/FICO"] = {}
-              end
-              if r >= 154 && r <= 157 && cc == 12
-                ltv_key = get_value value
-                @secondary_hash["LTV/CLTV/FICO"][ltv_key] = {}
-              end
-              if r >= 154 && r <= 157 && cc == 13
-                cltv_key = get_value value
-                @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key] = {}
-              end
-              if r >= 154 && r <= 157 && cc > 13 && cc <= 15
-                ltv_data = get_value @ltv_data[cc-1]
-                ltv_data = ltv_data.tr('() ','')
-                @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = {}
-                @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = value
-              end
-              if value == "LTV / FICO (Terms > 15 years only)"
-                first_row = 141
-                end_row = 144
-                last_column = 8
-                first_column = 4
-                ltv_row = 140
-                num = 1
-                ltv_adjustment range1, range2, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row,num
-              end
-              if value == "Cash Out Refinance"
-                @cashout_hash["RefinanceOption/FICO/LTV"] = {}
-                @cashout_hash["RefinanceOption/FICO/LTV"]["Cash Out"] = {}
-              end
-              if value == "OLYMPIC FIXED 2ND MORTGAGE"
-                @property_hash["LoanType/CLTV"] = {}
-                @property_hash["LoanType/CLTV"]["Fixed"] = {}
-              end
-              # Cash Out Refinance
-              if r >= 154 && r <= 157 && cc == 4
-                primary_key = get_value value
-                @cashout_hash["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key] = {}
-              end
-              if r >= 154 && r <= 157 && cc >= 5 && cc <= 8
-                ltv_key = get_value @ltv_data[cc-1]
-                @cashout_hash["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key][ltv_key] = {}
-                @cashout_hash["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key][ltv_key] = value
-              end
-              # OLYMPIC FIXED 2ND MORTGAGE
-              if r == 166 && cc == 4
-                @property_hash["LoanType/RefinanceOption/LTV"] = {}
-                @property_hash["LoanType/RefinanceOption/LTV"]["Fixed"] = {}
-                @property_hash["LoanType/RefinanceOption/LTV"]["Fixed"]["Cash Out"] = {}
-                @property_hash["LoanType/RefinanceOption/LTV"]["Fixed"]["Cash Out"]["100000"] = {}
-                cc = cc + 2
-                new_val = sheet_data.cell(r,cc)
-                @property_hash["LoanType/RefinanceOption/LTV"]["Fixed"]["Cash Out"]["100000"] = new_val
-              end
-              if r == 167 && cc == 4
-                @property_hash["LoanType/PropertyType"] = {}
-                @property_hash["LoanType/PropertyType"]["Fixed"] = {}
-                @property_hash["LoanType/PropertyType"]["Fixed"]["2nd Home"] = {}
-                cc = cc + 2
-                new_val = sheet_data.cell(r,cc)
-                @property_hash["LoanType/PropertyType"]["Fixed"]["2nd Home"] = new_val
-              end
-              if r >= 168 && r <= 171 && cc == 4
-                primary_key = value.tr('A-Z% ','')
-                @property_hash["LoanType/CLTV"]["Fixed"][primary_key] = {}
-                cc = cc + 2
-                new_val = sheet_data.cell(r,cc)
-                @property_hash["LoanType/CLTV"]["Fixed"][primary_key] = new_val
-              end
-              if r == 172 && cc == 4
-                @property_hash["LoanType/Term"] = {}
-                @property_hash["LoanType/Term"]["Fixed"] = {}
-                @property_hash["LoanType/Term"]["Fixed"]["15"] = {}
-                cc = cc + 2
-                new_val = sheet_data.cell(r,cc)
-                @property_hash["LoanType/Term"]["Fixed"]["15"] = new_val
-              end
-               # Other Adjustments
-              if r == 145 && cc == 14
-                @other_adjustment["PropertyType/Term/LTV"] = {}
-                @other_adjustment["PropertyType/Term/LTV"]["Condo"] = {}
-                @other_adjustment["PropertyType/Term/LTV"]["Condo"]["15-Inf"] = {}
-                @other_adjustment["PropertyType/Term/LTV"]["Condo"]["15-Inf"]["75-Inf"] = {}
-                cc = cc + 1
-                new_value = sheet_data.cell(r,cc)
-                @other_adjustment["PropertyType/Term/LTV"]["Condo"]["15-Inf"]["75-Inf"] = new_value
-              end
-              if r == 146 && cc == 14
-                @other_adjustment["LoanSize/RefinanceOption"] = {}
-                @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"] = {}
-                @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Cash Out"] = {}
-                cc = cc + 1
-                new_value = sheet_data.cell(r,cc)
-                @other_adjustment["LoanSize/RefinanceOption"]["High-Balance"]["Cash Out"] = new_value
-              end
-              if r == 147 && cc == 14
                 @other_adjustment["LoanSize/RefinanceOption"]["Rate and Term"] = {}
                 cc = cc + 1
                 new_value = sheet_data.cell(r,cc)
@@ -2841,6 +2724,91 @@ class ObNewfiWholesale7019Controller < ApplicationController
     file = File.join(Rails.root,  'OB_Newfi_Wholesale7019.xls')
     @xlsx = Roo::Spreadsheet.open(file)
   end
+  # def program_property value1, sheet
+  #   # term
+  #   if @program.program_name.include?("30 Year") || @program.program_name.include?("30Yr") || @program.program_name.include?("30 Yr") || @program.program_name.include?("30/25 Year") || @program.program_name.include?("30 YR")
+  #     term = 30
+  #   elsif @program.program_name.include?("20 Year") || @program.program_name.include?("20 YR")
+  #     term = 20
+  #   elsif @program.program_name.include?("15 Year") || @program.program_name.include?("15 YR")
+  #     term = 15
+  #   elsif @program.program_name.include?("10 Year") || @program.program_name.include?("10 YR")
+  #     term = 10
+  #   else
+  #     term = nil
+  #   end
+
+  #   # Loan-Type
+  #   if @program.program_name.include?("Fixed")
+  #     loan_type = "Fixed"
+  #   elsif @program.program_name.include?("ARM")
+  #     loan_type = "ARM"
+  #   elsif @program.program_name.include?("Floating")
+  #     loan_type = "Floating"
+  #   elsif @program.program_name.include?("Variable")
+  #     loan_type = "Variable"
+  #   else
+  #     loan_type = nil
+  #   end
+
+  #   # Streamline Vha, Fha, Usda
+  #   fha = false
+  #   va = false
+  #   usda = false
+  #   streamline = false
+  #   full_doc = false
+  #   if @program.program_name.include?("FHA")
+  #     streamline = true
+  #     fha = true
+  #     full_doc = true
+  #   elsif @program.program_name.include?("VA")
+  #     streamline = true
+  #     va = true
+  #     full_doc = true
+  #   elsif @program.program_name.include?("USDA")
+  #     streamline = true
+  #     usda = true
+  #     full_doc = true
+  #   end
+
+  #    # Arm Basic
+  #   if @program.program_name.include?("3/1") || @program.program_name.include?("3 / 1")
+  #     arm_basic = 3
+  #   elsif @program.program_name.include?("5/1") || @program.program_name.include?("5 / 1")
+  #     arm_basic = 5
+  #   elsif @program.program_name.include?("7/1") || @program.program_name.include?("7 / 1")
+  #     arm_basic = 7
+  #   elsif @program.program_name.include?("10/1") || @program.program_name.include?("10 / 1")
+  #     arm_basic = 10
+  #   end
+
+  #   # Loan Size
+  #   if @program.program_name.include?("High Bal")
+  #     loan_size = "High-Balance"
+  #   end
+
+  #   # Arm Advanced
+  #   if @program.program_name.include?("ARM")
+  #     arm_advanced = @program.program_name.split.last
+  #   end
+
+  #   # Loan Limit Type
+  #   if @program.program_name.include?("Non-Conforming")
+  #     @program.loan_limit_type << "Non-Conforming"
+  #   end
+  #   if @program.program_name.include?("Conforming")
+  #     @program.loan_limit_type << "Conforming"
+  #   end
+  #   if @program.program_name.include?("Jumbo")
+  #     @program.loan_limit_type << "Jumbo"
+  #   end
+  #   if @program.program_name.include?("High Balance")
+  #     @program.loan_limit_type << "High Balance"
+  #   end
+  #   @program.save
+  #   @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, sheet_name: sheet, loan_size: loan_size, arm_basic: arm_basic, arm_advanced: arm_advanced)
+  # end
+
   # def program_property value1, sheet
   #   # term
   #   if @program.program_name.include?("30 Year") || @program.program_name.include?("30Yr") || @program.program_name.include?("30 Yr") || @program.program_name.include?("30/25 Year") || @program.program_name.include?("30 YR")
