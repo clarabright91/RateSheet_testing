@@ -925,8 +925,8 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                     @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"] = {}
                     @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true] = {}
                     @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"] = {}
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1,000,000"] = {}
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1,000,000-Inf"] = {}
+                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1000000"] = {}
+                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1000000-Inf"] = {}
                   end
                   if value == "Other Specific Adjustments"
                     @jumbo_hash["PropertyType/LTV"] = {}
@@ -934,21 +934,21 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                   # Non-Conforming Jumbo CORE Loan Level Price Adjustments
                   if r >= 1158 && r <= 1164 && cc == 8
                     primary_key = get_value value
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1,000,000"][primary_key] = {}
+                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1000000"][primary_key] = {}
                   end
                   if r >= 1158 && r <= 1164 && cc >= 15 && cc <= 39
                     ltv_key = get_value @jumbo_data[cc-2]
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1,000,000"][primary_key][ltv_key] = {}
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1,000,000"][primary_key][ltv_key] = value
+                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1000000"][primary_key][ltv_key] = {}
+                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1000000"][primary_key][ltv_key] = value
                   end
                   if r >= 1167 && r <= 1173 && cc == 8
                     primary_key = get_value value
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1,000,000-Inf"][primary_key] = {}
+                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1000000-Inf"][primary_key] = {}
                   end
                   if r >= 1167 && r <= 1173 && cc >= 15 && cc <= 39
                     ltv_key = get_value @jumbo_data[cc-2]
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1,000,000-Inf"][primary_key][ltv_key] = {}
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1,000,000-Inf"][primary_key][ltv_key] = value
+                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1000000-Inf"][primary_key][ltv_key] = {}
+                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1000000-Inf"][primary_key][ltv_key] = value
                   end
                   # Other Specific Adjustments
                   if r == 1176 && cc == 8
