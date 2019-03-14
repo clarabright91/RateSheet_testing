@@ -423,10 +423,6 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                         key = value
                         @block_hash[key] = {}
                       else
-                        if @program.lock_period.length <= 3
-                          @program.lock_period << 15*c_i
-                          @program.save
-                        end
                         @block_hash[key][15*c_i] = value
                       end
                       @data << value
