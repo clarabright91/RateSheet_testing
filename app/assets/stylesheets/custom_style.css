@@ -16,3 +16,13 @@ i {
 h4#sheet-title{
   display: none;
 }
+.input-grp{
+	background-color: lightslategrey;
+	color: #fff;
+	padding: 5px 10px 5px;
+	margin: 10px;
+}
+
+.input-gry h5{
+	font-weight: 600;
+}
