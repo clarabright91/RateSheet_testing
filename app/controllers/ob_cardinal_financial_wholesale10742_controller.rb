@@ -1240,10 +1240,9 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         usda = true
         full_doc = true
       end
-      # High Balance
-      high_balance = false
+      # Loan Size
       if @program.program_name.include?("High Balance") || @program.program_name.include?("High Bal")
-        high_balance = true
+        loan_size = "High-Balance"
       end
 
       # Loan Limit Type
@@ -1261,7 +1260,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
       end
       @program.save
       bank_name = @bank.name
-      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, high_balance: high_balance, sheet_name: @sheet_name,bank_name: bank_name)
+      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, loan_size: loan_size, sheet_name: @sheet_name,bank_name: bank_name)
     end
 
     def make_adjust(block_hash, sheet)
