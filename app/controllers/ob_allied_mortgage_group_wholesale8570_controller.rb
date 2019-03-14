@@ -42,7 +42,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   @program.update(sheet_name: @sheet_name)
                   @program.update_fields @title
                   @programs_ids << @program.id
-                  # @program.adjustments.destroy_all
+                  @program.adjustments.destroy_all
                   key = ''
                   @block_hash = {}
                   (1..50).each do |max_row|
@@ -247,10 +247,10 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 if @title.present? && @title != 3.5 && @title != 3.125 && @title != "Loan Amount"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update(sheet_name: @sheet_name)
-                  @programs_ids << @program.id
-                  # Program Property
                   @program.update_fields @title
-                  # @program.adjustments.destroy_all
+                  @program.update_fields @title
+                  @programs_ids << @program.id
+                  @program.adjustments.destroy_all
                   key = ''
                   @block_hash = {}
                   (1..50).each do |max_row|
@@ -407,8 +407,8 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @program.update(sheet_name: @sheet_name)
-                @programs_ids << @program.id
                 @program.update_fields @title                 
+                @programs_ids << @program.id                
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -437,9 +437,6 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                     break # terminate the loop
                   end
                 end
-                # if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-                #   @block_hash.values.first.shift
-                # end
                 if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
