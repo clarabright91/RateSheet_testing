@@ -45,7 +45,7 @@
           <div class="form-group">
             <label>Term</label>
             <div class="input-group">
-             <% @term_list =[["10 yrs",10], ["15 yrs",15], ["20 yrs",20], ["25 yrs",25], ["30 yrs",30]] %>
+             <% @term_list = (Program.all.pluck(:term).reject(&:blank?).uniq.map{|n| n if MatheMatics.digits(n) < 3}.reject(&:blank?).push(5,10,15,20,25,30).uniq.sort).map{|y| [y.to_s + " yrs" , y]} %>
               <%= select_tag 'term', options_for_select(@term_list, (params[:term] rescue nil)), { prompt: 'Select Term', :class=> "form-control"} %>
             </div>
           </div>

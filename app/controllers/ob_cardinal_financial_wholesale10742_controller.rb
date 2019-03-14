@@ -925,8 +925,8 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                     @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"] = {}
                     @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true] = {}
                     @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"] = {}
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1,000,000"] = {}
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1,000,000-Inf"] = {}
+                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1000000"] = {}
+                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1000000-Inf"] = {}
                   end
                   if value == "Other Specific Adjustments"
                     @jumbo_hash["PropertyType/LTV"] = {}
@@ -934,21 +934,21 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                   # Non-Conforming Jumbo CORE Loan Level Price Adjustments
                   if r >= 1158 && r <= 1164 && cc == 8
                     primary_key = get_value value
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1,000,000"][primary_key] = {}
+                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1000000"][primary_key] = {}
                   end
                   if r >= 1158 && r <= 1164 && cc >= 15 && cc <= 39
                     ltv_key = get_value @jumbo_data[cc-2]
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1,000,000"][primary_key][ltv_key] = {}
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1,000,000"][primary_key][ltv_key] = value
+                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1000000"][primary_key][ltv_key] = {}
+                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1000000"][primary_key][ltv_key] = value
                   end
                   if r >= 1167 && r <= 1173 && cc == 8
                     primary_key = get_value value
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1,000,000-Inf"][primary_key] = {}
+                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1000000-Inf"][primary_key] = {}
                   end
                   if r >= 1167 && r <= 1173 && cc >= 15 && cc <= 39
                     ltv_key = get_value @jumbo_data[cc-2]
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1,000,000-Inf"][primary_key][ltv_key] = {}
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1,000,000-Inf"][primary_key][ltv_key] = value
+                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1000000-Inf"][primary_key][ltv_key] = {}
+                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1000000-Inf"][primary_key][ltv_key] = value
                   end
                   # Other Specific Adjustments
                   if r == 1176 && cc == 8
@@ -1240,10 +1240,9 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         usda = true
         full_doc = true
       end
-      # High Balance
-      high_balance = false
+      # Loan Size
       if @program.program_name.include?("High Balance") || @program.program_name.include?("High Bal")
-        high_balance = true
+        loan_size = "High-Balance"
       end
 
       # Loan Limit Type
@@ -1261,7 +1260,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
       end
       @program.save
       bank_name = @bank.name
-      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, high_balance: high_balance, sheet_name: @sheet_name,bank_name: bank_name)
+      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, loan_size: loan_size, sheet_name: @sheet_name,bank_name: bank_name)
     end
 
     def make_adjust(block_hash, sheet)
