@@ -148,11 +148,11 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                     @fha_adjustment["FHA/USDA/LoanAmount/FICO"] = {}
                     @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true] = {}
                     @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true] = {}
-                    @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true]["0-100k"] = {}
-                    @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true]["0-100k"]["0-640"] = {}
+                    @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true]["0-100000"] = {}
+                    @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true]["0-100000"]["0-640"] = {}
                     cc = cc + 3
                     new_val = sheet_data.cell(r,cc)
-                    @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true]["0-100k"]["0-640"] = new_val
+                    @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true]["0-100000"]["0-640"] = new_val
                   end
                   if r == 52 && cc == 17
                     @fha_adjustment["FHA/USDA/State"] = {}
@@ -191,7 +191,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                     if value.include?(">")
                       first_key = get_value value
                     else
-                      first_key = value.sub('to','-').tr('$','')
+                      first_key = value.sub('to','-').tr('$,','')
                     end
                     @loan_adj["LoanAmount"][first_key] = {}
                     cc = cc + 3
@@ -247,7 +247,6 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 if @title.present? && @title != 3.5 && @title != 3.125 && @title != "Loan Amount"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update(sheet_name: @sheet_name)
-                  @program.update_fields @title
                   @program.update_fields @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -342,7 +341,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   end
                   if r >= 37 && r <= 45 && cc == 17
                     if value.include?("to")
-                      primary_key = value.sub('to','-').tr('$><% ','')
+                      primary_key = value.sub('to','-').tr('$><%, ','')
                     else
                       primary_key = get_value value
                     end
@@ -618,7 +617,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   end
                   if r >= 91 && r <= 99 && cc == 13
                     if value.include?("to")
-                      ltv_key = value.sub('to','-').tr('$><% ','')
+                      ltv_key = value.sub('to','-').tr('$><%, ','')
                     else
                       ltv_key = get_value value
                     end
@@ -674,7 +673,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         elsif value1.include?(">") || value1.include?("+")
           value1 = value1.split(">").last.tr('^0-9', '')+"-Inf"
         else
-          value1 = value1.tr('A-Z ','')
+          value1 = value1.tr('A-Z, ','')
         end
       end
     end
