@@ -576,7 +576,7 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if @state = "All"
+                    if @state == "All"
                       first_state_key = adj.data[first_key].keys.first
                       if adj.data[first_key][first_state_key].present?
                         adj_key_hash[key_index] = first_state_key
@@ -955,7 +955,7 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if @state = "All"
+                    if @state == "All"
                       first_state_key = adj.data[first_key][adj_key_hash[key_index-1]].keys.first
                       if adj.data[first_key][adj_key_hash[key_index-1]][first_state_key].present?
                         adj_key_hash[key_index] = first_state_key
@@ -1333,7 +1333,7 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if @state = "All"
+                    if @state == "All"
                       first_state_key = adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
                       if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][first_state_key].present?
                         adj_key_hash[key_index] = first_state_key
@@ -1709,7 +1709,7 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if @state = "All"
+                    if @state == "All"
                       first_state_key = adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
                       if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][first_state_key].present?
                         adj_key_hash[key_index] = first_state_key
@@ -2084,7 +2084,7 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if @state = "All"
+                    if @state == "All"
                       first_state_key = adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
                       if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][first_state_key].present?
                         adj_key_hash[key_index] = first_state_key
@@ -2461,7 +2461,7 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if @state = "All"
+                    if @state == "All"
                       first_state_key = adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
                       if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][first_state_key].present?
                         adj_key_hash[key_index] = first_state_key
@@ -2839,7 +2839,7 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if @state = "All"
+                    if @state == "All"
                       first_state_key = adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
                       if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][first_state_key].present?
                         adj_key_hash[key_index] = first_state_key
