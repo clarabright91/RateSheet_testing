@@ -1,6 +1,6 @@
 class ObQuickenLoans3571Controller < ApplicationController
-	before_action :get_sheet, only: [:programs, :ws_du_lp_pricing, :durp_lp_relief_pricing, :fha_usda_full_doc_pricing, :fha_streamline_pricing, :va_full_doc_pricing, :va_irrrl_pricing_govy_llpas, :na_jumbo_pricing_llpas, :du_lp_llpas, :durp_lp_relief_llpas, :lpmi]
   before_action :read_sheet, only: [:index,:ws_du_lp_pricing, :durp_lp_relief_pricing, :fha_usda_full_doc_pricing, :fha_streamline_pricing, :va_full_doc_pricing, :va_irrrl_pricing_govy_llpas, :na_jumbo_pricing_llpas, :du_lp_llpas, :durp_lp_relief_llpas, :lpmi]
+	before_action :get_sheet, only: [:programs, :ws_du_lp_pricing, :durp_lp_relief_pricing, :fha_usda_full_doc_pricing, :fha_streamline_pricing, :va_full_doc_pricing, :va_irrrl_pricing_govy_llpas, :na_jumbo_pricing_llpas, :du_lp_llpas, :durp_lp_relief_llpas, :lpmi]
   before_action :get_program, only: [:single_program]
 
 	def index
@@ -21,6 +21,7 @@ class ObQuickenLoans3571Controller < ApplicationController
   def ws_du_lp_pricing
   	@xlsx.sheets.each do |sheet|
       if (sheet == "WS DU & LP Pricing")
+        @sheet_name = sheet
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         # programs
@@ -351,8 +352,8 @@ class ObQuickenLoans3571Controller < ApplicationController
           end
         end
         adjustment = [@adjustment_hash,@subordinate_hash,@property_hash,@cashout_hash,@other_adjustment]
-        make_adjust(adjustment,sheet)
-        create_program_association_with_adjustment(sheet)
+        make_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_quicken_loans3571_path(@sheet_obj)
@@ -361,6 +362,7 @@ class ObQuickenLoans3571Controller < ApplicationController
   def durp_lp_relief_pricing
   	@xlsx.sheets.each do |sheet|
       if (sheet == "DURP & LP Relief Pricing")
+        @sheet_name = sheet
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         # programs
@@ -848,8 +850,8 @@ class ObQuickenLoans3571Controller < ApplicationController
           end
         end
         adjustment = [@adjustment_hash,@lp_adjustment,@subordinate_hash,@property_hash,@cashout_hash,@pricing_cap,@other_adjustment]
-        make_adjust(adjustment,sheet)
-        # create_program_association_with_adjustment(sheet)
+        make_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_quicken_loans3571_path(@sheet_obj)
@@ -858,6 +860,7 @@ class ObQuickenLoans3571Controller < ApplicationController
   def fha_usda_full_doc_pricing
   	@xlsx.sheets.each do |sheet|
       if (sheet == "FHA & USDA Full Doc Pricing")
+        @sheet_name = sheet
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         # programs
@@ -873,7 +876,7 @@ class ObQuickenLoans3571Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != "=FALSE()"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.sheet_name = sheet
+                  @program.sheet_name = @sheet_name
                   @programs_ids << @program.id
                   @program.update_fields @title
   	              @block_hash = {}
@@ -915,6 +918,7 @@ class ObQuickenLoans3571Controller < ApplicationController
   def fha_streamline_pricing
   	@xlsx.sheets.each do |sheet|
       if (sheet == "FHA Streamline Pricing")
+        @sheet_name = sheet
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         # programs
@@ -930,7 +934,7 @@ class ObQuickenLoans3571Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != "=FALSE()"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.sheet_name = sheet
+                  @program.sheet_name = @sheet_name
                   @programs_ids << @program.id
                   @program.update_fields @title
   	              @block_hash = {}
@@ -972,6 +976,7 @@ class ObQuickenLoans3571Controller < ApplicationController
   def va_full_doc_pricing
   	@xlsx.sheets.each do |sheet|
       if (sheet == "VA Full Doc Pricing")
+        @sheet_name = sheet
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         # programs
@@ -987,7 +992,7 @@ class ObQuickenLoans3571Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != "=FALSE()"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.sheet_name = sheet
+                  @program.sheet_name = @sheet_name
                   @programs_ids << @program.id
                   @program.update_fields @title
   	              @block_hash = {}
@@ -1029,6 +1034,7 @@ class ObQuickenLoans3571Controller < ApplicationController
   def va_irrrl_pricing_govy_llpas
   	@xlsx.sheets.each do |sheet|
       if (sheet == "VA IRRRL Pricing & Govy LLPAs")
+        @sheet_name = sheet
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @adjustment_hash = {}
@@ -1049,7 +1055,7 @@ class ObQuickenLoans3571Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != "=FALSE()"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.sheet_name = sheet
+                  @program.sheet_name = @sheet_name
                   @programs_ids << @program.id
                   @program.update_fields @title
   	              @block_hash = {}
@@ -1186,8 +1192,8 @@ class ObQuickenLoans3571Controller < ApplicationController
         	end
         end
         adjustment = [@adjustment_hash,@government_hash]
-        make_adjust(adjustment,sheet)
-        create_program_association_with_adjustment(sheet)
+        make_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_quicken_loans3571_path(@sheet_obj)
@@ -1196,6 +1202,7 @@ class ObQuickenLoans3571Controller < ApplicationController
   def na_jumbo_pricing_llpas
   	@xlsx.sheets.each do |sheet|
       if (sheet == "NA Jumbo Pricing & LLPAs")
+        @sheet_name = sheet
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @adjustment_hash = {}
@@ -1212,7 +1219,7 @@ class ObQuickenLoans3571Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != "=FALSE()"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.sheet_name = sheet
+                  @program.sheet_name = @sheet_name
                   @programs_ids << @program.id
                   @program.update_fields @title
   	              @block_hash = {}
@@ -1282,7 +1289,8 @@ class ObQuickenLoans3571Controller < ApplicationController
           end
         end
         adjustment = [@adjustment_hash]
-        make_adjust(adjustment,sheet)
+        make_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_quicken_loans3571_path(@sheet_obj)
@@ -1291,6 +1299,7 @@ class ObQuickenLoans3571Controller < ApplicationController
   def lpmi
     @xlsx.sheets.each do |sheet|
       if (sheet == "LPMI")
+        @sheet_name = sheet
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @adjustment_hash = {}
@@ -1393,7 +1402,8 @@ class ObQuickenLoans3571Controller < ApplicationController
           end
         end
         adjustment = [@adjustment_hash,@additional_adjustment]
-        make_adjust(adjustment,sheet)
+        make_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_quicken_loans3571_path(@sheet_obj)
@@ -1444,94 +1454,6 @@ class ObQuickenLoans3571Controller < ApplicationController
       file = File.join(Rails.root,  'OB_Quicken_Loans3571.xls')
       @xlsx = Roo::Spreadsheet.open(file)
     end
-
-    # def program_property
-    #   if @program.program_name.include?("30") || @program.program_name.include?("30/25 Year")
-    #     term = @program.program_name.tr('A-Za-z- ','')
-    #   elsif @program.program_name.include?("20")
-    #     term = @program.program_name.tr('A-Za-z- ','')
-    #   elsif @program.program_name.include?("15")
-    #     term = @program.program_name.tr('A-Za-z- ','')
-    #   elsif @program.program_name.include?("10 Year")
-    #     term = @program.program_name.tr('A-Za-z- ','')
-    #   elsif @program.program_name.include?("5 Year")
-    #   	term = @program.program_name.tr('A-Za-z- ','')
-    #   elsif @program.program_name.include?("7 Year")
-    #    term = @program.program_name.tr('A-Za-z- ','')
-    #   else
-    #     term = nil
-    #   end
-
-    #   # Loan-Type
-    #   if @program.program_name.include?("Fixed") || @program.program_name.include?("FIXED")
-    #     loan_type = "Fixed"
-    #   elsif @program.program_name.include?("ARM")
-    #     loan_type = "ARM"
-    #   elsif @program.program_name.include?("Floating")
-    #     loan_type = "Floating"
-    #   elsif @program.program_name.include?("Variable")
-    #     loan_type = "Variable"
-    #   else
-    #     loan_type = nil
-    #   end
-
-    #   # Streamline Vha, Fha, Usda
-    #   fha = false
-    #   va = false
-    #   usda = false
-    #   streamline = false
-    #   full_doc = false
-    #   if @program.program_name.include?("FHA")
-    #     streamline = true
-    #     fha = true
-    #     full_doc = true
-    #   elsif @program.program_name.include?("VA")
-    #     streamline = true
-    #     va = true
-    #     full_doc = true
-    #   elsif @program.program_name.include?("USDA")
-    #     streamline = true
-    #     usda = true
-    #     full_doc = true
-    #   end
-
-    #   # High Balance
-    #   jumbo_high_balance = false
-    #   if @program.program_name.include?("High Bal") || @program.program_name.include?("High Balance")
-    #     jumbo_high_balance = true
-    #   end
-
-    #   # Arm Basic
-    #   if @program.program_name.include?("3/1") || @program.program_name.include?("3 / 1")
-    #     arm_basic = 3
-    #   elsif @program.program_name.include?("5/1") || @program.program_name.include?("5 / 1")
-    #     arm_basic = 5
-    #   elsif @program.program_name.include?("7/1") || @program.program_name.include?("7 / 1")
-    #     arm_basic = 7
-    #   elsif @program.program_name.include?("10/1") || @program.program_name.include?("10 / 1")
-    #     arm_basic = 10
-    #   end
-
-    #   # Arm Advanced
-    #   if @program.program_name.include?("2-2-5 ")
-    #     arm_advanced = "2-2-5"
-    #   end
-    #   # Loan Limit Type
-    #   if @program.program_name.include?("Non-Conforming")
-    #     @program.loan_limit_type << "Non-Conforming"
-    #   end
-    #   if @program.program_name.include?("Conforming")
-    #     @program.loan_limit_type << "Conforming"
-    #   end
-    #   if @program.program_name.include?("Jumbo")
-    #     @program.loan_limit_type << "Jumbo"
-    #   end
-    #   if @program.program_name.include?("High Balance")
-    #     @program.loan_limit_type << "High Balance"
-    #   end
-    #   @program.save
-    #   @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, jumbo_high_balance: jumbo_high_balance, arm_basic: arm_basic, arm_advanced: arm_advanced)
-    # end
 
     def create_program_association_with_adjustment(sheet)
       adjustment_list = Adjustment.where(sheet_name: sheet)
