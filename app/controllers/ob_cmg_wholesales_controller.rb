@@ -1371,6 +1371,7 @@ class ObCmgWholesalesController < ApplicationController
     @programs_ids = []
     @xlsx.sheets.each do |sheet|
       if (sheet == "MI LLPAS")
+        program_sheet = "AGENCY"
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @adjustment_hash = {}
@@ -1721,9 +1722,9 @@ class ObCmgWholesalesController < ApplicationController
           end
         end
         adjustment = [@adjustment_hash,@subordinate_hash,@adjustment_cap,@standard_hash,@home_hash,@property_hash]
-        make_adjust(adjustment,sheet)
+        make_adjust(adjustment,program_sheet)
 
-        create_program_association_with_adjustment(sheet)
+        create_program_association_with_adjustment(program_sheet)
       end
     end
     redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
