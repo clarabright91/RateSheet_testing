@@ -61,7 +61,6 @@ class Program < ApplicationRecord
     set_freddie_mac                 if ["Freddie Mac", "LP"].any? { |word| p_name.downcase.include?(word.downcase) }
     set_freddie_mac_product(p_name) if ["Home Possible"].any? { |word| p_name.downcase.include?(word.downcase) }
     set_term(p_name) if (5..50).to_a.collect{|n| n.to_s}.any? { |word| p_name.downcase.include?(word.downcase) }
-    self.term = ProgramUpdate.set_term(p_name)
     self.save
   end
 

@@ -12,13 +12,19 @@ class ProgramUpdate
 
     private
     def modify_string string
-      if string.include?("-")
-        last_digit   = string.split("-").last.to_i
+      symbol_arr    = ["-", "/"]
+      string_symbol = nil
+      string.each_char { |c|
+        string_symbol = c if symbol_arr.include?(c)
+      }
+
+      if string.include?(string_symbol)
+        last_digit   = string.split(string_symbol).last.to_i
         digits_count = MatheMatics.digits(last_digit)
         if digits_count > 1
-          string = string.gsub("-","").to_i
+          string = string.gsub(string_symbol,"").to_i
         else
-          string = string.split("-").first + "0" + string.split("-").last
+          string = string.split(string_symbol).first + "0" + string.split("-").last
           string = string.to_i
         end
       else
