@@ -9,6 +9,10 @@ class DashboardController < ApplicationController
     end
   end
 
+  def banks
+    @banks = Bank.all
+  end
+
   def fetch_programs_by_bank
     program_list = []
     if params[:bank_name].present?
@@ -80,7 +84,7 @@ class DashboardController < ApplicationController
     @misc_adjuster = params[:misc_adjuster] if params[:misc_adjuster].present?
     @premium_type = params[:premium_type] if params[:premium_type].present?
     @interest = params[:interest] if params[:interest].present?
-    @lock_period = params[:lock_period] if params[:lock_period].present?    
+    @lock_period = params[:lock_period] if params[:lock_period].present?
     @loan_amount = params[:loan_amount].to_i if params[:loan_amount].present?
     @program_category = params[:program_category] if params[:program_category].present?
     @payment_type =  params[:payment_type] if params[:payment_type].present?
@@ -95,7 +99,7 @@ class DashboardController < ApplicationController
     if params[:freddie_mac_product].present?
       unless (params[:freddie_mac_product] == "All")
         @filter_data[:freddie_mac_product] = params[:freddie_mac_product]
-        @freddie_mac_product = params[:freddie_mac_product] 
+        @freddie_mac_product = params[:freddie_mac_product]
       end
     end
 
@@ -258,8 +262,8 @@ class DashboardController < ApplicationController
       hash_obj[:bank_name] = pro.bank_name.present? ? pro.bank_name : ""
       hash_obj[:base_rate] = pro.base_rate[@interest.to_f.to_s][@lock_period].present? ? pro.base_rate[@interest.to_f.to_s][@lock_period] : 0.0
       if pro.adjustments.present?
-        pro.adjustments.each do |adj|          
-          first_key = adj.data.keys.first          
+        pro.adjustments.each do |adj|
+          first_key = adj.data.keys.first
           key_list = first_key.split("/")
           adj_key_hash = {}
           key_list.each_with_index do |key_name, key_index|
@@ -491,7 +495,7 @@ class DashboardController < ApplicationController
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
-                
+
                 if key_name == "RefinanceOption"
                   begin
                     if (@refinance_option == "Cash Out" || @refinance_option == "Cash-Out")
@@ -711,7 +715,7 @@ class DashboardController < ApplicationController
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
-                
+
                 if key_name == "LoanAmount"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-1]].present?
@@ -793,7 +797,7 @@ class DashboardController < ApplicationController
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
-                
+
                 if key_name == "LTV"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-1]].present?
@@ -1090,7 +1094,7 @@ class DashboardController < ApplicationController
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
-                
+
                 if key_name == "LoanAmount"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
@@ -1466,7 +1470,7 @@ class DashboardController < ApplicationController
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
-                
+
                 if key_name == "LoanAmount"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
@@ -1842,7 +1846,7 @@ class DashboardController < ApplicationController
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
-                
+
                 if key_name == "LoanAmount"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
@@ -2218,7 +2222,7 @@ class DashboardController < ApplicationController
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
-                
+
                 if key_name == "LoanAmount"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
@@ -2594,7 +2598,7 @@ class DashboardController < ApplicationController
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
-                
+
                 if key_name == "LoanAmount"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
@@ -2676,7 +2680,7 @@ class DashboardController < ApplicationController
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
-                
+
                 if key_name == "LTV"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
