@@ -16,6 +16,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
       @xlsx.sheets.each do |sheet|
         @sheetlist.push(sheet)
         if (sheet == "Cover Zone 1")
+          @sheet_name = sheet
           headers = ["Phone", "General Contacts", "Mortgagee Clause (Wholesale)"]
           @xlsx.sheet(sheet).each_with_index do |row, index|
             current_row = index+1
@@ -60,9 +61,20 @@ class ObNewRezWholesale5806Controller < ApplicationController
     @allAdjustments = {}
     @xlsx.sheets.each do |sheet|
       if (sheet == "Government")
+        @sheet_name = sheet
         @sheet = sheet
+        @credit_hash = {}
+        @loan_hash = {}
+        @hb_hash = {}
+        @bpc_loan_hash = {}
+        @govt_hash = {}
+        @second_hash = {}
+        @spe_hash = {}
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
+        new_key = ''
+        new_val = ''
+        c_val = ''
         (1..95).each do |r|
           row = sheet_data.row(r)
 
@@ -76,87 +88,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 # term
                 program_heading = @title.split
-                if @title.include?("10yr") || @title.include?("10 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("15yr") || @title.include?("15 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("20yr") || @title.include?("20 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("25yr") || @title.include?("25 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("30yr") || @title.include?("30 Yr")
-                  term = @title.scan(/\d+/)[0]
-                else
-                  term = nil
-                end
 
                 # rate arm
-                if @title.include?("Fixed")
-                  loan_type = "Fixed"
-                elsif @title.include?("ARM")
-                  loan_type = "ARM"
-                elsif @title.include?("Floating")
-                  loan_type = "Floating"
-                elsif @title.include?("Variable")
-                  loan_type = "Variable"
-                else
-                  loan_type = nil
-                end
-
-                # streamline && fha, Va , Usda
-                fha = false
-                va = false
-                usda = false
-                streamline = false
-                full_doc = false
-                if @title.include?("FHA")
-                  streamline = true
-                  fha = true
-                  full_doc = true
-                elsif @title.include?("VA")
-                  streamline = true
-                  va = true
-                  full_doc = true
-                elsif @title.include?("USDA")
-                  streamline = true
-                  usda = true
-                  full_doc = true
-                else
-                  streamline = false
-                  fha = false
-                  va = false
-                  usda = false
-                  full_doc = false
-                end
-
-                # rate arm
-                if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM")
-                  arm_basic = @title.scan(/\d+/)[0].to_i
-                end
-
-                # High Balance
-                jumbo_high_balance = false
-                if @title.include?("High Balance")
-                  jumbo_high_balance = true
-                end
-
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
-                  # Loan Limit Type
-                if @title.include?("Non-Conforming")
-                  @program.loan_limit_type << "Non-Conforming"
-                end
-                if @title.include?("Conforming")
-                  @program.loan_limit_type << "Conforming"
-                end
-                if @title.include?("Jumbo")
-                  @program.loan_limit_type << "Jumbo"
-                end
-                if @title.include?("High Balance")
-                  @program.loan_limit_type << "High Balance"
-                end
-                @program.save
-                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",streamline: streamline, fha: fha, va: va, usda: usda, full_doc: full_doc, jumbo_high_balance: jumbo_high_balance,sheet_name: sheet, arm_basic: arm_basic)
+                @program.update_fields @title
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -194,239 +130,178 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     break # terminate the loop
                   end
                 end
-                @program.update(base_rate: @block_hash,sheet_name: @sheet)
+                @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                 error_log.save
               end
             end
           end
         end
 
-        #For Adjustments
-        @xlsx.sheet(sheet).each_with_index do |sheet_row, index|
-          index = index+ 1
-          if sheet_row.include?("Loan Level Price Adjustments")
-            (index..@xlsx.sheet(sheet).last_row).each do |adj_row|
-              # First Adjustment
-              if @xlsx.sheet(sheet).row(adj_row).include?("Credit Score")
-                rr = adj_row
-                cc = 5
-                @credit_hash = {}
-                main_key = "CreditScore"
-                @credit_hash[main_key] = {}
-                @right_adj = {}
-                (0..9).each do |max_row|
-                  @data = []
-                  rrr = rr + max_row
-                  ccc = cc
-                  begin
-                    key = @xlsx.sheet(sheet).cell(rrr,ccc)
-                    if key.present?
-                      if (key.include?("<"))
-                        key = 0
-                      elsif (key.include?("-"))
-                        key = key.split("-").first
-                      elsif key.include?("≥")
-                        key = key.split.last
-                      else
-                        key
-                      end
-
-                      value = @xlsx.sheet(sheet).cell(rrr,ccc+4)
-                      right_adj_key = @xlsx.sheet(sheet).cell(rrr,ccc+7)
-                      right_adj_value = @xlsx.sheet(sheet).cell(rrr,ccc+13)
-                      raise "value is nil at row = #{rrr} and column = #{ccc}" unless value || key
-                      @credit_hash[main_key][key] = value
-                      @right_adj[right_adj_key] = right_adj_value
+        # Adjustments
+        (110..136).each do |r|
+          row = sheet_data.row(r)
+          # @key_data = sheet_data.row(40)
+          if (row.compact.count >= 1)
+            (0..18).each do |max_column|
+              cc = max_column
+              begin
+                value = sheet_data.cell(r,cc)
+                if value.present?
+                  if value == "Loan Level Price Adjustments"
+                    @credit_hash["FICO"] = {}
+                    @loan_hash["LoanAmount/LoanPurpose"] = {}
+                    @bpc_loan_hash["VA/LoanAmount/LoanPurpose"] = {}
+                    @govt_hash["FHA/RefinanceOption/Streamline/VA"]={}
+                    @spe_hash["LoanType"] = {}
+                    # @spe_hash["fixed"] = {}
+                    # @spe_hash["ARM"] = {}
+                    @second_hash["LoanType/LockDay"]={}
+                  end
+                  if r >= 112 && r <= 120 && cc == 5
+                    new_key = get_value value
+                    new_val = sheet_data.cell(r,cc+4)
+                    # @credit_hash["FICO"][new_key] = {}
+                    @credit_hash["FICO"][new_key] = new_val
+                    # make_adjust(@credit_hash, @sheet)
+                  end
+                  if r >= 123 && r <= 127 && cc == 5
+                    new_key = get_value value
+                    new_val = sheet_data.cell(r,cc+4)
+                    c_val = sheet_data.cell(r,cc+5)
+                    @loan_hash["LoanAmount/LoanPurpose"][new_key] = {}
+                    @loan_hash["LoanAmount/LoanPurpose"][new_key]["Purchase"] = new_val
+                    @loan_hash["LoanAmount/LoanPurpose"][new_key]["Refinance"] = c_val
+                    # make_adjust(@loan_hash, @sheet)
+                  end
+                  if r == 128 && cc == 5
+                    new_val = sheet_data.cell(r,cc+4)
+                    @hb_hash["High-Balance"] = {}
+                    @hb_hash["High-Balance"] = new_val
+                  end
+                  if r >= 129 && r <= 133 && cc == 5
+                    new_key = get_value value
+                    new_val = sheet_data.cell(r,cc+4)
+                    c_val = sheet_data.cell(r,cc+5)
+                    @bpc_loan_hash["VA/LoanAmount/LoanPurpose"]["true"] = {}
+                    @bpc_loan_hash["VA/LoanAmount/LoanPurpose"]["true"][new_key] = {}
+                    @bpc_loan_hash["VA/LoanAmount/LoanPurpose"]["true"][new_key]["Purchase"] = new_val
+                    @bpc_loan_hash["VA/LoanAmount/LoanPurpose"]["true"][new_key]["Refinance"] = c_val
+                    # make_adjust(@bpc_loan_hash, @sheet)
+                  end
+                  if r == 136 && cc == 6
+                    @govt_hash["FHA/RefinanceOption/Streamline/VA"]["true"]={}
+                    @govt_hash["FHA/RefinanceOption/Streamline/VA"]["true"]["IRRRL"]={}
+                    @govt_hash["FHA/RefinanceOption/Streamline/VA"]["true"]["IRRRL"]["true"]={}
+                    @govt_hash["FHA/RefinanceOption/Streamline/VA"]["true"]["IRRRL"]["true"]["true"]=value
+                    # make_adjust(@govt_hash, @sheet)
+                  end
+                  if r >= 112 && r <= 125 && cc == 12
+                    if value == "30, 45 & 60 Day Lock Purchase Special"
+                      new_val = sheet_data.cell(r,cc+6)
+                      @second_hash["LoanType/LockDay"]["Purchase"]={}
+                      @second_hash["LoanType/LockDay"]["Purchase"][30]=new_val
+                      @second_hash["LoanType/LockDay"]["Purchase"][45]=new_val
+                      @second_hash["LoanType/LockDay"]["Purchase"][60]=new_val
                     end
-                  rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
-                    error_log.save
-                  end
-                end
-                # make_adjust(@right_adj, @programs_ids)
-                # make_adjust(@credit_hash, @programs_ids)
-                @allAdjustments[@credit_hash.keys[0]] = @credit_hash[@credit_hash.keys[0]]
-                @right_adj.each do |key, value|
-                  @second_hash = {}
-                  if key == "30, 45 & 60 Day Lock Purchase Special"
-                    main_key = "LoanType/LockDay"
-                    @second_hash[main_key]={}
-                    @second_hash[main_key]["Purchase"]={}
-                    @second_hash[main_key]["Purchase"][30]=value
-                    @second_hash[main_key]["Purchase"][45]=value
-                    @second_hash[main_key]["Purchase"][60]=value
-                  elsif key == "FHA Refinances"
-                    main_key = "FHA/LoanType"
-                    @second_hash[main_key]={}
-                    @second_hash[main_key]["True"]={}
-                    @second_hash[main_key]["True"]["Refinance"]=value
-                  elsif key == "FHA/VA ARM <660"
-                    main_key = "FHA/LoanType/VA/FICO"
-                    @second_hash[main_key]={}
-                    @second_hash[main_key]["True"]={}
-                    @second_hash[main_key]["True"]["ARM"]={}
-                    @second_hash[main_key]["True"]["ARM"]["True"]={}
-                    @second_hash[main_key]["True"]["ARM"]["True"]["0-660"]=value
-                  elsif key == "90 Day Lock (FRM & Purch Only)"
-                    main_key = "RateType/LoanType/LockDay"
-                    @second_hash[main_key]={}
-                    @second_hash[main_key]["Fixed"]={}
-                    @second_hash[main_key]["Fixed"]["Purchase"]={}
-                    @second_hash[main_key]["Fixed"]["Purchase"]["90"]=value
-                  elsif key == "VA Cashout >95 LTV"
-                    main_key = "RefinanceOption/VA/LTV"
-                    @second_hash[main_key]={}
-                    @second_hash[main_key]["Cash out"]={}
-                    @second_hash[main_key]["Cash out"]["True"]={}
-                    @second_hash[main_key]["Cash out"]["True"]["LTV"]={}
-                    @second_hash[main_key]["Cash out"]["True"]["LTV"]["0-95"]=value
-                  elsif key == "VA - Refinance Credit Score ≥ 620"
-                    main_key = "LoanType/VA/CreditScore"
-                    @second_hash[main_key]={}
-                    @second_hash[main_key]["Refinance"]={}
-                    @second_hash[main_key]["Refinance"]["True"]={}
-                    @second_hash[main_key]["Refinance"]["True"]["0-620"]=value
-                  elsif key == "VA - All Loan Purposes - Credit Score < 620"
-                    main_key = "VA/FICO"
-                    @second_hash[main_key]={}
-                    @second_hash[main_key]["True"]={}
-                    @second_hash[main_key]["True"]["0-620"]=value
-                  elsif key == "VA - IRRRL - Investment Property"
-                    main_key = "VA/LoanType/RefinanceOption"
-                    @second_hash[main_key]={}
-                    @second_hash[main_key]["True"]={}
-                    @second_hash[main_key]["True"]["Refinance"]={}
-                    @second_hash[main_key]["True"]["Refinance"]["IRRRL"]=value
-                  elsif key == "Manufactured Home (FHA Only)"
-                    main_key = "FHA/PropertyType"
-                    @second_hash[main_key]={}
-                    @second_hash[main_key]["True"]={}
-                    @second_hash[main_key]["True"]["Manufactured Home"]=value
-                  elsif key == "High Balance - 15 Yr Term\n(Adjusting 15 Yr Conforming Pricing - FHA/VA ONLY"
-                    main_key = "FHA/HighBalance/VA/Term"
-                    @second_hash[main_key]={}
-                    @second_hash[main_key]["True"]={}
-                    @second_hash[main_key]["True"]["True"]={}
-                    @second_hash[main_key]["True"]["True"]["15"]=value
-                  elsif key == "Margin on all Government ARMs"
-                    main_key = "Margin"
-                    @second_hash[main_key]={}
-                    @second_hash[main_key][key]=value
-                  end
-                  make_adjust(@second_hash, @sheet)
-                  @allAdjustments[@second_hash.keys[0]] = @second_hash[@second_hash.keys[0]]
-                end
-              end
-
-              # Second Adjustment
-              if @xlsx.sheet(sheet).row(adj_row).include?("Loan Size Adjustments")
-                rr = adj_row
-                cc = 5
-                @loan_size = {}
-                main_key = "LoanPurpose/LoanAmount/LTV"
-                @loan_size[main_key] = {}
-                @loan_size[main_key]["Purchase"] = {}
-                @loan_size[main_key]["Refinance"] = {}
-                (0..5).each do |max_row|
-                  @data = []
-                  rrr = rr + max_row
-                  ccc = cc
-                  begin
-                    key = @xlsx.sheet(sheet).cell(rrr,ccc)
-                    if key.present?
-                      if (key.include?("<"))
-                        key = 0
-                      elsif (key.include?("-"))
-                        key = key.split("-").first.tr("^0-9", '')
-                      else
-                        key
-                      end
-                      value = @xlsx.sheet(sheet).cell(rrr,ccc+4)
-                      value1 = @xlsx.sheet(sheet).cell(rrr,ccc+5)
-                      raise "value is nil at row = #{rrr} and column = #{ccc}" unless value || key
-                      @loan_size[main_key]["Purchase"][key] = value
-                      @loan_size[main_key]["Refinance"][key] = value1
+                    if value == "FHA Refinances"
+                      new_val = sheet_data.cell(r,cc+6)
+                      @second_hash["FHA/LoanType"]={}
+                      @second_hash["FHA/LoanType"]["true"]={}
+                      @second_hash["FHA/LoanType"]["true"]["Refinance"]=new_val
                     end
-                  rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
-                    error_log.save
-                  end
-                end
-                # make_adjust(@loan_size, @programs_ids)
-                @allAdjustments[@loan_size.keys[0]] = @loan_size[@loan_size.keys[0]]
-              end
-              # Third Adjustment
-              if @xlsx.sheet(sheet).row(adj_row).include?("Loan Size Adjustments for VA BPC Loans\n(In addition to standard adjustments)")
-                rr = adj_row
-                cc = 5
-                @loan_size_va_bpc = {}
-                main_key = "VA/LoanPurpose/LoanAmount/LTV"
-                @loan_size_va_bpc[main_key] = {}
-                @loan_size_va_bpc[main_key]["Purchase"] = {}
-                @loan_size_va_bpc[main_key]["Refinance"] = {}
-                (0..4).each do |max_row|
-                  @data = []
-                  rrr = rr + max_row
-                  ccc = cc
-                  begin
-                    key = @xlsx.sheet(sheet).cell(rrr,ccc)
-                    if key.present?
-                      if (key.include?("<"))
-                        key = 0
-                      elsif (key.include?("-"))
-                        key = key.split("-").first.tr("^0-9", '')
-                      elsif (key.include?("≥"))
-                        key = key.split.last.tr("^0-9", '')
-                      else
-                        key
-                      end
-                      value = @xlsx.sheet(sheet).cell(rrr,ccc+4)
-                      value1 = @xlsx.sheet(sheet).cell(rrr,ccc+5)
-                      raise "value is nil at row = #{rrr} and column = #{ccc}" unless value || key
-                      @loan_size_va_bpc[main_key]["Purchase"][key] = value
-                      @loan_size_va_bpc[main_key]["Refinance"][key] = value1
+                    if value == "FHA/VA ARM <660"
+                      new_val = sheet_data.cell(r,cc+6)
+                      @second_hash["FHA/LoanType/VA/FICO"]={}
+                      @second_hash["FHA/LoanType/VA/FICO"]["true"]={}
+                      @second_hash["FHA/LoanType/VA/FICO"]["true"]["ARM"]={}
+                      @second_hash["FHA/LoanType/VA/FICO"]["true"]["ARM"]["true"]={}
+                      @second_hash["FHA/LoanType/VA/FICO"]["true"]["ARM"]["true"]["0-660"]=new_val
                     end
-                  rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
-                    error_log.save
+                    if value == "90 Day Lock (FRM & Purch Only)"
+                      new_val = sheet_data.cell(r,cc+6)
+                      @second_hash["RateType/LoanType/LockDay"]={}
+                      @second_hash["RateType/LoanType/LockDay"]["Fixed"]={}
+                      @second_hash["RateType/LoanType/LockDay"]["Fixed"]["Purchase"]={}
+                      @second_hash["RateType/LoanType/LockDay"]["Fixed"]["Purchase"]["90"]=new_val
+                    end
+                    if value == "VA Cashout >95 LTV"
+                      new_val = sheet_data.cell(r,cc+6)
+                      @second_hash["RefinanceOption/VA/LTV"]={}
+                      @second_hash["RefinanceOption/VA/LTV"]["Cash Out"]={}
+                      @second_hash["RefinanceOption/VA/LTV"]["Cash Out"]["true"]={}
+                      @second_hash["RefinanceOption/VA/LTV"]["Cash Out"]["true"]["LTV"]={}
+                      @second_hash["RefinanceOption/VA/LTV"]["Cash Out"]["true"]["LTV"]["0-95"]=new_val
+                    end
+                    if value == "VA - Refinance Credit Score ≥ 620"
+                      new_val = sheet_data.cell(r,cc+6)
+                      @second_hash["LoanType/VA/FICO"]={}
+                      @second_hash["LoanType/VA/FICO"]["Refinance"]={}
+                      @second_hash["LoanType/VA/FICO"]["Refinance"]["true"]={}
+                      @second_hash["LoanType/VA/FICO"]["Refinance"]["true"]["0-620"]=new_val
+                    end
+                    if value == "VA - All Loan Purposes - Credit Score < 620"
+                      new_val = sheet_data.cell(r,cc+6)
+                      @second_hash["VA/FICO"]={}
+                      @second_hash["VA/FICO"]["true"]={}
+                      @second_hash["VA/FICO"]["true"]["0-620"]=new_val
+                    end
+                    if value == "VA - IRRRL - Investment Property"
+                      new_val = sheet_data.cell(r,cc+6)
+                      @second_hash["VA/LoanType/RefinanceOption"]={}
+                      @second_hash["VA/LoanType/RefinanceOption"]["true"]={}
+                      @second_hash["VA/LoanType/RefinanceOption"]["true"]["Refinance"]={}
+                      @second_hash["VA/LoanType/RefinanceOption"]["true"]["Refinance"]["IRRRL"]=new_val
+                    end
+                    if value == "Manufactured Home (FHA Only)"
+                      new_val = sheet_data.cell(r,cc+6)
+                      @second_hash["FHA/PropertyType"]={}
+                      @second_hash["FHA/PropertyType"]["true"]={}
+                      @second_hash["FHA/PropertyType"]["true"]["Manufactured Home"]=new_val
+                    end
+                    if value == "High Balance - 15 Yr Term\n(Adjusting 15 Yr Conforming Pricing - FHA/VA ONLY"
+                      new_val = sheet_data.cell(r,cc+6)
+                      @second_hash["FHA/HighBalance/VA/Term"]={}
+                      @second_hash["FHA/HighBalance/VA/Term"]["true"]={}
+                      @second_hash["FHA/HighBalance/VA/Term"]["true"]["true"]={}
+                      @second_hash["FHA/HighBalance/VA/Term"]["true"]["true"]["15"]=new_val
+                    end
+                    if value == "Margin on all Government ARMs"
+                      new_val = sheet_data.cell(r,cc+6)
+                      new_val = get_value new_val
+                      @second_hash["Margin"]={}
+                      @second_hash["Margin"]=new_val
+                    end
+                    # make_adjust(@second_hash, @sheet)
                   end
-                end
-                # make_adjust(@loan_size_va_bpc, @programs_ids)
-                @allAdjustments[@loan_size_va_bpc.keys[0]] = @loan_size_va_bpc[@loan_size_va_bpc.keys[0]]
-              end
+                  if r >= 132 && r <= 133 && cc == 17
+                    new_val = sheet_data.cell(r,cc+1)
+                    @spe_hash["LoanType"]["fixed"] = new_val if value == "Fixed"
+                    @spe_hash["LoanType"]["ARM"] = new_val if value == "ARM"
+                  end
 
-              # Fourth Adjustment
-              if @xlsx.sheet(sheet).row(adj_row).include?("Govt Special\nVA IRRRL/FHA Streamline ONLY")
-                rr = adj_row
-                cc = 6
-                value = @xlsx.sheet(sheet).cell(rr,cc)
-                @govt_special = {}
-                main_key = "FHA/RefinanceOption/Streamline/VA"
-                @govt_special[main_key]={}
-                @govt_special[main_key]["True"]={}
-                @govt_special[main_key]["True"]["IRRRL"]={}
-                @govt_special[main_key]["True"]["IRRRL"]["True"]={}
-                @govt_special[main_key]["True"]["IRRRL"]["True"]["True"]=value
-                make_adjust(@govt_special, @sheet)
-                @allAdjustments[@govt_special.keys[0]] = @govt_special[@govt_special.keys[0]]
+                end
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: @sheet_name, error_detail: e.message)
+                error_log.save
               end
             end
           end
         end
-        adjustment = [@second_hash, @govt_special, @loan_size_va_bpc,@loan_size,@right_adj,@credit_hash]
-        create_adjust(adjustment,@sheet)
-        create_program_association_with_adjustment(@sheet)
+        make_adjust(@hb_hash, @sheet_name)
+        make_adjust(@loan_hash, @sheet_name)
+        make_adjust(@govt_hash, @sheet_name)
+        make_adjust(@bpc_loan_hash, @sheet_name)
+        make_adjust(@credit_hash, @sheet_name)
+        make_adjust(@second_hash, @sheet_name)
+        make_adjust(@spe_hash, @sheet_name)
+        # adjustment = [,@spe_hash,@hb_hash,@credit_hash,@bpc_loan_hash,@govt_hash,@loan_hash]
+        # make_adjust(adjustment,sheet)
+        create_program_association_with_adjustment(sheet)
       end
     end
-    # rename first level keys
-    @allAdjustments.keys.each do |key|
-      data = get_table_keys
-      if data[key]
-        @allAdjustments[data[key]] = @allAdjustments.delete(key)
-      end
-    end
+
     redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
@@ -435,6 +310,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     @allAdjustments = {}
     @xlsx.sheets.each do |sheet|
       if (sheet == "Freddie Fixed Rate")
+        @sheet_name = sheet
         sheet_data = @xlsx.sheet(sheet)
         @sheet = sheet
         main_key = ''
@@ -516,7 +392,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @program.loan_limit_type << "High Balance"
                 end
                 @program.save
-                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, sheet_name: sheet, fannie_mae: fannie_mae)
+                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, sheet_name: @sheet_name, fannie_mae: fannie_mae)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -554,9 +430,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @block_hash.values.first.shift
                 end
                 @block_hash.delete(nil)
-                @program.update(base_rate: @block_hash,sheet_name: @sheet)
+                @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                 error_log.save
               end
             end
@@ -856,7 +732,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         end
                       end
                     rescue Exception => e
-                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc,sheet_name: sheet, error_detail: e.message)
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc,sheet_name: @sheet_name, error_detail: e.message)
                       error_log.save
                     end
                   end
@@ -871,7 +747,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: @sheet_name, error_detail: e.message)
               error_log.save
             end
           end
@@ -898,6 +774,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     @allAdjustments = {}
     @xlsx.sheets.each do |sheet|
       if (sheet == "Conforming Fixed Rate")
+        @sheet_name = sheet
         @sheet = sheet
         sheet_data = @xlsx.sheet(sheet)
 
@@ -962,6 +839,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 # High Balance
                 jumbo_high_balance = false
                 if @title.include?("High Balance")
+                  loan_size = "High Balance"
                   jumbo_high_balance = true
                 end
 
@@ -975,13 +853,14 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @program.loan_limit_type << "Conforming"
                 end
                 if @title.include?("Jumbo")
+                  loan_size = "Jumbo"
                   @program.loan_limit_type << "Jumbo"
                 end
                 if @title.include?("High Balance")
                   @program.loan_limit_type << "High Balance"
                 end
                 @program.save
-                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, sheet_name: sheet,jumbo_high_balance: jumbo_high_balance)
+                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae,loan_size: loan_size, sheet_name: @sheet_name)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -1020,9 +899,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @block_hash.values.first.shift
                 end
                 @block_hash.delete(nil)
-                @program.update(base_rate: @block_hash,sheet_name: @sheet)
+                @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1293,7 +1172,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         end
                       end
                     rescue Exception => e
-                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: @sheet, error_detail: e.message)
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                       error_log.save
                     end
                   end
@@ -1310,7 +1189,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: @sheet_name, error_detail: e.message)
               error_log.save
             end
           end
@@ -1337,6 +1216,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     @allAdjustments = {}
     @xlsx.sheets.each do |sheet|
       if (sheet == "Home Possible")
+        @sheet_name = sheet
         @sheet = sheet
         sheet_data = @xlsx.sheet(sheet)
 
@@ -1432,7 +1312,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
                   @program.save
                   @program.adjustments.destroy_all
-                  @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, sheet_name: sheet,arm_basic: arm_basic)
+                  @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, sheet_name: @sheet_name,arm_basic: arm_basic)
                   @program.adjustments.destroy_all
                   @block_hash = {}
                   key = ''
@@ -1528,7 +1408,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
                 @program.save
                 @program.adjustments.destroy_all
-                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, sheet_name: sheet,arm_basic: arm_basic)
+                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, sheet_name: @sheet_name,arm_basic: arm_basic)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -1566,9 +1446,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @block_hash.values.first.shift
                 end
                 @block_hash.delete(nil)
-                @program.update(base_rate: @block_hash,sheet_name: @sheet)
+                @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1832,7 +1712,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                       @block_hash["LockDay"]["60"] = value
                     end
                   rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: @sheet_name, error_detail: e.message)
                     error_log.save
                   end
                 end
@@ -1867,7 +1747,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
   #   @programs_ids = []
   #   @xlsx.sheets.each do |sheet|
   #     if (sheet == "LP Open Acces ARMs")
-  #       sheet_data = @xlsx.sheet(sheet)
+  #      sheet_data = @xlsx.sheet(sheet)
   #       @adjustment_hash = {}
   #       @program_ids = []
   #       @fixed_data = []
@@ -2455,6 +2335,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     @programs_ids =[]
     @xlsx.sheets.each do |sheet|
       if (sheet == "Jumbo Series_D")
+        @sheet_name = sheet
         @sheet = sheet
         sheet_data = @xlsx.sheet(sheet)
         (1..22).each do |r|
@@ -2485,7 +2366,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @program.loan_limit_type << "High Balance"
                 end
                 @program.save
-                  @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase", sheet_name: sheet)
+                  @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase", sheet_name: @sheet_name)
                   @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -2525,9 +2406,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @block_hash.values.first.shift
                 end
                 @block_hash.delete(nil)
-                @program.update(base_rate: @block_hash,sheet_name: @sheet)
+                @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                 error_log.save
               end
             end
@@ -2688,7 +2569,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                 error_log.save
               end
             end
@@ -2706,7 +2587,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
   #   @programs_ids = []
   #   @xlsx.sheets.each do |sheet|
   #     if (sheet == "LP Open Access")
-  #       sheet_data = @xlsx.sheet(sheet)
+    # sheet_data = @xlsx.sheet(sheet)
   #       @adjustment_hash = {}
   #       @program_ids = []
   #       @fixed_data = []
@@ -3009,6 +2890,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
   def jumbo_series_f
     @xlsx.sheets.each do |sheet|
       if (sheet == "Jumbo Series_F")
+        @sheet_name = sheet
         @adjustment_hash = {}
         @refinance_hash = {}
         @loan_amount = {}
@@ -3085,7 +2967,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @program.loan_limit_type << "High Balance"
                 end
                 @program.save
-                @program.update(term: term,loan_type: @loan_type,loan_purpose: "Purchase",arm_basic: arm_basic, sheet_name: @sheet)
+                @program.update(term: term,loan_type: @loan_type,loan_purpose: "Purchase",arm_basic: arm_basic, sheet_name: @sheet_name)
                 @block_hash = {}
                 key = ''
                 # main_key = ''
@@ -3122,9 +3004,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @block_hash.values.first.shift
                 end
                 @block_hash.delete(nil)
-                @program.update(base_rate: @block_hash, sheet_name: @sheet)
+                @program.update(base_rate: @block_hash, sheet_name: @sheet_name)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                 error_log.save
               end
             end
@@ -3273,7 +3155,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                 error_log.save
               end
             end
@@ -3290,7 +3172,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
   #   @programs_ids = []
   #   @xlsx.sheets.each do |sheet|
   #     if (sheet == "Du Refi Plus ARMs")
-  #       sheet_data = @xlsx.sheet(sheet)
+    # sheet_data = @xlsx.sheet(sheet)
   #       @adjustment_hash = {}
   #       @program_ids = []
   #       @fixed_data = []
@@ -3569,6 +3451,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     @program_ids = []
     @xlsx.sheets.each do |sheet|
       if (sheet == "Jumbo Series_H")
+        @sheet_name = sheet
         sheet_data = @xlsx.sheet(sheet)
         @sheet = sheet
         (2..86).each do |r|
@@ -3662,7 +3545,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @program.loan_limit_type << "High Balance"
                   end
                   @program.save
-                  @program.update(term: term,loan_type: loan_type,loan_purpose: loan_purpose ,arm_basic: arm_basic, sheet_name: @sheet )
+                  @program.update(term: term,loan_type: loan_type,loan_purpose: loan_purpose ,arm_basic: arm_basic, sheet_name: @sheet_name )
                   @program.adjustments.destroy_all
 
                   @block_hash = {}
@@ -3700,10 +3583,10 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   if @block_hash.values.first.keys.first.nil?
                     @block_hash.values.first.shift
                   end
-                  @program.update(base_rate: @block_hash,sheet_name: @sheet)
+                  @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                 error_log.save
               end
             end
@@ -3772,7 +3655,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         end
                       end
                     rescue Exception => e
-                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: @sheet_name, error_detail: e.message)
                       error_log.save
                     end
                   end
@@ -3821,7 +3704,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         end
                       end
                     rescue Exception => e
-                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: ccc, sheet_name: @sheet_name, error_detail: e.message)
                       error_log.save
                     end
                   end
@@ -3864,7 +3747,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     # make_adjust(@second_home, @program_ids)
                   end
                   rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                     error_log.save
                   end
                 end
@@ -3902,7 +3785,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     end
                     # make_adjust(@data_hash, @program_ids)
                   rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                     error_log.save
                   end
                 end
@@ -3922,7 +3805,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
   #   @program_ids = []
   #   @xlsx.sheets.each do |sheet|
   #     if (sheet == "Du Refi Plus Fixed Rate_105")
-  #       sheet_data = @xlsx.sheet(sheet)
+    # sheet_data = @xlsx.sheet(sheet)
   #       @sheet = sheet
   #       (1..61).each do |r|
   #         row = sheet_data.row(r)
@@ -4397,6 +4280,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     @programs_ids = []
     @xlsx.sheets.each do |sheet|
       if (sheet == "Jumbo Series_I")
+        @sheet_name = sheet
         sheet_data = @xlsx.sheet(sheet)
         @adjustment_hash = {}
         @program_ids = []
@@ -4471,7 +4355,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @program.loan_limit_type << "High Balance"
                   end
                   @program.save
-                  @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase" ,arm_basic: arm_basic, sheet_name: sheet )
+                  @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase" ,arm_basic: arm_basic, sheet_name: @sheet_name )
                   @program.adjustments.destroy_all
                   @block_hash = {}
                   key = ''
@@ -4508,10 +4392,10 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   if @block_hash.values.first.keys.first.nil?
                     @block_hash.values.first.shift
                   end
-                  @program.update(base_rate: @block_hash,sheet_name: @sheet)
+                  @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                 error_log.save
               end
             end
@@ -4720,7 +4604,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 @adjustment_hash["LoanType/Term"]["ARM"]["5"] = value if column == 17
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: column, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: column, sheet_name: @sheet_name, error_detail: e.message)
               error_log.save
             end
           end
@@ -4736,7 +4620,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
   #   @programs_ids = []
   #   @xlsx.sheets.each do |sheet|
   #     if (sheet == "Du Refi Plus Fixed Rate")
-  #       sheet_data = @xlsx.sheet(sheet)
+    # sheet_data = @xlsx.sheet(sheet)
   #       @adjustment_hash = {}
   #       @program_ids = []
   #       @fixed_data = []
@@ -5010,6 +4894,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     @programs_ids = []
     @xlsx.sheets.each do |sheet|
       if (sheet == "Jumbo Series_JQM")
+        @sheet_name = sheet
         sheet_data = @xlsx.sheet(sheet)
         @program_ids = []
         @adjustment_hash = {}
@@ -5085,7 +4970,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @program.loan_limit_type << "High Balance"
                   end
                   @program.save
-                  @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase" ,arm_basic: arm_basic, sheet_name: sheet )
+                  @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase" ,arm_basic: arm_basic, sheet_name: @sheet_name )
                   @program.adjustments.destroy_all
                   @block_hash = {}
                   key = ''
@@ -5122,10 +5007,10 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   if @block_hash.values.first.keys.first.nil?
                     @block_hash.values.first.shift
                   end
-                  @program.update(base_rate: @block_hash,sheet_name: @sheet)
+                  @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                 error_log.save
               end
             end
@@ -5263,7 +5148,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                 error_log.save
               end
             end
@@ -5281,6 +5166,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     @programs_ids = []
     @xlsx.sheets.each do |sheet|
       if (sheet == "Dream Big")
+        @sheet_name = sheet
         sheet_data = @xlsx.sheet(sheet)
         @adjustment_hash = {}
         @jumbo_adjustment = {}
@@ -5356,7 +5242,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
 
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @program_ids << @program.id
-                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: sheet)
+                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: @sheet_name)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -5394,9 +5280,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @block_hash.values.first.shift
                 end
                 @block_hash.delete(nil)
-                @program.update(base_rate: @block_hash,sheet_name: @sheet)
+                @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                 error_log.save
               end
             end
@@ -5562,7 +5448,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                 error_log.save
               end
             end
@@ -5580,6 +5466,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     @programs_ids = []
     @xlsx.sheets.each do |sheet|
       if (sheet == "High Balance Extra")
+        @sheet_name = sheet
         sheet_data = @xlsx.sheet(sheet)
         @program_ids = []
         @adjustment_hash = {}
@@ -5660,7 +5547,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @program.loan_limit_type << "High Balance"
                 end
                 @program.save
-                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase", arm_basic: arm_basic, sheet_name: sheet, jumbo_high_balance: jumbo_high_balance)
+                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase", arm_basic: arm_basic, sheet_name: @sheet_name, jumbo_high_balance: jumbo_high_balance)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -5698,9 +5585,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @block_hash.values.first.shift
                 end
                 @block_hash.delete(nil)
-                @program.update(base_rate: @block_hash,sheet_name: @sheet)
+                @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                 error_log.save
               end
             end
@@ -5791,7 +5678,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                 error_log.save
               end
             end
@@ -5799,7 +5686,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@sub_hash,@cash_out]
         create_adjust(adjustment,sheet)
-        create_program_association_with_adjustment(@sheet)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
@@ -5810,6 +5697,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     @allAdjustments = {}
     @xlsx.sheets.each do |sheet|
       if (sheet == "Freddie ARMs")
+        @sheet_name = sheet
         @sheet = sheet
         sheet_data = @xlsx.sheet(sheet)
 
@@ -5891,7 +5779,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @program.loan_limit_type << "High Balance"
                 end
                 @program.save
-                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: sheet)
+                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: @sheet_name)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -5929,9 +5817,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @block_hash.values.first.shift
                 end
                 @block_hash.delete(nil)
-                @program.update(base_rate: @block_hash,sheet_name: @sheet)
+                @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                 error_log.save
               end
             end
@@ -6204,7 +6092,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                       end
                     end
                   rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet, error_detail: e.message)
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                     error_log.save
                   end
                 end
@@ -6234,7 +6122,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     end
 
     # create adjustment for each program
-    make_adjust(@allAdjustments, @sheet)
+    make_adjust(@allAdjustments, @sheet_name)
     create_program_association_with_adjustment(@sheet)
     redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
@@ -6244,6 +6132,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     @allAdjustments = {}
     @xlsx.sheets.each do |sheet|
       if (sheet == "Conforming ARMs")
+        @sheet_name = sheet
         @sheet = sheet
         sheet_data = @xlsx.sheet(sheet)
 
@@ -6325,7 +6214,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @program.loan_limit_type << "High Balance"
                 end
                 @program.save
-                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, jumbo_high_balance: jumbo_high_balance, sheet_name: sheet, arm_basic: arm_basic)
+                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, jumbo_high_balance: jumbo_high_balance, sheet_name: @sheet_name, arm_basic: arm_basic)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -6363,9 +6252,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @block_hash.values.first.shift
                 end
                 @block_hash.delete(nil)
-                @program.update(base_rate: @block_hash,sheet_name: @sheet)
+                @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                 error_log.save
               end
             end
@@ -6645,7 +6534,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet_name, error_detail: e.message)
               error_log.save
             end
           end
@@ -6662,7 +6551,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     end
 
     # create adjustment for each program
-    make_adjust(@allAdjustments, @sheet)
+    make_adjust(@allAdjustments, @sheet_name)
     create_program_association_with_adjustment(@sheet)
     redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
@@ -6672,6 +6561,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     @allAdjustments = {}
     @xlsx.sheets.each do |sheet|
       if (sheet == "HomeReady")
+        @sheet_name = sheet
         @sheet = sheet
         sheet_data = @xlsx.sheet(sheet)
 
@@ -6786,9 +6676,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @block_hash.values.first.shift
                 end
                 @block_hash.delete(nil)
-                @program.update(base_rate: @block_hash,sheet_name: @sheet)
+                @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                 error_log.save
               end
             end
@@ -7074,7 +6964,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet_name, error_detail: e.message)
               error_log.save
             end
           end
@@ -7091,7 +6981,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     end
 
     # create adjustment for each program
-    make_adjust(@allAdjustments, @sheet)
+    make_adjust(@allAdjustments, @sheet_name)
     create_program_association_with_adjustment(@sheet)
     redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
@@ -7101,6 +6991,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     @allAdjustments = {}
     @xlsx.sheets.each do |sheet|
       if (sheet == "HomeReady HB")
+        @sheet_name = sheet
         @sheet = sheet
         sheet_data = @xlsx.sheet(sheet)
 
@@ -7161,7 +7052,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_ids << @program.id
-                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, loan_purpose: "Purchase", fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, conforming: conforming, sheet_name: sheet)
+                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, loan_purpose: "Purchase", fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, conforming: conforming, sheet_name: @sheet_name)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -7199,9 +7090,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @block_hash.values.first.shift
                 end
                 @block_hash.delete(nil)
-                @program.update(base_rate: @block_hash,sheet_name: @sheet)
+                @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                 error_log.save
               end
             end
@@ -7471,7 +7362,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         @block_hash["LockDay"]["60"] = value
                       end
                     rescue Exception => e
-                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet, error_detail: e.message)
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                       error_log.save
                     end
                   end
@@ -7487,7 +7378,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: @sheet_name, error_detail: e.message)
               error_log.save
             end
           end
@@ -7504,7 +7395,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     end
 
     # create adjustment for each program
-    make_adjust(@allAdjustments, @sheet)
+    make_adjust(@allAdjustments, @sheet_name)
     create_program_association_with_adjustment(@sheet)
     redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
@@ -7601,13 +7492,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
       unless ["Lender Paid MI Adj.", "Term/LTV/FICO"].include?(key)
         hash = {}
         hash[key] = block_hash[key]
-        Adjustment.create(data: hash,sheet_name: sheet)
+        Adjustment.create(data: hash,sheet_name: @sheet_name)
       else
         unless block_hash[key].empty?
           block_hash[key].keys.each do |s_key|
             h1 = {}
             h1[s_key] = block_hash[key][s_key]
-            Adjustment.create(data: h1,sheet_name: sheet)
+            Adjustment.create(data: h1,sheet_name: @sheet_name)
           end
         end
       end
