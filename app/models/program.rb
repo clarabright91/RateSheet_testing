@@ -64,6 +64,9 @@ class Program < ApplicationRecord
     self.save
   end
 
+  def set_term(prog_name)
+    self.term = ProgramUpdate.set_term(prog_name)
+  end
 
   def set_load_type(prog_name)
     present_word = nil
