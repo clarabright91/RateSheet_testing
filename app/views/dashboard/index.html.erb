@@ -62,7 +62,7 @@
             <label>ARM Basic</label>
             <div class="input-group">
              <% @arm_basic_list =[["1/1 ARM"],["2/1 ARM"],["3/1 ARM"],["7/1 ARM"],["10/1 ARM"],["5-1"],["5/1"]]%>
-              <%= select_tag 'arm_basic', options_for_select(@arm_basic_list, (params[:arm_basic] rescue nil)), { prompt: 'Select ARM Basic', :class=> "form-control"} %>
+              <%= select_tag 'arm_basic', options_for_select(@arm_basic_list, (params[:arm_basic].present? ? params[:arm_basic] : "10/1 ARM")), { prompt: 'Select ARM Basic', :class=> "form-control"} %>
             </div>
           </div>
         </div>
@@ -254,6 +254,35 @@
           </div>
         </div>
 
+        <div class="col-md-2">
+          <div class="form-group">
+            <label>DTI</label>
+            <div class="input-group">
+              <%@dti_values = [["25.6%"]]%>
+              <%= select_tag 'dti', options_for_select(@dti_values, (params[:dti] rescue nil)), :class=> "form-control" %>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-2">
+          <div class="form-group">
+            <label>Coverage</label>
+            <div class="input-group">
+              <%@coverage_values = [["30.5%"]]%>
+              <%= select_tag 'coverage', options_for_select(@coverage_values, (params[:coverage] rescue nil)), :class=> "form-control" %>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-2">
+          <div class="form-group">
+            <label>Margin</label>
+            <div class="input-group">
+              <%@margin_values = [["2.0"]]%>
+              <%= select_tag 'margin', options_for_select(@margin_values, (params[:margin] rescue nil)), :class=> "form-control" %>
+            </div>
+          </div>
+        </div>
 
         <div class="col-md-2">
           <div class="form-group">
@@ -428,8 +457,6 @@
     $(".alert-error" ).fadeOut(3000);
     if ($("#loan_type").val() == "ARM") {
       $(".arm-basic").show()
-      opt_value = '10/1 ARM'
-      $("#arm_basic option[value='"+opt_value+"']").attr('selected','selected');
       $(".term").hide()
     }else{
      $(".arm-basic").hide()
@@ -440,12 +467,11 @@
      if ($(this).val()=="ARM"){
       $(".term").hide()
       $(".arm-basic").show()
-      opt_value = '10/1 ARM'
-      $("#arm_basic option[value='"+opt_value+"']").attr('selected','selected');
      }else{
       $(".term").show()
       $(".arm-basic").hide()
      }
    });
   });
+
 </script>
