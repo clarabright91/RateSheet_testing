@@ -348,10 +348,6 @@
             <td><%= program[:sheet_name] %></td>
             <td><%= program[:bank_name] %></td>
             <td><%= program[:adj_points] %></td>
-            <% if program[:final_rate].include?("NA") %>
-              <% program[:final_rate].delete("NA") %>
-            <%end%>
-            <%debugger%>
             <td><%= (program[:final_rate].sum).round(3) rescue nil %></td>
           </tr>
         <%end%>
