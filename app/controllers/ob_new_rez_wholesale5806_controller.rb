@@ -155,16 +155,12 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @bpc_loan_hash["VA/LoanAmount/LoanPurpose"] = {}
                     @govt_hash["FHA/RefinanceOption/Streamline/VA"]={}
                     @spe_hash["LoanType"] = {}
-                    # @spe_hash["fixed"] = {}
-                    # @spe_hash["ARM"] = {}
                     @second_hash["LoanType/LockDay"]={}
                   end
                   if r >= 112 && r <= 120 && cc == 5
                     new_key = get_value value
                     new_val = sheet_data.cell(r,cc+4)
-                    # @credit_hash["FICO"][new_key] = {}
                     @credit_hash["FICO"][new_key] = new_val
-                    # make_adjust(@credit_hash, @sheet)
                   end
                   if r >= 123 && r <= 127 && cc == 5
                     new_key = get_value value
@@ -173,7 +169,6 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @loan_hash["LoanAmount/LoanPurpose"][new_key] = {}
                     @loan_hash["LoanAmount/LoanPurpose"][new_key]["Purchase"] = new_val
                     @loan_hash["LoanAmount/LoanPurpose"][new_key]["Refinance"] = c_val
-                    # make_adjust(@loan_hash, @sheet)
                   end
                   if r == 128 && cc == 5
                     new_val = sheet_data.cell(r,cc+4)
@@ -188,14 +183,12 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @bpc_loan_hash["VA/LoanAmount/LoanPurpose"]["true"][new_key] = {}
                     @bpc_loan_hash["VA/LoanAmount/LoanPurpose"]["true"][new_key]["Purchase"] = new_val
                     @bpc_loan_hash["VA/LoanAmount/LoanPurpose"]["true"][new_key]["Refinance"] = c_val
-                    # make_adjust(@bpc_loan_hash, @sheet)
                   end
                   if r == 136 && cc == 6
                     @govt_hash["FHA/RefinanceOption/Streamline/VA"]["true"]={}
                     @govt_hash["FHA/RefinanceOption/Streamline/VA"]["true"]["IRRRL"]={}
                     @govt_hash["FHA/RefinanceOption/Streamline/VA"]["true"]["IRRRL"]["true"]={}
                     @govt_hash["FHA/RefinanceOption/Streamline/VA"]["true"]["IRRRL"]["true"]["true"]=value
-                    # make_adjust(@govt_hash, @sheet)
                   end
                   if r >= 112 && r <= 125 && cc == 12
                     if value == "30, 45 & 60 Day Lock Purchase Special"
@@ -207,9 +200,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     end
                     if value == "FHA Refinances"
                       new_val = sheet_data.cell(r,cc+6)
-                      @second_hash["FHA/LoanType"]={}
-                      @second_hash["FHA/LoanType"]["true"]={}
-                      @second_hash["FHA/LoanType"]["true"]["Refinance"]=new_val
+                      @second_hash["FHA/LoanPurpose"]={}
+                      @second_hash["FHA/LoanPurpose"]["true"]={}
+                      @second_hash["FHA/LoanPurpose"]["true"]["Refinance"]=new_val
                     end
                     if value == "FHA/VA ARM <660"
                       new_val = sheet_data.cell(r,cc+6)
@@ -221,10 +214,10 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     end
                     if value == "90 Day Lock (FRM & Purch Only)"
                       new_val = sheet_data.cell(r,cc+6)
-                      @second_hash["RateType/LoanType/LockDay"]={}
-                      @second_hash["RateType/LoanType/LockDay"]["Fixed"]={}
-                      @second_hash["RateType/LoanType/LockDay"]["Fixed"]["Purchase"]={}
-                      @second_hash["RateType/LoanType/LockDay"]["Fixed"]["Purchase"]["90"]=new_val
+                      @second_hash["RateType/LoanPurpose/LockDay"]={}
+                      @second_hash["RateType/LoanPurpose/LockDay"]["Fixed"]={}
+                      @second_hash["RateType/LoanPurpose/LockDay"]["Fixed"]["Purchase"]={}
+                      @second_hash["RateType/LoanPurpose/LockDay"]["Fixed"]["Purchase"]["90"]=new_val
                     end
                     if value == "VA Cashout >95 LTV"
                       new_val = sheet_data.cell(r,cc+6)
@@ -273,7 +266,6 @@ class ObNewRezWholesale5806Controller < ApplicationController
                       @second_hash["Margin"]={}
                       @second_hash["Margin"]=new_val
                     end
-                    # make_adjust(@second_hash, @sheet)
                   end
                   if r >= 132 && r <= 133 && cc == 17
                     new_val = sheet_data.cell(r,cc+1)
@@ -289,15 +281,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
             end
           end
         end
-        make_adjust(@hb_hash, @sheet_name)
-        make_adjust(@loan_hash, @sheet_name)
-        make_adjust(@govt_hash, @sheet_name)
-        make_adjust(@bpc_loan_hash, @sheet_name)
-        make_adjust(@credit_hash, @sheet_name)
-        make_adjust(@second_hash, @sheet_name)
-        make_adjust(@spe_hash, @sheet_name)
-        # adjustment = [,@spe_hash,@hb_hash,@credit_hash,@bpc_loan_hash,@govt_hash,@loan_hash]
-        # make_adjust(adjustment,sheet)
+        adjustment = [@spe_hash,@hb_hash,@credit_hash,@bpc_loan_hash,@govt_hash,@loan_hash,@second_hash]
+        create_adjust(adjustment,sheet)
         create_program_association_with_adjustment(sheet)
       end
     end
@@ -318,7 +303,6 @@ class ObNewRezWholesale5806Controller < ApplicationController
           row = sheet_data.row(r)
 
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet")) || (row.include?("Freddie Mac 10yr Super Conforming"))
-            # r == 7 / 35 / 55
             rr = r + 1 # (r == 8) / (r == 36) / (r == 56)
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
@@ -396,12 +380,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
-                # if @program.term.present?
-                #   main_key = "Term/LoanType/InterestRate/LockPeriod"
-                # else
-                #   main_key = "InterestRate/LockPeriod"
-                # end
-                # @block_hash[main_key] = {}
+
                 (0..50).each do |max_row|
                   @data = []
                   (0..4).each_with_index do |index, c_i|
@@ -1350,7 +1329,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @block_hash.values.first.shift
                   end
                   @block_hash.delete(nil)
-                  @program.update(base_rate:can(/\d+/)[0])
+                  # @program.update(base_rate:can(/\d+/)[0])
+                  @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
                 elsif @title.include?("30yr") || @title.include?("30 Yr")
                   term = @title.scan(/\d+/)[0]
                 end
@@ -6127,434 +6107,434 @@ class ObNewRezWholesale5806Controller < ApplicationController
     redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
-  def conforming_arms
-    @program_ids = []
-    @allAdjustments = {}
-    @xlsx.sheets.each do |sheet|
-      if (sheet == "Conforming ARMs")
-        @sheet_name = sheet
-        @sheet = sheet
-        sheet_data = @xlsx.sheet(sheet)
+  # def conforming_arms
+  #   @program_ids = []
+  #   @allAdjustments = {}
+  #   @xlsx.sheets.each do |sheet|
+  #     if (sheet == "Conforming ARMs")
+  #       @sheet_name = sheet
+  #       @sheet = sheet
+  #       sheet_data = @xlsx.sheet(sheet)
 
-        (1..47).each do |r|
-          row = sheet_data.row(r)
-          if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet")) || row.compact.include?("Fannie Mae 10-1 ARM (5-2-5) High Balance")
-            # r == 7 / 35 / 55
-            rr = r + 1 # (r == 8) / (r == 36) / (r == 56)
-            max_column_section = row.compact.count - 1
-            (0..max_column_section).each do |max_column|
-              cc = 3 + max_column*6 # (3 / 9 / 15)
-              begin
-                @title = sheet_data.cell(r,cc)
-                term = nil
-                program_heading = @title.split
-                if @title.include?("10yr") || @title.include?("10 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("15yr") || @title.include?("15 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("20yr") || @title.include?("20 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("25yr") || @title.include?("25 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("30yr") || @title.include?("30 Yr")
-                  term = @title.scan(/\d+/)[0]
-                end
+  #       (1..47).each do |r|
+  #         row = sheet_data.row(r)
+  #         if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet")) || row.compact.include?("Fannie Mae 10-1 ARM (5-2-5) High Balance")
+  #           # r == 7 / 35 / 55
+  #           rr = r + 1 # (r == 8) / (r == 36) / (r == 56)
+  #           max_column_section = row.compact.count - 1
+  #           (0..max_column_section).each do |max_column|
+  #             cc = 3 + max_column*6 # (3 / 9 / 15)
+  #             begin
+  #               @title = sheet_data.cell(r,cc)
+  #               term = nil
+  #               program_heading = @title.split
+  #               if @title.include?("10yr") || @title.include?("10 Yr")
+  #                 term = @title.scan(/\d+/)[0]
+  #               elsif @title.include?("15yr") || @title.include?("15 Yr")
+  #                 term = @title.scan(/\d+/)[0]
+  #               elsif @title.include?("20yr") || @title.include?("20 Yr")
+  #                 term = @title.scan(/\d+/)[0]
+  #               elsif @title.include?("25yr") || @title.include?("25 Yr")
+  #                 term = @title.scan(/\d+/)[0]
+  #               elsif @title.include?("30yr") || @title.include?("30 Yr")
+  #                 term = @title.scan(/\d+/)[0]
+  #               end
 
-                if @title.include?("Fixed")
-                  loan_type = "Fixed"
-                elsif @title.include?("ARM")
-                  loan_type = "ARM"
-                elsif @title.include?("Floating")
-                  loan_type = "Floating"
-                elsif @title.include?("Variable")
-                  loan_type = "Variable"
-                else
-                  loan_type = nil
-                end
+  #               if @title.include?("Fixed")
+  #                 loan_type = "Fixed"
+  #               elsif @title.include?("ARM")
+  #                 loan_type = "ARM"
+  #               elsif @title.include?("Floating")
+  #                 loan_type = "Floating"
+  #               elsif @title.include?("Variable")
+  #                 loan_type = "Variable"
+  #               else
+  #                 loan_type = nil
+  #               end
 
-                # rate arm
-                if @title.include?("3-1 ARM") || @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM")
-                  arm_basic = @title.scan(/\d+/)[0].to_i
-                end
+  #               # rate arm
+  #               if @title.include?("3-1 ARM") || @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM")
+  #                 arm_basic = @title.scan(/\d+/)[0].to_i
+  #               end
 
-                freddie_mac = false
-                if @title.include?("Freddie Mac")
-                  freddie_mac = true
-                end
+  #               freddie_mac = false
+  #               if @title.include?("Freddie Mac")
+  #                 freddie_mac = true
+  #               end
 
-                conforming = false
-                if @title.include?("Freddie Mac") || @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Possible") || @title.include?("Freddie Mac Home Ready")
-                  conforming = true
-                end
+  #               conforming = false
+  #               if @title.include?("Freddie Mac") || @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Possible") || @title.include?("Freddie Mac Home Ready")
+  #                 conforming = true
+  #               end
 
-                fannie_mae = false
-                if @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Ready")
-                  fannie_mae = true
-                end
+  #               fannie_mae = false
+  #               if @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Ready")
+  #                 fannie_mae = true
+  #               end
 
-                # High Balance
-                jumbo_high_balance = false
-                if @title.include?("High Balance")
-                  jumbo_high_balance = true
-                end
+  #               # High Balance
+  #               jumbo_high_balance = false
+  #               if @title.include?("High Balance")
+  #                 jumbo_high_balance = true
+  #               end
 
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                @program_ids << @program.id
-                # Loan Limit Type
-                if @title.include?("Non-Conforming")
-                  @program.loan_limit_type << "Non-Conforming"
-                end
-                if @title.include?("Conforming")
-                  @program.loan_limit_type << "Conforming"
-                end
-                if @title.include?("Jumbo")
-                  @program.loan_limit_type << "Jumbo"
-                end
-                if @title.include?("High Balance")
-                  @program.loan_limit_type << "High Balance"
-                end
-                @program.save
-                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, jumbo_high_balance: jumbo_high_balance, sheet_name: @sheet_name, arm_basic: arm_basic)
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                # main_key = ''
-                # if @program.term.present?
-                #   main_key = "Term/LoanType/InterestRate/LockPeriod"
-                # else
-                #   main_key = "InterestRate/LockPeriod"
-                # end
-                # @block_hash[main_key] = {}
-                (0..50).each do |max_row|
-                  @data = []
-                  (0..4).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[key] = {}
-                    else
-                      if @program.lock_period.length <= 3
-                        @program.lock_period << 15*c_i
-                        @program.save
-                      end
-                      @block_hash[key][15*c_i] = value
-                    end
-                    @data << value
-                  end
+  #               @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+  #               @program_ids << @program.id
+  #               # Loan Limit Type
+  #               if @title.include?("Non-Conforming")
+  #                 @program.loan_limit_type << "Non-Conforming"
+  #               end
+  #               if @title.include?("Conforming")
+  #                 @program.loan_limit_type << "Conforming"
+  #               end
+  #               if @title.include?("Jumbo")
+  #                 @program.loan_limit_type << "Jumbo"
+  #               end
+  #               if @title.include?("High Balance")
+  #                 @program.loan_limit_type << "High Balance"
+  #               end
+  #               @program.save
+  #               @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, jumbo_high_balance: jumbo_high_balance, sheet_name: @sheet_name, arm_basic: arm_basic)
+  #               @program.adjustments.destroy_all
+  #               @block_hash = {}
+  #               key = ''
+  #               # main_key = ''
+  #               # if @program.term.present?
+  #               #   main_key = "Term/LoanType/InterestRate/LockPeriod"
+  #               # else
+  #               #   main_key = "InterestRate/LockPeriod"
+  #               # end
+  #               # @block_hash[main_key] = {}
+  #               (0..50).each do |max_row|
+  #                 @data = []
+  #                 (0..4).each_with_index do |index, c_i|
+  #                   rrr = rr + max_row
+  #                   ccc = cc + c_i
+  #                   value = sheet_data.cell(rrr,ccc)
+  #                   if (c_i == 0)
+  #                     key = value
+  #                     @block_hash[key] = {}
+  #                   else
+  #                     if @program.lock_period.length <= 3
+  #                       @program.lock_period << 15*c_i
+  #                       @program.save
+  #                     end
+  #                     @block_hash[key][15*c_i] = value
+  #                   end
+  #                   @data << value
+  #                 end
 
-                  if @data.compact.length == 0
-                    break # terminate the loop
-                  end
-                end
-                if @block_hash.values.first.keys.first.nil?
-                  @block_hash.values.first.shift
-                end
-                @block_hash.delete(nil)
-                @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
-              rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet_name, error_detail: e.message)
-                error_log.save
-              end
-            end
-          end
-        end
+  #                 if @data.compact.length == 0
+  #                   break # terminate the loop
+  #                 end
+  #               end
+  #               if @block_hash.values.first.keys.first.nil?
+  #                 @block_hash.values.first.shift
+  #               end
+  #               @block_hash.delete(nil)
+  #               @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
+  #             rescue Exception => e
+  #               error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet_name, error_detail: e.message)
+  #               error_log.save
+  #             end
+  #           end
+  #         end
+  #       end
 
-        # adjustments
-        previous_title = nil
-        @another_title = nil
-        modified_keys  = get_table_keys
-        data = get_table_keys
-        (49..95).each do |r|
-          row = sheet_data.row(r)
-          # r == 52 / 68 / 81 / 84 / 89 / 94
-          rr = r #+ 1 # (r == 53) / (r == 69) / (r == 82) / (r == 90) / (r == 95)
-          max_column_section = row.compact.count - 1
-          (0..max_column_section).each do |max_column|
-            cc = 3 + max_column * 9 # (2 / 11)
-            begin
-              @title = sheet_data.cell(r,cc)
-              @block_hash = {}
+  #       # adjustments
+  #       previous_title = nil
+  #       @another_title = nil
+  #       modified_keys  = get_table_keys
+  #       data = get_table_keys
+  #       (49..95).each do |r|
+  #         row = sheet_data.row(r)
+  #         # r == 52 / 68 / 81 / 84 / 89 / 94
+  #         rr = r #+ 1 # (r == 53) / (r == 69) / (r == 82) / (r == 90) / (r == 95)
+  #         max_column_section = row.compact.count - 1
+  #         (0..max_column_section).each do |max_column|
+  #           cc = 3 + max_column * 9 # (2 / 11)
+  #           begin
+  #             @title = sheet_data.cell(r,cc)
+  #             @block_hash = {}
 
-              if(@title.eql?("All Conforming ARMs (Does not include DU Refi Plus)"))
-                @title = "LoanSize/LoanType/FICO/LTV"
-                @block_hash[@title] = {}
-                @block_hash[@title]["Conforming"] = {}
-                @block_hash[@title]["Conforming"]["ARM"] = {}
-                @block_hash["PropertyType"] = {} unless @block_hash.has_key?("PropertyType")
-                @block_hash["MiscAdjuster"] = {} unless @block_hash.has_key?("MiscAdjuster")
-                @block_hash["LockDay"] = {} unless @block_hash.has_key?("LockDay")
-                #  for high balance key
-                @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"] = {} unless @block_hash.has_key?("LoanSize/LoanPurpose/RefinanceOption/LTV")
-                @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High Balance"] = {} unless @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"].has_key?("High Balance")
-                @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High Balance"]["Purchase"] = {} unless @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High Balance"].has_key?("Purchase")
-                @block_hash["LoanSize/RefinanceOption/LTV"] = {} unless @block_hash.has_key?("LoanSize/RefinanceOption/LTV")
-                @block_hash["LoanSize/RefinanceOption/LTV"]["High Balance"] = {} unless @block_hash["LoanSize/RefinanceOption/LTV"].has_key?("High Balance")
+  #             if(@title.eql?("All Conforming ARMs (Does not include DU Refi Plus)"))
+  #               @title = "LoanSize/LoanType/FICO/LTV"
+  #               @block_hash[@title] = {}
+  #               @block_hash[@title]["Conforming"] = {}
+  #               @block_hash[@title]["Conforming"]["ARM"] = {}
+  #               @block_hash["PropertyType"] = {} unless @block_hash.has_key?("PropertyType")
+  #               @block_hash["MiscAdjuster"] = {} unless @block_hash.has_key?("MiscAdjuster")
+  #               @block_hash["LockDay"] = {} unless @block_hash.has_key?("LockDay")
+  #               #  for high balance key
+  #               @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"] = {} unless @block_hash.has_key?("LoanSize/LoanPurpose/RefinanceOption/LTV")
+  #               @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High Balance"] = {} unless @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"].has_key?("High Balance")
+  #               @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High Balance"]["Purchase"] = {} unless @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High Balance"].has_key?("Purchase")
+  #               @block_hash["LoanSize/RefinanceOption/LTV"] = {} unless @block_hash.has_key?("LoanSize/RefinanceOption/LTV")
+  #               @block_hash["LoanSize/RefinanceOption/LTV"]["High Balance"] = {} unless @block_hash["LoanSize/RefinanceOption/LTV"].has_key?("High Balance")
 
-                key = ''
-                another_key = ''
-                keyOfHash = ''
-                # for Misc Adjusters
-                first_key   = ''
-                second_key  = ''
-                third_key   = ''
-                final_key   = ''
-                f1_key      = ''
-                f2_key      = ''
-                loan_amount = ''
+  #               key = ''
+  #               another_key = ''
+  #               keyOfHash = ''
+  #               # for Misc Adjusters
+  #               first_key   = ''
+  #               second_key  = ''
+  #               third_key   = ''
+  #               final_key   = ''
+  #               f1_key      = ''
+  #               f2_key      = ''
+  #               loan_amount = ''
 
-                (0..47).each do |max_row|
-                  @data = []
-                  (7..19).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = index
-                    value = sheet_data.cell(rrr,ccc)
-                    # implementation of first key
-                    if rrr.eql?(63)
-                      # for 2nd table
-                      @title = sheet_data.cell(rrr,cc)
-                      unless @block_hash.has_key?(@title)
-                        @block_hash[@title] = {}
-                        @block_hash[@title]["Cash Out"] = {}
-                      end
-                    elsif rrr.eql?(68)
-                      # for 3rd table
-                      previous_title = @title = sheet_data.cell(rrr,ccc - 4) unless previous_title == @title
-                      unless @block_hash.has_key?(@title)
-                        @block_hash[@title] = {}
-                        first_key  = "LPMI/RefinanceOption/LTV"
-                        second_key = "LPMI/PropertyType/LTV"
-                        final_key  = "LPMI/FICO/LTV"
-                        @block_hash[@title][first_key] = {}
-                        @block_hash[@title][first_key][true] = {}
-                        @block_hash[@title][second_key] = {}
-                        @block_hash[@title][second_key][true] = {}
-                        @block_hash[@title][final_key] = {}
-                        @block_hash[@title][final_key][true] = {}
-                      end
-                    elsif rrr.eql?(81) && index == 13
-                      # for Loan Size Adjustments
-                      @another_title = sheet_data.cell(rrr,index)
-                      unless @block_hash.has_key?(@another_title)
-                        @block_hash[@another_title] = {}
-                      end
-                    elsif rrr.eql?(81) && index == 7
-                      # for Subordinate Financing
-                      @title = sheet_data.cell(rrr,ccc - 4)
-                      unless @block_hash.has_key?(@title)
-                        @block_hash[@title] = {}
-                        @block_hash[@title]["Subordinate Financing"] = {}
-                      end
-                    elsif rrr.eql?(87) && index.eql?(7)
-                      # for Non Owner Occupied
-                      @title = sheet_data.cell(rrr,ccc - 4)
-                      @block_hash[@title] = {} unless @block_hash.has_key?(@title)
-                      @block_hash[@title]["Non-Owner Occupied"] = {}
-                    elsif rrr.eql?(91) && index.eql?(7)
-                      # for Misc Adjusters
-                      @title = "PropertyType/LTV"
-                      @block_hash[@title] = {} unless @block_hash.has_key?(@title)
-                    end
+  #               (0..47).each do |max_row|
+  #                 @data = []
+  #                 (7..19).each_with_index do |index, c_i|
+  #                   rrr = rr + max_row
+  #                   ccc = index
+  #                   value = sheet_data.cell(rrr,ccc)
+  #                   # implementation of first key
+  #                   if rrr.eql?(63)
+  #                     # for 2nd table
+  #                     @title = sheet_data.cell(rrr,cc)
+  #                     unless @block_hash.has_key?(@title)
+  #                       @block_hash[@title] = {}
+  #                       @block_hash[@title]["Cash Out"] = {}
+  #                     end
+  #                   elsif rrr.eql?(68)
+  #                     # for 3rd table
+  #                     previous_title = @title = sheet_data.cell(rrr,ccc - 4) unless previous_title == @title
+  #                     unless @block_hash.has_key?(@title)
+  #                       @block_hash[@title] = {}
+  #                       first_key  = "LPMI/RefinanceOption/LTV"
+  #                       second_key = "LPMI/PropertyType/LTV"
+  #                       final_key  = "LPMI/FICO/LTV"
+  #                       @block_hash[@title][first_key] = {}
+  #                       @block_hash[@title][first_key][true] = {}
+  #                       @block_hash[@title][second_key] = {}
+  #                       @block_hash[@title][second_key][true] = {}
+  #                       @block_hash[@title][final_key] = {}
+  #                       @block_hash[@title][final_key][true] = {}
+  #                     end
+  #                   elsif rrr.eql?(81) && index == 13
+  #                     # for Loan Size Adjustments
+  #                     @another_title = sheet_data.cell(rrr,index)
+  #                     unless @block_hash.has_key?(@another_title)
+  #                       @block_hash[@another_title] = {}
+  #                     end
+  #                   elsif rrr.eql?(81) && index == 7
+  #                     # for Subordinate Financing
+  #                     @title = sheet_data.cell(rrr,ccc - 4)
+  #                     unless @block_hash.has_key?(@title)
+  #                       @block_hash[@title] = {}
+  #                       @block_hash[@title]["Subordinate Financing"] = {}
+  #                     end
+  #                   elsif rrr.eql?(87) && index.eql?(7)
+  #                     # for Non Owner Occupied
+  #                     @title = sheet_data.cell(rrr,ccc - 4)
+  #                     @block_hash[@title] = {} unless @block_hash.has_key?(@title)
+  #                     @block_hash[@title]["Non-Owner Occupied"] = {}
+  #                   elsif rrr.eql?(91) && index.eql?(7)
+  #                     # for Misc Adjusters
+  #                     @title = "PropertyType/LTV"
+  #                     @block_hash[@title] = {} unless @block_hash.has_key?(@title)
+  #                   end
 
-                    # implementation of second key inside first key
-                    if rrr > 52 && rrr < 61 && index == 7 && value
-                      # for 1st table
-                      key = get_value(value)
-                      @block_hash[@title]["Conforming"]["ARM"][key] = {} unless @block_hash[@title]["Conforming"]["ARM"].has_key?(key)
-                    elsif rrr > 62 && rrr < 66 && index == 7 && value
-                      # for 2nd table
-                      key = get_value(value)
-                      @block_hash[@title]["Cash Out"][key] = {} unless @block_hash[@title]["Cash Out"].has_key?(key)
-                    elsif (68..79).to_a.include?(rrr) && index == 7 && value
-                      if(68..72).to_a.include?(rrr) && index == 7 && value
-                        key = sheet_data.cell(rrr,ccc - 2)
-                        if "Rate & Term Refi".eql?(key)
-                          key = "Rate & Term"
-                          @block_hash[@title][first_key][true][key] = {}
-                        else
-                          @block_hash[@title][second_key][true][key] = {}
-                        end
-                      elsif(75..78).to_a.include?(rrr) && index == 7 && value
-                        key = sheet_data.cell(rrr,ccc - 2)
-                        key = key.eql?("<= 85") ? set_range(key) : get_value(key)
-                        @block_hash[@title][final_key][true][key] = {}
-                      end
-                    else
-                      if (81..84).to_a.include?(rrr) && ccc < 12
-                        # for Subordinate Financing
-                        if index.eql?(7)
-                          key = sheet_data.cell(rrr,ccc - 2)
-                          key = key.eql?("<=65") ? set_range(key) : get_value(key)
-                          @block_hash[@title]["Subordinate Financing"][key] = {} unless @block_hash[@title]["Subordinate Financing"].has_key?(key)
-                        elsif index.eql?(8)
-                          keyOfHash = sheet_data.cell(rrr,ccc - 2)
-                          keyOfHash = get_value(keyOfHash)
-                          @block_hash[@title]["Subordinate Financing"][key][keyOfHash] = {}
-                        end
-                      end
+  #                   # implementation of second key inside first key
+  #                   if rrr > 52 && rrr < 61 && index == 7 && value
+  #                     # for 1st table
+  #                     key = get_value(value)
+  #                     @block_hash[@title]["Conforming"]["ARM"][key] = {} unless @block_hash[@title]["Conforming"]["ARM"].has_key?(key)
+  #                   elsif rrr > 62 && rrr < 66 && index == 7 && value
+  #                     # for 2nd table
+  #                     key = get_value(value)
+  #                     @block_hash[@title]["Cash Out"][key] = {} unless @block_hash[@title]["Cash Out"].has_key?(key)
+  #                   elsif (68..79).to_a.include?(rrr) && index == 7 && value
+  #                     if(68..72).to_a.include?(rrr) && index == 7 && value
+  #                       key = sheet_data.cell(rrr,ccc - 2)
+  #                       if "Rate & Term Refi".eql?(key)
+  #                         key = "Rate & Term"
+  #                         @block_hash[@title][first_key][true][key] = {}
+  #                       else
+  #                         @block_hash[@title][second_key][true][key] = {}
+  #                       end
+  #                     elsif(75..78).to_a.include?(rrr) && index == 7 && value
+  #                       key = sheet_data.cell(rrr,ccc - 2)
+  #                       key = key.eql?("<= 85") ? set_range(key) : get_value(key)
+  #                       @block_hash[@title][final_key][true][key] = {}
+  #                     end
+  #                   else
+  #                     if (81..84).to_a.include?(rrr) && ccc < 12
+  #                       # for Subordinate Financing
+  #                       if index.eql?(7)
+  #                         key = sheet_data.cell(rrr,ccc - 2)
+  #                         key = key.eql?("<=65") ? set_range(key) : get_value(key)
+  #                         @block_hash[@title]["Subordinate Financing"][key] = {} unless @block_hash[@title]["Subordinate Financing"].has_key?(key)
+  #                       elsif index.eql?(8)
+  #                         keyOfHash = sheet_data.cell(rrr,ccc - 2)
+  #                         keyOfHash = get_value(keyOfHash)
+  #                         @block_hash[@title]["Subordinate Financing"][key][keyOfHash] = {}
+  #                       end
+  #                     end
 
-                      if (rrr >= 81 && rrr <= 88) && index.eql?(15)
-                        # for Loan Size Adjustments
-                        loan_amount = get_value(sheet_data.cell(rrr, ccc))
-                        @block_hash[@another_title][loan_amount] = {}
-                      end
+  #                     if (rrr >= 81 && rrr <= 88) && index.eql?(15)
+  #                       # for Loan Size Adjustments
+  #                       loan_amount = get_value(sheet_data.cell(rrr, ccc))
+  #                       @block_hash[@another_title][loan_amount] = {}
+  #                     end
 
-                      if [87,88,89].include?(rrr) && [7].include?(ccc)
-                        #for Non Owner Occupied
-                        diff_of_column = ccc - 6
-                        hash_key = sheet_data.cell(rrr,(ccc -diff_of_column))
-                        hash_key = hash_key.eql?("> 80") ? set_range(hash_key) : get_value(hash_key)
-                        key = hash_key
-                        @block_hash[@title]["Non-Owner Occupied"][hash_key] = {} if hash_key.present?
-                      end
+  #                     if [87,88,89].include?(rrr) && [7].include?(ccc)
+  #                       #for Non Owner Occupied
+  #                       diff_of_column = ccc - 6
+  #                       hash_key = sheet_data.cell(rrr,(ccc -diff_of_column))
+  #                       hash_key = hash_key.eql?("> 80") ? set_range(hash_key) : get_value(hash_key)
+  #                       key = hash_key
+  #                       @block_hash[@title]["Non-Owner Occupied"][hash_key] = {} if hash_key.present?
+  #                     end
 
-                      if [89,91].include?(rrr)
-                        # for High Balance
-                        if rrr.eql?(89) && index.eql?(16)
-                          @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High Balance"]["Purchase"]["Rate and Term"] = {} unless @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High Balance"]["Purchase"].has_key?("Rate and Term")
-                        elsif rrr.eql?(91) && index.eql?(16)
-                          @block_hash["LoanSize/RefinanceOption/LTV"]["High Balance"]["Cash Out"] = {} unless @block_hash["LoanSize/RefinanceOption/LTV"]["High Balance"].has_key?("Cash Out")
-                        end
-                      end
+  #                     if [89,91].include?(rrr)
+  #                       # for High Balance
+  #                       if rrr.eql?(89) && index.eql?(16)
+  #                         @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High Balance"]["Purchase"]["Rate and Term"] = {} unless @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High Balance"]["Purchase"].has_key?("Rate and Term")
+  #                       elsif rrr.eql?(91) && index.eql?(16)
+  #                         @block_hash["LoanSize/RefinanceOption/LTV"]["High Balance"]["Cash Out"] = {} unless @block_hash["LoanSize/RefinanceOption/LTV"]["High Balance"].has_key?("Cash Out")
+  #                       end
+  #                     end
 
-                      if (91..95).to_a.include?(rrr)
-                        # for Misc Adjusters
-                        if index.eql?(7)
-                          key = sheet_data.cell(rrr,ccc - 2)
-                          if key && key.eql?("Attached Condo > 75 LTV")
-                            first_key = key.split(" >")[0].split(" ").last
-                            @block_hash[@title][first_key] = {}
-                            second_key = key.split(" ")[3] + ".01"
-                          elsif key && key.eql?(">90 LTV")
-                            first_key  = key.split(" ")[1]
-                            @block_hash[@title][first_key] = {}
-                            second_key = key.split(">")[1].split(" ").first
-                          end
-                        end
-                      end
-                    end
+  #                     if (91..95).to_a.include?(rrr)
+  #                       # for Misc Adjusters
+  #                       if index.eql?(7)
+  #                         key = sheet_data.cell(rrr,ccc - 2)
+  #                         if key && key.eql?("Attached Condo > 75 LTV")
+  #                           first_key = key.split(" >")[0].split(" ").last
+  #                           @block_hash[@title][first_key] = {}
+  #                           second_key = key.split(" ")[3] + ".01"
+  #                         elsif key && key.eql?(">90 LTV")
+  #                           first_key  = key.split(" ")[1]
+  #                           @block_hash[@title][first_key] = {}
+  #                           second_key = key.split(">")[1].split(" ").first
+  #                         end
+  #                       end
+  #                     end
+  #                   end
 
-                    # implementation of third key inside second key with value
-                    if rrr > 52 && rrr < 61 && index > 7 && value
-                      diff_of_row = rrr - 52
-                      hash_key = sheet_data.cell((rrr - diff_of_row),ccc)
-                      hash_key = get_value(hash_key)
-                      if hash_key.present?
-                        @block_hash[@title]["Conforming"]["ARM"][key][hash_key] = value unless @block_hash[@title]["Conforming"]["ARM"][key].has_key?(hash_key)
-                      end
-                    end
+  #                   # implementation of third key inside second key with value
+  #                   if rrr > 52 && rrr < 61 && index > 7 && value
+  #                     diff_of_row = rrr - 52
+  #                     hash_key = sheet_data.cell((rrr - diff_of_row),ccc)
+  #                     hash_key = get_value(hash_key)
+  #                     if hash_key.present?
+  #                       @block_hash[@title]["Conforming"]["ARM"][key][hash_key] = value unless @block_hash[@title]["Conforming"]["ARM"][key].has_key?(hash_key)
+  #                     end
+  #                   end
 
-                    if rrr > 62 && rrr < 67 && index > 7 && value
-                      # for 2nd table
-                      hash_key = sheet_data.cell(rrr - (max_row + 1),ccc)
-                      hash_key = get_value(hash_key)
-                      if hash_key.present?
-                        @block_hash[@title]["Cash Out"][key][hash_key] = value unless @block_hash[@title]["Cash Out"][key].has_key?(hash_key)
-                      end
-                    elsif rrr >= 68 && index >= 7 && value
-                      if(rrr <= 78)
-                        diff_of_row = rrr - 67
-                        hash_key = sheet_data.cell((rrr - diff_of_row),ccc)
-                        hash_key = set_range(hash_key).nil? ? get_value(hash_key) : set_range(hash_key)
-                        if (68..72).to_a.include?(rrr)
-                          if(68..72).to_a.include?(rrr) && index >= 7 && value
-                            if rrr.eql?(68)
-                              @block_hash[@title][first_key][true][key][hash_key] = value
-                            else
-                              @block_hash[@title][second_key][true][key][hash_key] = value
-                            end
-                          end
-                        elsif(75..78).to_a.include?(rrr) && index >= 7 && value
-                          @block_hash[@title][final_key][true][key][hash_key] = value
-                        end
-                      elsif (81..88).to_a.include?(rrr) && ccc > 15 && value
-                        #for Loan Size Adjustments
-                        diff_of_row  = rrr - 80
-                        loan_purpose = sheet_data.cell(rrr-diff_of_row,ccc)
-                        @block_hash[@another_title][loan_amount][loan_purpose] = value
-                      end
+  #                   if rrr > 62 && rrr < 67 && index > 7 && value
+  #                     # for 2nd table
+  #                     hash_key = sheet_data.cell(rrr - (max_row + 1),ccc)
+  #                     hash_key = get_value(hash_key)
+  #                     if hash_key.present?
+  #                       @block_hash[@title]["Cash Out"][key][hash_key] = value unless @block_hash[@title]["Cash Out"][key].has_key?(hash_key)
+  #                     end
+  #                   elsif rrr >= 68 && index >= 7 && value
+  #                     if(rrr <= 78)
+  #                       diff_of_row = rrr - 67
+  #                       hash_key = sheet_data.cell((rrr - diff_of_row),ccc)
+  #                       hash_key = set_range(hash_key).nil? ? get_value(hash_key) : set_range(hash_key)
+  #                       if (68..72).to_a.include?(rrr)
+  #                         if(68..72).to_a.include?(rrr) && index >= 7 && value
+  #                           if rrr.eql?(68)
+  #                             @block_hash[@title][first_key][true][key][hash_key] = value
+  #                           else
+  #                             @block_hash[@title][second_key][true][key][hash_key] = value
+  #                           end
+  #                         end
+  #                       elsif(75..78).to_a.include?(rrr) && index >= 7 && value
+  #                         @block_hash[@title][final_key][true][key][hash_key] = value
+  #                       end
+  #                     elsif (81..88).to_a.include?(rrr) && ccc > 15 && value
+  #                       #for Loan Size Adjustments
+  #                       diff_of_row  = rrr - 80
+  #                       loan_purpose = sheet_data.cell(rrr-diff_of_row,ccc)
+  #                       @block_hash[@another_title][loan_amount][loan_purpose] = value
+  #                     end
 
-                      if (81..84).to_a.include?(rrr) && [9,10].include?(ccc)
-                        # for Subordinate Financing
-                        diff_of_row = rrr - 80
-                        hash_key = sheet_data.cell((rrr - diff_of_row),ccc)
-                        hash_key = hash_key.eql?(">= 720") ? set_range(hash_key) : get_value(hash_key)
-                        @block_hash[@title]["Subordinate Financing"][key][keyOfHash][hash_key] = value if hash_key.present?
-                      end
+  #                     if (81..84).to_a.include?(rrr) && [9,10].include?(ccc)
+  #                       # for Subordinate Financing
+  #                       diff_of_row = rrr - 80
+  #                       hash_key = sheet_data.cell((rrr - diff_of_row),ccc)
+  #                       hash_key = hash_key.eql?(">= 720") ? set_range(hash_key) : get_value(hash_key)
+  #                       @block_hash[@title]["Subordinate Financing"][key][keyOfHash][hash_key] = value if hash_key.present?
+  #                     end
 
-                      if [87,88,89].include?(rrr) && [9].include?(ccc)
-                        @block_hash[@title]["Non-Owner Occupied"][key] = value if key && value
-                      end
+  #                     if [87,88,89].include?(rrr) && [9].include?(ccc)
+  #                       @block_hash[@title]["Non-Owner Occupied"][key] = value if key && value
+  #                     end
 
-                      if (89..92).to_a.include?(rrr)
-                        # for High Balance
-                        ltv_value = set_range(sheet_data.cell(rrr,ccc - 1).split("LTV ")[-1]) if index.eql?(19)
-                        if [89,90].include?(rrr) && index.eql?(19)
-                          @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High Balance"]["Purchase"]["Rate and Term"][ltv_value] = value
-                        elsif [91,92].include?(rrr) && index.eql?(19)
-                          @block_hash["LoanSize/RefinanceOption/LTV"]["High Balance"]["Cash Out"][ltv_value] = value
-                        end
-                      end
+  #                     if (89..92).to_a.include?(rrr)
+  #                       # for High Balance
+  #                       ltv_value = set_range(sheet_data.cell(rrr,ccc - 1).split("LTV ")[-1]) if index.eql?(19)
+  #                       if [89,90].include?(rrr) && index.eql?(19)
+  #                         @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High Balance"]["Purchase"]["Rate and Term"][ltv_value] = value
+  #                       elsif [91,92].include?(rrr) && index.eql?(19)
+  #                         @block_hash["LoanSize/RefinanceOption/LTV"]["High Balance"]["Cash Out"][ltv_value] = value
+  #                       end
+  #                     end
 
-                      if (91..96).to_a.include?(rrr) && ccc.eql?(9)
-                        # for Misc Adjusters
-                        if rrr.eql?(93)
-                          @block_hash[@title][first_key][second_key] = value
-                        elsif rrr.eql?(96)
-                          ltv_value = sheet_data.cell(rrr, ccc - 4).split(">")[-1].split("LTV")[0] + " - #{Float::INFINITY}"
-                          @block_hash[@title][first_key][ltv_value] = value
-                        elsif [91,92].include?(rrr)
-                          property_type_value = sheet_data.cell(rrr, ccc - 4)
-                          @block_hash["PropertyType"][property_type_value] = value
-                        elsif [94,95].include?(rrr)
-                          misc_adjuster_value = sheet_data.cell(rrr, ccc - 4)
-                          @block_hash["MiscAdjuster"][misc_adjuster_value] = value
-                        end
-                      end
+  #                     if (91..96).to_a.include?(rrr) && ccc.eql?(9)
+  #                       # for Misc Adjusters
+  #                       if rrr.eql?(93)
+  #                         @block_hash[@title][first_key][second_key] = value
+  #                       elsif rrr.eql?(96)
+  #                         ltv_value = sheet_data.cell(rrr, ccc - 4).split(">")[-1].split("LTV")[0] + " - #{Float::INFINITY}"
+  #                         @block_hash[@title][first_key][ltv_value] = value
+  #                       elsif [91,92].include?(rrr)
+  #                         property_type_value = sheet_data.cell(rrr, ccc - 4)
+  #                         @block_hash["PropertyType"][property_type_value] = value
+  #                       elsif [94,95].include?(rrr)
+  #                         misc_adjuster_value = sheet_data.cell(rrr, ccc - 4)
+  #                         @block_hash["MiscAdjuster"][misc_adjuster_value] = value
+  #                       end
+  #                     end
 
-                      if rrr.eql?(94) && ccc.eql?(17)
-                        @block_hash["LockDay"]["30"] = value
-                        @block_hash["LockDay"]["45"] = value
-                        @block_hash["LockDay"]["60"] = value
-                      end
-                    end
-                  end
+  #                     if rrr.eql?(94) && ccc.eql?(17)
+  #                       @block_hash["LockDay"]["30"] = value
+  #                       @block_hash["LockDay"]["45"] = value
+  #                       @block_hash["LockDay"]["60"] = value
+  #                     end
+  #                   end
+  #                 end
 
-                  @allAdjustments[@title] = @block_hash[@title]
-                  if @another_title
-                    @allAdjustments[@another_title] = @block_hash[@another_title]
-                    @allAdjustments["LoanSize/LoanPurpose/RefinanceOption/LTV"] = @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]
-                    @allAdjustments["LoanSize/RefinanceOption/LTV"] = @block_hash["LoanSize/RefinanceOption/LTV"]
-                    @allAdjustments["PropertyType/LTV"] = @block_hash["PropertyType/LTV"]
-                    @allAdjustments["PropertyType"] = @block_hash["PropertyType"]
-                    @allAdjustments["MiscAdjuster"] = @block_hash["MiscAdjuster"]
-                    @allAdjustments["LockDay"] = @block_hash["LockDay"]
-                  end
-                end
-              end
-            rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet_name, error_detail: e.message)
-              error_log.save
-            end
-          end
-        end
-      end
-    end
+  #                 @allAdjustments[@title] = @block_hash[@title]
+  #                 if @another_title
+  #                   @allAdjustments[@another_title] = @block_hash[@another_title]
+  #                   @allAdjustments["LoanSize/LoanPurpose/RefinanceOption/LTV"] = @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]
+  #                   @allAdjustments["LoanSize/RefinanceOption/LTV"] = @block_hash["LoanSize/RefinanceOption/LTV"]
+  #                   @allAdjustments["PropertyType/LTV"] = @block_hash["PropertyType/LTV"]
+  #                   @allAdjustments["PropertyType"] = @block_hash["PropertyType"]
+  #                   @allAdjustments["MiscAdjuster"] = @block_hash["MiscAdjuster"]
+  #                   @allAdjustments["LockDay"] = @block_hash["LockDay"]
+  #                 end
+  #               end
+  #             end
+  #           rescue Exception => e
+  #             error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet_name, error_detail: e.message)
+  #             error_log.save
+  #           end
+  #         end
+  #       end
+  #     end
+  #   end
 
-    # rename first level keys
-    @allAdjustments.keys.each do |key|
-      data = get_table_keys
-      if data[key]
-        @allAdjustments[data[key]] = @allAdjustments.delete(key)
-      end
-    end
+  #   # rename first level keys
+  #   @allAdjustments.keys.each do |key|
+  #     data = get_table_keys
+  #     if data[key]
+  #       @allAdjustments[data[key]] = @allAdjustments.delete(key)
+  #     end
+  #   end
 
-    # create adjustment for each program
-    make_adjust(@allAdjustments, @sheet_name)
-    create_program_association_with_adjustment(@sheet)
-    redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
-  end
+  #   # create adjustment for each program
+  #   make_adjust(@allAdjustments, @sheet_name)
+  #   create_program_association_with_adjustment(@sheet)
+  #   redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
+  # end
 
   def homeready
     program_ids = []
@@ -6638,7 +6618,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @program.loan_limit_type << "High Balance"
                 end
                 @program.save
-                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, loan_purpose: "Purchase", fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, conforming: conforming, sheet_name: sheet)
+                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, loan_purpose: "Purchase", fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, conforming: conforming, sheet_name: @sheet_name)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
