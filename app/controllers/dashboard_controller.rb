@@ -3005,11 +3005,11 @@ class DashboardController < ApplicationController
         end
       end
       if hash_obj[:adj_points].present?
-        hash_obj[:final_rate] << hash_obj[:base_rate]
+        hash_obj[:final_rate] << hash_obj[:base_rate].to_f
         @result << hash_obj
       else
         hash_obj[:adj_points] = "Adjustment Not Present"
-        hash_obj[:final_rate] << hash_obj[:base_rate]
+        hash_obj[:final_rate] << hash_obj[:base_rate].to_f
         @result << hash_obj
       end
 
