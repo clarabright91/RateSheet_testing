@@ -232,6 +232,7 @@ class DashboardController < ApplicationController
       @programs =[]
       if @program_list3.present?
         @program_list3.each do |program|
+          puts program.id
           if(program.base_rate.keys.include?(@interest.to_f.to_s))
             if(program.base_rate[@interest.to_f.to_s].keys.include?(@lock_period))
                 @programs << program
@@ -2958,49 +2959,49 @@ class DashboardController < ApplicationController
           adj_key_hash.keys.each do |hash_key, index|
             if hash_key==0 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key]]
-              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
+              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "NA") && (point != "na") && (point != "-"))
                 hash_obj[:adj_points] << point
                 hash_obj[:final_rate] << point
               end
             end
             if hash_key==1 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
-              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
+              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "NA") && (point != "na") && (point != "-"))
                 hash_obj[:adj_points] << point
                 hash_obj[:final_rate] << point
               end
             end
             if hash_key==2 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
-              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
+              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "NA") && (point != "na") && (point != "-"))
                 hash_obj[:adj_points] << point
                 hash_obj[:final_rate] << point
               end
             end
             if hash_key==3 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
-              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
+              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "NA") && (point != "na") && (point != "-"))
                 hash_obj[:adj_points] << point
                 hash_obj[:final_rate] << point
               end
             end
             if hash_key==4 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-4]][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
-              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
+              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "NA") && (point != "na") && (point != "-"))
                 hash_obj[:adj_points] << point
                 hash_obj[:final_rate] << point
               end
             end
             if hash_key==5 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-5]][adj_key_hash[hash_key-4]][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
-              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
+              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "NA") && (point != "na") && (point != "-"))
                 hash_obj[:adj_points] << point
                 hash_obj[:final_rate] << point
               end
             end
             if hash_key==6 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-6]][adj_key_hash[hash_key-5]][adj_key_hash[hash_key-4]][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
-              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
+              if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "NA") && (point != "na") && (point != "-"))
                 hash_obj[:adj_points] << point
                 hash_obj[:final_rate] << point
               end

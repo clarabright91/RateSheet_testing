@@ -4339,13 +4339,12 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @program.adjustments.destroy_all
                   @block_hash = {}
                   key = ''
-                  new_key = ''
-                  if @program.term.present?
-                    new_key = "Term/LoanType/InterestRate/LockPeriod"
-                  else
-                    new_key = "InterestRate/LockPeriod"
-                  end
-                  @block_hash[new_key] = {}
+                  # new_key = ''
+                  # if @program.term.present?
+                  #   new_key = "Term/LoanType/InterestRate/LockPeriod"
+                  # else
+                  #   new_key = "InterestRate/LockPeriod"
+                  # end
                   (0..50).each do |max_row|
                     @data = []
                     (0..4).each_with_index do |index, c_i|
@@ -4354,13 +4353,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                       value = sheet_data.cell(rrr,ccc)
                       if (c_i == 0)
                         key = value
-                        @block_hash[new_key][key] = {}
+                        @block_hash[key] = {}
                       else
-                        if @program.lock_period.length <= 3
-                          @program.lock_period << 15*c_i
-                          @program.save
-                        end
-                        @block_hash[new_key][key][15*c_i] = value
+                        @block_hash[key][15*c_i] = value
                       end
                       @data << value
                     end
@@ -4954,13 +4949,12 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @program.adjustments.destroy_all
                   @block_hash = {}
                   key = ''
-                  main_key = ''
-                  if @program.term.present?
-                    main_key = "Term/LoanType/InterestRate/LockPeriod"
-                  else
-                    main_key = "InterestRate/LockPeriod"
-                  end
-                  @block_hash[main_key] = {}
+                  # main_key = ''
+                  # if @program.term.present?
+                  #   main_key = "Term/LoanType/InterestRate/LockPeriod"
+                  # else
+                  #   main_key = "InterestRate/LockPeriod"
+                  # end
                   (0..50).each do |max_row|
                     @data = []
                     (0..4).each_with_index do |index, c_i|
@@ -4969,13 +4963,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                       value = sheet_data.cell(rrr,ccc)
                       if (c_i == 0)
                         key = value
-                        @block_hash[main_key][key] = {}
+                        @block_hash[key] = {}
                       else
-                        if @program.lock_period.length <= 3
-                          @program.lock_period << 15*c_i
-                          @program.save
-                        end
-                        @block_hash[main_key][key][15*c_i] = value
+                        @block_hash[key][15*c_i] = value
                       end
                       @data << value
                     end
