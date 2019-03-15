@@ -36,7 +36,7 @@
               <div class="panel-basic">
                 <div class="input-grp"><h5>Loan Property</h5></div>
                 <div class="row panel-body">
-                  <div class="col-md-3">
+                  <div class="col-md-4">
                     <div class="form-group">
                       <label>Loan Purpose</label>
                       <div class="input-group">
@@ -46,7 +46,7 @@
                     </div>
                   </div>
 
-                  <div class="col-md-3">
+                  <div class="col-md-4">
                     <div class="form-group">
                       <label>Loan Type</label>
                       <% @loan_type_list =[["Fixed"], ["ARM"], ["Floating"], ["Variable"]]%>
@@ -54,7 +54,7 @@
                     </div>
                   </div>
 
-                  <div class="col-md-6 term">
+                  <div class="col-md-4 term">
                     <div class="form-group">
                       <label>Term</label>
                       <div class="input-group">
@@ -93,7 +93,7 @@
                 <div class="row">
                   <div class="col-md-12">
                     <div class="form-group">
-                      <label>Loan Size</label>
+                      <!-- <label>Loan Size</label> -->
                       <div class="input-group">
                         <% loan_size_list =[["Non-Conforming"], ["Conforming"], ["High-Balance"], ["Jumbo"]]%>
                         <%= select_tag 'loan_size', options_for_select(loan_size_list, (params[:loan_size] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control" }%>
@@ -103,7 +103,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-6">
               <div class="program-panel panel-basic">
                 <div class="input-grp"><h5>FM</h5></div>
                 <div class="row">
@@ -135,13 +135,13 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-2">
               <div class="program-panel panel-basic">
                 <div class="input-grp"><h5>Government Program</h5></div>
                 <div class="row">
                   <div class="col-md-12">
                     <div class="form-group">
-                      <label>Gov</label>
+                      <!-- <label>Gov</label> -->
                       <div class="input-group">
                         <% @gov_list =[["FHA"], ["VA"], ["USDA"], ["Streamline"]]%>
                         <%= select_tag 'gov', options_for_select(@gov_list, (params[:gov] rescue nil)), { prompt: 'Select Gov', :class=> "form-control" }%>
@@ -348,7 +348,7 @@
             <td><%= program[:sheet_name] %></td>
             <td><%= program[:bank_name] %></td>
             <td><%= program[:adj_points] %></td>
-            <td><%= (program[:final_rate].sum).round(3) %></td>
+            <td><%= (program[:final_rate].sum).round(3) rescue nil %></td>
           </tr>
         <%end%>
       <%end%>
