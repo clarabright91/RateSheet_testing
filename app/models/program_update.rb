@@ -18,8 +18,7 @@ class ProgramUpdate
       if hiphen_present or slash_present
         num = name.split("ARM")[0].gsub!(/[^0-9a-z]/, '')
         if num.length == 2
-          num.insert(-2, '-') if hiphen_present
-          num.insert(-2, '-') if slash_present
+          num.split("")[0].to_i
         end
       end
     end
