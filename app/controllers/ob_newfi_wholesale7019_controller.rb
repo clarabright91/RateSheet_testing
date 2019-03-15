@@ -83,10 +83,10 @@ class ObNewfiWholesale7019Controller < ApplicationController
                     break # terminate the loop
                   end
                 end
-               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
+                if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
-                @program.update(base_rate: @block_hash)
+                @program.update(base_rate: @block_hash,sheet_name: sheet)
               end
             end
           end
@@ -303,7 +303,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
-                @program.update(base_rate: @block_hash)
+                @program.update(base_rate: @block_hash,sheet_name: sheet)
               end
               rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
@@ -377,7 +377,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
-                @program.update(base_rate: @block_hash)
+                @program.update(base_rate: @block_hash,sheet_name: sheet)
             end
           end
         end
@@ -452,7 +452,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
-              @program.update(base_rate: @block_hash)
+              @program.update(base_rate: @block_hash,sheet_name: sheet)
             end
           end
         end
@@ -583,7 +583,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
-                @program.update(base_rate: @block_hash)
+                @program.update(base_rate: @block_hash,sheet_name: sheet)
               end
             end
           end
@@ -730,7 +730,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
-                @program.update(base_rate: @block_hash)
+                @program.update(base_rate: @block_hash,sheet_name: sheet)
             end
           end
         end
@@ -794,7 +794,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                     @block_hash.shift
                   end
-                  @program.update(base_rate: @block_hash)
+                  @program.update(base_rate: @block_hash,sheet_name: sheet)
                 end
               rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
@@ -989,7 +989,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
-              @program.update(base_rate: @block_hash)
+              @program.update(base_rate: @block_hash,sheet_name: sheet)
             end
           end
         end
@@ -1208,7 +1208,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 if @data.compact.reject { |c| c.blank? }.length == 0
                   break # terminate the loop
                 end
-                @program.update(base_rate: @block_hash)
+                @program.update(base_rate: @block_hash,sheet_name: sheet)
               rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
@@ -1216,7 +1216,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
-              @program.update(base_rate: @block_hash)
+              @program.update(base_rate: @block_hash,sheet_name: sheet)
             end
           end
         end
@@ -1515,7 +1515,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
-              @program.update(base_rate: @block_hash)
+              @program.update(base_rate: @block_hash,sheet_name: sheet)
             end
           end
         end
@@ -1807,7 +1807,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
-              @program.update(base_rate: @block_hash)
+              @program.update(base_rate: @block_hash,sheet_name: sheet)
             end
           end
         end
@@ -2088,7 +2088,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
-              @program.update(base_rate: @block_hash)
+              @program.update(base_rate: @block_hash,sheet_name: sheet)
             end
           end
         end
@@ -2317,7 +2317,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
-                @program.update(base_rate: @block_hash)
+                @program.update(base_rate: @block_hash,sheet_name: sheet)
               end
             end
           end
@@ -2527,13 +2527,10 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   break # terminate the loop
                 end
               end
-              # if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-              #   @block_hash.values.first.shift
-              # end
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
-              @program.update(base_rate: @block_hash)
+              @program.update(base_rate: @block_hash,sheet_name: sheet)
             end
           end
         end
