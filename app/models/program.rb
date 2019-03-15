@@ -17,21 +17,21 @@ class Program < ApplicationRecord
 
   def get_non_conforming
     non_conforming = ["Non-Conforming"]
-    non_conforming += Acronym.new(non_conforming).to_a
+    # non_conforming += Acronym.new(non_conforming).to_a
     non_conforming += non_conforming.map(&:downcase)
     return non_conforming
   end
 
   def get_conforming
     conforming = ["Conforming"]
-    conforming += Acronym.new(conforming).to_a
+    # conforming += Acronym.new(conforming).to_a
     conforming += conforming.map(&:downcase)
     return conforming
   end
 
   def get_high_balance
-    high_balance = ["High-Balance", "HIGH BAL"]
-    high_balance += Acronym.new(high_balance).to_a
+    high_balance = ["High-Balance", "HIGH BAL", "High Balance"]
+    # high_balance += Acronym.new(high_balance).to_a
     high_balance += high_balance.map(&:downcase)
     return high_balance
   end
@@ -57,10 +57,11 @@ class Program < ApplicationRecord
     set_loan_purpose(p_name)        if ["Purchase", "Refinance"].any? { |word| p_name.downcase.include?(word.downcase) }
     set_arm_basic(p_name)           if ["1/1", "2/1", "3/1", "7/1", "10/1", "5-1", "5/1"].any? { |word| p_name.downcase.include?(word.downcase) }
     set_arm_advanced(p_name)        if ["10/5", "5/1 3-2-5"].any? { |word| p_name.downcase.include?(word.downcase) }
-    set_fannie_mae                  if ["Fannie Mae, DU"].any? { |word| p_name.downcase.include?(word.downcase) }
-    set_freddie_mac                 if ["Freddie Mac, LP"].any? { |word| p_name.downcase.include?(word.downcase) }
+    set_fannie_mae                  if ["Fannie Mae", "DU"].any? { |word| p_name.downcase.include?(word.downcase) }
+    set_freddie_mac                 if ["Freddie Mac", "LP"].any? { |word| p_name.downcase.include?(word.downcase) }
     set_freddie_mac_product(p_name) if ["Home Possible"].any? { |word| p_name.downcase.include?(word.downcase) }
     set_term(p_name) if (5..50).to_a.collect{|n| n.to_s}.any? { |word| p_name.downcase.include?(word.downcase) }
+    self.term = ProgramUpdate.set_term(p_name)
     self.save
   end
 
@@ -71,15 +72,6 @@ class Program < ApplicationRecord
       present_word = word if prog_name.include?(word)
     }
     self.loan_type = present_word
-  end
-
-  def set_term(prog_name)
-    if prog_name.scan(/\d+/).uniq.count == 1
-      self.term = prog_name.scan(/\d+/).uniq[0]
-    elsif prog_name.scan(/\d+/).count > 1 && !prog_name.include?("ARM")
-      self.term = (prog_name.scan(/\d+/)[0]+ prog_name.scan(/\d+/)[1]).to_i if (MatheMatics.digits(prog_name.scan(/\d+/)[1].to_i).to_i) > 1
-      self.term = (prog_name.scan(/\d+/)[0]+ "0" + prog_name.scan(/\d+/)[1]).to_i unless (MatheMatics.digits(prog_name.scan(/\d+/)[1].to_i).to_i) > 1
-    end
   end
 
   def set_fha
@@ -116,7 +108,6 @@ class Program < ApplicationRecord
     fetch_loan_size_fields.any? { |word|
       present_word = word if p_name.include?(word)
     }
-
     loan_size = get_high_balance.include?(present_word) ? "High-Balance" : get_jumbo.include?(present_word) ? "Jumbo" : get_conforming.include?(present_word) ? "Conforming" : "Non-Conforming"
     self.loan_size = loan_size
   end
