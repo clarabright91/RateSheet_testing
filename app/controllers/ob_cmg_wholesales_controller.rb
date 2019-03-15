@@ -111,7 +111,7 @@ class ObCmgWholesalesController < ApplicationController
                     @data_hash["LoanAmount"] = {}
                     @data_hash["PropertyType"] = {}
                     @data_hash["LoanSize/Term"] = {}
-                    @data_hash["LoanSize/Term"]["High Balance"] = {}
+                    @data_hash["LoanSize/Term"]["High-Balance"] = {}
                   end
                   if r >= 70 && r <= 76 && cc == 1
                     if value.include?("-")
@@ -148,20 +148,20 @@ class ObCmgWholesalesController < ApplicationController
                     @data_hash["PropertyType"][secondary_key] = c_val
                   end
                   if r == 86 && cc == 1
-                    @data_hash["LoanSize/Term"]["High Balance"]["15"] = {}
-                    @data_hash["LoanSize/Term"]["High Balance"]["20"] = {}
+                    @data_hash["LoanSize/Term"]["High-Balance"]["15"] = {}
+                    @data_hash["LoanSize/Term"]["High-Balance"]["20"] = {}
                     ccc = cc + 6
                     c_val = sheet_data.cell(r,ccc)
-                    @data_hash["LoanSize/Term"]["High Balance"]["15"] = c_val
-                    @data_hash["LoanSize/Term"]["High Balance"]["20"] = c_val
+                    @data_hash["LoanSize/Term"]["High-Balance"]["15"] = c_val
+                    @data_hash["LoanSize/Term"]["High-Balance"]["20"] = c_val
                   end
                   if r == 87 && cc == 1
                     @data_hash["LoanSize/LoanType"] = {}
-                    @data_hash["LoanSize/LoanType"]["High Balance"] = {}
-                    @data_hash["LoanSize/LoanType"]["High Balance"]["ARM"] = {}
+                    @data_hash["LoanSize/LoanType"]["High-Balance"] = {}
+                    @data_hash["LoanSize/LoanType"]["High-Balance"]["ARM"] = {}
                     ccc = cc + 6
                     c_val = sheet_data.cell(r,ccc)
-                    @data_hash["LoanSize/LoanType"]["High Balance"]["ARM"] = c_val
+                    @data_hash["LoanSize/LoanType"]["High-Balance"]["ARM"] = c_val
                   end
                 end
               rescue Exception => e
@@ -524,7 +524,7 @@ class ObCmgWholesalesController < ApplicationController
                   @cashout_adjustment[cash_key][primary_key1][cash_key1][cltv_key][ltv_key] = value
                 end
 
-                # High Balance Adjustments
+                # High-Balance Adjustments
                 if r == 33 && cc == 1
                   cltv_key = "Standard Cash Out"
                   @cashout_adjustment[cash_key][secondary_key][cash_key1][cltv_key] = {}
@@ -949,13 +949,13 @@ class ObCmgWholesalesController < ApplicationController
                   end
                   if r == 70 && cc == 1
                     @adjustment_hash["LoanSize/Term/LTV"] = {}
-                    @adjustment_hash["LoanSize/Term/LTV"]["High Balance"] = {}
-                    @adjustment_hash["LoanSize/Term/LTV"]["High Balance"]["15"] = {}
+                    @adjustment_hash["LoanSize/Term/LTV"]["High-Balance"] = {}
+                    @adjustment_hash["LoanSize/Term/LTV"]["High-Balance"]["15"] = {}
                   end
                   if r == 70 && cc >= 8 && cc <= 16
                     ltv_key = get_value @fnma_data[cc-1]
-                    @adjustment_hash["LoanSize/Term/LTV"]["High Balance"]["15"][ltv_key] = {}
-                    @adjustment_hash["LoanSize/Term/LTV"]["High Balance"]["15"][ltv_key] = value
+                    @adjustment_hash["LoanSize/Term/LTV"]["High-Balance"]["15"][ltv_key] = {}
+                    @adjustment_hash["LoanSize/Term/LTV"]["High-Balance"]["15"][ltv_key] = value
                   end
 
                   # subordinate adjustment
@@ -1229,12 +1229,12 @@ class ObCmgWholesalesController < ApplicationController
                   end
                   if r == 70 && cc == 1
                     @adjustment_hash["LoanSize/LTV"] = {}
-                    @adjustment_hash["LoanSize/LTV"]["High Balance"] = {}
+                    @adjustment_hash["LoanSize/LTV"]["High-Balance"] = {}
                   end
                   if r == 70 && cc >= 8 && cc <= 16
                     fnma_key = get_value @fnma_data[cc-1]
-                    @adjustment_hash["LoanSize/LTV"]["High Balance"][fnma_key] = {}
-                    @adjustment_hash["LoanSize/LTV"]["High Balance"][fnma_key] = value
+                    @adjustment_hash["LoanSize/LTV"]["High-Balance"][fnma_key] = {}
+                    @adjustment_hash["LoanSize/LTV"]["High-Balance"][fnma_key] = value
                   end
 
                   # subordinate adjustment
@@ -4007,12 +4007,12 @@ class ObCmgWholesalesController < ApplicationController
       usda = true
       full_doc = true
     end
-    # High Balance
+    # High-Balance
     high_balance = false
     jumbo = false
     if @program.program_name.include?("High Bal") || @program.program_name.include?("HIGH BAL")
       high_balance = true
-      loan_size = "High Balance"
+      loan_size = "High-Balance"
     end
      # Fannie mae Product
     if @program.program_name.include?("HomeReady")
@@ -4037,8 +4037,8 @@ class ObCmgWholesalesController < ApplicationController
       jumbo = true
       @program.loan_limit_type << "Jumbo"
     end
-    if @program.program_name.include?("High Balance")
-      @program.loan_limit_type << "High Balance"
+    if @program.program_name.include?("High-Balance")
+      @program.loan_limit_type << "High-Balance"
     end
 
     @program.save
