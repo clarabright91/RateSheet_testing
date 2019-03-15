@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   # get 'error_logs/index'
   # get 'ob_american_financial_resources_wholesale5513/index'
   root :to => "dashboard#index"
+  get 'dashboard/banks'
   # root :to => "ob_new_rez_wholesale5806#index"
   get 'error_logs/*name', to: 'error_logs#display_logs', as: :display_logs
   resources :ob_new_rez_wholesale5806, :only => [:index] do

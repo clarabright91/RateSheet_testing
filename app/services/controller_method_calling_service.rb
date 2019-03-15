@@ -4,14 +4,15 @@ class ControllerMethodCallingService
     @controller = nil
     @method     = nil
     @sheet      = nil
-    @files      = Dir.entries("remote_files")
+    @files      = Dir.entries("remote_files") # get all files from remote files folder
   end
 
   def invoke_method
-    # new code
     @files.each do |file|
       if file.split(".").last.present?
+        # create object
         file       = File.join(Rails.root.join('remote_files', file))
+        # read file
         xlsx       = Roo::Spreadsheet.open(file)
 
         # remove .xls from file to find controller name

@@ -9,6 +9,10 @@ class DashboardController < ApplicationController
     end
   end
 
+  def banks
+    @banks = Bank.all
+  end
+
   def fetch_programs_by_bank
     program_list = []
     if params[:bank_name].present?
@@ -32,6 +36,8 @@ class DashboardController < ApplicationController
     @ltv = []
     @credit_score = []
     @cltv = []
+    @fannie_mae_product = "HomeReady"
+    @freddie_mac_product = "Home Possible"
   end
 
   def set_variable
@@ -79,11 +85,23 @@ class DashboardController < ApplicationController
     @premium_type = params[:premium_type] if params[:premium_type].present?
     @interest = params[:interest] if params[:interest].present?
     @lock_period = params[:lock_period] if params[:lock_period].present?
-    @fannie_mae_product = params[:fannie_mae_product] if params[:fannie_mae_product].present?
-    @fraddie_mac_product = params[:fraddie_mac_product] if params[:fraddie_mac_product].present?
     @loan_amount = params[:loan_amount].to_i if params[:loan_amount].present?
     @program_category = params[:program_category] if params[:program_category].present?
     @payment_type =  params[:payment_type] if params[:payment_type].present?
+
+    if params[:fannie_mae_product].present?
+      unless (params[:fannie_mae_product] == "All")
+        @filter_data[:fannie_mae_product] = params[:fannie_mae_product]
+        @fannie_mae_product = params[:fannie_mae_product]
+      end
+    end
+
+    if params[:freddie_mac_product].present?
+      unless (params[:freddie_mac_product] == "All")
+        @filter_data[:freddie_mac_product] = params[:freddie_mac_product]
+        @freddie_mac_product = params[:freddie_mac_product]
+      end
+    end
 
     if params[:bank_name].present?
       unless (params[:bank_name] == "All")
@@ -131,12 +149,8 @@ class DashboardController < ApplicationController
     if params[:fannie_options].present?
       if params[:fannie_options] == "Fannie Mae"
         @filter_data[:fannie_mae] = true
-      elsif params[:fannie_options] == "Fannie Mae Home Ready"
-        @filter_data[:fannie_mae_home_ready] = true
-      elsif params[:fannie_options] == "Fannie Mac"
+      elsif params[:fannie_options] == "Freddie Mac"
         @filter_data[:freddie_mac] = true
-      elsif params[:fannie_options] == "Fannie Mae freddie_mac_home_possible Possible"
-        @filter_data[:freddie_mac_home_possible] = true
       end
     end
 
@@ -159,10 +173,10 @@ class DashboardController < ApplicationController
         @filter_data[:conforming] = false
       elsif params[:loan_size] == "Conforming"
         @filter_data[:conforming] = true
-      elsif params[:loan_size] == "Jumbo"
-        @filter_data[:jumbo] = true
-      elsif params[:loan_size] == "High-Balance"
-        @filter_data[:high_balance] = true
+      # elsif params[:loan_size] == "Jumbo"
+      #   @filter_data[:jumbo] = true
+      # elsif params[:loan_size] == "High-Balance"
+      #   @filter_data[:high_balance] = true
       end
     end
 
@@ -200,9 +214,24 @@ class DashboardController < ApplicationController
         @program_list2 = @program_list
       end
 
-      @programs =[]
       if @program_list2.present?
-        @program_list2.each do |program|
+        @program_list3 = []
+        if (params[:loan_size].present? && (params[:loan_size] == "Jumbo" || params[:loan_size] == "High-Balance" ))
+          # @program_list2 = @program_list2.map{|p| p  if p.loan_size!=nil }
+          @program_list2.each do |pro|
+            if(pro.loan_size == params[:loan_size])
+              @program_list3 << pro
+            end
+          end
+        else
+          @program_list3 = @program_list2
+        end
+      end
+
+
+      @programs =[]
+      if @program_list3.present?
+        @program_list3.each do |program|
           if(program.base_rate.keys.include?(@interest.to_f.to_s))
             if(program.base_rate[@interest.to_f.to_s].keys.include?(@lock_period))
                 @programs << program
@@ -222,9 +251,10 @@ class DashboardController < ApplicationController
     hash_obj = {
       :program_name => "",
       :base_rate => 0.0,
-      :sheet_name=> "",
-      :bank_name=> "",
-      :adj_points => []
+      :sheet_name => "",
+      :bank_name => "",
+      :adj_points => [],
+      :final_rate => []
     }
     programs.each do |pro|
       hash_obj[:program_name] = pro.program_name.present? ? pro.program_name : ""
@@ -232,8 +262,8 @@ class DashboardController < ApplicationController
       hash_obj[:bank_name] = pro.bank_name.present? ? pro.bank_name : ""
       hash_obj[:base_rate] = pro.base_rate[@interest.to_f.to_s][@lock_period].present? ? pro.base_rate[@interest.to_f.to_s][@lock_period] : 0.0
       if pro.adjustments.present?
-        pro.adjustments.each do |adj|          
-          first_key = adj.data.keys.first          
+        pro.adjustments.each do |adj|
+          first_key = adj.data.keys.first
           key_list = first_key.split("/")
           adj_key_hash = {}
           key_list.each_with_index do |key_name, key_index|
@@ -286,7 +316,7 @@ class DashboardController < ApplicationController
                 if key_name == "FreddieMacProduct"
                   begin
                     if adj.data[first_key][@property_type].present?
-                      adj_key_hash[key_index] = @fraddie_mac_product
+                      adj_key_hash[key_index] = @freddie_mac_product
                     else
                       break
                     end
@@ -465,7 +495,7 @@ class DashboardController < ApplicationController
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
-                
+
                 if key_name == "RefinanceOption"
                   begin
                     if (@refinance_option == "Cash Out" || @refinance_option == "Cash-Out")
@@ -551,7 +581,7 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if @state = "All"
+                    if @state == "All"
                       first_state_key = adj.data[first_key].keys.first
                       if adj.data[first_key][first_state_key].present?
                         adj_key_hash[key_index] = first_state_key
@@ -666,7 +696,7 @@ class DashboardController < ApplicationController
                 if key_name == "FreddieMacProduct"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-1]][@property_type].present?
-                      adj_key_hash[key_index] = @fraddie_mac_product
+                      adj_key_hash[key_index] = @freddie_mac_product
                     else
                       break
                     end
@@ -685,7 +715,7 @@ class DashboardController < ApplicationController
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
-                
+
                 if key_name == "LoanAmount"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-1]].present?
@@ -767,7 +797,7 @@ class DashboardController < ApplicationController
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
-                
+
                 if key_name == "LTV"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-1]].present?
@@ -930,7 +960,7 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if @state = "All"
+                    if @state == "All"
                       first_state_key = adj.data[first_key][adj_key_hash[key_index-1]].keys.first
                       if adj.data[first_key][adj_key_hash[key_index-1]][first_state_key].present?
                         adj_key_hash[key_index] = first_state_key
@@ -1045,7 +1075,7 @@ class DashboardController < ApplicationController
                 if key_name == "FreddieMacProduct"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
-                      adj_key_hash[key_index] = @fraddie_mac_product
+                      adj_key_hash[key_index] = @freddie_mac_product
                     else
                       break
                     end
@@ -1064,7 +1094,7 @@ class DashboardController < ApplicationController
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
-                
+
                 if key_name == "LoanAmount"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
@@ -1308,7 +1338,7 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if @state = "All"
+                    if @state == "All"
                       first_state_key = adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
                       if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][first_state_key].present?
                         adj_key_hash[key_index] = first_state_key
@@ -1421,7 +1451,7 @@ class DashboardController < ApplicationController
                 if key_name == "FreddieMacProduct"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
-                      adj_key_hash[key_index] = @fraddie_mac_product
+                      adj_key_hash[key_index] = @freddie_mac_product
                     else
                       break
                     end
@@ -1440,7 +1470,7 @@ class DashboardController < ApplicationController
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
-                
+
                 if key_name == "LoanAmount"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
@@ -1684,7 +1714,7 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if @state = "All"
+                    if @state == "All"
                       first_state_key = adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
                       if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][first_state_key].present?
                         adj_key_hash[key_index] = first_state_key
@@ -1797,7 +1827,7 @@ class DashboardController < ApplicationController
                 if key_name == "FreddieMacProduct"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
-                      adj_key_hash[key_index] = @fraddie_mac_product
+                      adj_key_hash[key_index] = @freddie_mac_product
                     else
                       break
                     end
@@ -1816,7 +1846,7 @@ class DashboardController < ApplicationController
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
-                
+
                 if key_name == "LoanAmount"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
@@ -2059,7 +2089,7 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if @state = "All"
+                    if @state == "All"
                       first_state_key = adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
                       if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][first_state_key].present?
                         adj_key_hash[key_index] = first_state_key
@@ -2173,7 +2203,7 @@ class DashboardController < ApplicationController
                 if key_name == "FreddieMacProduct"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
-                      adj_key_hash[key_index] = @fraddie_mac_product
+                      adj_key_hash[key_index] = @freddie_mac_product
                     else
                       break
                     end
@@ -2192,7 +2222,7 @@ class DashboardController < ApplicationController
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
-                
+
                 if key_name == "LoanAmount"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
@@ -2436,7 +2466,7 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if @state = "All"
+                    if @state == "All"
                       first_state_key = adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
                       if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][first_state_key].present?
                         adj_key_hash[key_index] = first_state_key
@@ -2549,7 +2579,7 @@ class DashboardController < ApplicationController
                 if key_name == "FreddieMacProduct"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
-                      adj_key_hash[key_index] = @fraddie_mac_product
+                      adj_key_hash[key_index] = @freddie_mac_product
                     else
                       break
                     end
@@ -2568,7 +2598,7 @@ class DashboardController < ApplicationController
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
-                
+
                 if key_name == "LoanAmount"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
@@ -2650,7 +2680,7 @@ class DashboardController < ApplicationController
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
                   end
                 end
-                
+
                 if key_name == "LTV"
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
@@ -2814,7 +2844,7 @@ class DashboardController < ApplicationController
 
                 if key_name == "State"
                   begin
-                    if @state = "All"
+                    if @state == "All"
                       first_state_key = adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
                       if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][first_state_key].present?
                         adj_key_hash[key_index] = first_state_key
@@ -2882,43 +2912,43 @@ class DashboardController < ApplicationController
               end
             else
               if key_index==0
-                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo" || key_name == "FHLMC" || key_name == "LPMI")
+                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo" || key_name == "FHLMC" || key_name == "LPMI" || key_name == "EPMI")
                   adj.data[first_key]["true"]
                   adj_key_hash[key_index] = "true"
                 end
               end
               if key_index==1
-                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo" || key_name == "FHLMC" || key_name == "LPMI")
+                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo" || key_name == "FHLMC" || key_name == "LPMI" || key_name == "EPMI")
                   adj.data[first_key][adj_key_hash[key_index-1]]["true"]
                   adj_key_hash[key_index] = "true"
                 end
               end
               if key_index==2
-                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo" || key_name == "FHLMC" || key_name == "LPMI")
+                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo" || key_name == "FHLMC" || key_name == "LPMI" || key_name == "EPMI")
                   adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"]
                   adj_key_hash[key_index] = "true"
                 end
               end
               if key_index==3
-                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo" || key_name == "FHLMC" || key_name == "LPMI")
+                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo" || key_name == "FHLMC" || key_name == "LPMI" || key_name == "EPMI")
                   adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"]
                   adj_key_hash[key_index] = "true"
                 end
               end
               if key_index==4
-                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo" || key_name == "FHLMC" || key_name == "LPMI")
+                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo" || key_name == "FHLMC" || key_name == "LPMI" || key_name == "EPMI")
                   adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"]
                   adj_key_hash[key_index] = "true"
                 end
               end
               if key_index==5
-                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo" || key_name == "FHLMC" || key_name == "LPMI")
+                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo" || key_name == "FHLMC" || key_name == "LPMI" || key_name == "EPMI")
                   adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"]
                   adj_key_hash[key_index] = "true"
                 end
               end
               if key_index==6
-                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo" || key_name == "FHLMC" || key_name == "LPMI")
+                if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo" || key_name == "FHLMC" || key_name == "LPMI" || key_name == "EPMI")
                   adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]]["true"]
                   adj_key_hash[key_index] = "true"
                 end
@@ -2930,51 +2960,60 @@ class DashboardController < ApplicationController
               point = adj.data[first_key][adj_key_hash[hash_key]]
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
                 hash_obj[:adj_points] << point
+                hash_obj[:final_rate] << point
               end
             end
             if hash_key==1 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
                 hash_obj[:adj_points] << point
+                hash_obj[:final_rate] << point
               end
             end
             if hash_key==2 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
                 hash_obj[:adj_points] << point
+                hash_obj[:final_rate] << point
               end
             end
             if hash_key==3 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
                 hash_obj[:adj_points] << point
+                hash_obj[:final_rate] << point
               end
             end
             if hash_key==4 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-4]][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
                 hash_obj[:adj_points] << point
+                hash_obj[:final_rate] << point
               end
             end
             if hash_key==5 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-5]][adj_key_hash[hash_key-4]][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
                 hash_obj[:adj_points] << point
+                hash_obj[:final_rate] << point
               end
             end
             if hash_key==6 && adj_key_hash.keys.count-1==hash_key
               point = adj.data[first_key][adj_key_hash[hash_key-6]][adj_key_hash[hash_key-5]][adj_key_hash[hash_key-4]][adj_key_hash[hash_key-3]][adj_key_hash[hash_key-2]][adj_key_hash[hash_key-1]][adj_key_hash[hash_key]]
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "-"))
                 hash_obj[:adj_points] << point
+                hash_obj[:final_rate] << point
               end
             end
           end
         end
       end
       if hash_obj[:adj_points].present?
-        @result << hash_obj  
+        hash_obj[:final_rate] << hash_obj[:base_rate].to_f
+        @result << hash_obj
       else
         hash_obj[:adj_points] = "Adjustment Not Present"
+        hash_obj[:final_rate] << hash_obj[:base_rate].to_f
         @result << hash_obj
       end
 
@@ -2983,7 +3022,8 @@ class DashboardController < ApplicationController
         :base_rate => 0.0,
         :sheet_name=> "",
         :bank_name=> "",
-        :adj_points => []
+        :adj_points => [],
+        :final_rate => []
       }
     end
   end

@@ -12,8 +12,8 @@ Things you may want to cover:
 * Configuration
   **
 * Database creation
-  ** rake db:create
-  ** rake db:migrate
+  rake db:create
+  rake db:migrate
 * Database initialization
 
 * How to run the test suite

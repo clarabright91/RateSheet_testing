@@ -28,7 +28,7 @@ namespace :sheet_operation do
   end
 
   task :export_sheet => :environment do
-    # unless is_downloaded.present?
+    # unless is_downloaded.present? # check operation is executed today or not
       # make new folder for remote files
       directory_name = "remote_files"
       Dir.mkdir(directory_name) unless File.exists?(directory_name)
@@ -38,15 +38,21 @@ namespace :sheet_operation do
       sheet_links.each do |link|
         open(link) do |remote_file|
           file_name = remote_file.meta["content-disposition"].gsub("attachment;filename=", "")
-          # unless File.exists?(Rails.root.join('remote_files', file_name))
+
+          # if file is present inside folder delete first
+          if File.exists?(Rails.root.join('remote_files', file_name))
+            File.delete(Rails.root.join('remote_files', file_name))
+          end
+
+          # after delete opertion download file inside folder
+          unless File.exists?(Rails.root.join('remote_files', file_name))
             File.open("remote_files/" + file_name, "wb") do |local_file|
               # save file
               local_file.write(remote_file.read)
               # file name
               filename = local_file.to_path.split("/")[-1]
-              # call rake task to upload data on database
             end
-          # end
+          end
         end
       end
 
@@ -58,7 +64,7 @@ namespace :sheet_operation do
   end
 
   task :upload_on_drive => :environment do
-    # unless is_uploaded.present?
+    # unless is_uploaded.present?  # check operation is executed today or not
       # get all files of specified folder
       folder_files = Dir.entries("remote_files")
       folder_files.each do  |file|

@@ -40,9 +40,9 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 if @title.present? && @title != 3.125
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update(sheet_name: @sheet_name)
-                  Program.new().update_fields @title
+                  @program.update_fields @title
                   @programs_ids << @program.id
-                  # @program.adjustments.destroy_all
+                  @program.adjustments.destroy_all
                   key = ''
                   @block_hash = {}
                   (1..50).each do |max_row|
@@ -148,11 +148,11 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                     @fha_adjustment["FHA/USDA/LoanAmount/FICO"] = {}
                     @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true] = {}
                     @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true] = {}
-                    @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true]["0-100k"] = {}
-                    @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true]["0-100k"]["0-640"] = {}
+                    @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true]["0-100000"] = {}
+                    @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true]["0-100000"]["0-640"] = {}
                     cc = cc + 3
                     new_val = sheet_data.cell(r,cc)
-                    @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true]["0-100k"]["0-640"] = new_val
+                    @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true]["0-100000"]["0-640"] = new_val
                   end
                   if r == 52 && cc == 17
                     @fha_adjustment["FHA/USDA/State"] = {}
@@ -191,7 +191,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                     if value.include?(">")
                       first_key = get_value value
                     else
-                      first_key = value.sub('to','-').tr('$','')
+                      first_key = value.sub('to','-').tr('$,','')
                     end
                     @loan_adj["LoanAmount"][first_key] = {}
                     cc = cc + 3
@@ -247,10 +247,9 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 if @title.present? && @title != 3.5 && @title != 3.125 && @title != "Loan Amount"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update(sheet_name: @sheet_name)
+                  @program.update_fields @title
                   @programs_ids << @program.id
-                  # Program Property
-                  Program.new().update_fields @title
-                  # @program.adjustments.destroy_all
+                  @program.adjustments.destroy_all
                   key = ''
                   @block_hash = {}
                   (1..50).each do |max_row|
@@ -342,7 +341,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   end
                   if r >= 37 && r <= 45 && cc == 17
                     if value.include?("to")
-                      primary_key = value.sub('to','-').tr('$><% ','')
+                      primary_key = value.sub('to','-').tr('$><%, ','')
                     else
                       primary_key = get_value value
                     end
@@ -401,105 +400,16 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
             rr = r + 1
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
-
               cc = 4*max_column + (2+max_column) # 2, 7, 12, 17
               begin
                 @title = sheet_data.cell(r,cc)
-
-                # term
-                @term = nil
-                if @title.include?("30 Year") || @title.include?("30Yr") || @title.include?("30 Yr")
-                  @term = 30
-                elsif @title.include?("20 Year") || @title.include?("20 Yr")
-                  @term = 20
-                elsif @title.include?("15 Year") || @title.include?("15 Yr")
-                  @term = 15
-                elsif @title.include?("30/25 Yr")
-                  @term = 30
-                elsif @title.include?("10 Yr")
-                  @term = 10
-                end
-
-                # interest type
-                if @title.include?("Fixed")
-                  loan_type = "Fixed"
-                elsif @title.include?("ARM")
-                  loan_type = "ARM"
-                elsif @title.include?("Floating")
-                  loan_type = "Floating"
-                elsif @title.include?("Variable")
-                  loan_type = "Variable"
-                else
-                  loan_type = nil
-                end
-
-                # streamline
-                if @title.include?("FHA")
-                  @streamline = true
-                  @fha = true
-                  @full_doc = true
-                elsif @title.include?("VA")
-                  @streamline = true
-                  @va = true
-                  @full_doc = true
-                elsif @title.include?("USDA")
-                  @streamline = true
-                  @usda = true
-                  @full_doc = true
-                else
-                  @streamline = false
-                  @fha = false
-                  @va = false
-                  @usda = false
-                  @full_doc = false
-                end
-
-                # High Balance
-                if @title.include?("High Bal")
-                  @jumbo_high_balance = true
-                end
-
-                # Program Category
-                if @title.include?("C30/C25")
-                  @program_category = "C30/C25"
-                elsif @title.include?("C20")
-                  @program_category = "C20"
-                elsif @title.include?("C15")
-                  @program_category = "C15"
-                elsif @title.include?("C30")
-                  @program_category = "C30"
-                elsif @title.include?("C10")
-                  @program_category = "C10"
-                elsif @title.include?("C30JLP")
-                  @program_category = "C30JLP"
-                end
-
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @program.update(sheet_name: @sheet_name)
+                @program.update_fields @title
                 @programs_ids << @program.id
-                  # Loan Limit Type
-                if @title.include?("Non-Conforming")
-                  @program.loan_limit_type << "Non-Conforming"
-                end
-                if @title.include?("Conforming")
-                  @program.loan_limit_type << "Conforming"
-                end
-                if @title.include?("Jumbo")
-                  @program.loan_limit_type << "Jumbo"
-                end
-                if @title.include?("High Balance")
-                  @program.loan_limit_type << "High Balance"
-                end
-                @program.save
-                @program.update(term: @term,loan_type: loan_type,loan_purpose: "Purchase",streamline: @streamline,fha: @fha, va: @va, usda: @usda, full_doc: @full_doc)
-                # @program.adjustments.destroy_all
+                @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
-                # if @program.term.present?
-                #   main_key = "Term/LoanType/InterestRate/LockPeriod"
-                # else
-                #   main_key = "InterestRate/LockPeriod"
-                # end
                 @block_hash = {}
                 (1..50).each do |max_row|
                   @data = []
@@ -512,10 +422,6 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                         key = value
                         @block_hash[key] = {}
                       else
-                        if @program.lock_period.length <= 3
-                          @program.lock_period << 15*c_i
-                          @program.save
-                        end
                         @block_hash[key][15*c_i] = value
                       end
                       @data << value
@@ -525,9 +431,6 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                     break # terminate the loop
                   end
                 end
-                # if @block_hash.values.first.keys.first.nil? || @block_hash.values.first.keys.first == "Rate"
-                #   @block_hash.values.first.shift
-                # end
                 if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
@@ -709,7 +612,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   end
                   if r >= 91 && r <= 99 && cc == 13
                     if value.include?("to")
-                      ltv_key = value.sub('to','-').tr('$><% ','')
+                      ltv_key = value.sub('to','-').tr('$><%, ','')
                     else
                       ltv_key = get_value value
                     end
@@ -765,7 +668,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         elsif value1.include?(">") || value1.include?("+")
           value1 = value1.split(">").last.tr('^0-9', '')+"-Inf"
         else
-          value1 = value1.tr('A-Z ','')
+          value1 = value1.tr('A-Z, ','')
         end
       end
     end
@@ -897,4 +800,4 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
         end
       end
     end
-end
+  end
