@@ -406,7 +406,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @program.update(sheet_name: @sheet_name)
                 @program.update_fields @title
-                @programs_ids << @program.id                
+                @programs_ids << @program.id
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
