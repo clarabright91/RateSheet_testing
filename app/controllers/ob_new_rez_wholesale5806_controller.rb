@@ -960,9 +960,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 @block_hash["LockDay"] = {} unless @block_hash.has_key?("LockDay")
                 #  for high balance key
                 @block_hash["LoanSize/LoanPurpose/RefinanceOption"] = {} unless @block_hash.has_key?("LoanSize/LoanPurpose/RefinanceOption")
-                @block_hash["LoanSize/LoanPurpose/RefinanceOption"]["High Balance"] = {} unless @block_hash["LoanSize/LoanPurpose/RefinanceOption"].has_key?("High Balance")
+                @block_hash["LoanSize/LoanPurpose/RefinanceOption"]["High-Balance"] = {} unless @block_hash["LoanSize/LoanPurpose/RefinanceOption"].has_key?("High Balance")
                 @block_hash["LoanSize/RefinanceOption"] = {} unless @block_hash.has_key?("LoanSize/RefinanceOption")
-                @block_hash["LoanSize/RefinanceOption"]["High Balance"] = {} unless @block_hash["LoanSize/RefinanceOption"].has_key?("High Balance")
+                @block_hash["LoanSize/RefinanceOption"]["High-Balance"] = {} unless @block_hash["LoanSize/RefinanceOption"].has_key?("High Balance")
 
                 key = ''
                 another_key = ''
@@ -1181,10 +1181,10 @@ class ObNewRezWholesale5806Controller < ApplicationController
                       if [171,172].include?(rrr)
                         # for High Balance
                         if rrr.eql?(171) && index.eql?(19)
-                          @block_hash["LoanSize/LoanPurpose/RefinanceOption"]["High Balance"]["Purchase"] = {}
-                          @block_hash["LoanSize/LoanPurpose/RefinanceOption"]["High Balance"]["Purchase"]["Rate and Term"] = value
+                          @block_hash["LoanSize/LoanPurpose/RefinanceOption"]["High-Balance"]["Purchase"] = {}
+                          @block_hash["LoanSize/LoanPurpose/RefinanceOption"]["High-Balance"]["Purchase"]["Rate and Term"] = value
                         else
-                          @block_hash["LoanSize/RefinanceOption"]["High Balance"]["Cash Out"] = value
+                          @block_hash["LoanSize/RefinanceOption"]["High-Balance"]["Cash Out"] = value
                         end
                       end
 
@@ -5596,7 +5596,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 if value.present?
                   if value == "Pricing Adjustments"
                     @adjustment_hash["LoanSize/FICO/LTV"] = {}
-                    @adjustment_hash["LoanSize/FICO/LTV"]["High Balance"] = {}
+                    @adjustment_hash["LoanSize/FICO/LTV"]["High-Balance"] = {}
                   end
                   if value == "Cashout (adjustments are cumulative)"
                     @cash_out["RefinanceOption/FICO/LTV"] = {}
@@ -5613,7 +5613,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     else
                       ltv_key = get_value value
                     end
-                    @adjustment_hash["LoanSize/FICO/LTV"]["High Balance"][ltv_key] = {}
+                    @adjustment_hash["LoanSize/FICO/LTV"]["High-Balance"][ltv_key] = {}
                   end
                   if r >= 28 && r <= 32 && cc > 3 && cc <= 9
                     if @bal_data[cc-2].include?("<")
@@ -5621,8 +5621,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     else
                       bal_data = get_value @bal_data[cc-2]
                     end
-                    @adjustment_hash["LoanSize/FICO/LTV"]["High Balance"][ltv_key][bal_data] = {}
-                    @adjustment_hash["LoanSize/FICO/LTV"]["High Balance"][ltv_key][bal_data] = value
+                    @adjustment_hash["LoanSize/FICO/LTV"]["High-Balance"][ltv_key][bal_data] = {}
+                    @adjustment_hash["LoanSize/FICO/LTV"]["High-Balance"][ltv_key][bal_data] = value
                   end
                   # Cashout Adjustments
                   if r >= 34 && r <= 38 && cc == 2
@@ -5765,7 +5765,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @program.loan_limit_type << "Jumbo"
                 end
                 if @title.include?("High Balance")
-                  @program.loan_limit_type << "High Balance"
+                  @program.loan_limit_type << "High-Balance"
                 end
                 @program.save
                 @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: @sheet_name)
@@ -6264,10 +6264,10 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 @block_hash["LockDay"] = {} unless @block_hash.has_key?("LockDay")
                 #  for high balance key
                 @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"] = {} unless @block_hash.has_key?("LoanSize/LoanPurpose/RefinanceOption/LTV")
-                @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High Balance"] = {} unless @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"].has_key?("High Balance")
-                @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High Balance"]["Purchase"] = {} unless @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High Balance"].has_key?("Purchase")
+                @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High-Balance"] = {} unless @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"].has_key?("High Balance")
+                @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High-Balance"]["Purchase"] = {} unless @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High-Balance"].has_key?("Purchase")
                 @block_hash["LoanSize/RefinanceOption/LTV"] = {} unless @block_hash.has_key?("LoanSize/RefinanceOption/LTV")
-                @block_hash["LoanSize/RefinanceOption/LTV"]["High Balance"] = {} unless @block_hash["LoanSize/RefinanceOption/LTV"].has_key?("High Balance")
+                @block_hash["LoanSize/RefinanceOption/LTV"]["High-Balance"] = {} unless @block_hash["LoanSize/RefinanceOption/LTV"].has_key?("High Balance")
 
                 key = ''
                 another_key = ''
@@ -6389,9 +6389,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                       if [89,91].include?(rrr)
                         # for High Balance
                         if rrr.eql?(89) && index.eql?(16)
-                          @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High Balance"]["Purchase"]["Rate and Term"] = {} unless @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High Balance"]["Purchase"].has_key?("Rate and Term")
+                          @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High-Balance"]["Purchase"]["Rate and Term"] = {} unless @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High-Balance"]["Purchase"].has_key?("Rate and Term")
                         elsif rrr.eql?(91) && index.eql?(16)
-                          @block_hash["LoanSize/RefinanceOption/LTV"]["High Balance"]["Cash Out"] = {} unless @block_hash["LoanSize/RefinanceOption/LTV"]["High Balance"].has_key?("Cash Out")
+                          @block_hash["LoanSize/RefinanceOption/LTV"]["High-Balance"]["Cash Out"] = {} unless @block_hash["LoanSize/RefinanceOption/LTV"]["High-Balance"].has_key?("Cash Out")
                         end
                       end
 
@@ -6468,9 +6468,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         # for High Balance
                         ltv_value = set_range(sheet_data.cell(rrr,ccc - 1).split("LTV ")[-1]) if index.eql?(19)
                         if [89,90].include?(rrr) && index.eql?(19)
-                          @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High Balance"]["Purchase"]["Rate and Term"][ltv_value] = value
+                          @block_hash["LoanSize/LoanPurpose/RefinanceOption/LTV"]["High-Balance"]["Purchase"]["Rate and Term"][ltv_value] = value
                         elsif [91,92].include?(rrr) && index.eql?(19)
-                          @block_hash["LoanSize/RefinanceOption/LTV"]["High Balance"]["Cash Out"][ltv_value] = value
+                          @block_hash["LoanSize/RefinanceOption/LTV"]["High-Balance"]["Cash Out"][ltv_value] = value
                         end
                       end
 
@@ -7303,15 +7303,15 @@ class ObNewRezWholesale5806Controller < ApplicationController
                           first_key = sheet_data.cell(rrr,ccc - 5)
                           if ["High Balance Loan Adjustment - Fixed", "High Balance Loan Adjustment - ARM LTV ≤ 75", "High Balance Loan Adjustment - ARM LTV > 75"].include?(first_key)
                             if "High Balance Loan Adjustment - Fixed".include?(first_key)
-                              @block_hash["LoanSize/LoanType"]["High Balance"] = {}
-                              @block_hash["LoanSize/LoanType"]["High Balance"]["Fixed"] = {}
-                              @block_hash["LoanSize/LoanType"]["High Balance"]["Fixed"] = value
+                              @block_hash["LoanSize/LoanType"]["High-Balance"] = {}
+                              @block_hash["LoanSize/LoanType"]["High-Balance"]["Fixed"] = {}
+                              @block_hash["LoanSize/LoanType"]["High-Balance"]["Fixed"] = value
                             elsif "High Balance Loan Adjustment - ARM LTV ≤ 75".include?(first_key)
-                              @block_hash["LoanSize/LoanType/LTV"]["High Balance"] = {}
-                              @block_hash["LoanSize/LoanType/LTV"]["High Balance"]["ARM"] = {}
-                              @block_hash["LoanSize/LoanType/LTV"]["High Balance"]["ARM"]["0-75"] = value
+                              @block_hash["LoanSize/LoanType/LTV"]["High-Balance"] = {}
+                              @block_hash["LoanSize/LoanType/LTV"]["High-Balance"]["ARM"] = {}
+                              @block_hash["LoanSize/LoanType/LTV"]["High-Balance"]["ARM"]["0-75"] = value
                             elsif "High Balance Loan Adjustment - ARM LTV > 75".include?(first_key)
-                              @block_hash["LoanSize/LoanType/LTV"]["High Balance"]["ARM"]["75-Infinity"] = value
+                              @block_hash["LoanSize/LoanType/LTV"]["High-Balance"]["ARM"]["75-Infinity"] = value
                             end
                           else
                             @block_hash["PropertyType"][first_key] = value if ["2-4 Units", "Manufactured Home"].include?(first_key)

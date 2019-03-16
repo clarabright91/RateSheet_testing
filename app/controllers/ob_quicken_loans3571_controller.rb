@@ -233,21 +233,21 @@ class ObQuickenLoans3571Controller < ApplicationController
                   end
                   if r == 62 && cc == 13
                     @other_adjustment["LoanSize/LoanType/RefinanceOption"] = {}
-                    @other_adjustment["LoanSize/LoanType/RefinanceOption"]["High Balance"] = {}
-                    @other_adjustment["LoanSize/LoanType/RefinanceOption"]["High Balance"]["ARM"] = {}
-                    @other_adjustment["LoanSize/LoanType/RefinanceOption"]["High Balance"]["ARM"]["Cash Out"] = {}
+                    @other_adjustment["LoanSize/LoanType/RefinanceOption"]["High-Balance"] = {}
+                    @other_adjustment["LoanSize/LoanType/RefinanceOption"]["High-Balance"]["ARM"] = {}
+                    @other_adjustment["LoanSize/LoanType/RefinanceOption"]["High-Balance"]["ARM"]["Cash Out"] = {}
                     cc = cc + 8
                     new_value = sheet_data.cell(r,cc)
-                    @other_adjustment["LoanSize/LoanType/RefinanceOption"]["High Balance"]["ARM"]["Cash Out"] = new_value
+                    @other_adjustment["LoanSize/LoanType/RefinanceOption"]["High-Balance"]["ARM"]["Cash Out"] = new_value
                   end
                   if r == 63 && cc == 13
                     @other_adjustment["LoanSize/LoanType/FannieMaeProduct"] = {}
-                    @other_adjustment["LoanSize/LoanType/FannieMaeProduct"]["High Balance"] = {}
-                    @other_adjustment["LoanSize/LoanType/FannieMaeProduct"]["High Balance"]["ARM"] = {}
-                    @other_adjustment["LoanSize/LoanType/FannieMaeProduct"]["High Balance"]["ARM"]["Home Ready"] = {}
+                    @other_adjustment["LoanSize/LoanType/FannieMaeProduct"]["High-Balance"] = {}
+                    @other_adjustment["LoanSize/LoanType/FannieMaeProduct"]["High-Balance"]["ARM"] = {}
+                    @other_adjustment["LoanSize/LoanType/FannieMaeProduct"]["High-Balance"]["ARM"]["Home Ready"] = {}
                     cc = cc + 8
                     new_value = sheet_data.cell(r,cc)
-                    @other_adjustment["LoanSize/LoanType/FannieMaeProduct"]["High Balance"]["ARM"]["Home Ready"] = new_value
+                    @other_adjustment["LoanSize/LoanType/FannieMaeProduct"]["High-Balance"]["ARM"]["Home Ready"] = new_value
                   end
                   if r >= 64 && r <= 65 && cc == 13
                     secondary_key = get_value value
@@ -618,31 +618,31 @@ class ObQuickenLoans3571Controller < ApplicationController
                   if r == 56 && cc == 18
                     @other_adjustment["FannieMae/LoanSize/LoanType/LTV"] = {}
                     @other_adjustment["FannieMae/LoanSize/LoanType/LTV"][true] = {}
-                    @other_adjustment["FannieMae/LoanSize/LoanType/LTV"][true]["High Balance"] = {}
-                    @other_adjustment["FannieMae/LoanSize/LoanType/LTV"][true]["High Balance"]["ARM"] = {}
-                    @other_adjustment["FannieMae/LoanSize/LoanType/LTV"][true]["High Balance"]["ARM"]["0-80"] = {}
+                    @other_adjustment["FannieMae/LoanSize/LoanType/LTV"][true]["High-Balance"] = {}
+                    @other_adjustment["FannieMae/LoanSize/LoanType/LTV"][true]["High-Balance"]["ARM"] = {}
+                    @other_adjustment["FannieMae/LoanSize/LoanType/LTV"][true]["High-Balance"]["ARM"]["0-80"] = {}
                     cc = cc + 7
                     new_value = sheet_data.cell(r,cc)
-                    @other_adjustment["FannieMae/LoanSize/LoanType/LTV"][true]["High Balance"]["ARM"]["0-80"] = new_value
+                    @other_adjustment["FannieMae/LoanSize/LoanType/LTV"][true]["High-Balance"]["ARM"]["0-80"] = new_value
                   end
                   if r == 57 && cc == 18
-                    @other_adjustment["FannieMae/LoanSize/LoanType/LTV"][true]["High Balance"]["ARM"]["80-Inf"] = {}
+                    @other_adjustment["FannieMae/LoanSize/LoanType/LTV"][true]["High-Balance"]["ARM"]["80-Inf"] = {}
                     cc = cc + 7
                     new_value = sheet_data.cell(r,cc)
-                    @other_adjustment["FannieMae/LoanSize/LoanType/LTV"][true]["High Balance"]["ARM"]["80-Inf"] = new_value
+                    @other_adjustment["FannieMae/LoanSize/LoanType/LTV"][true]["High-Balance"]["ARM"]["80-Inf"] = new_value
                   end
                   if r == 58 && cc == 18
                     @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"] = {}
                     @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"][true] = {}
-                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"][true]["High Balance"] = {}
-                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"][true]["High Balance"]["2nd Home"] = {}
-                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"][true]["High Balance"]["Investment"] = {}
-                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"][true]["High Balance"]["2nd Home"]["80-Inf"] = {}
-                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"][true]["High Balance"]["Investment"]["80-Inf"] = {}
+                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"][true]["High-Balance"] = {}
+                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"][true]["High-Balance"]["2nd Home"] = {}
+                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"][true]["High-Balance"]["Investment"] = {}
+                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"][true]["High-Balance"]["2nd Home"]["80-Inf"] = {}
+                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"][true]["High-Balance"]["Investment"]["80-Inf"] = {}
                     cc = cc + 7
                     new_value = sheet_data.cell(r,cc)
-                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"][true]["High Balance"]["2nd Home"]["80-Inf"] = new_value
-                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"][true]["High Balance"]["Investment"]["80-Inf"] = new_value
+                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"][true]["High-Balance"]["2nd Home"]["80-Inf"] = new_value
+                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"][true]["High-Balance"]["Investment"]["80-Inf"] = new_value
                   end
                   if r >= 61 && r <= 63 && cc == 16
                     secondary_key = get_value value
