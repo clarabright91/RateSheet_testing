@@ -146,26 +146,15 @@ class DashboardController < ApplicationController
       @program_term = params[:term].to_i
     end
 
-    if params[:fannie_options].present?
-      if params[:fannie_options] == "Fannie Mae"
-        @filter_data[:fannie_mae] = true
-      elsif params[:fannie_options] == "Freddie Mac"
-        @filter_data[:freddie_mac] = true
-      end
-    end
 
-    if params[:gov].present?
-      if params[:gov] == "FHA"
-        @filter_data[:fha] = true
-      elsif params[:gov] == "VA"
-        @filter_data[:va] = true
-      elsif params[:gov] == "USDA"
-        @filter_data[:usda] = true
-      elsif params[:gov] == "FHA" || params[:gov] == "VA" || params[:gov] == "USDA"
-        @filter_data[:streamline] = true
-        @filter_data[:full_doc] = true
-      end
-    end
+    @filter_data[:fannie_mae] = true if params[:fannie_mae].present?
+    @filter_data[:freddie_mac] = true if params[:freddie_mac].present?
+
+    @filter_data[:fha] = true if params[:fha].present?
+    @filter_data[:va] = true if params[:va].present?
+    @filter_data[:usda] = true if params[:usda].present?
+    @filter_data[:streamline] = true if params[:streamline].present?
+    @filter_data[:full_doc] = true if params[:full_doc].present?
 
     if params[:loan_size].present?
       @loan_size = params[:loan_size]
@@ -173,10 +162,6 @@ class DashboardController < ApplicationController
         @filter_data[:conforming] = false
       elsif params[:loan_size] == "Conforming"
         @filter_data[:conforming] = true
-      # elsif params[:loan_size] == "Jumbo"
-      #   @filter_data[:jumbo] = true
-      # elsif params[:loan_size] == "High-Balance"
-      #   @filter_data[:high_balance] = true
       end
     end
 
