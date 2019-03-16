@@ -207,7 +207,7 @@ class ObMTBankWholesale9996Controller < ApplicationController
       @program.loan_limit_type << "Jumbo"
     end
     if @program.program_name.include?("High Balance")
-      @program.loan_limit_type << "High Balance"
+      @program.loan_limit_type << "High-Balance"
     end
     @program.save
     @program.update(arm_basic: arm_basic,term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, jumbo_high_balance: jumbo_high_balance, loan_size: loan_size, sheet_name: @sheet_name, arm_advanced: arm_advanced)

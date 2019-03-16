@@ -1901,7 +1901,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         @program.loan_limit_type << "Jumbo"
       end
       if @program.program_name.include?("High Balance")
-        @program.loan_limit_type << "High Balance"
+        @program.loan_limit_type << "High-Balance"
       end
       @program.save
       @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline,sheet_name: @sheet_name)
