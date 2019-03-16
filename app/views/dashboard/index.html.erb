@@ -45,7 +45,6 @@
                       </div>
                     </div>
                   </div>
-
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>Loan Type</label>
@@ -53,7 +52,6 @@
                       <%= select_tag 'loan_type', options_for_select(@loan_type_list, (params[:loan_type] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control"} %>
                     </div>
                   </div>
-
                   <div class="col-md-4 term">
                     <div class="form-group">
                       <label>Term</label>
@@ -63,7 +61,6 @@
                       </div>
                     </div>
                   </div>
-
                   <div class="col-md-3 arm-basic">
                     <div class="form-group">
                       <label>ARM Basic</label>
@@ -73,7 +70,6 @@
                       </div>
                     </div>
                   </div>
-
                   <div class="col-md-3 arm-basic">
                     <div class="form-group">
                       <label>ARM Advance</label>
@@ -85,7 +81,6 @@
               </div>
             </div>
           </div>
-
           <div class="row">
             <div class="col-md-3">
               <div class="program-panel panel-basic">
@@ -107,31 +102,30 @@
               <div class="program-panel panel-basic">
                 <div class="input-grp"><h5>FM</h5></div>
                 <div class="row panel-body">
-                    <div class="col-md-4">
-                      <div class="form-group">
-                        <label>Fannie Options</label>
-                        <div class="input-group">
-                          <% @loan_limit_type_list =[["Fannie Mae"], ["Freddie Mac"]] %>
-                          <%= select_tag 'fannie_options', options_for_select(@loan_limit_type_list, (params[:fannie_options] rescue nil)), { prompt: 'Select Fannie', :class=> "form-control" }%>
-                        </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <div class="checkbox">
+                        <label> <%= check_box_tag 'fannie_mae', 'fannie_mae', params[:fannie_mae].present? %> Fannie Mae</label>
+                      </div>
+                      <div class="checkbox">
+                        <label> <%= check_box_tag 'freddie_mac', 'freddie_mac', params[:freddie_mac].present? %> Freddie Mac</label>
                       </div>
                     </div>
-
-                    <div class="col-md-4">
-                      <div class="form-group">
-                        <label>Fannie Mae Product</label>
-                        <% @fannie_mae_product_list =[["All"], ["HomeReady"]]%>
-                        <%= select_tag 'fannie_mae_product', options_for_select(@fannie_mae_product_list, (params[:fannie_mae_product] rescue nil)), { :class=> "form-control", :required => true} %>
-                      </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label>Fannie Mae Product</label>
+                      <% @fannie_mae_product_list =[["All"], ["HomeReady"]]%>
+                      <%= select_tag 'fannie_mae_product', options_for_select(@fannie_mae_product_list, (params[:fannie_mae_product] rescue nil)), { :class=> "form-control", :required => true} %>
                     </div>
-
-                    <div class="col-md-4">
-                      <div class="form-group">
-                        <label>Freddie Mac Product</label>
-                        <% @freddie_mac_product_list =[["All"], ["Home Possible"]]%>
-                        <%= select_tag 'freddie_mac_product', options_for_select(@freddie_mac_product_list, (params[:freddie_mac_product] rescue nil)), { :class=> "form-control", :required => true} %>
-                      </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label>Freddie Mac Product</label>
+                      <% @freddie_mac_product_list =[["All"], ["Home Possible"]]%>
+                      <%= select_tag 'freddie_mac_product', options_for_select(@freddie_mac_product_list, (params[:freddie_mac_product] rescue nil)), { :class=> "form-control", :required => true} %>
                     </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -141,10 +135,17 @@
                 <div class="row panel-body">
                   <div class="col-md-12">
                     <div class="form-group">
-                      <!-- <label>Gov</label> -->
-                      <div class="input-group">
-                        <% @gov_list =[["FHA"], ["VA"], ["USDA"], ["Streamline"]]%>
-                        <%= select_tag 'gov', options_for_select(@gov_list, (params[:gov] rescue nil)), { prompt: 'Select Gov', :class=> "form-control" }%>
+                      <div class="checkbox">
+                        <label> <%= check_box_tag 'fha', 'fha', params[:fha].present? %> FHA</label>
+                      </div>
+                      <div class="checkbox">
+                        <label><%= check_box_tag 'va', 'va', params[:va].present? %> VA</label>
+                      </div>
+                      <div class="checkbox">
+                        <label><%= check_box_tag 'usda', 'usda', params[:usda].present? %> USDA</label>
+                      </div>
+                      <div class="checkbox">
+                        <label><%= check_box_tag 'streamline', 'streamline', params[:streamline].present? %> Streamline</label>
                       </div>
                     </div>
                   </div>
@@ -152,21 +153,21 @@
               </div>
             </div>
           </div>
-
-
-
-
-
           <div class="row">
+            <div class="col-md-2">
+              <div class="form-group">
+                <div class="checkbox">
+                  <label><%= check_box_tag 'full_doc', 'full_doc', params[:full_doc].present? %> Full Doc</label>
+                </div>
+              </div>
+            </div>
             <div class="col-md-2">
               <div class="form-group">
                 <label>Interest Rate</label>
                  <% @interest_list =[["3.250"],["3.375"],["3.500"],["3.625"],["3.750"],["3.875"],["4.000"],["4.125"],["4.250"],["4.375"],["4.500"],["4.625"],["4.750"],["4.875"],["5.000"],["5.125"],["5.250"],["5.375"],["5.500"],["5.625"],["5.750"],["5.875"]]%>
                 <%= select_tag 'interest', options_for_select(@interest_list, @interest), :class=> "form-control" %>
-                <%#= text_field_tag :interest,@interest, :class=> "form-control" %>
               </div>
             </div>
-
             <div class="col-md-2">
               <div class="form-group">
                 <label>Lock Period</label>
@@ -187,7 +188,6 @@
               <div class="form-group">
                 <label>Credit Score</label>
                 <div class="input-group">
-                  <%# @credit_score_list =  UserInput.first.present? ? UserInput.first.fico.map{|b| [b]} : []%>
                   <% @credit_score_list = [["760 +", "760 +"], ["740-759", "740-759"], ["720-739", "720-739"], ["700-719", "700-719"], ["680-699", "680-699"], ["660-679", "660-679"], ["640-659", "640-659"], ["620-639", "620-639"]] %>
                   <%= select_tag 'credit_score', options_for_select(@credit_score_list, (params[:credit_score] rescue nil)), :class=> "form-control" %>
                 </div>
@@ -309,7 +309,6 @@
           </div>
         </div>
       </div>
-
       <div class="row">
         <div class="col-md-8"></div>
         <div class="col-md-4">
@@ -320,7 +319,7 @@
             <%= submit_tag "Search", :class => "btn btn-info btn-block" %>
           </div>
         </div>
-
+      </div>
     <% end %>
   </div>
   <!-- end searching form -->
