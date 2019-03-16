@@ -62,6 +62,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
     @xlsx.sheets.each do |sheet|
       if (sheet == "Government")
         @sheet_name = sheet
+        @program_ids = []
         @sheet = sheet
         @credit_hash = {}
         @loan_hash = {}
@@ -86,51 +87,97 @@ class ObNewRezWholesale5806Controller < ApplicationController
               cc = 3 + max_column*6 # (3 / 9 / 15)
               begin
                 @title = sheet_data.cell(r,cc)
-                # term
-                program_heading = @title.split
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  @program_ids << @program.id
+                  @program.adjustments.destroy_all
+                  # rate arm
+                  if @title.include?("10yr") || @title.include?("10 Yr")
+                    term = 10
+                  elsif @title.include?("15yr") || @title.include?("15 Yr")
+                    term = 15
+                  elsif @title.include?("20yr") || @title.include?("20 Yr")
+                    term = 20
+                  elsif @title.include?("25yr") || @title.include?("25 Yr")
+                    term = 25
+                  elsif @title.include?("30yr") || @title.include?("30 Yr")
+                    term = 30
+                  end
 
-                # rate arm
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                @programs_ids << @program.id
-                @program.update_fields @title
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                if @program.fha
-                  gov_key = "FHA"
-                elsif @program.va
-                  gov_key = "VA"
-                elsif @program.usda
-                  gov_key = "USDA"
-                end
-                if @program.term.present?
-                  term = @program.term
-                end
-                if @program.loan_type.present?
-                  loan_type = @program.loan_type
-                end
+                  if @title.include?("Fixed")
+                    loan_type = "Fixed"
+                  elsif @title.include?("ARM")
+                    loan_type = "ARM"
+                  elsif @title.include?("Floating")
+                    loan_type = "Floating"
+                  elsif @title.include?("Variable")
+                    loan_type = "Variable"
+                  else
+                    loan_type = nil
+                  end
 
-                (1..23).each do |max_row|
-                  @data = []
-                  (0..4).each_with_index do |index, c_i|
-                    rrr = rr + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if value.present?
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+                  # rate arm
+                  if @title.include?("3-1 ARM") || @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM")
+                    arm_basic = @title.scan(/\d+/)[0].to_i
+                  end
+
+                  freddie_mac = false
+                  if @title.downcase.include?("freddie mac")
+                    freddie_mac = true
+                  end
+
+                  conforming = false
+                  if @title.downcase.include?("conforming") 
+                    conforming = true
+                  end
+
+                  fannie_mae = false
+                  if @title.downcase.include?("Fannie Mae")
+                    fannie_mae = true
+                  end
+                  # Arm Advanced
+                  if @title.downcase.include?("arm")
+                    arm_advanced = @title.split("ARM").last.tr('A-Za-z ()', '')
+                  end
+                  # High Balance
+                  if @title.include?("High Balance")
+                    loan_size = "High-Balance"
+                  end
+                  # Fha, va, usda
+                  if @title.downcase.include?("fha")
+                    fha = true
+                  end
+                  if @title.downcase.include?("va")
+                    va = true
+                  end
+                  if @title.downcase.include?("usda")
+                    usda = true
+                  end
+                  @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fha: fha, va: va, usda: usda, fannie_mae: fannie_mae, loan_size: loan_size, sheet_name: @sheet_name, arm_basic: arm_basic, arm_advanced: arm_advanced)
+                  @block_hash = {}
+                  key = ''
+                  (1..23).each do |max_row|
+                    @data = []
+                    (0..4).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
+                    end
+                    if @data.compact.reject { |c| c.blank? }.length == 0
+                      break # terminate the loop
                     end
                   end
-                  if @data.compact.reject { |c| c.blank? }.length == 0
-                    break # terminate the loop
-                  end
+                  @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
                 end
-                @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
               rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                 error_log.save
@@ -376,7 +423,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @program.loan_limit_type << "High Balance"
                 end
                 @program.save
-                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, sheet_name: @sheet_name, fannie_mae: fannie_mae)
+                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, sheet_name: @sheet_name, fannie_mae: fannie_mae)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -839,7 +886,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @program.loan_limit_type << "High Balance"
                 end
                 @program.save
-                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae,loan_size: loan_size, sheet_name: @sheet_name)
+                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae,loan_size: loan_size, sheet_name: @sheet_name)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -1291,7 +1338,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
                   @program.save
                   @program.adjustments.destroy_all
-                  @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, sheet_name: @sheet_name,arm_basic: arm_basic)
+                  @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, sheet_name: @sheet_name,arm_basic: arm_basic)
                   @program.adjustments.destroy_all
                   @block_hash = {}
                   key = ''
@@ -1388,7 +1435,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
                 @program.save
                 @program.adjustments.destroy_all
-                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, sheet_name: @sheet_name,arm_basic: arm_basic)
+                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, sheet_name: @sheet_name,arm_basic: arm_basic)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -1822,7 +1869,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
   #                 @program.loan_limit_type << "High Balance"
   #               end
   #               @program.save
-  #               @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: sheet)
+  #               @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: sheet)
   #               @program.adjustments.destroy_all
   #               @block_hash = {}
   #               key = ''
@@ -2106,7 +2153,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
   #                 @program.loan_limit_type << "High Balance"
   #               end
   #               @program.save
-  #               @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: sheet)
+  #               @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: sheet)
   #               @program.adjustments.destroy_all
   #               @block_hash = {}
   #               key = ''
@@ -2346,7 +2393,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @program.loan_limit_type << "High Balance"
                 end
                 @program.save
-                  @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase", sheet_name: @sheet_name)
+                  @program.update(term: term,loan_type: loan_type, sheet_name: @sheet_name)
                   @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -2663,7 +2710,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
   #                 @program.loan_limit_type << "High Balance"
   #               end
   #               @program.save
-  #               @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: sheet)
+  #               @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: sheet)
   #               @program.adjustments.destroy_all
   #               @block_hash = {}
   #               key = ''
@@ -2947,7 +2994,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @program.loan_limit_type << "High Balance"
                 end
                 @program.save
-                @program.update(term: term,loan_type: @loan_type,loan_purpose: "Purchase",arm_basic: arm_basic, sheet_name: @sheet_name)
+                @program.update(term: term,loan_type: @loan_type,arm_basic: arm_basic, sheet_name: @sheet_name)
                 @block_hash = {}
                 key = ''
                 # main_key = ''
@@ -3251,7 +3298,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
   #                 @program.loan_limit_type << "High Balance"
   #               end
   #               @program.save
-  #               @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: sheet, jumbo_high_balance: jumbo_high_balance)
+  #               @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: sheet, jumbo_high_balance: jumbo_high_balance)
   #               @program.adjustments.destroy_all
   #               @block_hash = {}
   #               key = ''
@@ -3865,7 +3912,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
   #                 @program.loan_limit_type << "High Balance"
   #               end
   #               @program.save
-  #               @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: sheet)
+  #               @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: sheet)
   #               @program.adjustments.destroy_all
   #               @block_hash = {}
   #               key = ''
@@ -4682,7 +4729,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
   #                 @program.loan_limit_type << "High Balance"
   #               end
   #               @program.save
-  #               @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming, arm_basic: arm_basic, sheet_name: sheet, jumbo_high_balance: jumbo_high_balance)
+  #               @program.update(term: term,loan_type: loan_type,conforming: conforming, arm_basic: arm_basic, sheet_name: sheet, jumbo_high_balance: jumbo_high_balance)
   #               @program.adjustments.destroy_all
   #               @block_hash = {}
   #               key = ''
@@ -5212,7 +5259,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
 
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @program_ids << @program.id
-                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: @sheet_name)
+                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: @sheet_name)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -5452,110 +5499,82 @@ class ObNewRezWholesale5806Controller < ApplicationController
         bal_data = ''
         sub_data = ''
         @sheet = sheet
-        (1..23).each do |r|
+        (5..23).each do |r|
           row = sheet_data.row(r)
           if (row.compact.include?("High Balance Extra 30 Yr Fixed"))
-            max_column_section = row.compact.count - 1
+            rr = r + 1
+            max_column_section = row.compact.count
             (0..max_column_section).each do |max_column|
               cc = 2 + max_column*6 # (3 / 9 / 15)
               begin
                 # title
                 @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  # term
+                  term = nil
+                  if @title.include?("10yr") || @title.include?("10 Yr")
+                    term = @title.scan(/\d+/)[0]
+                  elsif @title.include?("15yr") || @title.include?("15 Yr")
+                    term = @title.scan(/\d+/)[0]
+                  elsif @title.include?("20yr") || @title.include?("20 Yr")
+                    term = @title.scan(/\d+/)[0]
+                  elsif @title.include?("25yr") || @title.include?("25 Yr")
+                    term = @title.scan(/\d+/)[0]
+                  elsif @title.include?("30yr") || @title.include?("30 Yr")
+                    term = @title.scan(/\d+/)[0]
+                  end
 
-                # term
-                term = nil
-                program_heading = @title.split
-                if @title.include?("10yr") || @title.include?("10 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("15yr") || @title.include?("15 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("20yr") || @title.include?("20 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("25yr") || @title.include?("25 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("30yr") || @title.include?("30 Yr")
-                  term = @title.scan(/\d+/)[0]
-                end
 
-
-                # rate type
-                if @title.include?("Fixed")
-                  loan_type = "Fixed"
-                elsif @title.include?("ARM")
-                  loan_type = "ARM"
-                elsif @title.include?("Floating")
-                  loan_type = "Floating"
-                elsif @title.include?("Variable")
-                  loan_type = "Variable"
-                else
-                  loan_type = nil
-                end
-
-                # rate arm
-                if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
-                  arm_basic = @title.scan(/\d+/)[0].to_i
-                end
-                # High Balance
-                jumbo_high_balance = false
-                if @title.include?("High Balance")
-                  jumbo_high_balance = true
-                end
-
-                @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                @program_ids << @program.id
-                # Loan Limit Type
-                if @title.include?("Non-Conforming")
-                  @program.loan_limit_type << "Non-Conforming"
-                end
-                if @title.include?("Conforming")
-                  @program.loan_limit_type << "Conforming"
-                end
-                if @title.include?("Jumbo")
-                  @program.loan_limit_type << "Jumbo"
-                end
-                if @title.include?("High Balance")
-                  @program.loan_limit_type << "High Balance"
-                end
-                @program.save
-                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase", arm_basic: arm_basic, sheet_name: @sheet_name, jumbo_high_balance: jumbo_high_balance)
-                @program.adjustments.destroy_all
-                @block_hash = {}
-                key = ''
-                # main_key = ''
-                # if @program.term.present?
-                #   main_key = "Term/LoanType/InterestRate/LockPeriod"
-                # else
-                #   main_key = "InterestRate/LockPeriod"
-                # end
-                # @block_hash[main_key] = {}
-                (0..50).each do |max_row|
-                  @data = []
-                  (0..4).each_with_index do |index, c_i|
-                    rrr = r + max_row
-                    ccc = cc + c_i
-                    value = sheet_data.cell(rrr,ccc)
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[key] = {}
-                    else
-                      if @program.lock_period.length <= 3
-                        @program.lock_period << 15*c_i
-                        @program.save
+                  # rate type
+                  if @title.include?("Fixed")
+                    loan_type = "Fixed"
+                  elsif @title.include?("ARM")
+                    loan_type = "ARM"
+                  elsif @title.include?("Floating")
+                    loan_type = "Floating"
+                  elsif @title.include?("Variable")
+                    loan_type = "Variable"
+                  else
+                    loan_type = nil
+                  end
+                  # rate arm
+                  if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
+                    arm_basic = @title.scan(/\d+/)[0].to_i
+                  end
+                  # High Balance
+                  if @title.include?("High Balance")
+                    loan_size = "High-Balance"
+                  end
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  @program_ids << @program.id
+                  @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, sheet_name: @sheet_name, loan_size: loan_size)
+                  @program.adjustments.destroy_all
+                  @block_hash = {}
+                  key = ''
+                  (0..50).each do |max_row|
+                    @data = []
+                    (0..4).each_with_index do |index, c_i|
+                      rrr = rr + max_row
+                      ccc = cc + c_i
+                      value = sheet_data.cell(rrr,ccc)
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        @block_hash[key][15*c_i] = value
                       end
-                      @block_hash[key][15*c_i] = value
+                      @data << value
                     end
-                    @data << value
-                  end
 
-                  if @data.compact.length == 0
-                    break # terminate the loop
+                    if @data.compact.length == 0
+                      break # terminate the loop
+                    end
                   end
-                end
-                if @block_hash.values.first.keys.first.nil?
-                  @block_hash.values.first.shift
-                end
-                @block_hash.delete(nil)
-                @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
+                  if @block_hash.values.first.keys.first.nil? || @block_hash.keys.first == "Rate"
+                    @block_hash.shift
+                  end
+                  @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
+              end
               rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, sheet_name: @sheet_name, error_detail: e.message)
                 error_log.save
@@ -5749,7 +5768,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @program.loan_limit_type << "High Balance"
                 end
                 @program.save
-                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: @sheet_name)
+                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, sheet_name: @sheet_name)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -6117,7 +6136,6 @@ class ObNewRezWholesale5806Controller < ApplicationController
               begin
                 @title = sheet_data.cell(r,cc)
                 term = nil
-                program_heading = @title.split
                 if @title.include?("10yr") || @title.include?("10 Yr")
                   term = @title.scan(/\d+/)[0]
                 elsif @title.include?("15yr") || @title.include?("15 Yr")
@@ -6148,53 +6166,45 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
 
                 freddie_mac = false
-                if @title.include?("Freddie Mac")
+                if @title.downcase.include?("freddie mac")
                   freddie_mac = true
                 end
 
                 conforming = false
-                if @title.include?("Freddie Mac") || @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Possible") || @title.include?("Freddie Mac Home Ready")
+                if @title.downcase.include?("conforming") 
                   conforming = true
                 end
 
                 fannie_mae = false
-                if @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Ready")
+                if @title.downcase.include?("Fannie Mae")
                   fannie_mae = true
                 end
-
+                # Arm Advanced
+                if @title.downcase.include?("arm")
+                  arm_advanced = @title.split("ARM").last.tr('A-Za-z ()', '')
+                end
                 # High Balance
-                jumbo_high_balance = false
                 if @title.include?("High Balance")
-                  jumbo_high_balance = true
+                  loan_size = "High-Balance"
+                end
+
+                # Fha, va, usda
+                if @title.downcase.include?("fha")
+                  fha = true
+                end
+                if @title.downcase.include?("va")
+                  va = true
+                end
+                if @title.downcase.include?("usda")
+                  usda = true
                 end
 
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @program_ids << @program.id
-                # Loan Limit Type
-                if @title.include?("Non-Conforming")
-                  @program.loan_limit_type << "Non-Conforming"
-                end
-                if @title.include?("Conforming")
-                  @program.loan_limit_type << "Conforming"
-                end
-                if @title.include?("Jumbo")
-                  @program.loan_limit_type << "Jumbo"
-                end
-                if @title.include?("High Balance")
-                  @program.loan_limit_type << "High Balance"
-                end
-                @program.save
-                # @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, jumbo_high_balance: jumbo_high_balance, sheet_name: @sheet_name, arm_basic: arm_basic)
+     
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
-                # main_key = ''
-                # if @program.term.present?
-                #   main_key = "Term/LoanType/InterestRate/LockPeriod"
-                # else
-                #   main_key = "InterestRate/LockPeriod"
-                # end
-                # @block_hash[main_key] = {}
                 (0..50).each do |max_row|
                   @data = []
                   (0..4).each_with_index do |index, c_i|
@@ -6205,10 +6215,6 @@ class ObNewRezWholesale5806Controller < ApplicationController
                       key = value
                       @block_hash[key] = {}
                     else
-                      if @program.lock_period.length <= 3
-                        @program.lock_period << 15*c_i
-                        @program.save
-                      end
                       @block_hash[key][15*c_i] = value
                     end
                     @data << value
@@ -6221,8 +6227,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 if @block_hash.values.first.keys.first.nil?
                   @block_hash.values.first.shift
                 end
-                @block_hash.delete(nil)
-                @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, jumbo_high_balance: jumbo_high_balance, sheet_name: @sheet_name, arm_basic: arm_basic,base_rate: @block_hash)
+                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fha: fha, va: va, usda: usda, fannie_mae: fannie_mae, loan_size: loan_size, sheet_name: @sheet_name, arm_basic: arm_basic, arm_advanced: arm_advanced ,base_rate: @block_hash)
 
                 # @program.update(base_rate: @block_hash,sheet_name: @sheet_name)
               rescue Exception => e
@@ -6610,7 +6615,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @program.loan_limit_type << "High Balance"
                 end
                 @program.save
-                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, loan_purpose: "Purchase", fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, conforming: conforming, sheet_name: @sheet_name)
+                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic,  fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, conforming: conforming, sheet_name: @sheet_name)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -7024,7 +7029,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_ids << @program.id
-                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, loan_purpose: "Purchase", fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, conforming: conforming, sheet_name: @sheet_name)
+                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic,  fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, conforming: conforming, sheet_name: @sheet_name)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
