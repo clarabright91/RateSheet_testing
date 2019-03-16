@@ -344,7 +344,7 @@
           <tr>
             <td><%= index +1 %></td>
             <td><%= program[:program_name] %></td>
-            <td><%= (program[:base_rate]).round(2) %></td>
+            <td><%= (program[:base_rate].to_f).round(2) %></td>
             <td><%= program[:sheet_name] %></td>
             <td><%= program[:bank_name] %></td>
             <td><%= program[:adj_points] %></td>

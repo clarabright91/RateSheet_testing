@@ -271,6 +271,8 @@ class DashboardController < ApplicationController
         hash_obj[:base_rate] = pro.base_rate[@interest.to_f.to_s][@lock_period]
       elsif (pro.base_rate[@interest.to_s][@lock_period].present?)
         hash_obj[:base_rate] = pro.base_rate[@interest.to_s][@lock_period]
+      else
+        hash_obj[:base_rate] = 0.0
       end
 
       if pro.adjustments.present?
