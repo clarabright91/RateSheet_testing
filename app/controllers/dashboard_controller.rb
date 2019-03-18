@@ -270,68 +270,68 @@ class DashboardController < ApplicationController
               if key_index==0
                 if key_name == "LockDay"
                   begin
-                    if adj.data[first_key][@property_type].present?
+                    if adj.data[first_key][@lock_period].present?
                       adj_key_hash[key_index] = @lock_period
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "ArmBasic"
                   begin
-                    if adj.data[first_key][@property_type].present?
+                    if adj.data[first_key][@arm_basic].present?
                       adj_key_hash[key_index] = @arm_basic
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "ArmAdvanced"
                   begin
-                    if adj.data[first_key][@property_type].present?
+                    if adj.data[first_key][@arm_advanced].present?
                       adj_key_hash[key_index] = @arm_advanced
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "FannieMaeProduct"
                   begin
-                    if adj.data[first_key][@property_type].present?
+                    if adj.data[first_key][@fannie_mae_product].present?
                       adj_key_hash[key_index] = @fannie_mae_product
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "FreddieMacProduct"
                   begin
-                    if adj.data[first_key][@property_type].present?
+                    if adj.data[first_key][@freddie_mac_product].present?
                       adj_key_hash[key_index] = @freddie_mac_product
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "LoanPurpose"
                   begin
-                    if adj.data[first_key][@property_type].present?
+                    if adj.data[first_key][@loan_purpose].present?
                       adj_key_hash[key_index] = @loan_purpose
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -367,19 +367,19 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
                 if key_name == "ProgramCategory"
                   begin
-                    if adj.data[first_key][@property_type].present?
+                    if adj.data[first_key][@program_category].present?
                       adj_key_hash[key_index] = @program_category
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -391,7 +391,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "FinancingType"
@@ -402,7 +402,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "PremiumType"
@@ -413,7 +413,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -452,7 +452,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -491,7 +491,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -511,7 +511,7 @@ class DashboardController < ApplicationController
                       adj_key_hash[key_index] = @refinance_option
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -523,7 +523,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -535,7 +535,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -574,7 +574,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -595,7 +595,7 @@ class DashboardController < ApplicationController
                       end
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -607,7 +607,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -630,7 +630,7 @@ class DashboardController < ApplicationController
                       end
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -642,7 +642,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -650,68 +650,68 @@ class DashboardController < ApplicationController
               if key_index==1
                 if key_name == "LockDay"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-1]][@lock_period].present?
                       adj_key_hash[key_index] = @lock_period
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "ArmBasic"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-1]][@arm_basic].present?
                       adj_key_hash[key_index] = @arm_basic
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "ArmAdvanced"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-1]][@arm_advanced].present?
                       adj_key_hash[key_index] = @arm_advanced
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "FannieMaeProduct"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-1]][@fannie_mae_product].present?
                       adj_key_hash[key_index] = @fannie_mae_product
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "FreddieMacProduct"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-1]][@freddie_mac_product].present?
                       adj_key_hash[key_index] = @freddie_mac_product
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "LoanPurpose"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-1]][@loan_purpose].present?
                       adj_key_hash[key_index] = @loan_purpose
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -747,19 +747,19 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
                 if key_name == "ProgramCategory"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-1]][@program_category].present?
                       adj_key_hash[key_index] = @program_category
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -771,7 +771,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "FinancingType"
@@ -782,7 +782,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "PremiumType"
@@ -793,7 +793,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -832,7 +832,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -871,7 +871,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -891,7 +891,7 @@ class DashboardController < ApplicationController
                       adj_key_hash[key_index] = @refinance_option
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -903,7 +903,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -915,7 +915,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "CLTV"
@@ -953,7 +953,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -974,7 +974,7 @@ class DashboardController < ApplicationController
                       end
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -986,7 +986,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1009,7 +1009,7 @@ class DashboardController < ApplicationController
                       end
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1021,7 +1021,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
               end
@@ -1029,68 +1029,68 @@ class DashboardController < ApplicationController
               if key_index==2
                 if key_name == "LockDay"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@lock_period].present?
                       adj_key_hash[key_index] = @lock_period
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "ArmBasic"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@arm_basic].present?
                       adj_key_hash[key_index] = @arm_basic
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "ArmAdvanced"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@arm_advanced].present?
                       adj_key_hash[key_index] = @arm_advanced
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "FannieMaeProduct"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@fannie_mae_product].present?
                       adj_key_hash[key_index] = @fannie_mae_product
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "FreddieMacProduct"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@freddie_mac_product].present?
                       adj_key_hash[key_index] = @freddie_mac_product
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "LoanPurpose"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_purpose].present?
                       adj_key_hash[key_index] = @loan_purpose
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1126,19 +1126,19 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
                 if key_name == "ProgramCategory"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@program_category].present?
                       adj_key_hash[key_index] = @program_category
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1150,7 +1150,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "FinancingType"
@@ -1161,7 +1161,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "PremiumType"
@@ -1172,7 +1172,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1211,7 +1211,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1250,7 +1250,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1270,7 +1270,7 @@ class DashboardController < ApplicationController
                       adj_key_hash[key_index] = @refinance_option
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1282,7 +1282,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "LoanSize"
@@ -1293,7 +1293,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "CLTV"
@@ -1331,7 +1331,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1352,7 +1352,7 @@ class DashboardController < ApplicationController
                       end
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1364,7 +1364,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "Term"
@@ -1386,7 +1386,7 @@ class DashboardController < ApplicationController
                       end
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1398,75 +1398,75 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
               end
               if key_index==3
                 if key_name == "LockDay"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@lock_period].present?
                       adj_key_hash[key_index] = @lock_period
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "ArmBasic"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@arm_basic].present?
                       adj_key_hash[key_index] = @arm_basic
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "ArmAdvanced"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@arm_advanced].present?
                       adj_key_hash[key_index] = @arm_advanced
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "FannieMaeProduct"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@fannie_mae_product].present?
                       adj_key_hash[key_index] = @fannie_mae_product
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "FreddieMacProduct"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@freddie_mac_product].present?
                       adj_key_hash[key_index] = @freddie_mac_product
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "LoanPurpose"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_purpose].present?
                       adj_key_hash[key_index] = @loan_purpose
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1502,19 +1502,19 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
                 if key_name == "ProgramCategory"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@program_category].present?
                       adj_key_hash[key_index] = @program_category
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1526,7 +1526,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "FinancingType"
@@ -1537,7 +1537,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "PremiumType"
@@ -1548,7 +1548,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1587,7 +1587,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1626,7 +1626,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1646,7 +1646,7 @@ class DashboardController < ApplicationController
                       adj_key_hash[key_index] = @refinance_option
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1658,7 +1658,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "LoanSize"
@@ -1669,7 +1669,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "CLTV"
@@ -1707,7 +1707,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1728,7 +1728,7 @@ class DashboardController < ApplicationController
                       end
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1740,7 +1740,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "Term"
@@ -1762,7 +1762,7 @@ class DashboardController < ApplicationController
                       end
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1774,75 +1774,75 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
               end
               if key_index==4
                 if key_name == "LockDay"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@lock_period].present?
                       adj_key_hash[key_index] = @lock_period
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "ArmBasic"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@arm_basic].present?
                       adj_key_hash[key_index] = @arm_basic
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "ArmAdvanced"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@arm_advanced].present?
                       adj_key_hash[key_index] = @arm_advanced
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "FannieMaeProduct"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@fannie_mae_product].present?
                       adj_key_hash[key_index] = @fannie_mae_product
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "FreddieMacProduct"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@freddie_mac_product].present?
                       adj_key_hash[key_index] = @freddie_mac_product
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "LoanPurpose"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_purpose].present?
                       adj_key_hash[key_index] = @loan_purpose
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1878,19 +1878,19 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
                 if key_name == "ProgramCategory"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@program_category].present?
                       adj_key_hash[key_index] = @program_category
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1902,7 +1902,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "FinancingType"
@@ -1913,7 +1913,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "PremiumType"
@@ -1924,7 +1924,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -1963,7 +1963,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2002,7 +2002,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2022,7 +2022,7 @@ class DashboardController < ApplicationController
                       adj_key_hash[key_index] = @refinance_option
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "MiscAdjuster"
@@ -2033,7 +2033,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "LoanSize"
@@ -2044,7 +2044,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "CLTV"
@@ -2082,7 +2082,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2103,7 +2103,7 @@ class DashboardController < ApplicationController
                       end
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2115,7 +2115,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2138,7 +2138,7 @@ class DashboardController < ApplicationController
                       end
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2150,75 +2150,75 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
               end
               if key_index==5
                 if key_name == "LockDay"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@lock_period].present?
                       adj_key_hash[key_index] = @lock_period
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "ArmBasic"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@arm_basic].present?
                       adj_key_hash[key_index] = @arm_basic
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "ArmAdvanced"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@arm_advanced].present?
                       adj_key_hash[key_index] = @arm_advanced
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "FannieMaeProduct"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@fannie_mae_product].present?
                       adj_key_hash[key_index] = @fannie_mae_product
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "FreddieMacProduct"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@freddie_mac_product].present?
                       adj_key_hash[key_index] = @freddie_mac_product
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "LoanPurpose"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_purpose].present?
                       adj_key_hash[key_index] = @loan_purpose
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2254,19 +2254,19 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
                 if key_name == "ProgramCategory"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@program_category].present?
                       adj_key_hash[key_index] = @program_category
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2278,7 +2278,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "FinancingType"
@@ -2289,7 +2289,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "PremiumType"
@@ -2300,7 +2300,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2339,7 +2339,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2378,7 +2378,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2398,7 +2398,7 @@ class DashboardController < ApplicationController
                       adj_key_hash[key_index] = @refinance_option
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2410,7 +2410,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "LoanSize"
@@ -2421,7 +2421,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "CLTV"
@@ -2459,7 +2459,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2480,7 +2480,7 @@ class DashboardController < ApplicationController
                       end
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2492,7 +2492,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "Term"
@@ -2514,7 +2514,7 @@ class DashboardController < ApplicationController
                       end
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2526,75 +2526,75 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
               end
               if key_index==6
                 if key_name == "LockDay"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@lock_period].present?
                       adj_key_hash[key_index] = @lock_period
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "ArmBasic"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@arm_basic].present?
                       adj_key_hash[key_index] = @arm_basic
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "ArmAdvanced"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@arm_advanced].present?
                       adj_key_hash[key_index] = @arm_advanced
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "FannieMaeProduct"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@fannie_mae_product].present?
                       adj_key_hash[key_index] = @fannie_mae_product
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "FreddieMacProduct"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@freddie_mac_product].present?
                       adj_key_hash[key_index] = @freddie_mac_product
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "LoanPurpose"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@loan_purpose].present?
                       adj_key_hash[key_index] = @loan_purpose
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2630,19 +2630,19 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
                 if key_name == "ProgramCategory"
                   begin
-                    if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@property_type].present?
+                    if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@program_category].present?
                       adj_key_hash[key_index] = @program_category
                     else
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2654,7 +2654,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "FinancingType"
@@ -2665,7 +2665,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
                 if key_name == "PremiumType"
@@ -2676,7 +2676,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2715,7 +2715,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2754,7 +2754,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2774,7 +2774,7 @@ class DashboardController < ApplicationController
                       adj_key_hash[key_index] = @refinance_option
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2786,7 +2786,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2798,7 +2798,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2837,7 +2837,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2858,7 +2858,7 @@ class DashboardController < ApplicationController
                       end
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2870,7 +2870,7 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2893,7 +2893,7 @@ class DashboardController < ApplicationController
                       end
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
 
@@ -2905,13 +2905,14 @@ class DashboardController < ApplicationController
                       break
                     end
                   rescue Exception
-                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name #{adj.sheet_name}"
+                    puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Sheet Name: #{adj.sheet_name}"
                   end
                 end
               end
             else
               if key_index==0
                 if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo" || key_name == "FHLMC" || key_name == "LPMI" || key_name == "EPMI")
+                  puts adj.id
                   adj.data[first_key]["true"]
                   adj_key_hash[key_index] = "true"
                 end
