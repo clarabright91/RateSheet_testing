@@ -252,12 +252,14 @@ class DashboardController < ApplicationController
       hash_obj[:sheet_name] = pro.sheet_name.present? ? pro.sheet_name : ""
       hash_obj[:bank_name] = pro.bank_name.present? ? pro.bank_name : ""
 
-      if (pro.base_rate[@interest.to_f.to_s][@lock_period].present?)
-        hash_obj[:base_rate] = pro.base_rate[@interest.to_f.to_s][@lock_period]
-      elsif (pro.base_rate[@interest.to_s][@lock_period].present?)
-        hash_obj[:base_rate] = pro.base_rate[@interest.to_s][@lock_period]
-      else
-        hash_obj[:base_rate] = 0.0
+      if (pro.base_rate.present? || pro.base_rate[@interest.to_f.to_s].present? || pro.base_rate[@interest.to_s].present?)
+        if (pro.base_rate[@interest.to_f.to_s][@lock_period].present?)
+          hash_obj[:base_rate] = pro.base_rate[@interest.to_f.to_s][@lock_period]
+        elsif (pro.base_rate[@interest.to_s][@lock_period].present?)
+          hash_obj[:base_rate] = pro.base_rate[@interest.to_s][@lock_period]
+        else
+          hash_obj[:base_rate] = 0.0
+        end
       end
 
       if pro.adjustments.present?
@@ -2912,7 +2914,6 @@ class DashboardController < ApplicationController
             else
               if key_index==0
                 if (key_name == "HighBalance" || key_name == "Conforming" || key_name == "FannieMae" || key_name == "FannieMaeHomeReady" || key_name == "FreddieMac" || key_name == "FreddieMacHomePossible" || key_name == "FHA" || key_name == "VA" || key_name == "USDA" || key_name == "StreamLine" || key_name == "FullDoc" || key_name == "Jumbo" || key_name == "FHLMC" || key_name == "LPMI" || key_name == "EPMI")
-                  puts adj.id
                   adj.data[first_key]["true"]
                   adj_key_hash[key_index] = "true"
                 end
