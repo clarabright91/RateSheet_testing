@@ -6976,17 +6976,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 3)) && (!row.compact.include?("California Wholesale Rate Sheet"))
             rr = r + 1 # (r == 8) / (r == 36) / (r == 56)
-
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
-
-              cc = 3 + max_column*6 # (3 / 9 / 15) 3/8/13
+              cc = 3 + max_column*6 
               begin
                 @title = sheet_data.cell(r,cc)
-                program_heading = @title.split
                  # term
                 term = nil
-                program_heading = @title.split
                 if @title.include?("10yr") || @title.include?("10 Yr")
                   term = @title.scan(/\d+/)[0]
                 elsif @title.include?("15yr") || @title.include?("15 Yr")
@@ -7012,9 +7008,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   loan_type = nil
                 end
 
-                # rate arm
-                if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
+                # Arm Basic
+                if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM")
                   arm_basic = @title.scan(/\d+/)[0].to_i
+                end
+                # Arm Advanced
+                if @title.downcase.include?("arm") 
+                  arm_advanced = @title.split("ARM").last.tr('A-Z- () ','')
                 end
 
                 conforming = false
@@ -7029,17 +7029,10 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_ids << @program.id
-                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic,  fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, conforming: conforming, sheet_name: @sheet_name)
+                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, arm_advanced: arm_advanced, fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, conforming: conforming, sheet_name: @sheet_name)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
-                # main_key = ''
-                # if @program.term.present?
-                #   main_key = "Term/LoanType/InterestRate/LockPeriod"
-                # else
-                #   main_key = "InterestRate/LockPeriod"
-                # end
-                # @block_hash[main_key] = {}
                 (0..50).each do |max_row|
                   @data = []
                   (0..4).each_with_index do |index, c_i|
@@ -7050,10 +7043,6 @@ class ObNewRezWholesale5806Controller < ApplicationController
                       key = value
                       @block_hash[key] = {}
                     else
-                      if @program.lock_period.length <= 3
-                        @program.lock_period << 15*c_i
-                        @program.save
-                      end
                       @block_hash[key][15*c_i] = value
                     end
                     @data << value
