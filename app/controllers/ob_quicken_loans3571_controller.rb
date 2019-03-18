@@ -1097,17 +1097,16 @@ class ObQuickenLoans3571Controller < ApplicationController
               value = sheet_data.cell(r,cc)
           		if value.present?
           			if value == "Government FICO Adjusters"
-          				primary_key1 = "LoanType/FICO"
+          				primary_key1 = "FICO"
           				@government_hash[primary_key1] = {}
           			end
           			if r == 76 && cc == 5
           				primary_key = "LockDay"
           				@adjustment_hash[primary_key] = {}
-          				if @adjustment_hash[primary_key] = {}
-          					cc = cc +10
-          					new_value = sheet_data.cell(r,cc)
-          					@adjustment_hash[primary_key] = new_value
-          				end
+                  @adjustment_hash[primary_key]["60"] = {}
+        					cc = cc +10
+        					new_value = sheet_data.cell(r,cc)
+        					@adjustment_hash[primary_key]["60"] = new_value
           			end
           			# Loan Ladder
           			if r >= 88 && r <= 91 && cc == 5
@@ -1131,59 +1130,48 @@ class ObQuickenLoans3571Controller < ApplicationController
           			end
           			# Geography
           			if r == 82 && cc == 19
-          				primary_key1 = "NJ"
-          				@government_hash[primary_key1] = {}
-          				if @government_hash[primary_key1] = {}
-          					cc = cc + 10
-          					new_value = sheet_data.cell(r,cc)
-          					@government_hash[primary_key1] = new_value
-          				end
+                  @government_hash["State"] = {}
+                  @government_hash["State"]["NJ"] = {}
+        					cc = cc + 10
+        					new_value = sheet_data.cell(r,cc)
+        					@government_hash["State"]["NJ"] = new_value
           			end
           			if r == 83 && cc == 19
-          				primary_key1 = "NY"
-          				@government_hash[primary_key1] = {}
-          				if @government_hash[primary_key1] = {}
-          					cc = cc + 10
-          					new_value = sheet_data.cell(r,cc)
-          					@government_hash[primary_key1] = new_value
-          				end
+                  @government_hash["State"]["NY"] = {}
+        					cc = cc + 10
+        					new_value = sheet_data.cell(r,cc)
+        					@government_hash["State"]["NY"] = new_value
           			end
           			if r == 86 && cc == 19
-          				primary_key1 = "VA/LoanPurpose/>=95%"
-          				@government_hash[primary_key1] = {}
-          				if @government_hash[primary_key1] = {}
-          					cc = cc + 10
-          					new_value = sheet_data.cell(r,cc)
-          					@government_hash[primary_key1] = new_value
-          				end
+          				@government_hash["VA/LoanPurpose/LTV"] = {}
+                  @government_hash["VA/LoanPurpose/LTV"][true] = {}
+                  @government_hash["VA/LoanPurpose/LTV"][true]["Purchase"] = {}
+                  @government_hash["VA/LoanPurpose/LTV"][true]["Purchase"]["95-Inf"] = {}
+
+                  @government_hash["VA/RefinanceOption/LTV"] = {}
+                  @government_hash["VA/RefinanceOption/LTV"][true] = {}
+                  @government_hash["VA/RefinanceOption/LTV"][true]["Rate and Term"] = {}
+                  @government_hash["VA/RefinanceOption/LTV"][true]["Rate and Term"]["95-Inf"] = {}
+        					cc = cc + 10
+        					new_value = sheet_data.cell(r,cc)
+        					@government_hash["VA/LoanPurpose/LTV"][true]["Purchase"]["95-Inf"] = new_value
+                  @government_hash["VA/RefinanceOption/LTV"][true]["Rate and Term"]["95-Inf"] = new_value
           			end
           			if r == 87 && cc == 19
-          				primary_key1 = "VA/RefinanceOption/>90%"
-          				@government_hash[primary_key1] = {}
-          				if @government_hash[primary_key1] = {}
-          					cc = cc + 10
-          					new_value = sheet_data.cell(r,cc)
-          					@government_hash[primary_key1] = new_value
-          				end
+                  @government_hash["VA/RefinanceOption/LTV"][true]["Cash Out"] = {}
+                  @government_hash["VA/RefinanceOption/LTV"][true]["Cash Out"]["90-Inf"] = {}
+        					cc = cc + 10
+        					new_value = sheet_data.cell(r,cc)
+        					@government_hash["VA/RefinanceOption/LTV"][true]["Cash Out"]["90-Inf"] = new_value
           			end
-          			if r == 88 && cc == 19
-          				primary_key1 = "19 for 19 through 19th"
-          				@government_hash[primary_key1] = {}
-          				if @government_hash[primary_key1] = {}
-          					cc = cc + 10
-          					new_value = sheet_data.cell(r,cc)
-          					@government_hash[primary_key1] = new_value
-          				end
-          			end
-          			if r == 88 && cc == 19
-          				primary_key1 = "VA/>100%"
-          				@government_hash[primary_key1] = {}
-          				if @government_hash[primary_key1] = {}
-          					cc = cc + 10
-          					new_value = sheet_data.cell(r,cc)
-          					@government_hash[primary_key1] = new_value
-          				end
-          			end
+                if r == 89 && cc == 19
+                  @government_hash["VA/LTV"] = {}
+                  @government_hash["VA/LTV"][true] = {}
+                  @government_hash["VA/LTV"][true]["100-Inf"] = {}
+                  cc = cc + 10
+                  new_value = sheet_data.cell(r,cc)
+                  @government_hash["VA/LTV"][true]["100-Inf"] = new_value
+                end
           		end
             rescue Exception => e
               error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)

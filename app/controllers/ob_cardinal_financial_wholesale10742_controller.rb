@@ -292,9 +292,10 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                   end
                   if r == 404 && cc == 2
                     @additional_hash["State"] = {}
+                    @additional_hash["State"]["AL"] = {}
                     cc = cc + 8
                     new_val = sheet_data.cell(r,cc)
-                    @additional_hash["State"] = new_val
+                    @additional_hash["State"]["AL"] = new_val
                   end
                   if r == 396 && cc == 37
                     @additional_hash["FICO/LTV"] = {}

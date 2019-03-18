@@ -1,12 +1,11 @@
 class ObHomePointFinancialWholesale11098Controller < ApplicationController
+  before_action :read_sheet, only: [:conforming_standard, :conforming_high_balance, :fha_va_usda, :homestyle, :fha_203k, :durp, :lpoa, :err, :hlr, :homeready, :homepossible, :jumbo_select, :jumbo_choice]
   before_action :get_sheet, only: [:programs, :conforming_standard, :conforming_high_balance, :fha_va_usda, :homestyle, :fha_203k, :durp, :lpoa, :err, :hlr, :homeready, :homepossible, :jumbo_select, :jumbo_choice]
   before_action :get_program, only: [:single_program, :program_property]
 
   def index
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
     begin
-      xlsx.sheets.each do |sheet|
+      @xlsx.sheets.each do |sheet|
         if (sheet == "Conforming Standard")
           headers = ["Phone", "General Contacts", "Mortgagee Clause (Wholesale)"]
           @name = "Home Point Financial Corporation"
@@ -21,11 +20,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
   def conforming_standard
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "Conforming Standard")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -86,11 +83,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
   def conforming_high_balance
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "Conforming High Balance")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -146,11 +141,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
   def fha_va_usda
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "FHA-VA-USDA")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -207,11 +200,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
   def homestyle
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "HomeStyle")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -268,11 +259,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
   # skip for same name programs
   def durp
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "DURP")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -329,11 +318,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
   # skip for same name programs
   def lpoa
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "LPOA")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -390,11 +377,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
   def fha_203k
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "FHA 203K")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -450,11 +435,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
   def err
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "ERR")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -510,11 +493,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
   def hlr
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "HLR")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -570,11 +551,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
   def homeready
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "HomeReady")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -634,11 +613,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
   def homepossible
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "HomePossible")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -694,11 +671,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
   def jumbo_select
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "Jumbo Select")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -758,11 +733,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
   def jumbo_choice
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "Jumbo Choice")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -822,11 +795,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
   def conforming_high_balance
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "Conforming High Balance")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -882,11 +853,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
   def fha_va_usda
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "FHA-VA-USDA")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -943,11 +912,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
   def homestyle
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "HomeStyle")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -1006,9 +973,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
   #   @programs_ids = []
   #   file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
   #   xlsx = Roo::Spreadsheet.open(file)
-  #   xlsx.sheets.each do |sheet|
+  #   @xlsx.sheets.each do |sheet|
   #     if (sheet == "DURP")
-  #       sheet_data = xlsx.sheet(sheet)
+  #       sheet_data = @xlsx.sheet(sheet)
   #       @programs_ids = []
   #       @block_hash = {}
 
@@ -1062,9 +1029,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
   #   @programs_ids = []
   #   file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
   #   xlsx = Roo::Spreadsheet.open(file)
-  #   xlsx.sheets.each do |sheet|
+  #   @xlsx.sheets.each do |sheet|
   #     if (sheet == "LPOA")
-  #       sheet_data = xlsx.sheet(sheet)
+  #       sheet_data = @xlsx.sheet(sheet)
   #       @programs_ids = []
   #       @block_hash = {}
 
@@ -1116,11 +1083,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
   def fha_203k
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "FHA 203K")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -1176,11 +1141,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
   def err
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "ERR")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -1236,11 +1199,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
   def hlr
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "HLR")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -1296,11 +1257,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
   def homeready
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "HomeReady")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -1360,11 +1319,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
   def homepossible
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "HomePossible")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -1420,11 +1377,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
   def jumbo_select
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "Jumbo Select")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -1485,11 +1440,9 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
   def jumbo_choice
     @programs_ids = []
-    file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
-    xlsx = Roo::Spreadsheet.open(file)
-    xlsx.sheets.each do |sheet|
+    @xlsx.sheets.each do |sheet|
       if (sheet == "Jumbo Choice")
-        sheet_data = xlsx.sheet(sheet)
+        sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @block_hash = {}
 
@@ -1578,6 +1531,11 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
     def get_program
       @program = Program.find(params[:id])
+    end
+
+    def read_sheet
+      file = File.join(Rails.root,  'OB_Home_Point_Financial_Wholesale11098.xls')
+      @xlsx = Roo::Spreadsheet.open(file)
     end
 
     def program_property value1
@@ -1681,6 +1639,3 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
       end
     end
 end
-
-
-

@@ -1242,12 +1242,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @cashout_hash["RefinanceOption/FICO/LTV"]["Cash Out"] = {}
               end
               if value == "LPMI Single Premium Rate Card"
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"][true] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"][true]["Fixed"] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"][true]["Fixed"]["Rate and Term"] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"][true]["Fixed"]["Rate and Term"]["20-Inf"] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"][true]["Fixed"]["Rate and Term"]["0-20"] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["20-Inf"] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["0-20"] = {}
               end
               # Cash Out Refinance
               if r >= 154 && r <= 160 && cc == 4
@@ -1266,12 +1266,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 else
                   primary_key = value.sub('to','-').tr('% ','')
                 end
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"][true]["Fixed"]["Rate and Term"]["20-Inf"][primary_key] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["20-Inf"][primary_key] = {}
               end
               if r >= 167 && r <= 170 && cc >= 5 && cc <= 11
                 ltv_key = get_value @lpmi_data[cc-1]
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"][true]["Fixed"]["Rate and Term"]["20-Inf"][primary_key][ltv_key] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"][true]["Fixed"]["Rate and Term"]["20-Inf"][primary_key][ltv_key] = value
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["20-Inf"][primary_key][ltv_key] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["20-Inf"][primary_key][ltv_key] = value
               end
               if r >= 173 && r <= 176 && cc == 2
                 if value.include?("below")
@@ -1279,12 +1279,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 else
                   primary_key = value.sub('to','-').tr('% ','')
                 end
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"][true]["Fixed"]["Rate and Term"]["0-20"][primary_key] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["0-20"][primary_key] = {}
               end
               if r >= 173 && r <= 176 && cc >= 5 && cc <= 11
                 ltv_key = get_value @lpmi_data[cc-1]
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"][true]["Fixed"]["Rate and Term"]["0-20"][primary_key][ltv_key] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"][true]["Fixed"]["Rate and Term"]["0-20"][primary_key][ltv_key] = value
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["0-20"][primary_key][ltv_key] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["0-20"][primary_key][ltv_key] = value
               end
               if r == 178 && cc == 2
                 @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/LTV"] = {}
@@ -1543,12 +1543,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
               end
               # LPMI Single Premium Rate Card
               if value == "LPMI Single Premium Rate Card"
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"][true] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"][true]["Fixed"] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"][true]["Fixed"]["Rate and Term"] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"][true]["Fixed"]["Rate and Term"]["20-Inf"] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"][true]["Fixed"]["Rate and Term"]["0-20"] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["20-Inf"] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["0-20"] = {}
               end
               # Cash Out Refinance
               if r >= 154 && r <= 160 && cc == 4
@@ -1567,12 +1567,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 else
                   primary_key = value.sub('to','-').tr('% ','')
                 end
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"][true]["Fixed"]["Rate and Term"]["20-Inf"][primary_key] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["20-Inf"][primary_key] = {}
               end
               if r >= 173 && r <= 176 && cc >= 5 && cc <= 11
                 ltv_key = get_value @lpmi_data[cc-1]
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"][true]["Fixed"]["Rate and Term"]["20-Inf"][primary_key][ltv_key] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"][true]["Fixed"]["Rate and Term"]["20-Inf"][primary_key][ltv_key] = value
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["20-Inf"][primary_key][ltv_key] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["20-Inf"][primary_key][ltv_key] = value
               end
               if r >= 179 && r <= 182 && cc == 2
                 if value.include?("below")
@@ -1580,12 +1580,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 else
                   primary_key = value.sub('to','-').tr('% ','')
                 end
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"][true]["Fixed"]["Rate and Term"]["0-20"][primary_key] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["0-20"][primary_key] = {}
               end
               if r >= 179 && r <= 182 && cc >= 5 && cc <= 11
                 ltv_key = get_value @lpmi_data[cc-1]
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"][true]["Fixed"]["Rate and Term"]["0-20"][primary_key][ltv_key] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/FICO/LTV"][true]["Fixed"]["Rate and Term"]["0-20"][primary_key][ltv_key] = value
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["0-20"][primary_key][ltv_key] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["0-20"][primary_key][ltv_key] = value
               end
               if r == 184 && cc == 2
                 @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/LTV"] = {}
