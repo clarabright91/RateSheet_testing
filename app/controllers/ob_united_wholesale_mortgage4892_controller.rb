@@ -35,6 +35,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
       end
       # adjustments
       if (sheet == "Conv Adjustments")
+        @sheet_name = "Conv"
         sheet_data = @xlsx.sheet(sheet)
         @adjustment_hash = {}
         @cash_out = {}
@@ -88,7 +89,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
           end
         end
         adjustment = [@adjustment_hash,@cash_out]
-        make_adjust(adjustment,sheet)
+        make_adjust(adjustment,@sheet_name)
       end
     end
     redirect_to programs_ob_united_wholesale_mortgage4892_path(@sheet_obj)
