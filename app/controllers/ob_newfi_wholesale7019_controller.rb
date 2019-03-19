@@ -47,6 +47,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @title = sheet_data.cell(r,cc)
               if @title.present? && @title != "Rate"
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                @term = program_property @title
                 @program.update_fields @title
                 @programs_ids << @program.id
                 @program.adjustments.destroy_all
@@ -86,7 +87,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
-                @program.update(base_rate: @block_hash,sheet_name: sheet)
+                @program.update(base_rate: @block_hash,sheet_name: sheet, term: @term)
               end
             end
           end
@@ -261,6 +262,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @title = sheet_data.cell(r,cc)
                   if @title.present?
                     @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                    @term = program_property @title
                     @program.update_fields @title
                     @programs_ids << @program.id
                   end
@@ -303,7 +305,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
-                @program.update(base_rate: @block_hash,sheet_name: sheet)
+                @program.update(base_rate: @block_hash,sheet_name: sheet, term: @term)
               end
               rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
@@ -335,6 +337,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @title = sheet_data.cell(r,cc)
                   if @title.present?
                     @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                    @term = program_property @title
                     @program.update_fields @title
                     @programs_ids << @program.id
                   end
@@ -377,7 +380,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
-                @program.update(base_rate: @block_hash,sheet_name: sheet)
+                @program.update(base_rate: @block_hash,sheet_name: sheet, term: @term)
             end
           end
         end
@@ -410,6 +413,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 begin
                   @title = sheet_data.cell(r,cc)
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  @term = program_property @title
                   @program.update_fields @title
                   @programs_ids << @program.id
 
@@ -452,7 +456,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
-              @program.update(base_rate: @block_hash,sheet_name: sheet)
+              @program.update(base_rate: @block_hash,sheet_name: sheet, term: @term)
             end
           end
         end
@@ -548,6 +552,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @title = sheet_data.cell(r,cc)
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                @term = program_property @title
                 @program.update_fields @title
                 @programs_ids << @program.id
 
@@ -583,7 +588,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
-                @program.update(base_rate: @block_hash,sheet_name: sheet)
+                @program.update(base_rate: @block_hash,sheet_name: sheet, term: @term)
               end
             end
           end
@@ -687,6 +692,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @title = sheet_data.cell(r,cc)
                   if @title.present?
                     @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                    @term = program_property @title
                     @program.update_fields @title
                     @programs_ids << @program.id
                   end
@@ -730,7 +736,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
-                @program.update(base_rate: @block_hash,sheet_name: sheet)
+                @program.update(base_rate: @block_hash,sheet_name: sheet, term: @term)
             end
           end
         end
@@ -765,6 +771,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != "5/1 CMT ARM 1/1/5 VA"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  @term = program_property @title
                   @program.update_fields @title
                   @programs_ids << @program.id
 
@@ -794,7 +801,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                     @block_hash.shift
                   end
-                  @program.update(base_rate: @block_hash,sheet_name: sheet)
+                  @program.update(base_rate: @block_hash,sheet_name: sheet, term: @term)
                 end
               rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
@@ -947,6 +954,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 begin
                   @title = sheet_data.cell(r,cc)
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  @term = program_property @title
                   @program.update_fields @title
                   @programs_ids << @program.id
 
@@ -989,7 +997,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
-              @program.update(base_rate: @block_hash,sheet_name: sheet)
+              @program.update(base_rate: @block_hash,sheet_name: sheet, term: @term)
             end
           end
         end
@@ -1182,6 +1190,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @title = sheet_data.cell(r,cc)
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                @term = program_property @title
                 @program.update_fields @title
                 @programs_ids << @program.id
               end
@@ -1208,7 +1217,6 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 if @data.compact.reject { |c| c.blank? }.length == 0
                   break # terminate the loop
                 end
-                @program.update(base_rate: @block_hash,sheet_name: sheet)
               rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                 error_log.save
@@ -1216,7 +1224,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
-              @program.update(base_rate: @block_hash,sheet_name: sheet)
+              @program.update(base_rate: @block_hash,sheet_name: sheet, term: @term)
             end
           end
         end
@@ -1473,13 +1481,11 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @title = sheet_data.cell(r,cc)
                   if @title.present?
                     @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                    @term = program_property @title
                     @program.update_fields @title
                     @programs_ids << @program.id
                   end
-
                   @program.adjustments.destroy_all
-                  @block_hash = {}
-                  key = ''
                 rescue Exception => e
                   error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
                   error_log.save
@@ -1515,7 +1521,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
-              @program.update(base_rate: @block_hash,sheet_name: sheet)
+              @program.update(base_rate: @block_hash,sheet_name: sheet,term: @term)
             end
           end
         end
@@ -1763,6 +1769,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 begin
                   if @title.present?
                     @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                    @term = program_property @title
                     @program.update_fields @title
                     @programs_ids << @program.id
                   end
@@ -1807,7 +1814,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
-              @program.update(base_rate: @block_hash,sheet_name: sheet)
+              @program.update(base_rate: @block_hash,sheet_name: sheet, term: @term)
             end
           end
         end
@@ -2045,6 +2052,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @title = sheet_data.cell(r,cc)
                   if @title.present?
                     @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                    @term = program_property @title
                     @program.update_fields @title
                     @programs_ids << @program.id
                   end
@@ -2088,7 +2096,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
-              @program.update(base_rate: @block_hash,sheet_name: sheet)
+              @program.update(base_rate: @block_hash,sheet_name: sheet, term: @term)
             end
           end
         end
@@ -2284,6 +2292,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               @title = sheet_data.cell(r,cc)
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                @term = program_property @title
                 @program.update_fields @title
                 @programs_ids << @program.id
                 @program.adjustments.destroy_all
@@ -2317,7 +2326,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
-                @program.update(base_rate: @block_hash,sheet_name: sheet)
+                @program.update(base_rate: @block_hash,sheet_name: sheet, term: @term)
               end
             end
           end
@@ -2488,6 +2497,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @title = sheet_data.cell(r,cc)
                   if @title.present?
                     @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                    @term = program_property @title
                     @program.update_fields @title
                     @programs_ids << @program.id
                   end
@@ -2530,7 +2540,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
-              @program.update(base_rate: @block_hash,sheet_name: sheet)
+              @program.update(base_rate: @block_hash,sheet_name: sheet, term: @term)
             end
           end
         end
@@ -2721,19 +2731,10 @@ class ObNewfiWholesale7019Controller < ApplicationController
     file = File.join(Rails.root,  'OB_Newfi_Wholesale7019.xls')
     @xlsx = Roo::Spreadsheet.open(file)
   end
-  # def program_property value1, sheet
-  #   # term
-  #   if @program.program_name.include?("30 Year") || @program.program_name.include?("30Yr") || @program.program_name.include?("30 Yr") || @program.program_name.include?("30/25 Year") || @program.program_name.include?("30 YR")
-  #     term = 30
-  #   elsif @program.program_name.include?("20 Year") || @program.program_name.include?("20 YR")
-  #     term = 20
-  #   elsif @program.program_name.include?("15 Year") || @program.program_name.include?("15 YR")
-  #     term = 15
-  #   elsif @program.program_name.include?("10 Year") || @program.program_name.include?("10 YR")
-  #     term = 10
-  #   else
-  #     term = nil
-  #   end
+  def program_property title
+    if title.exclude?("ARM")
+      @term = title.scan(/[0-9]/i).uniq.join()
+    end
 
   #   # Loan-Type
   #   if @program.program_name.include?("Fixed")
@@ -2974,7 +2975,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
   #   end
   #   @program.save
   #   @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, sheet_name: sheet, loan_size: loan_size, arm_basic: arm_basic, arm_advanced: arm_advanced)
-  # end
+  end
 
   def make_adjust(block_hash, sheet)
     block_hash.each do |hash|
