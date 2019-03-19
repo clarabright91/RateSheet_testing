@@ -39,8 +39,9 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != 3.125
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update(sheet_name: @sheet_name)
                   @program.update_fields @title
+                  @term = program_property @title
+                  @program.update(sheet_name: @sheet_name, term: @term )
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
                   key = ''
@@ -246,8 +247,9 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != 3.5 && @title != 3.125 && @title != "Loan Amount"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update(sheet_name: @sheet_name)
                   @program.update_fields @title
+                  @term = program_property @title
+                  @program.update(sheet_name: @sheet_name, term: @term )
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
                   key = ''
@@ -404,8 +406,9 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
               begin
                 @title = sheet_data.cell(r,cc)
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                @program.update(sheet_name: @sheet_name)
                 @program.update_fields @title
+                @term = program_property @title
+                @program.update(sheet_name: @sheet_name, term: @term )
                 @programs_ids << @program.id
                 @program.adjustments.destroy_all
                 @block_hash = {}
@@ -681,19 +684,30 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
       @program = Program.find(params[:id])
     end
 
-    # def program_property value1
-    #   # term
-    #   if @program.program_name.include?("30 Year") || @program.program_name.include?("30Yr") || @program.program_name.include?("30 Yr") || @program.program_name.include?("30/25 Year")
-    #     term = 30
-    #   elsif @program.program_name.include?("20 Year")
-    #     term = 20
-    #   elsif @program.program_name.include?("15 Year")
-    #     term = 15
-    #   elsif @program.program_name.include?("10 Year")
-    #     term = 10
-    #   else
-    #     term = nil
-    #   end
+    def program_property title
+      if title.exclude?("ARM")
+        # @term = title.gsub!(/[^0-9Yr]/, '').to_i
+        @term = title.scan(/[0-9]/i).uniq.join()
+
+      end
+      # if @program.program_name.include?("30 Year") || @program.program_name.include?("30Yr") || @program.program_name.include?("30 Yr")
+      #   term = 30
+      # elsif @program.program_name.include?("30/25 Year") || @program.program_name.include?("30/25 Yr")
+      #   term = 3025
+      # elsif @program.program_name.include?("20 Year")
+      #   term = 20
+      # elsif @program.program_name.include?("15 Year") || @program.program_name.include?("15")
+      #   term = 15
+      # elsif @program.program_name.include?("10 Year")
+      #   term = 10
+      # elsif @program.program_name.include?("5 Yr")
+
+      #   term = nil
+      # end
+
+      # val = "FHA 5-1 ARM (1-1-5 Caps)"
+
+
 
     #   # Loan-Type
     #   if @program.program_name.include?("Fixed")
@@ -749,9 +763,8 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
     #   if @program.program_name.include?("High Balance")
     #     @program.loan_limit_type << "High Balance"
     #   end
-    #   @program.save
-    #   @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, loan_size: loan_size, program_category: program_category)
-    # end
+      
+    end
 
     def make_adjust(block_hash, sheet)
       block_hash.each do |hash|
