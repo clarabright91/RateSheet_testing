@@ -20,7 +20,7 @@
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>Program Category</label>
-                      <%= select_tag 'pro_category', options_for_select(Program.all.pluck(:program_category).push("102RP","101RPHB","101RP","103RP","101RP","101RPHB","103RP","102RP","103OA","101RPHB","101OA","101RP","103RP","102RP","102OA","101OAHB","102OA","101OA","103OA","102OA","101OAHB","101OAHB","101OA","103OA").uniq.sort.compact.map{|c| [c]}.prepend(["All"]), (params[:pro_category] rescue nil)), { :class=> "form-control", :required => true} %>
+                      <%= select_tag 'pro_category', options_for_select(Program.all.pluck(:program_category).push("102RP","101RPHB","101RP","103RP","101RP","101RPHB","103RP","102RP","103OA","101RPHB","101OA","101RP","103RP","102RP","102OA","101OAHB","102OA","101OA","103OA","102OA","101OAHB","101OAHB","101OA","103OA").uniq.compact.sort.map{|c| [c]}.prepend(["All"]), (params[:pro_category] rescue nil)), { :class=> "form-control", :required => true} %>
                     </div>
                   </div>
                   <div class="col-md-4">
