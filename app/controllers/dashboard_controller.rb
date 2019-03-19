@@ -14,23 +14,27 @@ class DashboardController < ApplicationController
   end
 
   def fetch_programs_by_bank
+
     program_list = []
+    program_list2 = []
     if params[:pro_category].present?
       if (params[:pro_category] == "All")
         program_list = Program.all
       else
         program_list = Program.where(program_category: params[:pro_category])
       end
+    else
+      program_list =  Program.all
     end
 
     if params[:bank_name].present?
       if (params[:bank_name] == "All")
-        program_list = Program.all
+        program_list2 = program_list
       else
-        program_list = Program.where(bank_name: params[:bank_name])
+        program_list2 = program_list.where(bank_name: params[:bank_name])
       end
     end
-    render json: {program_list: program_list.map{ |n| {program_name: n.program_name} }}
+    render json: {program_list: program_list2.map{ |n| {program_name: n.program_name} }}
   end
 
   def set_default

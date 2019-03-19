@@ -384,10 +384,12 @@
   $(document).ready(function(){
     $('#bank_name').change(function(){
       var bank_name =  $(this).val();
+      var pro_category = $('#pro_category').val()
+
       $.ajax({
         type:'GET',
         url:'/dashboard/fetch_programs_by_bank',
-        data: {bank_name : bank_name },
+        data: {bank_name : bank_name, pro_category: pro_category },
         success:function(response){
           var selectBox = document.getElementById('program_name');
           selectBox.options.length = 0
@@ -401,10 +403,11 @@
 
     $('#pro_category').change(function(){
       var pro_category =  $(this).val();
+      var bank_name = $('#bank_name').val()
       $.ajax({
         type:'GET',
         url:'/dashboard/fetch_programs_by_bank',
-        data: {pro_category : pro_category },
+        data: {pro_category : pro_category, bank_name : bank_name },
         success:function(response){
           var selectBox = document.getElementById('program_name');
           selectBox.options.length = 0
