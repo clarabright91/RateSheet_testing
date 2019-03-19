@@ -58,7 +58,7 @@ class Program < ApplicationRecord
     set_arm_basic(p_name)           if ["ARM"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_arm_advanced(p_name)        if ["ARM"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_fannie_mae                  if ["Fannie Mae", "DU"].each{ |word| p_name.downcase.include?(word.downcase) }
-    set_freddie_mac                 if ["Freddie Mac", "LP"].each{ |word| p_name.downcase.include?(word.downcase) }
+    set_freddie_mac(p_name)         if ["Freddie Mac", "LP"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_freddie_mac_product(p_name) if ["Home Possible"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_term(p_name) if (5..50).to_a.collect{|n| n.to_s}.each{ |word| p_name.downcase.include?(word.downcase) }
     self.save
@@ -105,7 +105,7 @@ class Program < ApplicationRecord
     fetch_loan_size_fields.each{ |word|
       present_word = word if p_name.downcase.include?(word.downcase)
     }
-    loan_size = get_high_balance.include?(present_word) ? "High-Balance" : get_jumbo.include?(present_word) ? "Jumbo" : get_conforming.include?(present_word) ? "Conforming" : "Non-Conforming"
+    loan_size = get_high_balance.include?(present_word) ? "High-Balance" : get_jumbo.include?(present_word) ? "Jumbo" : get_conforming.include?(present_word) ? "Conforming" : get_non_conforming.include?(present_word) ? "Non-Conforming" : nil
     self.loan_size = loan_size
   end
 
@@ -121,7 +121,7 @@ class Program < ApplicationRecord
     self.fannie_mae = true
   end
 
-  def set_freddie_mac
+  def set_freddie_mac p_name
     self.freddie_mac = true
   end
 
