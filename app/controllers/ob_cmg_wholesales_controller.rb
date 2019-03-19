@@ -55,7 +55,7 @@ class ObCmgWholesalesController < ApplicationController
                 program_property sheet
 
                 @programs_ids << @program.id
-                # @program.adjustments.destroy_all
+                @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
                 (1..50).each do |max_row|
@@ -3989,28 +3989,22 @@ class ObCmgWholesalesController < ApplicationController
     bank_name = @sheet_obj.bank.name
 
     # streamline
-    streamline = false
-    fha = false
-    va = false
-    usda = false
-    full_doc = false
-    if @program.program_name.include?("FHA")
-      streamline = true
+    if @program.program_name.downcase.include?("fha")
       fha = true
-      full_doc = true
-    elsif @program.program_name.include?("VA")
-      streamline = true
+    end
+    if @program.program_name.downcase.include?("va")
       va = true
-      full_doc = true
-    elsif @program.program_name.include?("USDA")
-      streamline = true
+    end
+    if @program.program_name.downcase.include?("usda")
       usda = true
-      full_doc = true
+    end
+    if @program.program_name.downcase.include?("streamline")
+      streamline = true
     end
     # High-Balance
     high_balance = false
     jumbo = false
-    if @program.program_name.include?("High Bal") || @program.program_name.include?("HIGH BAL")
+    if @program.program_name.downcase.include?("high bal") || @program.program_name.downcase.include?("high balance")
       high_balance = true
       loan_size = "High-Balance"
     end
@@ -4024,25 +4018,22 @@ class ObCmgWholesalesController < ApplicationController
     end
     # Program Property
     if @program.program_name.split("-").count > 1
-      program_category = @program.program_name.split.last
+      program_category = @program.program_name.split("-").last
     end
        # Loan Limit Type
     if @program.program_name.include?("Non-Conforming")
-      @program.loan_limit_type << "Non-Conforming"
+      loan_size = "Non-Conforming"
     end
     if @program.program_name.include?("Conforming")
-      @program.loan_limit_type << "Conforming"
+      loan_size = "Conforming"
     end
     if @program.program_name.include?("Jumbo")
-      jumbo = true
-      @program.loan_limit_type << "Jumbo"
+      loan_size = "Jumbo"
     end
     if @program.program_name.include?("High-Balance")
-      @program.loan_limit_type << "High-Balance"
+      loan_size = "High-Balance"
     end
-
-    @program.save
-    @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",program_category: program_category, streamline: streamline,fha: fha, va: va, usda: usda, full_doc: full_doc, arm_basic: arm_basic, sheet_name: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product, loan_size: loan_size, bank_name: bank_name)
+    @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",program_category: program_category, streamline: streamline,fha: fha, va: va, usda: usda, arm_basic: arm_basic, sheet_name: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product, loan_size: loan_size, bank_name: bank_name)
   end
 
   def make_adjust(block_hash, sheet)
