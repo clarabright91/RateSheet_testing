@@ -122,7 +122,11 @@ class Program < ApplicationRecord
   end
 
   def set_freddie_mac p_name
-    self.freddie_mac = true
+    present_word = nil
+    ["Freddie Mac", "LP"].each{ |word|
+      present_word = true if p_name.downcase.include?(word.downcase)
+    }
+    self.freddie_mac = present_word
   end
 
   def set_freddie_mac_product p_name
