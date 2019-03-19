@@ -168,15 +168,6 @@ class DashboardController < ApplicationController
     @filter_data[:streamline] = true if params[:streamline].present?
     @filter_data[:full_doc] = true if params[:full_doc].present?
 
-    if params[:loan_size].present?
-      @loan_size = params[:loan_size]
-      if params[:loan_size] == "Non-Conforming"
-        @filter_data[:conforming] = false
-      elsif params[:loan_size] == "Conforming"
-        @filter_data[:conforming] = true
-      end
-    end
-
     if params[:loan_purpose].present?
       @loan_purpose = params[:loan_purpose]
       @filter_data[:loan_purpose] = params[:loan_purpose]
@@ -213,10 +204,10 @@ class DashboardController < ApplicationController
 
       if @program_list2.present?
         @program_list3 = []
-        if (params[:loan_size].present? && (params[:loan_size] == "Jumbo" || params[:loan_size] == "High-Balance" ))
-          # @program_list2 = @program_list2.map{|p| p  if p.loan_size!=nil }
+        if params[:loan_size].present?
+          @program_list2 = @program_list2.where.not(loan_size:nil)
           @program_list2.each do |pro|
-            if(pro.loan_size == params[:loan_size])
+            if(pro.loan_size.split("and").map{ |l| l.strip }.include?(params[:loan_size]))
               @program_list3 << pro
             end
           end
