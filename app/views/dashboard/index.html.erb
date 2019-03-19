@@ -19,14 +19,14 @@
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
-                      <label>Program Name</label>
-                      <%= select_tag 'program_name', options_for_select(Program.all.map{|n| [n.program_name] }, (params[:program_name] rescue nil)), { prompt: 'All', :class=> "form-control"} %>
+                      <label>Program Category</label>
+                      <%= select_tag 'pro_category', options_for_select(Program.all.pluck(:program_category).push("102RP","101RPHB","101RP","103RP","101RP","101RPHB","103RP","102RP","103OA","101RPHB","101OA","101RP","103RP","102RP","102OA","101OAHB","102OA","101OA","103OA","102OA","101OAHB","101OAHB","101OA","103OA").uniq.sort.compact.map{|c| [c]}.prepend(["All"]), (params[:pro_category] rescue nil)), { :class=> "form-control", :required => true} %>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
-                      <label>Program Category</label>
-                      <%= select_tag 'pro_category', options_for_select(Program.pluck(:program_category).uniq.compact.map{|c| [c]}.prepend(["All"]), (params[:pro_category] rescue nil)), { :class=> "form-control", :required => true} %>
+                      <label>Program Name</label>
+                      <%= select_tag 'program_name', options_for_select(Program.all.map{|n| [n.program_name] }, (params[:program_name] rescue nil)), { prompt: 'All', :class=> "form-control"} %>
                     </div>
                   </div>
                 </div>
@@ -334,6 +334,7 @@
           <th>Sheet Name</th>
           <th>Bank Name</th>
           <th>Adjustments</th>
+          <th>Adjustment Names</th>
           <th>Final Rate</th>
         </tr>
       </thead>
@@ -347,6 +348,21 @@
             <td><%= program[:sheet_name] %></td>
             <td><%= program[:bank_name] %></td>
             <td><%= program[:adj_points] %></td>
+            <td>
+              <%
+                if program[:adj_primary_key] == "Adjustment Not Present"
+                  %>
+                    <%= program[:adj_primary_key] %>
+                  <%
+                else
+                  program[:adj_primary_key].each_with_index do |key, index|
+                    %>
+                      <%= index+1 %>. <%= key %>
+                    <%
+                  end
+                end
+              %>
+            </td>
             <td><%= (program[:final_rate].sum).round(3) rescue nil %></td>
           </tr>
         <%end%>
@@ -372,6 +388,23 @@
         type:'GET',
         url:'/dashboard/fetch_programs_by_bank',
         data: {bank_name : bank_name },
+        success:function(response){
+          var selectBox = document.getElementById('program_name');
+          selectBox.options.length = 0
+          selectBox.options.add( new Option('All', 'All'));
+          response.program_list.map((program)=>{
+            selectBox.options.add( new Option(program.program_name, program.program_name));
+          });
+        }
+      });
+    });
+
+    $('#pro_category').change(function(){
+      var pro_category =  $(this).val();
+      $.ajax({
+        type:'GET',
+        url:'/dashboard/fetch_programs_by_bank',
+        data: {pro_category : pro_category },
         success:function(response){
           var selectBox = document.getElementById('program_name');
           selectBox.options.length = 0

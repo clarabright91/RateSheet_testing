@@ -15,6 +15,14 @@ class DashboardController < ApplicationController
 
   def fetch_programs_by_bank
     program_list = []
+    if params[:pro_category].present?
+      if (params[:pro_category] == "All")
+        program_list = Program.all
+      else
+        program_list = Program.where(program_category: params[:pro_category])
+      end
+    end
+
     if params[:bank_name].present?
       if (params[:bank_name] == "All")
         program_list = Program.all
@@ -245,6 +253,7 @@ class DashboardController < ApplicationController
       :sheet_name => "",
       :bank_name => "",
       :adj_points => [],
+      :adj_primary_key => [],
       :final_rate => []
     }
     programs.each do |pro|
@@ -2962,6 +2971,7 @@ class DashboardController < ApplicationController
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "NA") && (point != "na") && (point != "-"))
                 hash_obj[:adj_points] << point.to_f
                 hash_obj[:final_rate] << point.to_f
+                hash_obj[:adj_primary_key] << adj.data.keys.first
               end
             end
             if hash_key==1 && adj_key_hash.keys.count-1==hash_key
@@ -2969,6 +2979,7 @@ class DashboardController < ApplicationController
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "NA") && (point != "na") && (point != "-"))
                 hash_obj[:adj_points] << point.to_f
                 hash_obj[:final_rate] << point.to_f
+                hash_obj[:adj_primary_key] << adj.data.keys.first
               end
             end
             if hash_key==2 && adj_key_hash.keys.count-1==hash_key
@@ -2976,6 +2987,7 @@ class DashboardController < ApplicationController
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "NA") && (point != "na") && (point != "-"))
                 hash_obj[:adj_points] << point.to_f
                 hash_obj[:final_rate] << point.to_f
+                hash_obj[:adj_primary_key] << adj.data.keys.first
               end
             end
             if hash_key==3 && adj_key_hash.keys.count-1==hash_key
@@ -2983,6 +2995,7 @@ class DashboardController < ApplicationController
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "NA") && (point != "na") && (point != "-"))
                 hash_obj[:adj_points] << point.to_f
                 hash_obj[:final_rate] << point.to_f
+                hash_obj[:adj_primary_key] << adj.data.keys.first
               end
             end
             if hash_key==4 && adj_key_hash.keys.count-1==hash_key
@@ -2990,6 +3003,7 @@ class DashboardController < ApplicationController
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "NA") && (point != "na") && (point != "-"))
                 hash_obj[:adj_points] << point.to_f
                 hash_obj[:final_rate] << point.to_f
+                hash_obj[:adj_primary_key] << adj.data.keys.first
               end
             end
             if hash_key==5 && adj_key_hash.keys.count-1==hash_key
@@ -2997,6 +3011,7 @@ class DashboardController < ApplicationController
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "NA") && (point != "na") && (point != "-"))
                 hash_obj[:adj_points] << point.to_f
                 hash_obj[:final_rate] << point.to_f
+                hash_obj[:adj_primary_key] << adj.data.keys.first
               end
             end
             if hash_key==6 && adj_key_hash.keys.count-1==hash_key
@@ -3004,6 +3019,7 @@ class DashboardController < ApplicationController
               if (((point.is_a? Float) || (point.is_a? Integer) || (point.is_a? String)) && (point != "N/A") && (point != "n/a") && (point != "NA") && (point != "na") && (point != "-"))
                 hash_obj[:adj_points] << point.to_f
                 hash_obj[:final_rate] << point.to_f
+                hash_obj[:adj_primary_key] << adj.data.keys.first
               end
             end
           end
@@ -3014,18 +3030,22 @@ class DashboardController < ApplicationController
         @result << hash_obj
       else
         hash_obj[:adj_points] = "Adjustment Not Present"
+        hash_obj[:adj_primary_key] = "Adjustment Not Present"
         hash_obj[:final_rate] << hash_obj[:base_rate].to_f
         @result << hash_obj
       end
 
-        hash_obj = {
-        :program_name => "",
-        :base_rate => 0.0,
-        :sheet_name=> "",
-        :bank_name=> "",
-        :adj_points => [],
-        :final_rate => []
-      }
+
+      hash_obj = {
+      :program_name => "",
+      :base_rate => 0.0,
+      :sheet_name => "",
+      :bank_name => "",
+      :adj_points => [],
+      :adj_primary_key => [],
+      :final_rate => []
+    }
+
     end
   end
 
