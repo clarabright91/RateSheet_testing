@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_13_120133) do
+ActiveRecord::Schema.define(version: 2019_03_20_084010) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -18,7 +18,7 @@ ActiveRecord::Schema.define(version: 2019_03_13_120133) do
   create_table "adjustments", force: :cascade do |t|
     t.json "data"
     t.string "program_title"
-    t.string "sheet_name"
+    t.string "loan_category"
     t.integer "program_ids", default: [], array: true
     t.integer "program_id"
     t.datetime "created_at", null: false
@@ -43,7 +43,7 @@ ActiveRecord::Schema.define(version: 2019_03_13_120133) do
     t.text "details"
     t.integer "column"
     t.integer "row"
-    t.string "sheet_name"
+    t.string "loan_category"
     t.integer "sheet_id"
     t.boolean "status", default: false
     t.datetime "created_at", null: false
@@ -75,7 +75,7 @@ ActiveRecord::Schema.define(version: 2019_03_13_120133) do
     t.text "adjustments"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "sheet_name"
+    t.string "loan_category"
     t.json "base_rate"
     t.string "program_category"
     t.string "bank_name"
