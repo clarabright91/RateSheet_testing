@@ -17,30 +17,56 @@ class DashboardController < ApplicationController
 
     program_list = []
     program_list2 = []
+    program_list3 = []
+    loan_category_list = []
     pro_category_list = []
+    pro_category_list2 = []
 
     if params[:bank_name].present?
       if (params[:bank_name] == "All")
         program_list = Program.all
         loan_category_list = Program.all.pluck(:loan_category).uniq.compact.map{ |lc| {name: lc}}
+        pro_category_list = Program.all.pluck(:program_category).uniq.compact.map{ |lc| {name: lc}}
       else
         loan_category_list = Program.where(bank_name: params[:bank_name]).pluck(:loan_category).uniq.compact.map{ |lc| {name: lc}}
+        pro_category_list = Program.where(bank_name: params[:bank_name]).pluck(:program_category).uniq.compact.map{ |lc| {name: lc}}
         program_list = Program.where(bank_name: params[:bank_name])
       end
-    else
-      program_list =  Program.all
-      loan_category_list = Program.all.pluck(:loan_category).uniq.compact.map{ |lc| {name: lc}}
+
+      if pro_category_list.present?
+        pro_category_list.prepend({name: "All"})
+      else
+        pro_category_list << {name: "No Category"}
+      end
     end
 
     if params[:loan_category].present?
       if (params[:loan_category] == "All")
         program_list2 = program_list
+        pro_category_list2 = pro_category_list
       else
+        pro_category_list2 = program_list.where(loan_category: params[:loan_category]).pluck(:program_category).uniq.compact.map{ |lc| {name: lc}}
         program_list2 = program_list.where(loan_category: params[:loan_category])
+
+        if pro_category_list2.present?
+          pro_category_list2.prepend({name: "All"})
+        else
+          pro_category_list2 << {name: "No Category"}
+        end
       end
     end
 
-    render json: {program_list: program_list2.map{ |n| {program_name: n.program_name} }, loan_category_list: loan_category_list }
+    if params[:pro_category].present?
+      if (params[:pro_category] == "All")
+        program_list3 = program_list2
+      elsif (params[:pro_category] == "No Category")
+        program_list3 = []
+      else
+        program_list3 = program_list2.where(program_category: params[:pro_category])
+      end
+    end
+
+    render json: {program_list: program_list3.map{ |n| {program_name: n.program_name} }, loan_category_list: loan_category_list, pro_category_list: pro_category_list2 }
   end
 
   def set_default
@@ -96,6 +122,7 @@ class DashboardController < ApplicationController
     end
 
     @state = params[:state] if params[:state].present?
+
     @property_type = params[:property_type] if params[:property_type].present?
     @financing_type = params[:financing_type] if params[:financing_type].present?
     @refinance_option = params[:refinance_option] if params[:refinance_option].present?
@@ -136,6 +163,12 @@ class DashboardController < ApplicationController
     if params[:pro_category].present?
       unless (params[:pro_category] == "All")
         @filter_data[:program_category] = params[:pro_category]
+      end
+    end
+
+    if params[:loan_category].present?
+      unless (params[:loan_category] == "All")
+        @filter_data[:loan_category] = params[:loan_category]
       end
     end
 
