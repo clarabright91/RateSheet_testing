@@ -329,10 +329,11 @@
         <h2>Searched Programs</h2>
         <tr>
           <th>No.</th>
+          <th>Bank Name</th>
+          <th>Loan Category</th>
+          <th>Program Category</th>
           <th>Program Name</th>
           <th>Base Rate</th>
-          <th>Sheet Name</th>
-          <th>Bank Name</th>
           <th>Adjustments</th>
           <th>Adjustment Names</th>
           <th>Final Rate</th>
@@ -343,10 +344,11 @@
         <% @result.each_with_index do |program, index|%>
           <tr>
             <td><%= index +1 %></td>
+            <td><%= program[:bank_name] %></td>
+            <td><%= program[:loan_category] %></td>
+            <td><%= program[:program_category] %></td>
             <td><%= program[:program_name] %></td>
             <td><%= (program[:base_rate].to_f).round(2) %></td>
-            <td><%= program[:sheet_name] %></td>
-            <td><%= program[:bank_name] %></td>
             <td><%= program[:adj_points] %></td>
             <td>
               <%
