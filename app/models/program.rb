@@ -37,7 +37,7 @@ class Program < ApplicationRecord
   end
   
   def get_high_balance
-    high_balance = ["High-Balance", "HIGH BAL", "High Balance"]
+    high_balance = ["High-Balance", "HIGH BAL", "High Balance", "HB"]
     # high_balance += Acronym.new(high_balance).to_a
     high_balance += high_balance.map(&:downcase)
     return high_balance
@@ -68,6 +68,7 @@ class Program < ApplicationRecord
     set_fannie_mae(p_name)          if ["Fannie Mae", "DU"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_freddie_mac(p_name)         if ["Freddie Mac", "LP"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_freddie_mac_product(p_name) if ["Home Possible"].each{ |word| p_name.downcase.include?(word.downcase) }
+    set_fannie_mae_product(p_name) if ["HOMEREADY"].each{ |word| p_name.downcase.include?(word.downcase) }
     # set_term(p_name) if (5..50).to_a.collect{|n| n.to_s}.each{ |word| p_name.downcase.include?(word.downcase) }
     self.save
   end
@@ -148,6 +149,14 @@ class Program < ApplicationRecord
   def set_freddie_mac_product p_name
     present_word = nil
     ["Home Possible"].each{ |word|
+      present_word = word if p_name.downcase.include?(word.downcase)
+    }
+    self.freddie_mac_product = present_word
+  end
+
+  def set_fannie_mae_product p_name
+    present_word = nil
+    ["HomeReady"].each{ |word|
       present_word = word if p_name.downcase.include?(word.downcase)
     }
     self.freddie_mac_product = present_word

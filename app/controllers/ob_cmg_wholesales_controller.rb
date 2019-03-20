@@ -4033,7 +4033,7 @@ class ObCmgWholesalesController < ApplicationController
     if @program.program_name.include?("High-Balance")
       loan_size = "High-Balance"
     end
-    @program.update(term: term,loan_type: loan_type,loan_purpose: "Purchase",program_category: program_category, streamline: streamline,fha: fha, va: va, usda: usda, arm_basic: arm_basic, sheet_name: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product, loan_size: loan_size, bank_name: bank_name)
+    @program.update(term: term,loan_type: loan_type,program_category: program_category, streamline: streamline,fha: fha, va: va, usda: usda, arm_basic: arm_basic, sheet_name: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product, loan_size: loan_size, bank_name: bank_name)
   end
 
   def make_adjust(block_hash, sheet)
