@@ -17,24 +17,30 @@ class DashboardController < ApplicationController
 
     program_list = []
     program_list2 = []
-    if params[:pro_category].present?
-      if (params[:pro_category] == "All")
-        program_list = Program.all
-      else
-        program_list = Program.where(program_category: params[:pro_category])
-      end
-    else
-      program_list =  Program.all
-    end
+    pro_category_list = []
 
     if params[:bank_name].present?
       if (params[:bank_name] == "All")
+        program_list = Program.all
+        loan_category_list = Sheet.all
+      else
+        loan_category_list = Bank.find_by_name(params[:bank_name]).sheets
+        program_list = Program.where(bank_name: params[:bank_name])
+      end
+    else
+      program_list =  Program.all
+      loan_category_list = Sheet.all
+    end
+
+    if params[:loan_category].present?
+      if (params[:loan_category] == "All")
         program_list2 = program_list
       else
-        program_list2 = program_list.where(bank_name: params[:bank_name])
+        program_list2 = program_list.where(sheet_name: params[:loan_category])
       end
     end
-    render json: {program_list: program_list2.map{ |n| {program_name: n.program_name} }}
+
+    render json: {program_list: program_list2.map{ |n| {program_name: n.program_name} }, loan_category_list: loan_category_list.map{ |pc| {name: pc.name} }}
   end
 
   def set_default
