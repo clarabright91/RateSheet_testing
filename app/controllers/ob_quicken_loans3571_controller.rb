@@ -36,9 +36,10 @@ class ObQuickenLoans3571Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != "=FALSE()"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.sheet_name = sheet
+                  @program.loan_category = sheet
                   @programs_ids << @program.id
                   @program.update_fields @title
+                  program_property @title
   	              @block_hash = {}
   	              key = ''
   	              (1..25).each do |max_row|
@@ -378,9 +379,10 @@ class ObQuickenLoans3571Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != "=FALSE()"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.sheet_name = sheet
+                  @program.loan_category = sheet
                   @programs_ids << @program.id
                   @program.update_fields @title
+                  program_property @title
   	              @block_hash = {}
   	              key = ''
   	              (1..15).each do |max_row|
@@ -876,9 +878,10 @@ class ObQuickenLoans3571Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != "=FALSE()"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.sheet_name = @sheet_name
+                  @program.loan_category = @sheet_name
                   @programs_ids << @program.id
                   @program.update_fields @title
+                  program_property @title
   	              @block_hash = {}
   	              key = ''
   	              (1..20).each do |max_row|
@@ -934,9 +937,10 @@ class ObQuickenLoans3571Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != "=FALSE()"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.sheet_name = @sheet_name
+                  @program.loan_category = @sheet_name
                   @programs_ids << @program.id
                   @program.update_fields @title
+                  program_property @title
   	              @block_hash = {}
   	              key = ''
   	              (1..20).each do |max_row|
@@ -992,9 +996,10 @@ class ObQuickenLoans3571Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != "=FALSE()"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.sheet_name = @sheet_name
+                  @program.loan_category = @sheet_name
                   @programs_ids << @program.id
                   @program.update_fields @title
+                  program_property @title
   	              @block_hash = {}
   	              key = ''
   	              (1..20).each do |max_row|
@@ -1055,9 +1060,10 @@ class ObQuickenLoans3571Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != "=FALSE()"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.sheet_name = @sheet_name
+                  @program.loan_category = @sheet_name
                   @programs_ids << @program.id
                   @program.update_fields @title
+                  program_property @title
   	              @block_hash = {}
   	              key = ''
   	              (1..20).each do |max_row|
@@ -1207,9 +1213,10 @@ class ObQuickenLoans3571Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != "=FALSE()"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.sheet_name = @sheet_name
+                  @program.loan_category = @sheet_name
                   @programs_ids << @program.id
                   @program.update_fields @title
+                  program_property @title
   	              @block_hash = {}
   	              key = ''
   	              (1..15).each do |max_row|
@@ -1441,6 +1448,27 @@ class ObQuickenLoans3571Controller < ApplicationController
     def read_sheet
       file = File.join(Rails.root,  'OB_Quicken_Loans3571.xls')
       @xlsx = Roo::Spreadsheet.open(file)
+    end
+
+    def program_property title
+      if (title.include?("YEAR") || title.downcase.include?("yr") || title.downcase.include?("y")) && title.exclude?("/")
+        if title.scan(/\d+/).count > 1
+          term = title.scan(/\d+/)[0] + term = title.scan(/\d+/)[1]  
+        else
+          term = title.scan(/\d+/)[0]
+        end
+      end
+        # Arm Basic
+      if title.include?("3/1") || title.include?("3 / 1")
+        arm_basic = 3
+      elsif title.include?("5/1") || title.include?("5 / 1")
+        arm_basic = 5
+      elsif title.include?("7/1") || title.include?("7 / 1")
+        arm_basic = 7
+      elsif title.include?("10/1") || title.include?("10 / 1")
+        arm_basic = 10
+      end
+      @program.update(term: term,arm_basic: arm_basic)
     end
 
     def create_program_association_with_adjustment(sheet)

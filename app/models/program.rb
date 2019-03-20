@@ -62,13 +62,14 @@ class Program < ApplicationRecord
     set_va                          if p_name.downcase.include?("va")
     set_usda                        if p_name.downcase.include?("usda")
     set_streamline                  if p_name.downcase.include?("streamline")
+    set_full_doc                    if p_name.downcase.include?("full doc")
     set_loan_purpose(p_name)        if ["Purchase", "Refinance"].each{ |word| p_name.downcase.include?(word.downcase) }
     # set_arm_basic(p_name)           if ["ARM"].each{ |word| p_name.downcase.include?(word.downcase) }
     # set_arm_advanced(p_name)        if ["ARM"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_fannie_mae(p_name)          if ["Fannie Mae", "DU"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_freddie_mac(p_name)         if ["Freddie Mac", "LP"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_freddie_mac_product(p_name) if ["Home Possible","HOME POSSIBLE"].each{ |word| p_name.downcase.include?(word.downcase) }
-    set_fannie_mae_product(p_name)  if ["HOMEREADY"].each{ |word| p_name.downcase.include?(word.downcase) }
+    set_fannie_mae_product(p_name)  if ["HOMEREADY", "Home Ready"].each{ |word| p_name.downcase.include?(word.downcase) }
     # set_term(p_name) if (5..50).to_a.collect{|n| n.to_s}.each{ |word| p_name.downcase.include?(word.downcase) }
     self.save
   end
@@ -99,6 +100,10 @@ class Program < ApplicationRecord
 
   def set_streamline
     self.streamline = true
+  end
+
+  def set_full_doc
+    self.full_doc = true
   end
 
   def set_loan_purpose p_name
@@ -156,8 +161,8 @@ class Program < ApplicationRecord
 
   def set_fannie_mae_product p_name
     present_word = nil
-    ["HomeReady"].each{ |word|
-      present_word = word if p_name.downcase.include?(word.downcase)
+    ["HomeReady", "Home Ready"].each{ |word|
+      present_word = "HomeReady" if p_name.downcase.include?(word.downcase)
     }
     self.fannie_mae_product = present_word
   end
