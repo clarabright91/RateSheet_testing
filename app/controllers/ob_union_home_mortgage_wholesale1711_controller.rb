@@ -1,7 +1,7 @@
 class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
   before_action :read_sheet, only: [:index, :conventional, :conven_highbalance_30, :gov_highbalance_30, :government_30_15_yr, :arm_programs, :fnma_du_refi_plus, :fhlmc_open_access, :fnma_home_ready, :fhlmc_home_possible, :simple_access, :jumbo_fixed]
   before_action :get_sheet, only: [:programs, :conventional, :conven_highbalance_30, :gov_highbalance_30, :government_30_15_yr, :arm_programs, :fnma_du_refi_plus, :fhlmc_open_access, :fnma_home_ready, :fhlmc_home_possible, :simple_access, :jumbo_fixed]
-  before_action :get_program, only: [:single_program]
+  before_action :get_program, only: [:single_program, :program_property]
 
   def index
     begin
@@ -48,6 +48,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
                   @program.update_fields @title
+                  program_property @title
                   @block_hash = {}
                   key = ''
                   (1..16).each do |max_row|
@@ -261,6 +262,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
                   @program.update_fields @title
+                  program_property @title
                   @block_hash = {}
                   key = ''
                   (1..10).each do |max_row|
@@ -318,6 +320,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
                   @program.update_fields @title
+                  program_property @title
                   @block_hash = {}
                   key = ''
                   (1..8).each do |max_row|
@@ -381,6 +384,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
                   @program.update_fields @title
+                  program_property @title
                   @block_hash = {}
                   key = ''
                   (1..16).each do |max_row|
@@ -508,6 +512,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
                   @program.update_fields @title
+                  program_property @title
                   @block_hash = {}
                   key = ''
                   (1..13).each do |max_row|
@@ -719,6 +724,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
                   @program.update_fields @title
+                  program_property @title
                   @block_hash = {}
                   key = ''
                   (1..13).each do |max_row|
@@ -934,6 +940,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
                   @program.update_fields @title
+                  program_property @title
                   @block_hash = {}
                   key = ''
                   (1..13).each do |max_row|
@@ -1134,6 +1141,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
                   @program.update_fields @title
+                  program_property @title
                   @block_hash = {}
                   key = ''
                   (1..16).each do |max_row|
@@ -1321,6 +1329,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
                   @program.update_fields @title
+                  program_property @title
                   @block_hash = {}
                   key = ''
                   (1..16).each do |max_row|
@@ -1493,6 +1502,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
                   @program.update_fields @title
+                  program_property @title
                   @block_hash = {}
                   key = ''
                   (1..23).each do |max_row|
@@ -1624,6 +1634,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
                   @program.update_fields @title
+                  program_property @title
                   @block_hash = {}
                   key = ''
                   (1..10).each do |max_row|
@@ -1811,6 +1822,27 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
         value1
       end
     end
+  end
+
+  def program_property title
+    if title.include?("YEAR") || title.downcase.include?("yr") || title.downcase.include?("y")
+      if title.scan(/\d+/).count > 1
+        term = title.scan(/\d+/)[0] + term = title.scan(/\d+/)[1]  
+      else
+        term = title.scan(/\d+/)[0]
+      end
+    end
+      # Arm Basic
+    if title.include?("3/1") || title.include?("3 / 1")
+      arm_basic = 3
+    elsif title.include?("5/1") || title.include?("5 / 1")
+      arm_basic = 5
+    elsif title.include?("7/1") || title.include?("7 / 1")
+      arm_basic = 7
+    elsif title.include?("10/1") || title.include?("10 / 1")
+      arm_basic = 10
+    end
+    @program.update(term: term,arm_basic: arm_basic)
   end
 
   def make_adjust(block_hash, sheet)
