@@ -89,7 +89,7 @@ class ObCmgWholesalesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -165,7 +165,7 @@ class ObCmgWholesalesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -249,7 +249,7 @@ class ObCmgWholesalesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -307,7 +307,7 @@ class ObCmgWholesalesController < ApplicationController
                         @data << value
                       end
                     rescue Exception => e
-                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, loan_category: sheet, error_detail: e.message)
                       error_log.save
                     end
                   end
@@ -734,7 +734,7 @@ class ObCmgWholesalesController < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -788,7 +788,7 @@ class ObCmgWholesalesController < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -869,7 +869,7 @@ class ObCmgWholesalesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1013,7 +1013,7 @@ class ObCmgWholesalesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1067,7 +1067,7 @@ class ObCmgWholesalesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1148,7 +1148,7 @@ class ObCmgWholesalesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1288,7 +1288,7 @@ class ObCmgWholesalesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1351,7 +1351,7 @@ class ObCmgWholesalesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1712,7 +1712,7 @@ class ObCmgWholesalesController < ApplicationController
                     end
                   end
                 rescue Exception => e
-                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                   error_log.save
                 end
               end
@@ -1797,7 +1797,7 @@ class ObCmgWholesalesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1885,7 +1885,7 @@ class ObCmgWholesalesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1911,7 +1911,7 @@ class ObCmgWholesalesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1935,7 +1935,7 @@ class ObCmgWholesalesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -2009,7 +2009,7 @@ class ObCmgWholesalesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -2181,7 +2181,7 @@ class ObCmgWholesalesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -2268,7 +2268,7 @@ class ObCmgWholesalesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -2322,7 +2322,7 @@ class ObCmgWholesalesController < ApplicationController
                   @program.update(base_rate: @block_hash)
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -2463,7 +2463,7 @@ class ObCmgWholesalesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -2502,7 +2502,7 @@ class ObCmgWholesalesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -2620,7 +2620,7 @@ class ObCmgWholesalesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -2713,7 +2713,7 @@ class ObCmgWholesalesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -2876,7 +2876,7 @@ class ObCmgWholesalesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -2950,7 +2950,7 @@ class ObCmgWholesalesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -3112,7 +3112,7 @@ class ObCmgWholesalesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -3186,7 +3186,7 @@ class ObCmgWholesalesController < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -3245,7 +3245,7 @@ class ObCmgWholesalesController < ApplicationController
                   end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -3280,7 +3280,7 @@ class ObCmgWholesalesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -3383,7 +3383,7 @@ class ObCmgWholesalesController < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -3911,8 +3911,8 @@ class ObCmgWholesalesController < ApplicationController
   end
 
   def create_program_association_with_adjustment(sheet)
-    adjustment_list = Adjustment.where(sheet_name: sheet)
-    program_list = Program.where(sheet_name: sheet)
+    adjustment_list = Adjustment.where(loan_category: sheet)
+    program_list = Program.where(loan_category: sheet)
 
     adjustment_list.each_with_index do |adj_ment, index|
       key_list = adj_ment.data.keys.first.split("/")
@@ -4033,7 +4033,7 @@ class ObCmgWholesalesController < ApplicationController
     if @program.program_name.include?("High-Balance")
       loan_size = "High-Balance"
     end
-    @program.update(term: term,loan_type: loan_type,program_category: program_category, streamline: streamline,fha: fha, va: va, usda: usda, arm_basic: arm_basic, sheet_name: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product, loan_size: loan_size, bank_name: bank_name)
+    @program.update(term: term,loan_type: loan_type,program_category: program_category, streamline: streamline,fha: fha, va: va, usda: usda, arm_basic: arm_basic, loan_category: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product, loan_size: loan_size, bank_name: bank_name)
   end
 
   def make_adjust(block_hash, sheet)
@@ -4042,7 +4042,7 @@ class ObCmgWholesalesController < ApplicationController
         hash.each do |key|
           data = {}
           data[key[0]] = key[1]
-          Adjustment.create(data: data,sheet_name: sheet)
+          Adjustment.create(data: data,loan_category: sheet)
         end
       end
     end

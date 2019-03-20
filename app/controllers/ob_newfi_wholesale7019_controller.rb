@@ -76,7 +76,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                         @data << value
                       end
                     rescue Exception => e
-                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, loan_category: sheet, error_detail: e.message)
                       error_log.save
                     end
                   end
@@ -87,7 +87,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
-                @program.update(base_rate: @block_hash,sheet_name: sheet)
+                @program.update(base_rate: @block_hash,loan_category: sheet)
               end
             end
           end
@@ -229,7 +229,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -271,7 +271,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @block_hash = {}
                   key = ''
                 rescue Exception => e
-                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                   error_log.save
                 end
                 @program.adjustments.destroy_all
@@ -294,7 +294,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                         @data << value
                       end
                     rescue Exception => e
-                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
                       error_log.save
                     end
                   end
@@ -305,10 +305,10 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
-                @program.update(base_rate: @block_hash,sheet_name: sheet)
+                @program.update(base_rate: @block_hash,loan_category: sheet)
               end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -346,7 +346,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @block_hash = {}
                   key = ''
                 rescue Exception => e
-                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
                   error_log.save
                 end
                 @program.adjustments.destroy_all
@@ -369,7 +369,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                         @data << value
                       end
                     rescue Exception => e
-                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
                       error_log.save
                     end
                   end
@@ -380,7 +380,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
-                @program.update(base_rate: @block_hash,sheet_name: sheet)
+                @program.update(base_rate: @block_hash,loan_category: sheet)
             end
           end
         end
@@ -421,7 +421,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @block_hash = {}
                   key = ''
                 rescue Exception => e
-                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
                   error_log.save
                 end
               end
@@ -445,7 +445,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                       @data << value
                     end
                   rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, loan_category: sheet, error_detail: e.message)
                     error_log.save
                   end
                 end
@@ -456,7 +456,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
-              @program.update(base_rate: @block_hash,sheet_name: sheet)
+              @program.update(base_rate: @block_hash,loan_category: sheet)
             end
           end
         end
@@ -515,7 +515,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -577,7 +577,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                         @data << value
                       end
                     rescue Exception => e
-                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, loan_category: sheet, error_detail: e.message)
                       error_log.save
                     end
                   end
@@ -588,7 +588,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
-                @program.update(base_rate: @block_hash,sheet_name: sheet)
+                @program.update(base_rate: @block_hash,loan_category: sheet)
               end
             end
           end
@@ -659,7 +659,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -701,7 +701,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @block_hash = {}
                   key = ''
                 rescue Exception => e
-                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
                   error_log.save
                 end
 
@@ -725,7 +725,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                         @data << value
                       end
                     rescue Exception => e
-                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
                       error_log.save
                     end
                   end
@@ -736,7 +736,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
-                @program.update(base_rate: @block_hash,sheet_name: sheet)
+                @program.update(base_rate: @block_hash,loan_category: sheet)
             end
           end
         end
@@ -801,10 +801,10 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                     @block_hash.shift
                   end
-                  @program.update(base_rate: @block_hash,sheet_name: sheet)
+                  @program.update(base_rate: @block_hash,loan_category: sheet)
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -915,7 +915,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -962,7 +962,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @block_hash = {}
                   key = ''
                 rescue Exception => e
-                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
                   error_log.save
                 end
 
@@ -986,7 +986,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                         @data << value
                       end
                     rescue Exception => e
-                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, loan_category: sheet, error_detail: e.message)
                       error_log.save
                     end
                   end
@@ -997,7 +997,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
-              @program.update(base_rate: @block_hash,sheet_name: sheet)
+              @program.update(base_rate: @block_hash,loan_category: sheet)
             end
           end
         end
@@ -1218,13 +1218,13 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   break # terminate the loop
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
-              @program.update(base_rate: @block_hash,sheet_name: sheet)
+              @program.update(base_rate: @block_hash,loan_category: sheet)
             end
           end
         end
@@ -1439,7 +1439,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -1487,7 +1487,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   end
                   @program.adjustments.destroy_all
                 rescue Exception => e
-                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
                   error_log.save
                 end
               @program.adjustments.destroy_all
@@ -1510,7 +1510,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                       @data << value
                     end
                   rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
                     error_log.save
                   end
                 end
@@ -1521,7 +1521,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
-              @program.update(base_rate: @block_hash,sheet_name: sheet)
+              @program.update(base_rate: @block_hash,loan_category: sheet)
             end
           end
         end
@@ -1729,7 +1729,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -1779,7 +1779,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   key = ''
                   lock_hash = {}
                 rescue Exception => e
-                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                   error_log.save
                 end
               @program.adjustments.destroy_all
@@ -1803,7 +1803,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                       @data << value
                     end
                   rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, loan_category: sheet, error_detail: e.message)
                     error_log.save
                   end
                 end
@@ -1814,7 +1814,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
-              @program.update(base_rate: @block_hash,sheet_name: sheet)
+              @program.update(base_rate: @block_hash,loan_category: sheet)
             end
           end
         end
@@ -2010,7 +2010,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -2061,7 +2061,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @block_hash = {}
                   key = ''
                 rescue Exception => e
-                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
                   error_log.save
                 end
 
@@ -2085,7 +2085,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                       @data << value
                     end
                   rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, loan_category: sheet, error_detail: e.message)
                     error_log.save
                   end
                 end
@@ -2096,7 +2096,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
-              @program.update(base_rate: @block_hash,sheet_name: sheet)
+              @program.update(base_rate: @block_hash,loan_category: sheet)
             end
           end
         end
@@ -2253,7 +2253,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -2315,7 +2315,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                         @data << value
                       end
                     rescue Exception => e
-                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                      error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, loan_category: sheet, error_detail: e.message)
                       error_log.save
                     end
                   end
@@ -2326,7 +2326,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                   @block_hash.shift
                 end
-                @program.update(base_rate: @block_hash,sheet_name: sheet)
+                @program.update(base_rate: @block_hash,loan_category: sheet)
               end
             end
           end
@@ -2456,7 +2456,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = value
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -2506,7 +2506,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @block_hash = {}
                   key = ''
                 rescue Exception => e
-                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
                   error_log.save
                 end
               @program.adjustments.destroy_all
@@ -2529,7 +2529,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                       @data << value
                     end
                   rescue Exception => e
-                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, sheet_name: sheet, error_detail: e.message)
+                    error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rrr, column: ccc, loan_category: sheet, error_detail: e.message)
                     error_log.save
                   end
                 end
@@ -2540,7 +2540,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @block_hash.keys.first.nil? || @block_hash.keys.first == "Rate"
                 @block_hash.shift
               end
-              @program.update(base_rate: @block_hash,sheet_name: sheet)
+              @program.update(base_rate: @block_hash,loan_category: sheet)
             end
           end
         end
@@ -2685,7 +2685,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @secondary_hash["LTV/CLTV/FICO"][ltv_key][cltv_key][ltv_data] = value
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -2810,7 +2810,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
   #     @program.loan_limit_type << "High Balance"
   #   end
   #   @program.save
-  #   @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, sheet_name: sheet, loan_size: loan_size, arm_basic: arm_basic, arm_advanced: arm_advanced)
+  #   @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, loan_category: sheet, loan_size: loan_size, arm_basic: arm_basic, arm_advanced: arm_advanced)
   # end
 
   # def program_property value1, sheet
@@ -2895,7 +2895,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
   #     @program.loan_limit_type << "High Balance"
   #   end
   #   @program.save
-  #   @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, sheet_name: sheet, loan_size: loan_size, arm_basic: arm_basic, arm_advanced: arm_advanced)
+  #   @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, loan_category: sheet, loan_size: loan_size, arm_basic: arm_basic, arm_advanced: arm_advanced)
   # end
 
   # def program_property value1, sheet
@@ -2980,7 +2980,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
   #     @program.loan_limit_type << "High Balance"
   #   end
   #   @program.save
-  #   @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, sheet_name: sheet, loan_size: loan_size, arm_basic: arm_basic, arm_advanced: arm_advanced)
+  #   @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, loan_category: sheet, loan_size: loan_size, arm_basic: arm_basic, arm_advanced: arm_advanced)
   end
 
   def make_adjust(block_hash, sheet)
@@ -2989,7 +2989,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
         hash.each do |key|
           data = {}
           data[key[0]] = key[1]
-          Adjustment.create(data: data,sheet_name: sheet)
+          Adjustment.create(data: data,loan_category: sheet)
         end
       end
     end
@@ -3024,7 +3024,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
               end
             end
           rescue Exception => e
-            error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+            error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
             error_log.save
           end
         end
@@ -3036,8 +3036,8 @@ class ObNewfiWholesale7019Controller < ApplicationController
   end
 
   def create_program_association_with_adjustment(sheet)
-    adjustment_list = Adjustment.where(sheet_name: sheet)
-    program_list = Program.where(sheet_name: sheet)
+    adjustment_list = Adjustment.where(loan_category: sheet)
+    program_list = Program.where(loan_category: sheet)
 
     adjustment_list.each_with_index do |adj_ment, index|
       key_list = adj_ment.data.keys.first.split("/")

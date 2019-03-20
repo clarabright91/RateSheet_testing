@@ -415,7 +415,7 @@ class ObRoyalPacificFundingWholesale8409Controller < ApplicationController
               @program.update(base_rate: @block_hash)
             end
           rescue Exception => e
-            error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+            error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
             error_log.save
           end
         end

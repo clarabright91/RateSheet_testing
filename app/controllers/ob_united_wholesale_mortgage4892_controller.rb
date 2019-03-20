@@ -82,7 +82,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -147,10 +147,10 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                       break # terminate the loop
                     end
                   end
-                  @program.update(base_rate: @block_hash,sheet_name: sheet)
+                  @program.update(base_rate: @block_hash,loan_category: sheet)
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -306,9 +306,9 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                     break # terminate the loop
                   end
                 end
-                @program.update(base_rate: @block_hash,sheet_name: sheet)
+                @program.update(base_rate: @block_hash,loan_category: sheet)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -351,9 +351,9 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                     break # terminate the loop
                   end
                 end
-                @program.update(base_rate: @block_hash,sheet_name: sheet)
+                @program.update(base_rate: @block_hash,loan_category: sheet)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -395,9 +395,9 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                     break # terminate the loop
                   end
                 end
-                @program.update(base_rate: @block_hash,sheet_name: sheet)
+                @program.update(base_rate: @block_hash,loan_category: sheet)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -440,9 +440,9 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                     break # terminate the loop
                   end
                 end
-                @program.update(base_rate: @block_hash,sheet_name: sheet)
+                @program.update(base_rate: @block_hash,loan_category: sheet)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -548,7 +548,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                   # end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -610,9 +610,9 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                     break # terminate the loop
                   end
                 end
-                @program.update(base_rate: @block_hash,sheet_name: sheet)
+                @program.update(base_rate: @block_hash,loan_category: sheet)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -656,9 +656,9 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                     break # terminate the loop
                   end
                 end
-                @program.update(base_rate: @block_hash,sheet_name: sheet)
+                @program.update(base_rate: @block_hash,loan_category: sheet)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -702,9 +702,9 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                     break # terminate the loop
                   end
                 end
-                @program.update(base_rate: @block_hash,sheet_name: sheet)
+                @program.update(base_rate: @block_hash,loan_category: sheet)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -812,7 +812,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -880,9 +880,9 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                     break # terminate the loop
                   end
                 end
-                @program.update(base_rate: @block_hash,sheet_name: sheet)
+                @program.update(base_rate: @block_hash,loan_category: sheet)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -927,7 +927,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
         hash.each do |key|
           data = {}
           data[key[0]] = key[1]
-          Adjustment.create(data: data,sheet_name: sheet)
+          Adjustment.create(data: data,loan_category: sheet)
         end
       end
     end
@@ -938,7 +938,11 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
     @xlsx = Roo::Spreadsheet.open(file)
   end
 
-  # def program_property
+  def program_property
+    
+    if title.include?("YEAR") || title.include?("YR") || title.include?("yr") || title.include?("Yr")
+      term = title.scan(/\d+/)[0]
+    end
   #   if @program.program_name.include?("30") || @program.program_name.include?("30/25 Year")
   #     term = 30
   #   elsif @program.program_name.include?("20")
@@ -1020,7 +1024,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
   #   end
   #   @program.save
   #   @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, jumbo_high_balance: jumbo_high_balance, arm_basic: arm_basic, arm_advanced: arm_advanced)
-  # end
+  end
 
   # create programs
   def make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2
@@ -1036,6 +1040,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
             if @title.present?
               @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
               @program.update_fields @title
+              program_property @title
               @programs_ids << @program.id
               # Base rate
               @program.adjustments.destroy_all
@@ -1062,10 +1067,10 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 end
               end
               sheet = @program.sheet.name
-              @program.update(base_rate: @block_hash, sheet_name: sheet)
+              @program.update(base_rate: @block_hash, loan_category: sheet)
             end
           rescue Exception => e
-            error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+            error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
             error_log.save
           end
         end
@@ -1074,8 +1079,8 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
   end
 
   def create_program_association_with_adjustment(sheet)
-    adjustment_list = Adjustment.where(sheet_name: sheet)
-    program_list = Program.where(sheet_name: sheet)
+    adjustment_list = Adjustment.where(loan_category: sheet)
+    program_list = Program.where(loan_category: sheet)
 
     adjustment_list.each_with_index do |adj_ment, index|
       key_list = adj_ment.data.keys.first.split("/")

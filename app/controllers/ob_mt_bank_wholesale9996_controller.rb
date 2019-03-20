@@ -77,7 +77,7 @@ class ObMTBankWholesale9996Controller < ApplicationController
                   @program.update(base_rate: @block_hash)
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -210,7 +210,7 @@ class ObMTBankWholesale9996Controller < ApplicationController
       @program.loan_limit_type << "High-Balance"
     end
     @program.save
-    @program.update(arm_basic: arm_basic,term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, jumbo_high_balance: jumbo_high_balance, loan_size: loan_size, sheet_name: @sheet_name, arm_advanced: arm_advanced)
+    @program.update(arm_basic: arm_basic,term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline, jumbo_high_balance: jumbo_high_balance, loan_size: loan_size, loan_category: @sheet_name, arm_advanced: arm_advanced)
   end
 
   def get_sheet

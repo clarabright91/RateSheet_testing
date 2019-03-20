@@ -115,7 +115,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -298,7 +298,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -353,7 +353,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -478,7 +478,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
               end
               # ADJUSTMENT CAPS end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -532,7 +532,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -648,7 +648,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -702,7 +702,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -800,7 +800,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -855,7 +855,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
                 @program.update(base_rate: @block_hash)
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -933,7 +933,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -982,7 +982,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                   @program.update(base_rate: @block_hash)
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1045,7 +1045,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #         @spec_adjustment4[primary_key][ltv_key][c_val] = value
         #       end
         #     rescue Exception => e
-        #       error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+        #       error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
         #       error_log.save
         #     end
         #   end
@@ -1091,7 +1091,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #           @program.update(base_rate: @block_hash)
         #         end
         #       rescue Exception => e
-        #         error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+        #         error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
         #         error_log.save
         #       end
         #     end
@@ -1154,7 +1154,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #         @spec_adjustment6[primary_key][ltv_key][c_val] = value
         #       end
         #     rescue Exception => e
-        #       error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+        #       error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
         #       error_log.save
         #     end
         #   end
@@ -1200,7 +1200,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #           @program.update(base_rate: @block_hash)
         #         end
         #       rescue Exception => e
-        #         error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+        #         error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
         #         error_log.save
         #       end
         #     end
@@ -1266,7 +1266,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #         @day_adjustment[primary_key][value] = c_val
         #       end
         #     rescue Exception => e
-        #       error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+        #       error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
         #       error_log.save
         #     end
         #   end
@@ -1312,7 +1312,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #           @program.update(base_rate: @block_hash)
         #         end
         #       rescue Exception => e
-        #         error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+        #         error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
         #         error_log.save
         #       end
         #     end
@@ -1363,7 +1363,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #         ltv_adjustment range1_g, range2_g, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
         #       end
         #     rescue Exception => e
-        #       error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+        #       error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
         #       error_log.save
         #     end
         #   end
@@ -1409,7 +1409,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #           @program.update(base_rate: @block_hash)
         #         end
         #       rescue Exception => e
-        #         error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+        #         error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
         #         error_log.save
         #       end
         #     end
@@ -1482,7 +1482,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #         ltv_adjustment range1_h, range2_h, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
         #       end
         #     rescue Exception => e
-        #       error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+        #       error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
         #       error_log.save
         #     end
         #   end
@@ -1528,7 +1528,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #           @program.update(base_rate: @block_hash)
         #         end
         #       rescue Exception => e
-        #         error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+        #         error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
         #         error_log.save
         #       end
         #     end
@@ -1587,7 +1587,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #         ltv_adjustment range1_i, range2_i, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
         #       end
         #     rescue Exception => e
-        #       error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+        #       error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
         #       error_log.save
         #     end
         #   end
@@ -1633,7 +1633,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #           @program.update(base_rate: @block_hash)
         #         end
         #       rescue Exception => e
-        #         error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+        #         error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
         #         error_log.save
         #       end
         #     end
@@ -1683,7 +1683,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #         ltv_adjustment range1_j, range2_j, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
         #       end
         #     rescue Exception => e
-        #       error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+        #       error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
         #       error_log.save
         #     end
         #     # PREPAYMENT PENALTY #adjustment remaining
@@ -1730,7 +1730,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #           @program.update(base_rate: @block_hash)
         #         end
         #       rescue Exception => e
-        #         error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+        #         error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
         #         error_log.save
         #       end
         #     end
@@ -1779,7 +1779,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         #       #   ltv_adjustment range1_k, range2_k, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
         #       # end
         #     rescue Exception => e
-        #       error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+        #       error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
         #       error_log.save
         #     end
         #   end
@@ -1904,7 +1904,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         @program.loan_limit_type << "High-Balance"
       end
       @program.save
-      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline,sheet_name: @sheet_name)
+      @program.update(term: term, loan_type: loan_type, fha: fha, va: va, usda: usda, full_doc: full_doc, streamline: streamline,loan_category: @sheet_name)
     end
 
     def ltv_adjustment range1, range2, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row, primary_key
@@ -1933,7 +1933,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -1969,7 +1969,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -2005,7 +2005,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -2046,7 +2046,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
               end
             rescue Exception => e
-              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, sheet_name: sheet, error_detail: e.message)
+              error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
               error_log.save
             end
           end
@@ -2062,17 +2062,17 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
           hash.keys.each do |key|
             second_hash = {}
             second_hash[key] = hash[key]
-            Adjustment.create(data: second_hash,sheet_name: sheet)
+            Adjustment.create(data: second_hash,loan_category: sheet)
           end
         else
-          Adjustment.create(data: hash,sheet_name: sheet)
+          Adjustment.create(data: hash,loan_category: sheet)
         end
       end
     end
 
     def create_program_association_with_adjustment(sheet)
-      adjustment_list = Adjustment.where(sheet_name: sheet)
-      program_list = Program.where(sheet_name: sheet)
+      adjustment_list = Adjustment.where(loan_category: sheet)
+      program_list = Program.where(loan_category: sheet)
 
       adjustment_list.each_with_index do |adj_ment, index|
         key_list = adj_ment.data.keys.first.split("/")
