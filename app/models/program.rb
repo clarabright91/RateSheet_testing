@@ -23,14 +23,14 @@ class Program < ApplicationRecord
   end
 
   def get_conforming
-    conforming = ["Conforming"]
+    conforming = ["Conforming","Conf"]
     # conforming += Acronym.new(conforming).to_a
     conforming += conforming.map(&:downcase)
     return conforming
   end
   
   def get_conf
-    conf = ["CONF HB"]
+    conf = ["CONF HB","Conf High Bal"]
     # conforming += Acronym.new(conforming).to_a
     conf += conf.map(&:downcase)
     return conf
@@ -61,13 +61,14 @@ class Program < ApplicationRecord
     set_fha                         if p_name.downcase.include?("fha")
     set_va                          if p_name.downcase.include?("va")
     set_usda                        if p_name.downcase.include?("usda")
+    set_streamline                  if p_name.downcase.include?("streamline")
     set_loan_purpose(p_name)        if ["Purchase", "Refinance"].each{ |word| p_name.downcase.include?(word.downcase) }
-    set_arm_basic(p_name)           if ["ARM"].each{ |word| p_name.downcase.include?(word.downcase) }
-    set_arm_advanced(p_name)        if ["ARM"].each{ |word| p_name.downcase.include?(word.downcase) }
+    # set_arm_basic(p_name)           if ["ARM"].each{ |word| p_name.downcase.include?(word.downcase) }
+    # set_arm_advanced(p_name)        if ["ARM"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_fannie_mae(p_name)          if ["Fannie Mae", "DU"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_freddie_mac(p_name)         if ["Freddie Mac", "LP"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_freddie_mac_product(p_name) if ["Home Possible"].each{ |word| p_name.downcase.include?(word.downcase) }
-    set_term(p_name) if (5..50).to_a.collect{|n| n.to_s}.each{ |word| p_name.downcase.include?(word.downcase) }
+    # set_term(p_name) if (5..50).to_a.collect{|n| n.to_s}.each{ |word| p_name.downcase.include?(word.downcase) }
     self.save
   end
 
@@ -93,6 +94,10 @@ class Program < ApplicationRecord
 
   def set_usda
     self.usda = true
+  end
+
+  def set_streamline
+    self.streamline = true
   end
 
   def set_loan_purpose p_name
