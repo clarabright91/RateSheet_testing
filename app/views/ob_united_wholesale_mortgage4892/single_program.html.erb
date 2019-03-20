@@ -8,20 +8,32 @@
           <td><%= @program.program_name %></td>
         </tr>
         <tr>
-          <th>Loan Purpose</th>
-          <td><%= @program.loan_purpose %></td>
+          <th>Loan Type</th>
+          <td><%= @program.loan_type %></td>
         </tr>
         <tr>
           <th>Term</th>
           <td><%= @program.term %></td>
         </tr>
         <tr>
-          <th>Loan Type</th>
-          <td><%= @program.loan_type %></td>
+          <th>Interest Type</th>
+          <td><%= @program.rate_type %></td>
         </tr>
         <tr>
           <th>FHA</th>
           <td><%= @program.fha %></td>
+        </tr>
+        <tr>
+          <th>Va</th>
+          <td><%= @program.va %></td>
+        </tr>
+        <tr>
+          <th>USDA</th>
+          <td><%= @program.usda %></td>
+        </tr>
+        <tr>
+          <th>Streamline</th>
+          <td><%= @program.streamline %></td>
         </tr>
         <tr>
           <th>Arm Basic</th>
@@ -31,10 +43,14 @@
           <th>Arm Advanced</th>
           <td><%= @program.arm_advanced %></td>
         </tr>
-        <!-- <tr>
-          <th>Jumbo High Balance</th>
-          <td><%#= @program.jumbo_high_balance %></td>
-        </tr> -->
+        <tr>
+          <th>Program Category</th>
+          <td><%= @program.program_category %></td>
+        </tr>
+        <tr>
+          <th>Loan Size</th>
+          <td><%= @program.loan_size %></td>
+        </tr>
         <tr>
           <th>Conforming</th>
           <td><%= @program.conforming %></td>
@@ -43,21 +59,29 @@
           <th>Fannie Mae</th>
           <td><%= @program.fannie_mae %></td>
         </tr>
-         <tr>
+        <tr>
           <th>Freddie Mac</th>
           <td><%= @program.freddie_mac %></td>
         </tr>
-         <tr>
+        <tr>
+          <th>Freddie Mac Product</th>
+          <td><%= @program.freddie_mac_product %></td>
+        </tr>
+        <tr>
+          <th>Fannie Mae Product</th>
+          <td><%= @program.fannie_mae_product %></td>
+        </tr>
+        <tr>
           <th>Base Rate</th>
           <td><%= @program.base_rate.to_json %></td>
         </tr>
-         <tr>
-          <th>Adjustment</th>
-          <td><% @program.adjustments.each do |adj| %>
-              <%= adj.data %>
-            <%end%>
-          </td>
-        </tr>
+       <tr>
+        <th>Adjustment</th>
+        <td><% @program.adjustments.each do |adj| %>
+            <%= adj.data %>
+          <%end%>
+        </td>
+      </tr>
       </tbody>
     </table>
   </div>

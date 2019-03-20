@@ -2,7 +2,7 @@ class ErrorLog < ApplicationRecord
   before_create :set_bank_name
   validate :validate_repeated_data
   def set_bank_name
-    self.bank_name = Bank.joins(:sheets).where("sheets.name Like ?", self.loan_category).first.name
+    self.bank_name = Bank.joins(:sheets).where("sheets.name Like ?", self.loan_category).first.name rescue nil
   end
 
   def validate_repeated_data

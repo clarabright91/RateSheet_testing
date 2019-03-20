@@ -67,8 +67,8 @@ class Program < ApplicationRecord
     # set_arm_advanced(p_name)        if ["ARM"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_fannie_mae(p_name)          if ["Fannie Mae", "DU"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_freddie_mac(p_name)         if ["Freddie Mac", "LP"].each{ |word| p_name.downcase.include?(word.downcase) }
-    set_freddie_mac_product(p_name) if ["Home Possible"].each{ |word| p_name.downcase.include?(word.downcase) }
-    set_fannie_mae_product(p_name) if ["HOMEREADY"].each{ |word| p_name.downcase.include?(word.downcase) }
+    set_freddie_mac_product(p_name) if ["Home Possible","HOME POSSIBLE"].each{ |word| p_name.downcase.include?(word.downcase) }
+    set_fannie_mae_product(p_name)  if ["HOMEREADY"].each{ |word| p_name.downcase.include?(word.downcase) }
     # set_term(p_name) if (5..50).to_a.collect{|n| n.to_s}.each{ |word| p_name.downcase.include?(word.downcase) }
     self.save
   end
@@ -159,6 +159,6 @@ class Program < ApplicationRecord
     ["HomeReady"].each{ |word|
       present_word = word if p_name.downcase.include?(word.downcase)
     }
-    self.freddie_mac_product = present_word
+    self.fannie_mae_product = present_word
   end
 end

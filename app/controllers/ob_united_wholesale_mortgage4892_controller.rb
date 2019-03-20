@@ -123,6 +123,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 if @title.present? && @title != "GOVERNMENT PRICE ADJUSTMENTS"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  program_property @title
                   @programs_ids << @program.id
 
                   @block_hash = {}
@@ -282,6 +283,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  program_property @title
                   @programs_ids << @program.id
                 end
                 @block_hash = {}
@@ -326,6 +328,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  program_property @title
                   @programs_ids << @program.id
                 end
                 # @program.adjustments.destroy_all
@@ -371,6 +374,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  program_property @title
                   @programs_ids << @program.id
                 end
                 @block_hash = {}
@@ -415,6 +419,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  program_property @title
                   @programs_ids << @program.id
                 end
                 # @program.adjustments.destroy_all
@@ -586,6 +591,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  program_property @title
                   @programs_ids << @program.id
                 end
                 @block_hash = {}
@@ -630,6 +636,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  program_property @title
                   @programs_ids << @program.id
                 end
 
@@ -676,6 +683,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  program_property @title
                   @programs_ids << @program.id
                 end
 
@@ -856,6 +864,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  program_property @title
                   @programs_ids << @program.id
                 end
                 @block_hash = {}
@@ -938,11 +947,29 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
     @xlsx = Roo::Spreadsheet.open(file)
   end
 
-  def program_property
-    
-    if title.include?("YEAR") || title.include?("YR") || title.include?("yr") || title.include?("Yr")
-      term = title.scan(/\d+/)[0]
+  def program_property title
+    if title.include?("YEAR") || title.downcase.include?("yr") || title.downcase.include?("y")
+      if title.scan(/\d+/).count > 1
+        term = title.scan(/\d+/)[0] + term = title.scan(/\d+/)[1]  
+      else
+        term = title.scan(/\d+/)[0]
+      end
     end
+      # Arm Basic
+    if title.include?("3/1") || title.include?("3 / 1")
+      arm_basic = 3
+    elsif title.include?("5/1") || title.include?("5 / 1")
+      arm_basic = 5
+    elsif title.include?("7/1") || title.include?("7 / 1")
+      arm_basic = 7
+    elsif title.include?("10/1") || title.include?("10 / 1")
+      arm_basic = 10
+    end
+    # Arm Advanced
+    if title.downcase.include?("arm")
+      arm_advanced = title.downcase.split("arm").last.tr('A-Za-z ','')
+    end
+    @program.update(term: term,arm_basic: arm_basic, arm_advanced: arm_advanced)
   #   if @program.program_name.include?("30") || @program.program_name.include?("30/25 Year")
   #     term = 30
   #   elsif @program.program_name.include?("20")
@@ -992,17 +1019,6 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
   #   jumbo_high_balance = false
   #   if @program.program_name.include?("High Bal") || @program.program_name.include?("High Balance")
   #     jumbo_high_balance = true
-  #   end
-
-  #   # Arm Basic
-  #   if @program.program_name.include?("3/1") || @program.program_name.include?("3 / 1")
-  #     arm_basic = 3
-  #   elsif @program.program_name.include?("5/1") || @program.program_name.include?("5 / 1")
-  #     arm_basic = 5
-  #   elsif @program.program_name.include?("7/1") || @program.program_name.include?("7 / 1")
-  #     arm_basic = 7
-  #   elsif @program.program_name.include?("10/1") || @program.program_name.include?("10 / 1")
-  #     arm_basic = 10
   #   end
 
   #   # Arm Advanced
