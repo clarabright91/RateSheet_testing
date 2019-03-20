@@ -19,8 +19,8 @@
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
-                      <label>Program Category</label>
-                      <%= select_tag 'pro_category', options_for_select(Program.all.pluck(:program_category).push("102RP","101RPHB","101RP","103RP","101RP","101RPHB","103RP","102RP","103OA","101RPHB","101OA","101RP","103RP","102RP","102OA","101OAHB","102OA","101OA","103OA","102OA","101OAHB","101OAHB","101OA","103OA").uniq.compact.sort.map{|c| [c]}.prepend(["All"]), (params[:pro_category] rescue nil)), { :class=> "form-control", :required => true} %>
+                      <label>Loan Category</label>
+                      <%= select_tag 'loan_category', options_for_select(Sheet.all.map{ |s| [s.name]}.prepend(["All"]), (params[:loan_category] rescue nil)), { :class=> "form-control", :required => true} %>
                     </div>
                   </div>
                   <div class="col-md-4">
@@ -384,12 +384,13 @@
   $(document).ready(function(){
     $('#bank_name').change(function(){
       var bank_name =  $(this).val();
-      var pro_category = $('#pro_category').val()
+      // var loan_category = $('#loan_category').val()
+      loan_category = "All"
 
       $.ajax({
         type:'GET',
         url:'/dashboard/fetch_programs_by_bank',
-        data: {bank_name : bank_name, pro_category: pro_category },
+        data: {bank_name : bank_name, loan_category: loan_category },
         success:function(response){
           var selectBox = document.getElementById('program_name');
           selectBox.options.length = 0
@@ -397,17 +398,24 @@
           response.program_list.map((program)=>{
             selectBox.options.add( new Option(program.program_name, program.program_name));
           });
+
+          var selectBox2 = document.getElementById('loan_category');
+          selectBox2.options.length = 0
+          selectBox2.options.add( new Option('All', 'All'));
+          response.loan_category_list.map((loan_category)=>{
+            selectBox2.options.add( new Option(loan_category.name, loan_category.name));
+          });
         }
       });
     });
 
-    $('#pro_category').change(function(){
-      var pro_category =  $(this).val();
+    $('#loan_category').change(function(){
+      var loan_category =  $(this).val();
       var bank_name = $('#bank_name').val()
       $.ajax({
         type:'GET',
         url:'/dashboard/fetch_programs_by_bank',
-        data: {pro_category : pro_category, bank_name : bank_name },
+        data: {loan_category : loan_category, bank_name : bank_name },
         success:function(response){
           var selectBox = document.getElementById('program_name');
           selectBox.options.length = 0
