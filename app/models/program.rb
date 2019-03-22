@@ -28,6 +28,12 @@ class Program < ApplicationRecord
     conforming += conforming.map(&:downcase)
     return conforming
   end
+
+  def get_non_conf_hb
+    non_conf_hb = ["Non-Conforming Jumbo"]
+    non_conf_hb += non_conf_hb.map(&:downcase)
+    return non_conf_hb
+  end
   
   def get_conf
     conf = ["CONF HB","Conf High Bal"]
@@ -51,7 +57,7 @@ class Program < ApplicationRecord
   end
 
   def fetch_loan_size_fields
-    loan_size = get_conforming + get_non_conforming + get_high_balance + get_jumbo + get_conf
+    loan_size = get_conforming + get_non_conforming + get_high_balance + get_jumbo + get_conf + get_non_conf_hb
     return loan_size
   end
 
@@ -123,7 +129,7 @@ class Program < ApplicationRecord
     fetch_loan_size_fields.each{ |word|
       present_word = word if p_name.downcase.include?(word.downcase)
     }
-    loan_size = get_high_balance.include?(present_word) ? "High-Balance" : get_jumbo.include?(present_word) ? "Jumbo" : get_conforming.include?(present_word) ? "Conforming" : get_non_conforming.include?(present_word) ? "Non-Conforming" : get_conf.include?(present_word) ? "Conforming and High-Balance" : nil
+    loan_size = get_high_balance.include?(present_word) ? "High-Balance" : get_jumbo.include?(present_word) ? "Jumbo" : get_conforming.include?(present_word) ? "Conforming" : get_non_conforming.include?(present_word) ? "Non-Conforming" : get_conf.include?(present_word) ? "Conforming and High-Balance" : get_non_conf_hb.include?(present_word) ? "Non-Conforming and Jumbo" : nil
     self.loan_size = loan_size
   end
 

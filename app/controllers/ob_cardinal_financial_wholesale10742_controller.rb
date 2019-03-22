@@ -1,7 +1,7 @@
 class ObCardinalFinancialWholesale10742Controller < ApplicationController
-  before_action :read_sheet, only: [:index,:ak]
+  before_action :read_sheet, only: [:index,:ak, :fannie_mae_products, :freddie_mac_products, :fha_va_usda_products, :non_conforming_jumbo_core, :non_conforming_jumbo_x]
   # before_action :check_sheet_empty , only:[:ak, :sheet1]
-  before_action :get_sheet, only: [:programs, :ak]
+  before_action :get_sheet, only: [:programs, :ak, :fannie_mae_products, :freddie_mac_products, :fha_va_usda_products, :non_conforming_jumbo_core, :non_conforming_jumbo_x]
   before_action :get_program, only: [:single_program, :program_property]
 
 
@@ -47,12 +47,25 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         @property_hash = {}
         @jumbo_hash = {}
         @non_jumbo_hash = {}
+      end
+    end
+    redirect_to programs_ob_cardinal_financial_wholesale10742_path(@sheet_obj)
+  end
+
+  def fannie_mae_products
+    @xlsx.sheets.each do |sheet|
+      if (sheet == "AK")
+        sheet_data = @xlsx.sheet(sheet)
+        @programs_ids = []
+        @adjustment_hash = {}
+        @cashout_adjustment = {}
+        @product_hash = {}
+        @subordinate_hash = {}
+        @additional_hash = {}
+        @lpmi_hash = {}
         # Fannie Mae Programs
         (71..298).each do |r|
           row = sheet_data.row(r)
-          @sheet_name = "Fannie Mae Products"
-          @bank = @sheet_obj.bank
-          @sheet_obj = @bank.sheets.find_or_create_by(name: @sheet_name)
           if ((row.compact.count > 1) && (row.compact.count <= 4))
             rr = r + 1
             max_column_section = row.compact.count - 1
@@ -64,8 +77,10 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
+                  @sheet_name = @program.sub_sheet.name
                   # Program Property
                   @program.update_fields @title
+                  program_property @title
                   @program.adjustments.destroy_all
                   @block_hash = {}
                   key = ''
@@ -367,7 +382,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -375,14 +390,24 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@cashout_adjustment,@product_hash,@subordinate_hash,@additional_hash,@lpmi_hash]
         make_adjust(adjustment,@sheet_name)
-        create_program_association_with_adjustment(@sheet_name)
+        # create_program_association_with_adjustment(@sheet_name)
+      end
+    end
+    redirect_to programs_ob_cardinal_financial_wholesale10742_path(@sheet_obj)
+  end
 
-        # Freddie programs
+  def freddie_mac_products
+    @xlsx.sheets.each do |sheet|
+      if (sheet == "AK")
+        sheet_data = @xlsx.sheet(sheet)
+        @programs_ids = []
+        @freddie_adjustment_hash = {}
+        @cashout_hash = {}
+        @sub_hash = {}
+        @property_hash = {}
+        @sub_hash = {}
         (458..684).each do |r|
           row = sheet_data.row(r)
-          @sheet_name = "Freddie Mac Products"
-          @bank = @sheet_obj.bank
-          @sheet_obj = @bank.sheets.find_or_create_by(name: @sheet_name)
           if ((row.compact.count > 1) && (row.compact.count <= 4))
             rr = r + 1
             max_column_section = row.compact.count - 1
@@ -394,8 +419,10 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
+                  @sheet_name = @program.sub_sheet.name
                   # Program Property
                   @program.update_fields @title
+                  program_property @title
                   @program.adjustments.destroy_all
                   @block_hash = {}
                   key = ''
@@ -700,7 +727,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -708,14 +735,21 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         end
         adjustment = [@freddie_adjustment_hash,@cashout_hash,@sub_hash,@property_hash,@sub_hash]
         make_adjust(adjustment,@sheet_name)
-        create_program_association_with_adjustment(@sheet_name)
+        # create_program_association_with_adjustment(@sheet_name)
+      end
+    end
+    redirect_to programs_ob_cardinal_financial_wholesale10742_path(@sheet_obj)
+  end
 
+  def fha_va_usda_products
+    @xlsx.sheets.each do |sheet|
+      if (sheet == "AK")
+        sheet_data = @xlsx.sheet(sheet)
+         @programs_ids = []
+         @relief_cashout_adjustment = {}
         # FHA Va Usda programs
         (844..1006).each do |r|
           row = sheet_data.row(r)
-          @sheet_name = "FHA, VA, and USDA Products"
-          @bank = @sheet_obj.bank
-          @sheet_obj = @bank.sheets.find_or_create_by(name: @sheet_name)
           if ((row.compact.count > 1) && (row.compact.count <= 4))
             rr = r + 1
             max_column_section = row.compact.count - 1
@@ -727,8 +761,10 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
+                  @sheet_name = @program.sub_sheet.name
                   # Program Property
                   @program.update_fields @title
+                  program_property @title
                   @program.adjustments.destroy_all
                   @block_hash = {}
                   key = ''
@@ -861,13 +897,21 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         end
         adjustment = [@relief_cashout_adjustment]
         make_adjust(adjustment,@sheet_name)
-        create_program_association_with_adjustment(@sheet_name)
-        # Non Conforming programs
+        # create_program_association_with_adjustment(@sheet_name)
+      end
+    end
+    redirect_to programs_ob_cardinal_financial_wholesale10742_path(@sheet_obj)
+  end
+
+  def non_conforming_jumbo_core
+    @xlsx.sheets.each do |sheet|
+      if (sheet == "AK")
+        sheet_data = @xlsx.sheet(sheet)
+         @programs_ids = []
+         @jumbo_hash = {}
+         # Non Conforming programs
         (1126..1145).each do |r|
           row = sheet_data.row(r)
-          @sheet_name = "Non-Conforming Jumbo CORE"
-          @bank = @sheet_obj.bank
-          @sheet_obj = @bank.sheets.find_or_create_by(name: @sheet_name)
           if ((row.compact.count > 1) && (row.compact.count <= 3))
             rr = r + 1
             max_column_section = row.compact.count - 1
@@ -879,8 +923,10 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
+                  @sheet_name = @program.sub_sheet.name
                   # Program Property
                   @program.update_fields @title
+                  program_property @title
                   @program.adjustments.destroy_all
                 end
                 @block_hash = {}
@@ -1012,7 +1058,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1020,13 +1066,20 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         end
         adjustment = [@jumbo_hash]
         make_adjust(adjustment,@sheet_name)
-        create_program_association_with_adjustment(@sheet_name)
-        # Jumbo Non Conforming programs
+        # create_program_association_with_adjustment(@sheet_name)
+      end
+    end
+    redirect_to programs_ob_cardinal_financial_wholesale10742_path(@sheet_obj)
+  end
+
+  def non_conforming_jumbo_x
+    @xlsx.sheets.each do |sheet|
+      if (sheet == "AK")
+        sheet_data = @xlsx.sheet(sheet)
+        @programs_ids = []
+        @non_jumbo_hash = {}
         (1220..1260).each do |r|
           row = sheet_data.row(r)
-          @sheet_name = "Non-Conforming Jumbo X"
-          @bank = @sheet_obj.bank
-          @sheet_obj = @bank.sheets.find_or_create_by(name: @sheet_name)
           if ((row.compact.count >= 1) && (row.compact.count <= 4))
             rr = r + 1
             max_column_section = row.compact.count - 1
@@ -1037,8 +1090,10 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids << @program.id
+                @sheet_name = @program.sub_sheet.name
                 # Program Property
                 @program.update_fields @title
+                program_property @title
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -1120,7 +1175,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                   end
                 end
               rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
@@ -1128,15 +1183,15 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         end
         adjustment = [@non_jumbo_hash]
         make_adjust(adjustment,@sheet_name)
-        create_program_association_with_adjustment(@sheet_name)
+        # create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_cardinal_financial_wholesale10742_path(@sheet_obj)
   end
 
-  def sheet1
-    redirect_to ob_cardinal_financial_wholesale10742_index_path
-  end
+  # def sheet1
+  #   redirect_to ob_cardinal_financial_wholesale10742_index_path
+  # end
 
   # def check_sheet_empty
   #   action =  params[:action]
@@ -1184,7 +1239,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
     end
 
     def get_sheet
-      @sheet_obj = Sheet.find(params[:id])
+      @sheet_obj = SubSheet.find(params[:id])
     end
 
     def get_program
@@ -1192,7 +1247,33 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
     end
 
     def get_sheets_names
-      return ["Fannie Mae Products","Freddie Mac Products","FHA, VA, and USDA Products","Non-Conforming Jumbo CORE","Non-Conforming Jumbo X"]
+      return ["Fannie Mae Products","Freddie Mac Products","FHA VA USDA Products","Non Conforming Jumbo Core","Non Conforming Jumbo X"]
+    end
+
+    def program_property title
+      @arm_advanced = ''
+      if title.downcase.exclude?("arm") 
+        term = title.downcase.split("fixed").first.tr('A-Za-z/ ','')
+      end
+         # Arm Basic
+      if title.include?("3/1") || title.include?("3 / 1")
+        arm_basic = 3
+      elsif title.include?("5/1") || title.include?("5 / 1")
+        arm_basic = 5
+      elsif title.include?("7/1") || title.include?("7 / 1")
+        arm_basic = 7
+      elsif title.include?("10/1") || title.include?("10 / 1") || title.include?("10 /1")
+        arm_basic = 10
+      end
+      # Arm_advanced
+      if title.downcase.include?("arm")
+        title.split.each do |arm|
+          if arm.tr('1-9A-Za-z(|.% ','') == "//"
+            @arm_advanced = arm.tr('A-Za-z()|.% , ','')[0,5]
+          end
+        end
+      end
+      @program.update(term: term, arm_basic: arm_basic, arm_advanced: @arm_advanced)
     end
 
     def make_adjust(block_hash, sheet)
@@ -1207,41 +1288,41 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
       end
     end
 
-    def create_program_association_with_adjustment(sheet)
-      adjustment_list = Adjustment.where(loan_category: sheet)
-      program_list = Program.where(loan_category: sheet)
+    # def create_program_association_with_adjustment(sheet)
+    #   adjustment_list = Adjustment.where(loan_category: sheet)
+    #   program_list = Program.where(loan_category: sheet)
 
-      adjustment_list.each_with_index do |adj_ment, index|
-        key_list = adj_ment.data.keys.first.split("/")
-        program_filter1={}
-        program_filter2={}
-        include_in_input_values = false
-        if key_list.present?
-          key_list.each_with_index do |key_name, key_index|
-            if (Program.column_names.include?(key_name.underscore))
-              unless (Program.column_for_attribute(key_name.underscore).type.to_s == "boolean")
-                program_filter1[key_name.underscore] = nil
-              else
-                if (Program.column_for_attribute(key_name.underscore).type.to_s == "boolean")
-                  program_filter2[key_name.underscore] = true
-                end
-              end
-            else
-              if(Adjustment::INPUT_VALUES.include?(key_name))
-                include_in_input_values = true
-              end
-            end
-          end
+    #   adjustment_list.each_with_index do |adj_ment, index|
+    #     key_list = adj_ment.data.keys.first.split("/")
+    #     program_filter1={}
+    #     program_filter2={}
+    #     include_in_input_values = false
+    #     if key_list.present?
+    #       key_list.each_with_index do |key_name, key_index|
+    #         if (Program.column_names.include?(key_name.underscore))
+    #           unless (Program.column_for_attribute(key_name.underscore).type.to_s == "boolean")
+    #             program_filter1[key_name.underscore] = nil
+    #           else
+    #             if (Program.column_for_attribute(key_name.underscore).type.to_s == "boolean")
+    #               program_filter2[key_name.underscore] = true
+    #             end
+    #           end
+    #         else
+    #           if(Adjustment::INPUT_VALUES.include?(key_name))
+    #             include_in_input_values = true
+    #           end
+    #         end
+    #       end
 
-          if (include_in_input_values)
-            program_list1 = program_list.where.not(program_filter1)
-            program_list2 = program_list1.where(program_filter2)
+    #       if (include_in_input_values)
+    #         program_list1 = program_list.where.not(program_filter1)
+    #         program_list2 = program_list1.where(program_filter2)
 
-            if program_list2.present?
-              program_list2.map{ |program| program.adjustments << adj_ment unless program.adjustments.include?(adj_ment) }
-            end
-          end
-        end
-      end
-    end
+    #         if program_list2.present?
+    #           program_list2.map{ |program| program.adjustments << adj_ment unless program.adjustments.include?(adj_ment) }
+    #         end
+    #       end
+    #     end
+    #   end
+    # end
 end
