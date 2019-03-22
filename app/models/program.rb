@@ -12,7 +12,7 @@ class Program < ApplicationRecord
   end
 
   def get_adjustments
-    Adjustment.where(sheet_name: self.sheet_name)
+    Adjustment.where(loan_category: self.loan_category)
   end
 
   def get_non_conforming
