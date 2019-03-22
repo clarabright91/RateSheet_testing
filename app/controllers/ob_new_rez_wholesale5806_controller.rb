@@ -841,7 +841,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
 
                 # High Balance
                 if @title.include?("High Balance")
-                  loan_size = "High Balance"
+                  loan_size = "High-Balance"
                 end
 
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
@@ -2736,9 +2736,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   term = 20
                 elsif @title.include?("25yr") || @title.include?("25 Yr")
                   term = 25
-                elsif @title.include?("30yr") || @title.include?("30 Yr")
+                elsif @title.include?("30yr") || @title.include?("30 Yr") 
                   term = 30
-                elsif @title.include?("20/25/30 Yr")
+                end
+
+                if @title.include?("20/25/30 Yr")
                   term = 2030
                 elsif @title.include?("10/15 Yr")
                   term = 1015
@@ -2781,13 +2783,15 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     rrr = rr + max_row
                     ccc = cc + c_i
                     value = sheet_data.cell(rrr,ccc)
-                    if (c_i == 0)
-                      key = value
-                      @block_hash[key] = {}
-                    else
-                      @block_hash[key][15*c_i] = value
+                    if value.present?
+                      if (c_i == 0)
+                        key = value
+                        @block_hash[key] = {}
+                      else
+                        @block_hash[key][15*c_i] = value
+                      end
+                      @data << value
                     end
-                    @data << value
                   end
 
                   if @data.compact.length == 0
@@ -4104,14 +4108,26 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     end
 
                     # rate arm
-                    if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
+                    arm_basic = nil
+                    if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("7/1") || @title.include?("5/1")
                       arm_basic = @title.scan(/\d+/)[0].to_i
                     end
+
+                    arm_advanced = nil
+                    if @title.include?("5/2/5")
+                      arm_advanced = "5/2/5"
+                    end
+
+                    loan_size = nil
+                    if @title.include?("Jumbo")
+                      loan_size = "Jumbo"
+                    end
+
 
 
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program_ids << @program.id
-                  @program.update(term: term,loan_type: loan_type ,arm_basic: arm_basic, loan_category: @sheet_name )
+                  @program.update(term: term,loan_type: loan_type ,arm_basic: arm_basic, loan_category: @sheet_name, loan_size: loan_size, arm_advanced: arm_advanced )
                   @program.adjustments.destroy_all
                   @block_hash = {}
                   key = ''
@@ -5250,19 +5266,21 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @program.adjustments.destroy_all
                   @block_hash = {}
                   key = ''
-                  (0..50).each do |max_row|
+                  (0..19).each do |max_row|
                     @data = []
                     (0..4).each_with_index do |index, c_i|
                       rrr = rr + max_row
                       ccc = cc + c_i
                       value = sheet_data.cell(rrr,ccc)
-                      if (c_i == 0)
-                        key = value
-                        @block_hash[key] = {}
-                      else
-                        @block_hash[key][15*c_i] = value
+                      if value.present?
+                        if (c_i == 0)
+                          key = value
+                          @block_hash[key] = {}
+                        else
+                          @block_hash[key][15*c_i] = value
+                        end
+                        @data << value
                       end
-                      @data << value
                     end
 
                     if @data.compact.length == 0
@@ -5853,7 +5871,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
 
                 fannie_mae = false
-                if @title.downcase.include?("Fannie Mae")
+                if @title.downcase.include?("fannie mae")
                   fannie_mae = true
                 end
                 # Arm Advanced
@@ -6265,14 +6283,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   arm_basic = @title.scan(/\d+/)[0].to_i
                 end
 
-                fannie_mae_home_ready = false
-                if @title.include?("Fannie Mae HomeReady")
-                  fannie_mae_home_ready = true
+                if @title.downcase.include?("homeready")
+                  fannie_mae_product = "HomeReady"
                 end
 
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_ids << @program.id
-                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic,  fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, loan_category: @sheet_name)
+                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, fannie_mae_product: fannie_mae_product, loan_category: @sheet_name)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
