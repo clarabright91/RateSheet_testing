@@ -948,7 +948,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
   end
 
   def program_property title
-    if title.include?("YEAR") || title.downcase.include?("yr") || title.downcase.include?("y")
+    if (title.downcase.include?("year") || title.downcase.include?("yr") || title.downcase.include?("y")) && title.downcase.exclude?('arm')
       if title.scan(/\d+/).count > 1
         term = title.scan(/\d+/)[0] + term = title.scan(/\d+/)[1]  
       else
@@ -966,10 +966,17 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
       arm_basic = 10
     end
     # Arm Advanced
+    @arm_advanced = nil
     if title.downcase.include?("arm")
-      arm_advanced = title.downcase.split("arm").last.tr('A-Za-z ','')
-    end
-    @program.update(term: term,arm_basic: arm_basic, arm_advanced: arm_advanced)
+        title.split.each do |arm|
+          if arm.tr('1-9A-Za-z(|.% ','') == "//"
+            @arm_advanced = arm.tr('A-Za-z()|.% , ','')[0,5]
+          elsif arm.split('/').last == "5"
+            @arm_advanced = arm.tr('A-Za-z()|.% , ','')[0,3]
+          end
+        end
+      end
+    @program.update(term: term,arm_basic: arm_basic, arm_advanced: @arm_advanced)
   #   if @program.program_name.include?("30") || @program.program_name.include?("30/25 Year")
   #     term = 30
   #   elsif @program.program_name.include?("20")
