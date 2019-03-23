@@ -415,6 +415,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @term = program_property @title
                   @program.update_fields @title
+                  @program.update(arm_advanced: nil)
                   @programs_ids << @program.id
 
                   @program.adjustments.destroy_all
