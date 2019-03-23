@@ -40,6 +40,11 @@ class ObQuickenLoans3571Controller < ApplicationController
                   @programs_ids << @program.id
                   @program.update_fields @title
                   program_property @title
+
+                  if @title == "30 Year Home Possible/Home Ready"
+                    @program.update(term: 30)
+                  end
+
   	              @block_hash = {}
   	              key = ''
   	              (1..25).each do |max_row|
@@ -1453,7 +1458,11 @@ class ObQuickenLoans3571Controller < ApplicationController
     def program_property title
       if (title.include?("YEAR") || title.downcase.include?("yr") || title.downcase.include?("y")) && title.exclude?("/")
         if title.scan(/\d+/).count > 1
-          term = title.scan(/\d+/)[0] + term = title.scan(/\d+/)[1]  
+          if(title.scan(/\d+/)[1].to_i < title.scan(/\d+/)[0].to_i)
+            term = title.scan(/\d+/)[1] + term = title.scan(/\d+/)[0]
+          else
+            term = title.scan(/\d+/)[0] + term = title.scan(/\d+/)[1]
+          end
         else
           term = title.scan(/\d+/)[0]
         end

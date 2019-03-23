@@ -3964,6 +3964,17 @@ class ObCmgWholesalesController < ApplicationController
 
   def program_property sheet
     # term
+    term = nil
+    loan_size = nil
+    loan_type = nil
+    program_category = nil
+    fha = false
+    va = false
+    usda = false
+    streamline = false
+    jumbo = false
+    high_balance = false
+
     if (@program.program_name.split("Year").count > 1)
       term = @program.program_name.split("Year").first.tr('^0-9><%', '')
     elsif (@program.program_name.split("Yr").count > 1)
@@ -4029,9 +4040,11 @@ class ObCmgWholesalesController < ApplicationController
     end
     if @program.program_name.include?("Jumbo")
       loan_size = "Jumbo"
+      jumbo = true
     end
     if @program.program_name.include?("High-Balance")
       loan_size = "High-Balance"
+      high_balance = true
     end
     @program.update(term: term,loan_type: loan_type,program_category: program_category, streamline: streamline,fha: fha, va: va, usda: usda, arm_basic: arm_basic, loan_category: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product, loan_size: loan_size, bank_name: bank_name)
   end
