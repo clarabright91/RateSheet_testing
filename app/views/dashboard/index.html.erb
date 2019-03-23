@@ -178,7 +178,7 @@
               <div class="form-group">
                 <label>Lock Period</label>
                 <div class="input-group">
-                  <% @lock_period_list =[["15 days","15"], ["30 days","30"], ["45 days","45"], ["60 days","60"]]%>
+                  <% @lock_period_list =[["15 days","15"], ["30 days","30"], ["45 days","45"], ["60 days","60"], ["75 days","75"], ["90 days","90"]]%>
                   <%= select_tag 'lock_period', options_for_select(@lock_period_list, @lock_period), :class=> "form-control" %>
                 </div>
               </div>

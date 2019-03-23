@@ -142,7 +142,7 @@ class Program < ApplicationRecord
   end
 
   def set_fannie_mae p_name
-    present_word = nil
+    present_word = false
     ["Fannie Mae", "DU"].each{ |word|
       present_word = true if p_name.downcase.include?(word.downcase)
     }
@@ -150,7 +150,7 @@ class Program < ApplicationRecord
   end
 
   def set_freddie_mac p_name
-    present_word = nil
+    present_word = false
     ["Freddie Mac", "LP"].each{ |word|
       present_word = true if p_name.downcase.include?(word.downcase)
     }
