@@ -51,7 +51,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                   program_property @title
                   @block_hash = {}
                   key = ''
-                  (1..16).each do |max_row|
+                  (1..13).each do |max_row|
                     @data = []
                     (0..4).each_with_index do |index, c_i|
                       rrr = rr + max_row

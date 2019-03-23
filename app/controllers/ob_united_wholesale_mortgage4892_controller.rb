@@ -973,6 +973,8 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
             @arm_advanced = arm.tr('A-Za-z()|.% , ','')[0,5]
           elsif arm.split('/').last == "5"
             @arm_advanced = arm.tr('A-Za-z()|.% , ','')[0,3]
+          elsif arm == "2-2-5"
+              @arm_advanced = "2-2-5"
           end
         end
       end
