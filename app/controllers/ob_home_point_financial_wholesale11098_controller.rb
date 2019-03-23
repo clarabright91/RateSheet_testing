@@ -42,6 +42,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 if @title.present? && @title != "Margin 2.25%; Caps 2/2/5, index Libor"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -82,64 +83,65 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
   end
 
 
-  def conforming_high_balance
-    @programs_ids = []
-    @xlsx.sheets.each do |sheet|
-      if (sheet == "Conforming High Balance")
-        sheet_data = @xlsx.sheet(sheet)
-        @programs_ids = []
-        @block_hash = {}
+  # def conforming_high_balance
+  #   @programs_ids = []
+  #   @xlsx.sheets.each do |sheet|
+  #     if (sheet == "Conforming High Balance")
+  #       sheet_data = @xlsx.sheet(sheet)
+  #       @programs_ids = []
+  #       @block_hash = {}
 
-        (9..77).each do |r|
-          row = sheet_data.row(r)
-          if ((row.compact.count >= 1) && (row.compact.count <= 2))
-            rr = r + 1
-            max_column_section = row.compact.count
-            (0..max_column_section).each do |max_column|
-              cc = 6*max_column + 2 # 2 /8
-              begin
-                @title = sheet_data.cell(r,cc)
-                if @title.present? && @title != "Margin 2.25%; Caps 2/2/5, index Libor"
-                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
-                  program_property @title
-                  @programs_ids << @program.id
-                  @program.adjustments.destroy_all
-                  @block_hash = {}
-                  key = ''
-                  (1..20).each do |max_row|
-                    @data = []
-                    (0..8).each_with_index do |index, c_i|
-                      rrr = rr + max_row
-                      ccc = cc + c_i
-                      value = sheet_data.cell(rrr,ccc)
-                      if value.present?
-                        if (c_i == 0)
-                          key = value
-                          @block_hash[key] = {}
-                        else
-                          @block_hash[key][15*c_i] = value
-                        end
-                        @data << value
-                      end
-                    end
-                    if @data.compact.reject { |c| c.blank? }.length == 0
-                      break # terminate the loop
-                    end
-                  end
-                  @program.update(base_rate: @block_hash)
-                end
-              rescue Exception => e
-                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
-                error_log.save
-              end
-            end
-          end
-        end
-      end
-    end
-    redirect_to programs_ob_home_point_financial_wholesale11098_path(@sheet_obj)
-  end
+  #       (9..77).each do |r|
+  #         row = sheet_data.row(r)
+  #         if ((row.compact.count >= 1) && (row.compact.count <= 2))
+  #           rr = r + 1
+  #           max_column_section = row.compact.count
+  #           (0..max_column_section).each do |max_column|
+  #             cc = 6*max_column + 2 # 2 /8
+  #             begin
+  #               @title = sheet_data.cell(r,cc)
+  #               if @title.present? && @title != "Margin 2.25%; Caps 2/2/5, index Libor"
+  #                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+  #                 @program.update_fields @title
+  #                 @program.update(loan_category: sheet, loan_size: loan_size)
+  #                 program_property @title
+  #                 @programs_ids << @program.id
+  #                 @program.adjustments.destroy_all
+  #                 @block_hash = {}
+  #                 key = ''
+  #                 (1..20).each do |max_row|
+  #                   @data = []
+  #                   (0..8).each_with_index do |index, c_i|
+  #                     rrr = rr + max_row
+  #                     ccc = cc + c_i
+  #                     value = sheet_data.cell(rrr,ccc)
+  #                     if value.present?
+  #                       if (c_i == 0)
+  #                         key = value
+  #                         @block_hash[key] = {}
+  #                       else
+  #                         @block_hash[key][15*c_i] = value
+  #                       end
+  #                       @data << value
+  #                     end
+  #                   end
+  #                   if @data.compact.reject { |c| c.blank? }.length == 0
+  #                     break # terminate the loop
+  #                   end
+  #                 end
+  #                 @program.update(base_rate: @block_hash)
+  #               end
+  #             rescue Exception => e
+  #               error_log = ErrorLog.new(details: e.backtrace_locations[0], row: rr, column: cc, loan_category: sheet, error_detail: e.message)
+  #               error_log.save
+  #             end
+  #           end
+  #         end
+  #       end
+  #     end
+  #   end
+  #   redirect_to programs_ob_home_point_financial_wholesale11098_path(@sheet_obj)
+  # end
 
   def fha_va_usda
     @programs_ids = []
@@ -161,6 +163,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -221,6 +224,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -281,6 +285,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -341,6 +346,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -401,6 +407,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -460,6 +467,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -519,6 +527,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -582,6 +591,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -641,6 +651,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 if @title.present? && @title != "Margin 2.25%; Caps 2/2/5" && @title != "Margin 2.25%; Caps 5/2/5"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -704,6 +715,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -767,6 +779,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -826,6 +839,14 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 if @title.present? && @title != "Margin 2.25%; Caps 2/2/5, index Libor"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+
+                  loan_size = nil
+                  if @title.include?("CONF") && @title.include?("HB")
+                    loan_size = "High-Balance and Conforming"
+                  end
+
+                  @program.update(loan_category: sheet, loan_size: loan_size)
+                  @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -885,6 +906,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -945,6 +967,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -1117,6 +1140,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -1176,6 +1200,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -1235,6 +1260,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -1298,6 +1324,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -1357,6 +1384,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 if @title.present? && @title != "Margin 2.25%; Caps 2/2/5" && @title != "Margin 2.25%; Caps 5/2/5"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -1421,6 +1449,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -1485,6 +1514,7 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields @title
+                  @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
