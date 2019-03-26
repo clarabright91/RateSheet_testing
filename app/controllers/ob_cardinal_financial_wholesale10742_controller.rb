@@ -1078,7 +1078,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @non_jumbo_hash = {}
-        (1220..1260).each do |r|
+        (1223..1260).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count >= 1) && (row.compact.count <= 4))
             rr = r + 1
