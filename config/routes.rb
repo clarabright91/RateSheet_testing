@@ -139,7 +139,21 @@ Rails.application.routes.draw do
     member do
       get :programs
       get :ratesheet
-      get :single_program
+      get :single_program 
+      get :agency_conforming_programs
+      get :fhlmc_home_possible
+      get :non_conforming_sigma_qm_prime_jumbo
+      get :non_conforming_jw
+      get :government_programs
+      get :hecm_reverse_mortgage
+      get :non_qm_sigma_seasoned_credit_event
+      get :non_qm_sigma_no_credit_event_plus
+      get :non_qm_real_prime_advantage
+      get :non_qm_real_credit_advantage_a
+      get :non_qm_real_credit_advantage_bbc
+      get :non_qm_real_investor_income_a
+      get :non_qm_real_investor_income_bb
+      get :non_qm_real_dsc_ratio
     end
   end
 

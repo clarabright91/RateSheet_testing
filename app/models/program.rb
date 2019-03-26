@@ -70,6 +70,7 @@ class Program < ApplicationRecord
     set_streamline                  if p_name.downcase.include?("streamline")
     set_full_doc                    if p_name.downcase.include?("full doc")
     set_loan_purpose(p_name)        if ["Purchase", "Refinance"].each{ |word| p_name.downcase.include?(word.downcase) }
+    set_conforming                  if get_conforming.each{ |word| p_name.downcase.include?(word.downcase) }
     # set_arm_basic(p_name)           if ["ARM"].each{ |word| p_name.downcase.include?(word.downcase) }
     # set_arm_advanced(p_name)        if ["ARM"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_fannie_mae(p_name)          if ["Fannie Mae", "DU"].each{ |word| p_name.downcase.include?(word.downcase) }
@@ -90,6 +91,10 @@ class Program < ApplicationRecord
       present_word = word if prog_name.downcase.include?(word.downcase)
     }
     self.loan_type = present_word
+  end
+
+  def set_conforming
+    self.conforming = true
   end
 
   def set_fha
@@ -114,10 +119,10 @@ class Program < ApplicationRecord
 
   def set_loan_purpose p_name
     present_word = nil
-    ["Purchase", "Refinance"].each{ |word|
+    ["Purchase", "Refinance", "PURCHASE", "REFINANCE"].each{ |word|
       present_word = word if p_name.downcase.include?(word.downcase)
     }
-    self.loan_purpose = present_word
+    self.loan_purpose = present_word.downcase rescue nil
   end
 
   def set_arm_basic p_name

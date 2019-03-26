@@ -1456,7 +1456,7 @@ class ObQuickenLoans3571Controller < ApplicationController
     end
 
     def program_property title
-      if (title.include?("YEAR") || title.downcase.include?("yr") || title.downcase.include?("y")) && title.exclude?("/")
+      if (title.downcase.include?("year") || title.downcase.include?("yr") || title.downcase.include?("y")) && title.downcase.exclude?("arm")
         if title.scan(/\d+/).count > 1
           if(title.scan(/\d+/)[1].to_i < title.scan(/\d+/)[0].to_i)
             term = title.scan(/\d+/)[1] + term = title.scan(/\d+/)[0]
@@ -1468,14 +1468,8 @@ class ObQuickenLoans3571Controller < ApplicationController
         end
       end
         # Arm Basic
-      if title.include?("3/1") || title.include?("3 / 1")
-        arm_basic = 3
-      elsif title.include?("5/1") || title.include?("5 / 1")
-        arm_basic = 5
-      elsif title.include?("7/1") || title.include?("7 / 1")
-        arm_basic = 7
-      elsif title.include?("10/1") || title.include?("10 / 1")
-        arm_basic = 10
+      if title.downcase.include?("arm")
+        arm_basic = title.scan(/\d+/)[0]
       end
       @program.update(term: term,arm_basic: arm_basic)
     end
