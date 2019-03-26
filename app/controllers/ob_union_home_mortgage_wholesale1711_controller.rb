@@ -1487,6 +1487,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
         ltv_key = ''
         secondary_key = ''
         first_key = ''
+        @sheet_name = sheet
         # programs
         (9..83).each do |r|
           row = sheet_data.row(r)
