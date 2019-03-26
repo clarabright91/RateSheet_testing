@@ -801,7 +801,6 @@ class ObCmgWholesalesController < ApplicationController
         end
         adjustment = [@adjustment_hash,@adjustment_fico,@cashout_adjustment,@subordinate_hash,@adjustment_cap,@loan_adjustment,@state_adjustments,@other_adjustment,@lpmi_hash,@lpmi_adj,@home_ready,@home_possible,@property_hash]
         make_adjust(adjustment,"AGENCY")
-
         create_program_association_with_adjustment("AGENCY")
       end
     end
@@ -1365,7 +1364,6 @@ class ObCmgWholesalesController < ApplicationController
         end
         adjustment = [@adjustment_hash,@subordinate_hash,@adjustment_cap,@misc_adjustment,@state_adjustment]
         make_adjust(adjustment,sheet)
-
         create_program_association_with_adjustment(sheet)
       end
     end
@@ -1729,7 +1727,6 @@ class ObCmgWholesalesController < ApplicationController
         end
         adjustment = [@adjustment_hash,@subordinate_hash,@adjustment_cap,@standard_hash,@home_hash,@property_hash]
         make_adjust(adjustment,program_sheet)
-
         create_program_association_with_adjustment(program_sheet)
       end
     end
@@ -1949,7 +1946,6 @@ class ObCmgWholesalesController < ApplicationController
         end
         adjustment = [@adjustment_hash,@state_adjustment]
         make_adjust(adjustment,sheet)
-
         create_program_association_with_adjustment(sheet)
       end
     end
@@ -2195,7 +2191,6 @@ class ObCmgWholesalesController < ApplicationController
         end
         adjustment = [@data_hash]
         make_adjust(adjustment,sheet)
-
         create_program_association_with_adjustment(sheet)
       end
     end
@@ -2653,8 +2648,7 @@ class ObCmgWholesalesController < ApplicationController
         end
         adjustment = [@jumbo_purchase_adjustment,@jumbo_rate_adjustment,@jumbo_other_adjustment]
         make_adjust(adjustment,sheet)
-
-        # create_program_association_with_adjustment(sheet)
+        create_program_association_with_adjustment(sheet)
         end
       end
     redirect_to programs_ob_cmg_wholesale_path(@sheet_obj)
@@ -2890,7 +2884,6 @@ class ObCmgWholesalesController < ApplicationController
         end
         adjustment = [@purchase_adjustment,@rate_adjustment,@adjustment_hash,@other_adjustment]
         make_adjust(adjustment,sheet)
-
         create_program_association_with_adjustment(sheet)
       end
     end
@@ -3126,7 +3119,6 @@ class ObCmgWholesalesController < ApplicationController
         end
         adjustment = [@purchase_adjustment,@rate_adjustment,@adjustment_hash,@other_adjustment]
         make_adjust(adjustment,sheet)
-
         create_program_association_with_adjustment(sheet)
       end
     end
@@ -3398,7 +3390,6 @@ class ObCmgWholesalesController < ApplicationController
 
         adjustment = [@jumbo_flex_hash]
         make_adjust(adjustment,sheet)
-
         create_program_association_with_adjustment(sheet)
       end
     end
@@ -3526,7 +3517,6 @@ class ObCmgWholesalesController < ApplicationController
         end
         adjustment = [@misc_adjustment,@block_adjustment]
         make_adjust(adjustment,sheet)
-
         create_program_association_with_adjustment(sheet)
       end
     end
@@ -3885,7 +3875,6 @@ class ObCmgWholesalesController < ApplicationController
         end
         adjustment = [@jumbo_adjustment_hash,@jumbo_other_adjustment]
         make_adjust(adjustment,sheet)
-
         create_program_association_with_adjustment(sheet)
       end
     end

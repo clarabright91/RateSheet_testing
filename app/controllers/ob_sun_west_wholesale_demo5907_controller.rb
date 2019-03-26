@@ -263,6 +263,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         end
         adjustment = [@adj_hash]
         make_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_sun_west_wholesale_demo5907_path(@sheet_obj)
@@ -452,6 +453,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         end
         adjustment = [@property_hash]
         make_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_sun_west_wholesale_demo5907_path(@sheet_obj)
@@ -462,6 +464,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
       if (sheet == "RATESHEET")
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
+        @jumbo_hash = {}
         #Non-Confirming: Sigma Programs
         (1101..1179).each do |r|
           row = sheet_data.row(r)
@@ -628,6 +631,9 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
             end
           end
         end
+        adjustment = [@jumbo_hash]
+        make_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_sun_west_wholesale_demo5907_path(@sheet_obj)
@@ -789,6 +795,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         end
         adjustment = [@price_hash]
         make_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_sun_west_wholesale_demo5907_path(@sheet_obj)
@@ -931,6 +938,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         end
         adjustment = [@price_hash]
         make_adjust(adjustment,@gov_hash)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_sun_west_wholesale_demo5907_path(@sheet_obj)
@@ -1120,6 +1128,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         end
         adjustment = [@spec_adjustment5, @spec_adjustment6]
         make_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_sun_west_wholesale_demo5907_path(@sheet_obj)
@@ -1238,6 +1247,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         end
         adjustment = [@day_adjustment]
         make_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_sun_west_wholesale_demo5907_path(@sheet_obj)
@@ -1349,6 +1359,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         end
         adjustment = [@spec_adjustment12,@day_adjustment6]
         make_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_sun_west_wholesale_demo5907_path(@sheet_obj)
@@ -1483,6 +1494,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         end
         adjustment = [@spec_adjustment8,@day_adjustment2]
         make_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_sun_west_wholesale_demo5907_path(@sheet_obj)
@@ -1603,6 +1615,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         end
         adjustment = [@spec_adjustment9,@day_adjustment3]
         make_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_sun_west_wholesale_demo5907_path(@sheet_obj)
@@ -1613,6 +1626,8 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
       if (sheet == "RATESHEET")
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
+        @spec_adjustment10 = {}
+        @day_adjustment4 = {}
         #NON-QM: R.E.A.L INVESTOR INCOME - B, B- /Program
         (3334..3346).each do |r|
           row = sheet_data.row(r)
@@ -1711,6 +1726,9 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
             # PREPAYMENT PENALTY #adjustment remaining
           end
         end
+        adjustment = [@spec_adjustment10,@day_adjustment4]
+        make_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_sun_west_wholesale_demo5907_path(@sheet_obj)
@@ -1721,6 +1739,8 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
       if (sheet == "RATESHEET")
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
+        @spec_adjustment11 = {}
+        @day_adjustment5 = {}
         # # NON-QM: R.E.A.L DSC RATIO /Programs
         (3433..3445).each do |r|
           row = sheet_data.row(r)
@@ -1817,6 +1837,9 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
             end
           end
         end
+        adjustment = [@spec_adjustment11,@day_adjustment5]
+        make_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_sun_west_wholesale_demo5907_path(@sheet_obj)

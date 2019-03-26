@@ -390,7 +390,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@cashout_adjustment,@product_hash,@subordinate_hash,@additional_hash,@lpmi_hash]
         make_adjust(adjustment,@sheet_name)
-        # create_program_association_with_adjustment(@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_cardinal_financial_wholesale10742_path(@sheet_obj)
@@ -735,7 +735,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         end
         adjustment = [@freddie_adjustment_hash,@cashout_hash,@sub_hash,@property_hash,@sub_hash]
         make_adjust(adjustment,@sheet_name)
-        # create_program_association_with_adjustment(@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_cardinal_financial_wholesale10742_path(@sheet_obj)
@@ -897,7 +897,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         end
         adjustment = [@relief_cashout_adjustment]
         make_adjust(adjustment,@sheet_name)
-        # create_program_association_with_adjustment(@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_cardinal_financial_wholesale10742_path(@sheet_obj)
@@ -1066,7 +1066,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         end
         adjustment = [@jumbo_hash]
         make_adjust(adjustment,@sheet_name)
-        # create_program_association_with_adjustment(@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_cardinal_financial_wholesale10742_path(@sheet_obj)
@@ -1183,7 +1183,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         end
         adjustment = [@non_jumbo_hash]
         make_adjust(adjustment,@sheet_name)
-        # create_program_association_with_adjustment(@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_cardinal_financial_wholesale10742_path(@sheet_obj)

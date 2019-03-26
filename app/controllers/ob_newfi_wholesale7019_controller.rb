@@ -524,7 +524,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
         end
         adjustment = [@adjustment_hash, @other_adjustment, @other_adjustment1]
         make_adjust(adjustment,sheet)
-        # create_program_association_with_adjustment(sheet)
+        create_program_association_with_adjustment(sheet)
       end
     end
     redirect_to programs_ob_newfi_wholesale7019_path(@sheet_obj)
@@ -668,7 +668,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
         end
         adjustment = [@adjustment_hash, @other_adjustment, @other_adjustment1]
         make_adjust(adjustment,sheet)
-        # create_program_association_with_adjustment(sheet)
+        create_program_association_with_adjustment(sheet)
       end
     end
     redirect_to programs_ob_newfi_wholesale7019_path(@sheet_obj)
@@ -2018,7 +2018,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
         end
         adjustment = [@secondary_hash,@cashout_hash,@other_adjustment]
         make_adjust(adjustment,sheet)
-        # create_program_association_with_adjustment(sheet)
+        create_program_association_with_adjustment(sheet)
       end
     end
     redirect_to programs_ob_newfi_wholesale7019_path(@sheet_obj)
@@ -3033,7 +3033,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
     end
     adjustment = [@adjustment_hash]
     make_adjust(adjustment,sheet)
-    # create_program_association_with_adjustment(sheet)
+    create_program_association_with_adjustment(sheet)
   end
 
   def create_program_association_with_adjustment(sheet)

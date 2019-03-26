@@ -1612,41 +1612,41 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
       @program.update(term: term,arm_basic: arm_basic)
     end
 
-    def create_program_association_with_adjustment(sheet)
-      adjustment_list = Adjustment.where(loan_category: sheet)
-      program_list = Program.where(loan_category: sheet)
+    # def create_program_association_with_adjustment(sheet)
+    #   adjustment_list = Adjustment.where(loan_category: sheet)
+    #   program_list = Program.where(loan_category: sheet)
 
-      adjustment_list.each_with_index do |adj_ment, index|
-        key_list = adj_ment.data.keys.first.split("/")
-        program_filter1={}
-        program_filter2={}
-        include_in_input_values = false
-        if key_list.present?
-          key_list.each_with_index do |key_name, key_index|
-            if (Program.column_names.include?(key_name.underscore))
-              unless (Program.column_for_attribute(key_name.underscore).type.to_s == "boolean")
-                program_filter1[key_name.underscore] = nil
-              else
-                if (Program.column_for_attribute(key_name.underscore).type.to_s == "boolean")
-                  program_filter2[key_name.underscore] = true
-                end
-              end
-            else
-              if(Adjustment::INPUT_VALUES.include?(key_name))
-                include_in_input_values = true
-              end
-            end
-          end
+    #   adjustment_list.each_with_index do |adj_ment, index|
+    #     key_list = adj_ment.data.keys.first.split("/")
+    #     program_filter1={}
+    #     program_filter2={}
+    #     include_in_input_values = false
+    #     if key_list.present?
+    #       key_list.each_with_index do |key_name, key_index|
+    #         if (Program.column_names.include?(key_name.underscore))
+    #           unless (Program.column_for_attribute(key_name.underscore).type.to_s == "boolean")
+    #             program_filter1[key_name.underscore] = nil
+    #           else
+    #             if (Program.column_for_attribute(key_name.underscore).type.to_s == "boolean")
+    #               program_filter2[key_name.underscore] = true
+    #             end
+    #           end
+    #         else
+    #           if(Adjustment::INPUT_VALUES.include?(key_name))
+    #             include_in_input_values = true
+    #           end
+    #         end
+    #       end
 
-          if (include_in_input_values)
-            program_list1 = program_list.where.not(program_filter1)
-            program_list2 = program_list1.where(program_filter2)
+    #       if (include_in_input_values)
+    #         program_list1 = program_list.where.not(program_filter1)
+    #         program_list2 = program_list1.where(program_filter2)
 
-            if program_list2.present?
-              program_list2.map{ |program| program.adjustments << adj_ment unless program.adjustments.include?(adj_ment) }
-            end
-          end
-        end
-      end
-    end
+    #         if program_list2.present?
+    #           program_list2.map{ |program| program.adjustments << adj_ment unless program.adjustments.include?(adj_ment) }
+    #         end
+    #       end
+    #     end
+    #   end
+    # end
 end
