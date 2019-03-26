@@ -122,7 +122,7 @@ class Program < ApplicationRecord
     ["Purchase", "Refinance", "PURCHASE", "REFINANCE"].each{ |word|
       present_word = word if p_name.downcase.include?(word.downcase)
     }
-    self.loan_purpose = present_word.downcase rescue nil
+    self.loan_purpose = present_word.downcase.capitalize rescue nil
   end
 
   def set_arm_basic p_name

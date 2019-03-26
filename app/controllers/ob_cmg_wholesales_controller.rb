@@ -131,9 +131,11 @@ class ObCmgWholesalesController < ApplicationController
                   end
                   if r >= 78 && r <= 82 && cc == 1
                     if value.include?("Conf Limit")
-                      secondary_key = value.tr('A-Za-z<>=$ ','') + "Inf"
+                      secondary_key = value.tr('A-Za-z<>=$, ','') + "Inf"
                     elsif value.include?("-")
-                      secondary_key = value.tr('A-Za-z<>=$ ','')
+                      secondary_key = value.tr('A-Za-z<>=$, ','')
+                    else
+                      secondary_key = get_value value
                     end
                     @data_hash["LoanAmount"][secondary_key] = {}
                     ccc = cc + 6
@@ -141,7 +143,11 @@ class ObCmgWholesalesController < ApplicationController
                     @data_hash["LoanAmount"][secondary_key] = c_val
                   end
                   if r >= 83 && r <= 85 && cc == 1
-                    secondary_key = value
+                    if value.downcase.include?('units')
+                      secondary_key = value.split('s').first
+                    else
+                      secondary_key = value
+                    end
                     @data_hash["PropertyType"][secondary_key] = {}
                     ccc = cc + 6
                     c_val = sheet_data.cell(r,ccc)
