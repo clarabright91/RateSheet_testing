@@ -72,6 +72,7 @@ class DashboardController < ApplicationController
   def set_default
     @base_rate = 0.0
     @filter_data = {}
+    @filter_not_nil = {}
     @interest = "4.375"
     @lock_period ="30"
     @loan_size = "High-Balance"
@@ -172,45 +173,68 @@ class DashboardController < ApplicationController
       end
     end
 
+    if params[:loan_purpose].present?
+      if (params[:loan_purpose] == "All")
+        @filter_not_nil[:loan_purpose] = params[:loan_purpose]
+      else
+        @filter_data[:loan_purpose] = params[:loan_purpose]
+      end
+      @loan_purpose = params[:loan_purpose]
+    end
+
    if params[:loan_type].present?
       @loan_type = params[:loan_type]
       @filter_data[:loan_type] = params[:loan_type]
       if params[:loan_type] =="ARM" && params[:arm_basic].present?
         @arm_basic = params[:arm_basic]
-        if params[:arm_basic].include?("/")
-          @filter_data[:arm_basic] = params[:arm_basic].split("/").first
-        end
-        if params[:arm_basic].include?("-")
-          @filter_data[:arm_basic] = params[:arm_basic].split("-").first
+        if (params[:arm_basic] == "All")
+          @filter_not_nil[:arm_basic] = params[:arm_basic]
+        else
+          if params[:arm_basic].include?("/")
+            @filter_data[:arm_basic] = params[:arm_basic].split("/").first
+          end
+          if params[:arm_basic].include?("-")
+            @filter_data[:arm_basic] = params[:arm_basic].split("-").first
+          end
         end
       end
       if params[:loan_type] =="ARM" && params[:arm_advanced].present?
-        unless params[:arm_advanced] == "All"
-          @arm_advanced = params[:arm_advanced]
+        @arm_advanced = params[:arm_advanced]
+        if params[:arm_advanced] == "All"
+          @filter_not_nil[:arm_advanced] = params[:arm_advanced]
+        else
           @filter_data[:arm_advanced] = params[:arm_advanced]
         end
       end
     end
 
     if (params[:term].present? && params[:loan_type] != "ARM")
-      @term = params[:term].to_i
-      @program_term = params[:term].to_i
+      if params[:term] == "All"
+        @filter_not_nil[:term] = params[:term]
+      else
+        @term = params[:term].to_i
+        @program_term = params[:term].to_i
+      end
     end
 
+    if params[:loan_size].present?
+      if params[:loan_size] == "All"
+        @filter_not_nil[:loan_size] = params[:loan_size]
+      else
+        @loan_size = params[:loan_size]
+      end
+    end
 
     @filter_data[:fannie_mae] = true if params[:fannie_mae].present?
     @filter_data[:freddie_mac] = true if params[:freddie_mac].present?
+    @filter_data[:du] = true if params[:du].present?
+    @filter_data[:lp] = true if params[:lp].present?
 
     @filter_data[:fha] = true if params[:fha].present?
     @filter_data[:va] = true if params[:va].present?
     @filter_data[:usda] = true if params[:usda].present?
     @filter_data[:streamline] = true if params[:streamline].present?
-    @filter_data[:full_doc] = true if params[:full_doc].present?
-
-    if params[:loan_purpose].present?
-      @loan_purpose = params[:loan_purpose]
-      @filter_data[:loan_purpose] = params[:loan_purpose]
-    end
+    @filter_data[:full_doc] = true if params[:full_doc].present?    
   end
 
   def find_base_rate
