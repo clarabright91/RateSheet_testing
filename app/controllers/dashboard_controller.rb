@@ -268,6 +268,7 @@ class DashboardController < ApplicationController
       if @program_list2.present?
         @program_list3 = []
         if params[:loan_size].present?
+          @loan_size = params[:loan_size]
           @program_list2 = @program_list2.map{ |pro| pro if pro.loan_size!=nil}.compact
           @program_list2.each do |pro|
             if(pro.loan_size.split("and").map{ |l| l.strip }.include?(params[:loan_size]))
