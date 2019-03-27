@@ -153,7 +153,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   if @title.downcase.include?("usda")
                     usda = true
                   end
-                  @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fha: fha, va: va, usda: usda, fannie_mae: fannie_mae, loan_size: loan_size, loan_category: @sheet_name, arm_basic: arm_basic, arm_advanced: arm_advanced)
+                  # LoanPurpose
+                  if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                    loan_purpose = "Refinance"
+                  else
+                    loan_purpose = "Purchase"
+                  end
+                  @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fha: fha, va: va, usda: usda, fannie_mae: fannie_mae, loan_size: loan_size, loan_category: @sheet_name, arm_basic: arm_basic, arm_advanced: arm_advanced, loan_purpose: loan_purpose)
                   @block_hash = {}
                   key = ''
                   (1..23).each do |max_row|
@@ -353,10 +359,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
             rr = r + 1 # (r == 8) / (r == 36) / (r == 56)
             max_column_section = row.compact.count - 1
             (0..max_column_section).each do |max_column|
-
-
               cc = 3 + max_column*6 # (3 / 9 / 15)
-
               begin
                 #title
                 @title = sheet_data.cell(r,cc)
@@ -405,9 +408,16 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   fannie_mae = true
                 end
 
+                # loan_purpose
+                if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                  loan_purpose = "Refinance"
+                else
+                  loan_purpose = "Purchase"
+                end
+
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @program_ids << @program.id
-                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, loan_category: @sheet_name, fannie_mae: fannie_mae,loan_size: loan_size)
+                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, loan_category: @sheet_name, fannie_mae: fannie_mae,loan_size: loan_size, loan_purpose: loan_purpose)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -844,10 +854,17 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   loan_size = "High-Balance"
                 end
 
+                # loan_purpose
+                if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                  loan_purpose = "Refinance"
+                else
+                  loan_purpose = "Purchase"
+                end
+
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_ids << @program.id
 
-                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae,loan_size: loan_size, loan_category: @sheet_name)
+                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae,loan_size: loan_size, loan_category: @sheet_name, loan_purpose: loan_purpose)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -1255,10 +1272,18 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 if @title.downcase.include?("home possible")
                   freddie_mac_product = "Home Possible"
                 end
+
+                # loan_purpose
+                if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                  loan_purpose = "Refinance"
+                else
+                  loan_purpose = "Purchase"
+                end
+
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @program_ids << @program.id
                 @program.adjustments.destroy_all
-                @program.update(term: term,loan_type: loan_type,freddie_mac: freddie_mac, fannie_mae: fannie_mae, loan_category: @sheet_name,arm_basic: arm_basic, freddie_mac_product: freddie_mac_product, arm_advanced: arm_advanced)
+                @program.update(term: term,loan_type: loan_type,freddie_mac: freddie_mac, fannie_mae: fannie_mae, loan_category: @sheet_name,arm_basic: arm_basic, freddie_mac_product: freddie_mac_product, arm_advanced: arm_advanced, loan_purpose: loan_purpose)
                 @block_hash = {}
                 key = ''
                 (0..50).each do |max_row|
@@ -2190,9 +2215,15 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 if @title.downcase.include?("jumbo")
                   loan_size = "Jumbo"
                 end
+                # loan_purpose
+                if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                  loan_purpose = "Refinance"
+                else
+                  loan_purpose = "Purchase"
+                end
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @programs_ids  << @program.id
-                @program.update(term: term,loan_type: loan_type, loan_category: @sheet_name,loan_size: loan_size)
+                @program.update(term: term,loan_type: loan_type, loan_category: @sheet_name,loan_size: loan_size, loan_purpose: loan_purpose)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -2773,8 +2804,16 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 if @title.downcase.include?("jumbo")
                   loan_size = "Jumbo"
                 end
+
+                # loan_purpose
+                if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                  loan_purpose = "Refinance"
+                else
+                  loan_purpose = "Purchase"
+                end
+
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                @program.update(term: term,loan_type: loan_type,arm_basic: arm_basic, loan_category: @sheet_name,arm_advanced: arm_advanced, loan_size: loan_size)
+                @program.update(term: term,loan_type: loan_type,arm_basic: arm_basic, loan_category: @sheet_name,arm_advanced: arm_advanced, loan_size: loan_size, loan_purpose: loan_purpose)
                 @block_hash = {}
                 key = ''
                 (0..50).each do |max_row|
@@ -3319,10 +3358,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
 
                   # Purchase & Refinance
-                  if @title.include?("Purchase")
-                    loan_purpose = "Purchase"
-                  elsif @title.include?("Refinance")
+                  # loan_purpose
+                  if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
                     loan_purpose = "Refinance"
+                  else
+                    loan_purpose = "Purchase"
                   end
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program_ids << @program.id
@@ -4123,11 +4163,16 @@ class ObNewRezWholesale5806Controller < ApplicationController
                       loan_size = "Jumbo"
                     end
 
-
+                    # loan_purpose
+                    if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                      loan_purpose = "Refinance"
+                    else
+                      loan_purpose = "Purchase"
+                    end
 
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program_ids << @program.id
-                  @program.update(term: term,loan_type: loan_type ,arm_basic: arm_basic, loan_category: @sheet_name, loan_size: loan_size, arm_advanced: arm_advanced )
+                  @program.update(term: term,loan_type: loan_type ,arm_basic: arm_basic, loan_category: @sheet_name, loan_size: loan_size, arm_advanced: arm_advanced, loan_purpose: loan_purpose)
                   @program.adjustments.destroy_all
                   @block_hash = {}
                   key = ''
@@ -4723,9 +4768,15 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   if @title.downcase.include?("arm")
                     arm_advanced = @title.downcase.split("arm").last.tr("A-Za-z- ","")
                   end
+                  # loan_purpose
+                  if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                    loan_purpose = "Refinance"
+                  else
+                    loan_purpose = "Purchase"
+                  end
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program_ids << @program.id
-                  @program.update(term: term,loan_type: loan_type,arm_basic: arm_basic, loan_category: @sheet_name,loan_size: loan_size,arm_advanced: arm_advanced)
+                  @program.update(term: term,loan_type: loan_type,arm_basic: arm_basic, loan_category: @sheet_name,loan_size: loan_size,arm_advanced: arm_advanced, loan_purpose: loan_purpose)
                   @program.adjustments.destroy_all
                   @block_hash = {}
                   key = ''
@@ -4983,10 +5034,16 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 if @title.downcase.include?("fannie mae")
                   fannie_mae = true
                 end
+                # loan_purpose
+                if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                  loan_purpose = "Refinance"
+                else
+                  loan_purpose = "Purchase"
+                end
 
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @program_ids << @program.id
-                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, loan_category: @sheet_name,arm_advanced: arm_advanced)
+                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, loan_category: @sheet_name,arm_advanced: arm_advanced, loan_purpose: loan_purpose)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -5260,9 +5317,15 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   if @title.include?("High Balance")
                     loan_size = "High-Balance"
                   end
+                  # loan_purpose
+                  if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                    loan_purpose = "Refinance"
+                  else
+                    loan_purpose = "Purchase"
+                  end
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program_ids << @program.id
-                  @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, loan_category: @sheet_name, loan_size: loan_size)
+                  @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, loan_category: @sheet_name, loan_size: loan_size, loan_purpose: loan_purpose)
                   @program.adjustments.destroy_all
                   @block_hash = {}
                   key = ''
@@ -5473,9 +5536,16 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   fannie_mae = true
                 end
 
+                # loan_purpose
+                if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                  loan_purpose = "Refinance"
+                else
+                  loan_purpose = "Purchase"
+                end
+
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @program_ids << @program.id
-                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, loan_category: @sheet_name, arm_advanced: arm_advanced,loan_size: loan_size)
+                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, loan_category: @sheet_name, arm_advanced: arm_advanced,loan_size: loan_size, loan_purpose: loan_purpose)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -5894,6 +5964,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   usda = true
                 end
 
+                # loan_purpose
+                if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                  loan_purpose = "Refinance"
+                else
+                  loan_purpose = "Purchase"
+                end
+
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @program_ids << @program.id
      
@@ -5922,7 +5999,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 if @block_hash.values.first.keys.first.nil?
                   @block_hash.values.first.shift
                 end
-                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fha: fha, va: va, usda: usda, fannie_mae: fannie_mae, loan_size: loan_size, loan_category: @sheet_name, arm_basic: arm_basic, arm_advanced: arm_advanced ,base_rate: @block_hash)
+                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fha: fha, va: va, usda: usda, fannie_mae: fannie_mae, loan_size: loan_size, loan_category: @sheet_name, arm_basic: arm_basic, arm_advanced: arm_advanced ,base_rate: @block_hash, loan_purpose: loan_purpose)
 
                 # @program.update(base_rate: @block_hash,loan_category: @sheet_name)
               rescue Exception => e
@@ -6247,8 +6324,6 @@ class ObNewRezWholesale5806Controller < ApplicationController
               cc = 3 + max_column*6 # (3 / 9 / 15) 3/8/13
               begin
                 @title = sheet_data.cell(r,cc)
-                program_heading = @title.split
-
 
                 # term
                 term = nil
@@ -6287,9 +6362,16 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   fannie_mae_product = "HomeReady"
                 end
 
+                # loan_purpose
+                if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                  loan_purpose = "Refinance"
+                else
+                  loan_purpose = "Purchase"
+                end
+
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_ids << @program.id
-                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, fannie_mae_product: fannie_mae_product, loan_category: @sheet_name)
+                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, fannie_mae_product: fannie_mae_product, loan_category: @sheet_name, loan_purpose: loan_purpose)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -6696,9 +6778,16 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 if @title.downcase.include?("homeready")
                   fannie_mae_product = 'HomeReady'
                 end
+
+                # loan_purpose
+                if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                  loan_purpose = "Refinance"
+                else
+                  loan_purpose = "Purchase"
+                end
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_ids << @program.id
-                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, arm_advanced: arm_advanced, fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, loan_category: @sheet_name,loan_size: loan_size, fannie_mae_product: fannie_mae_product)
+                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, arm_advanced: arm_advanced, fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, loan_category: @sheet_name,loan_size: loan_size, fannie_mae_product: fannie_mae_product, loan_purpose: loan_purpose)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''

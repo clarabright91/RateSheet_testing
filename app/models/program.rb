@@ -89,18 +89,11 @@ class Program < ApplicationRecord
     # set_loan_purpose(p_name)        if ["Purchase", "Refinance"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_loan_purpose(p_name)        if fetch_loan_purpose_fields.each{ |word| p_name.downcase.include?(word.downcase) }
     set_conforming                  if get_conforming.each{ |word| p_name.downcase.include?(word.downcase) }
-    # set_arm_basic(p_name)           if ["ARM"].each{ |word| p_name.downcase.include?(word.downcase) }
-    # set_arm_advanced(p_name)        if ["ARM"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_fannie_mae(p_name)          if ["Fannie Mae", "DU", "FNMA"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_freddie_mac(p_name)         if ["Freddie Mac", "LP", "FHLMC"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_freddie_mac_product(p_name) if ["Home Possible","HOME POSSIBLE"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_fannie_mae_product(p_name)  if ["HOMEREADY", "Home Ready"].each{ |word| p_name.downcase.include?(word.downcase) }
-    # set_term(p_name) if (5..50).to_a.collect{|n| n.to_s}.each{ |word| p_name.downcase.include?(word.downcase) }
     self.save
-  end
-
-  def set_term(prog_name)
-    self.term = ProgramUpdate.set_term(prog_name)
   end
 
   def set_load_type(prog_name)
