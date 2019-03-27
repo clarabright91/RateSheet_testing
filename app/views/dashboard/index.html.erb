@@ -120,14 +120,14 @@
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>Fannie Mae Product</label>
-                      <% @fannie_mae_product_list =[["HomeReady"]]%>
+                      <% @fannie_mae_product_list =[["All"], ["HomeReady"]]%>
                       <%= select_tag 'fannie_mae_product', options_for_select(@fannie_mae_product_list, (params[:fannie_mae_product] rescue nil)), { :class=> "form-control", :required => true} %>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>Freddie Mac Product</label>
-                      <% @freddie_mac_product_list =[["Home Possible"]]%>
+                      <% @freddie_mac_product_list =[["All"], ["Home Possible"]]%>
                       <%= select_tag 'freddie_mac_product', options_for_select(@freddie_mac_product_list, (params[:freddie_mac_product] rescue nil)), { :class=> "form-control", :required => true} %>
                     </div>
                   </div>
