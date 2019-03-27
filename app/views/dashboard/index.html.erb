@@ -46,7 +46,7 @@
                     <div class="form-group">
                       <label>Loan Purpose</label>
                       <div class="input-group">
-                        <% loan_purpose_list =[["All"],["Purchase"], ["Refinance"]]%>
+                        <% loan_purpose_list =[["Purchase"], ["Refinance"]]%>
                         <%= select_tag 'loan_purpose', options_for_select(loan_purpose_list, (params[:loan_purpose] rescue nil)), { prompt: 'Select Loan Purpose', :class=> "form-control" }%>
                       </div>
                     </div>
@@ -55,7 +55,7 @@
                     <div class="form-group">
                       <label>Loan Size</label>
                       <div class="input-group">
-                        <% loan_size_list =[ ["All"], ["Conforming"], ["Non-Conforming"], ["Jumbo"], ["High-Balance"]]%>
+                        <% loan_size_list =[ ["Conforming"], ["Non-Conforming"], ["Jumbo"], ["High-Balance"]]%>
                         <%= select_tag 'loan_size', options_for_select(loan_size_list, (params[:loan_size] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control" }%>
                       </div>
                     </div>
@@ -63,7 +63,7 @@
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>Loan Type</label>
-                      <% @loan_type_list =[["All"], ["Fixed"], ["ARM"], ["Hybrid"], ["Floating"], ["Variable"]]%>
+                      <% @loan_type_list =[["Fixed"], ["ARM"], ["Hybrid"], ["Floating"], ["Variable"]]%>
                       <%= select_tag 'loan_type', options_for_select(@loan_type_list, (params[:loan_type] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control"} %>
                     </div>
                   </div>
@@ -71,7 +71,7 @@
                     <div class="form-group">
                       <label>Term</label>
                       <div class="input-group">
-                       <% @term_list = (Program.all.pluck(:term).reject(&:blank?).uniq.map{|n| n if n.to_s.length < 3}.reject(&:blank?).push(5,10,15,20,25,30).uniq.sort).map{|y| [y.to_s + " yrs" , y]}.prepend(["All"]) %>
+                       <% @term_list = (Program.all.pluck(:term).reject(&:blank?).uniq.map{|n| n if n.to_s.length < 3}.reject(&:blank?).push(5,10,15,20,25,30).uniq.sort).map{|y| [y.to_s + " yrs" , y]} %>
                         <%= select_tag 'term', options_for_select(@term_list, (params[:term] rescue nil)), { prompt: 'Select Term', :class=> "form-control"} %>
                       </div>
                     </div>
@@ -80,7 +80,7 @@
                     <div class="form-group">
                       <label>ARM Basic</label>
                       <div class="input-group">
-                       <% @arm_basic_list =[["All"],["1/1 ARM"],["2/1 ARM"],["3/1 ARM"],["7/1 ARM"],["10/1 ARM"],["5-1"],["5/1"]]%>
+                       <% @arm_basic_list =[["1/1 ARM"],["2/1 ARM"],["3/1 ARM"],["7/1 ARM"],["10/1 ARM"],["5-1"],["5/1"]]%>
                         <%= select_tag 'arm_basic', options_for_select(@arm_basic_list, (params[:arm_basic].present? ? params[:arm_basic] : "10/1 ARM")), { prompt: 'Select ARM Basic', :class=> "form-control"} %>
                       </div>
                     </div>
@@ -88,7 +88,7 @@
                   <div class="col-md-4 arm-basic">
                     <div class="form-group">
                       <label>ARM Advance</label>
-                      <% @arm_advanced_list = Program.pluck(:arm_advanced).push("10/5", "5/1 3-2-5").uniq.compact.reject { |c| c.empty? }.map{|c| [c]}.prepend(["All"]) %>
+                      <% @arm_advanced_list = Program.pluck(:arm_advanced).push("10/5", "5/1 3-2-5").uniq.compact.reject { |c| c.empty? }.map{|c| [c]} %>
                       <%= select_tag 'arm_advanced', options_for_select( @arm_advanced_list, (params[:arm_advanced] rescue nil)), { :class=> "form-control"} %>
                     </div>
                   </div>
@@ -97,22 +97,6 @@
             </div>
           </div>
           <div class="row">
-            <!-- <div class="col-md-3">
-              <div class="program-panel panel-basic">
-                <div class="input-grp"><h5>Loan Size</h5></div>
-                <div class="row panel-body">
-                  <div class="col-md-12">
-                    <div class="form-group">
-                      <label>Loan Size</label>
-                      <div class="input-group">
-                        <%# loan_size_list =[ ["All"], ["Conforming"], ["Non-Conforming"], ["Jumbo"], ["High-Balance"]]%>
-                        <%#= select_tag 'loan_size', options_for_select(loan_size_list, (params[:loan_size] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control" }%>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div> -->
             <div class="col-md-6">
               <div class="program-panel panel-basic">
                 <div class="input-grp"><h5>FM</h5></div>
@@ -136,14 +120,14 @@
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>Fannie Mae Product</label>
-                      <% @fannie_mae_product_list =[["All"], ["HomeReady"]]%>
+                      <% @fannie_mae_product_list =[["HomeReady"]]%>
                       <%= select_tag 'fannie_mae_product', options_for_select(@fannie_mae_product_list, (params[:fannie_mae_product] rescue nil)), { :class=> "form-control", :required => true} %>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>Freddie Mac Product</label>
-                      <% @freddie_mac_product_list =[["All"], ["Home Possible"]]%>
+                      <% @freddie_mac_product_list =[["Home Possible"]]%>
                       <%= select_tag 'freddie_mac_product', options_for_select(@freddie_mac_product_list, (params[:freddie_mac_product] rescue nil)), { :class=> "form-control", :required => true} %>
                     </div>
                   </div>
@@ -209,7 +193,7 @@
               <div class="form-group">
                 <label>Credit Score</label>
                 <div class="input-group">
-                  <% @credit_score_list = [["All"], ["760 +", "760 +"], ["740-759", "740-759"], ["720-739", "720-739"], ["700-719", "700-719"], ["680-699", "680-699"], ["660-679", "660-679"], ["640-659", "640-659"], ["620-639", "620-639"]] %>
+                  <% @credit_score_list = [["760 +", "760 +"], ["740-759", "740-759"], ["720-739", "720-739"], ["700-719", "700-719"], ["680-699", "680-699"], ["660-679", "660-679"], ["640-659", "640-659"], ["620-639", "620-639"]] %>
                   <%= select_tag 'credit_score', options_for_select(@credit_score_list, (params[:credit_score] rescue nil)), :class=> "form-control" %>
                 </div>
               </div>
@@ -218,7 +202,7 @@
               <div class="form-group">
                 <label>LTV</label>
                 <div class="input-group">
-                  <%@ltv_values = [["All"], ["97 +","97 +"], ["96-97", "96-97"], ["91-95", "91-95"], ["86-90", "86-90"], ["81-85", "81-85"], ["76-80", "76-80"], ["71-75", "71-75"], ["61-70", "61-70"],["0-60","0-60"]]%>
+                  <%@ltv_values = [["97 +","97 +"], ["96-97", "96-97"], ["91-95", "91-95"], ["86-90", "86-90"], ["81-85", "81-85"], ["76-80", "76-80"], ["71-75", "71-75"], ["61-70", "61-70"],["0-60","0-60"]]%>
                   <%= select_tag 'ltv', options_for_select(@ltv_values, (params[:ltv] rescue nil)), :class=> "form-control" %>
                 </div>
               </div>
@@ -227,7 +211,7 @@
               <div class="form-group">
                 <label>CLTV</label>
                 <div class="input-group">
-                  <%@cltv_values = [["All"], ["97 +","97 +"], ["96-97", "96-97"], ["91-95", "91-95"], ["86-90", "86-90"], ["81-85", "81-85"], ["76-80", "76-80"], ["71-75", "71-75"], ["61-70", "61-70"],["0-60","0-60"]]%>
+                  <%@cltv_values = [["97 +","97 +"], ["96-97", "96-97"], ["91-95", "91-95"], ["86-90", "86-90"], ["81-85", "81-85"], ["76-80", "76-80"], ["71-75", "71-75"], ["61-70", "61-70"],["0-60","0-60"]]%>
                   <%= select_tag 'cltv', options_for_select(@cltv_values, (params[:cltv] rescue nil)), :class=> "form-control" %>
                 </div>
               </div>
@@ -236,7 +220,7 @@
               <div class="form-group">
                 <label>State</label>
                 <div class="input-group">
-                  <%@state_list = [["All"],["AL"],["AK"],["AZ"],["AR"],["CA"],["CO"],["CT"],["DE"],["FL"],["GA"],["HI"],["ID"],["IL"],["IN"],["IA"],["KS"],["KY"],["LA"],["ME"],["MD"],["MA"],["MI"],["MN"],["MS"],["MO"],["MT"],["NE"],["NV"],["NH"],["NJ"],["NM"],["NY"],["NC"],["ND"],["OH"],["OK"],["OR"],["PA"],["RI"],["SC"],["SD"],["TN"],["TX"],["UT"],["VT"],["VA"],["WA"],["WV"],["WI"],["WY"],["AS"],["DC"],["FM"],["GU"],["MH"],["MP"],["PW"],["PR"],["VI"]]%>
+                  <%@state_list = [["All"], ["AL"],["AK"],["AZ"],["AR"],["CA"],["CO"],["CT"],["DE"],["FL"],["GA"],["HI"],["ID"],["IL"],["IN"],["IA"],["KS"],["KY"],["LA"],["ME"],["MD"],["MA"],["MI"],["MN"],["MS"],["MO"],["MT"],["NE"],["NV"],["NH"],["NJ"],["NM"],["NY"],["NC"],["ND"],["OH"],["OK"],["OR"],["PA"],["RI"],["SC"],["SD"],["TN"],["TX"],["UT"],["VT"],["VA"],["WA"],["WV"],["WI"],["WY"],["AS"],["DC"],["FM"],["GU"],["MH"],["MP"],["PW"],["PR"],["VI"]]%>
                   <%= select_tag 'state', options_for_select(@state_list, (params[:state] rescue nil)), :class=> "form-control" %>
                 </div>
               </div>
@@ -244,14 +228,14 @@
             <div class="col-md-2">
               <div class="form-group">
                 <label>Loan Amount</label>
-                <% @loan_amount_list =[["All"], ["$0-$50,000",50000], ["$500,00 - $100,000", 100000], ["$100,000 - $150,000", 100000], ["$150,000 - $200,000", 150000], ["$250,000 - $300,000", 250000], ["$300,000 - $350,000", 300000], ["$350,000 - $400,000", 350000], ["$400,000 - $450,000", 400000], ["$450,000 - $500,000", 450000], ["$500,000 - $550,000", 500000], ["$550,000 - $600,000", 550000], ["$600,000 - $650,000", 600000], ["$650,000 - $700,000", 650000], ["$700,000 - $750,000", 700000], ["$750,000 - $800,000", 750000], ["$800,000 - $850,000", 800000], ["$850,000 +", 850000]]%>
+                <% @loan_amount_list =[["$0-$50,000",50000], ["$500,00 - $100,000", 100000], ["$100,000 - $150,000", 100000], ["$150,000 - $200,000", 150000], ["$250,000 - $300,000", 250000], ["$300,000 - $350,000", 300000], ["$350,000 - $400,000", 350000], ["$400,000 - $450,000", 400000], ["$450,000 - $500,000", 450000], ["$500,000 - $550,000", 500000], ["$550,000 - $600,000", 550000], ["$600,000 - $650,000", 600000], ["$650,000 - $700,000", 650000], ["$700,000 - $750,000", 700000], ["$750,000 - $800,000", 750000], ["$800,000 - $850,000", 800000], ["$850,000 +", 850000]]%>
                 <%= select_tag 'loan_amount', options_for_select(@loan_amount_list, (params[:loan_amount] rescue nil)), { :class=> "form-control", :required => true} %>
               </div>
             </div>
             <div class="col-md-2">
               <div class="form-group">
                 <label>Program Category</label>
-                <% @program_category_list =[["All"], ["Non-Qm 7900"], ["QM 6900"]]%>
+                <% @program_category_list =[["Non-Qm 7900"], ["QM 6900"]]%>
                 <%= select_tag 'program_category', options_for_select(@program_category_list, (params[:program_category] rescue nil)), { :class=> "form-control", :required => true} %>
               </div>
             </div>
@@ -259,7 +243,7 @@
               <div class="form-group">
                 <label>Property Type</label>
                 <div class="input-group">
-                  <%@property_type_values = [["All"], ["Manufactured Home"],["2nd Home"],["3-4 Unit"],["Non-Owner Occupied"],["Condo"],["2-Unit"], ["2-4 Unit"],["Investment Property"], ["Gov'n Non Owner"], ["NOO"]] %>
+                  <%@property_type_values = [["Manufactured Home"],["2nd Home"],["3-4 Unit"],["Non-Owner Occupied"],["Condo"],["2-Unit"], ["2-4 Unit"],["Investment Property"], ["Gov'n Non Owner"], ["NOO"]] %>
                   <%= select_tag 'property_type', options_for_select(@property_type_values, (params[:property_type] rescue nil)), :class=> "form-control" %>
                 </div>
               </div>
@@ -268,7 +252,7 @@
               <div class="form-group">
                 <label>Financing Type</label>
                 <div class="input-group">
-                  <%@financing_type_values = [["All"], ["Subordinate Financing"]]%>
+                  <%@financing_type_values = [["Subordinate Financing"]]%>
                   <%= select_tag 'financing_type', options_for_select(@financing_type_values, (params[:financing_type] rescue nil)), :class=> "form-control" %>
                 </div>
               </div>
@@ -277,7 +261,7 @@
               <div class="form-group">
                 <label>Refinance Option</label>
                 <div class="input-group">
-                  <%@refinance_option_values = [["All"], ["Cash Out"], ["Rate and Term"], ["IRRRL"]]%>
+                  <%@refinance_option_values = [["Cash Out"], ["Rate and Term"], ["IRRRL"]]%>
                   <%= select_tag 'refinance_option', options_for_select(@refinance_option_values, (params[:refinance_option] rescue nil)), :class=> "form-control" %>
                 </div>
               </div>
@@ -286,7 +270,7 @@
               <div class="form-group">
                 <label>Misc Adjuster</label>
                 <div class="input-group">
-                  <%@misc_adjuster_values = [["All"], ["CA Escrow Waiver (Full or Taxes Only)"], ["CA Escrow Waiver (Insurance Only)"], ["Miscellaneous"], ["Escrow Waiver Fee"], ["Escrow Waiver (LTVs >80%; CA only)"]]%>
+                  <%@misc_adjuster_values = [["CA Escrow Waiver (Full or Taxes Only)"], ["CA Escrow Waiver (Insurance Only)"], ["Miscellaneous"], ["Escrow Waiver Fee"], ["Escrow Waiver (LTVs >80%; CA only)"]]%>
                   <%= select_tag 'misc_adjuster', options_for_select(@misc_adjuster_values, (params[:misc_adjuster] rescue nil)), :class=> "form-control" %>
                 </div>
               </div>
@@ -295,7 +279,7 @@
               <div class="form-group">
                 <label>Payment Type</label>
                 <div class="input-group">
-                  <%@patment_type_values = [["All"], ["Principal and Interest"], ["Interest Only"]]%>
+                  <%@patment_type_values = [["Principal and Interest"], ["Interest Only"]]%>
                   <%= select_tag 'payment_type', options_for_select(@patment_type_values, (params[:payment_type] rescue nil)), :class=> "form-control" %>
                 </div>
               </div>
@@ -304,7 +288,7 @@
               <div class="form-group">
                 <label>DTI</label>
                 <div class="input-group">
-                  <%@dti_values = [["All"], ["25.6%"]]%>
+                  <%@dti_values = [["25.6%"]]%>
                   <%= select_tag 'dti', options_for_select(@dti_values, (params[:dti] rescue nil)), :class=> "form-control" %>
                 </div>
               </div>
@@ -313,7 +297,7 @@
               <div class="form-group">
                 <label>Coverage</label>
                 <div class="input-group">
-                  <%@coverage_values = [["All"], ["30.5%"]]%>
+                  <%@coverage_values = [["30.5%"]]%>
                   <%= select_tag 'coverage', options_for_select(@coverage_values, (params[:coverage] rescue nil)), :class=> "form-control" %>
                 </div>
               </div>
@@ -322,7 +306,7 @@
               <div class="form-group">
                 <label>Margin</label>
                 <div class="input-group">
-                  <%@margin_values = [["All"], ["2.0"]]%>
+                  <%@margin_values = [["2.0"]]%>
                   <%= select_tag 'margin', options_for_select(@margin_values, (params[:margin] rescue nil)), :class=> "form-control" %>
                 </div>
               </div>
