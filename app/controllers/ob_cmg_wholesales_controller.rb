@@ -2111,22 +2111,22 @@ class ObCmgWholesalesController < ApplicationController
                     @data_hash[first_key]["Jumbo"][second_key] = {}
                   end
                   if value == "Rate/Term Transaction"
-                    @data_hash["Jumbo/RefinanceOption/FICO/LTV"] = {}
-                    @data_hash["Jumbo/RefinanceOption/FICO/LTV"][true] = {}
-                    @data_hash["Jumbo/RefinanceOption/FICO/LTV"][true]["Rate and Term"] = {}
+                    @data_hash["LoanSize/RefinanceOption/FICO/LTV"] = {}
+                    @data_hash["LoanSize/RefinanceOption/FICO/LTV"]["Jumbo"] = {}
+                    @data_hash["LoanSize/RefinanceOption/FICO/LTV"]["Jumbo"]["Rate and Term"] = {}
                   end
                   if value == "Cash Out Transaction"
                     second_key = "Cash Out"
-                    @data_hash["Jumbo/RefinanceOption/FICO/LTV"][true][second_key] = {}
-                    @data_hash["Jumbo/RefinanceOption/LoanAmount/LTV"] = {}
-                    @data_hash["Jumbo/RefinanceOption/LoanAmount/LTV"][true] = {}
-                    @data_hash["Jumbo/RefinanceOption/LoanAmount/LTV"][true][second_key] = {}
-                    @data_hash["Jumbo/RefinanceOption/PropertyType/LTV"] = {}
-                    @data_hash["Jumbo/RefinanceOption/PropertyType/LTV"][true] = {}
-                    @data_hash["Jumbo/RefinanceOption/PropertyType/LTV"][true][second_key] = {}
-                    @data_hash["Jumbo/RefinanceOption/Term/LTV"] = {}
-                    @data_hash["Jumbo/RefinanceOption/Term/LTV"][true] = {}
-                    @data_hash["Jumbo/RefinanceOption/Term/LTV"][true][second_key] = {}
+                    @data_hash["LoanSize/RefinanceOption/FICO/LTV"]["Jumbo"][second_key] = {}
+                    @data_hash["LoanSize/RefinanceOption/LoanAmount/LTV"] = {}
+                    @data_hash["LoanSize/RefinanceOption/LoanAmount/LTV"]["Jumbo"] = {}
+                    @data_hash["LoanSize/RefinanceOption/LoanAmount/LTV"]["Jumbo"][second_key] = {}
+                    @data_hash["LoanSize/RefinanceOption/PropertyType/LTV"] = {}
+                    @data_hash["LoanSize/RefinanceOption/PropertyType/LTV"]["Jumbo"] = {}
+                    @data_hash["LoanSize/RefinanceOption/PropertyType/LTV"]["Jumbo"][second_key] = {}
+                    @data_hash["LoanSize/RefinanceOption/Term/LTV"] = {}
+                    @data_hash["LoanSize/RefinanceOption/Term/LTV"]["Jumbo"] = {}
+                    @data_hash["LoanSize/RefinanceOption/Term/LTV"]["Jumbo"][second_key] = {}
                   end
 
                   # Purchase Transaction Adjustment
@@ -2150,82 +2150,88 @@ class ObCmgWholesalesController < ApplicationController
                     else
                       cltv_key = get_value value
                     end
-                    @data_hash["Jumbo/RefinanceOption/FICO/LTV"][true]["Rate and Term"][cltv_key] = {}
+                    @data_hash["LoanSize/RefinanceOption/FICO/LTV"]["Jumbo"]["Rate and Term"][cltv_key] = {}
                   end
                   if r >= 49 && r <= 54 && cc >= 6 && cc <= 13
                     key_val = get_value @key_data[cc-1]
-                    @data_hash["Jumbo/RefinanceOption/FICO/LTV"][true]["Rate and Term"][cltv_key][key_val] = value
+                    @data_hash["LoanSize/RefinanceOption/FICO/LTV"]["Jumbo"]["Rate and Term"][cltv_key][key_val] = value
                   end
 
                   # Cash Out Transaction Adjustment
                   if r >= 57 && r <= 61 && cc == 1
                     if value.include?("-")
-                      cltv_key = value.tr('A-Z ','')
+                      cltv_key = value.tr('A-Z, ','')
                     else
                       cltv_key = get_value value
                     end
-                    @data_hash["Jumbo/RefinanceOption/FICO/LTV"][true][second_key][cltv_key] = {}
+                    @data_hash["LoanSize/RefinanceOption/FICO/LTV"]["Jumbo"][second_key][cltv_key] = {}
                   end
                   if r >= 57 && r <= 61 && cc >= 6 && cc <= 13
                     key_val = get_value @key_data[cc-1]
-                    @data_hash["Jumbo/RefinanceOption/FICO/LTV"][true][second_key][cltv_key][key_val] = value
+                    @data_hash["LoanSize/RefinanceOption/FICO/LTV"]["Jumbo"][second_key][cltv_key][key_val] = value
                   end
                   if r >= 62 && r <= 65 && cc == 1
                     if value.include?("-")
-                      cltv_key = value.tr('A-Za-z$  ','')
+                      cltv_key = value.tr('A-Za-z$,  ','')
                     else
                       cltv_key = get_value value
                     end
-                    @data_hash["Jumbo/RefinanceOption/LoanAmount/LTV"][true][second_key][cltv_key] = {}
+                    @data_hash["LoanSize/RefinanceOption/LoanAmount/LTV"]["Jumbo"][second_key][cltv_key] = {}
                   end
                   if r >= 62 && r <= 65 && cc >= 6 && cc <= 13
                     key_val = get_value @key_data[cc-1]
-                    @data_hash["Jumbo/RefinanceOption/LoanAmount/LTV"][true][second_key][cltv_key][key_val] = {}
-                    @data_hash["Jumbo/RefinanceOption/LoanAmount/LTV"][true][second_key][cltv_key][key_val] = value
+                    @data_hash["LoanSize/RefinanceOption/LoanAmount/LTV"]["Jumbo"][second_key][cltv_key][key_val] = {}
+                    @data_hash["LoanSize/RefinanceOption/LoanAmount/LTV"]["Jumbo"][second_key][cltv_key][key_val] = value
                   end
                   if r >= 66 && r <= 69 && cc == 1
-                    cltv_key = get_value value
-                    @data_hash["Jumbo/RefinanceOption/PropertyType/LTV"][true][second_key][cltv_key] = {}
+                    if value.downcase.include?('units')
+                      cltv_key = value.split('s').first
+                    elsif value.downcase.include?('investment')
+                      cltv_key = "Investment Property"
+                    else
+                      cltv_key = value
+                    end
+                    @data_hash["LoanSize/RefinanceOption/PropertyType/LTV"]["Jumbo"][second_key][cltv_key] = {}
                   end
                   if r >= 66 && r <= 69 && cc >= 6 && cc <= 13
                     key_val = get_value @key_data[cc-1]
-                    @data_hash["Jumbo/RefinanceOption/PropertyType/LTV"][true][second_key][cltv_key][key_val] = {}
-                    @data_hash["Jumbo/RefinanceOption/PropertyType/LTV"][true][second_key][cltv_key][key_val] = value
+                    @data_hash["LoanSize/RefinanceOption/PropertyType/LTV"]["Jumbo"][second_key][cltv_key][key_val] = {}
+                    @data_hash["LoanSize/RefinanceOption/PropertyType/LTV"]["Jumbo"][second_key][cltv_key][key_val] = value
                   end
                   if r >= 70 && r <= 75 && cc == 1
-                    cltv_key = value.tr('a-zA-Z- ','')
-                    @data_hash["Jumbo/RefinanceOption/Term/LTV"][true][second_key][cltv_key] = {}
+                    cltv_key = value.tr('a-zA-Z-() ','')
+                    @data_hash["LoanSize/RefinanceOption/Term/LTV"]["Jumbo"][second_key][cltv_key] = {}
                   end
                   if r >= 70 && r <= 75 && cc >= 6 && cc <= 13
                     key_val = get_value @key_data[cc-1]
-                    @data_hash["Jumbo/RefinanceOption/Term/LTV"][true][second_key][cltv_key][key_val] = {}
-                    @data_hash["Jumbo/RefinanceOption/Term/LTV"][true][second_key][cltv_key][key_val] = value
+                    @data_hash["LoanSize/RefinanceOption/Term/LTV"]["Jumbo"][second_key][cltv_key][key_val] = {}
+                    @data_hash["LoanSize/RefinanceOption/Term/LTV"]["Jumbo"][second_key][cltv_key][key_val] = value
                   end
                   if r == 76 && cc == 1
                     cltv_key = value
-                    @data_hash["Jumbo/RefinanceOption/MiscAdjuster/LTV"] = {}
-                    @data_hash["Jumbo/RefinanceOption/MiscAdjuster/LTV"][true] = {}
-                    @data_hash["Jumbo/RefinanceOption/MiscAdjuster/LTV"][true][second_key] = {}
-                    @data_hash["Jumbo/RefinanceOption/MiscAdjuster/LTV"][true][second_key][cltv_key] = {}
+                    @data_hash["LoanSize/RefinanceOption/MiscAdjuster/LTV"] = {}
+                    @data_hash["LoanSize/RefinanceOption/MiscAdjuster/LTV"]["Jumbo"] = {}
+                    @data_hash["LoanSize/RefinanceOption/MiscAdjuster/LTV"]["Jumbo"][second_key] = {}
+                    @data_hash["LoanSize/RefinanceOption/MiscAdjuster/LTV"]["Jumbo"][second_key][cltv_key] = {}
                   end
                   if r == 76 && cc >= 6 &&  cc <= 13
                     key_val = get_value @key_data[cc-1]
-                    @data_hash["Jumbo/RefinanceOption/MiscAdjuster/LTV"][true][second_key][cltv_key][key_val] = {}
-                    @data_hash["Jumbo/RefinanceOption/MiscAdjuster/LTV"][true][second_key][cltv_key][key_val] = value
+                    @data_hash["LoanSize/RefinanceOption/MiscAdjuster/LTV"]["Jumbo"][second_key][cltv_key][key_val] = {}
+                    @data_hash["LoanSize/RefinanceOption/MiscAdjuster/LTV"]["Jumbo"][second_key][cltv_key][key_val] = value
                   end
                   if r == 77 && cc == 1
-                    @data_hash["Jumbo/RefinanceOption/State/LTV"] = {}
-                    @data_hash["Jumbo/RefinanceOption/State/LTV"][true] = {}
-                    @data_hash["Jumbo/RefinanceOption/State/LTV"][true][second_key] = {}
-                    @data_hash["Jumbo/RefinanceOption/State/LTV"][true][second_key]["FL"] = {}
-                    @data_hash["Jumbo/RefinanceOption/State/LTV"][true][second_key]["NV"] = {}
+                    @data_hash["LoanSize/RefinanceOption/State/LTV"] = {}
+                    @data_hash["LoanSize/RefinanceOption/State/LTV"]["Jumbo"] = {}
+                    @data_hash["LoanSize/RefinanceOption/State/LTV"]["Jumbo"][second_key] = {}
+                    @data_hash["LoanSize/RefinanceOption/State/LTV"]["Jumbo"][second_key]["FL"] = {}
+                    @data_hash["LoanSize/RefinanceOption/State/LTV"]["Jumbo"][second_key]["NV"] = {}
                   end
                   if r == 77 && cc >= 6 &&  cc <= 13
                     key_val = get_value @key_data[cc-1]
-                    @data_hash["Jumbo/RefinanceOption/State/LTV"][true][second_key]["NV"][key_val] = {}
-                    @data_hash["Jumbo/RefinanceOption/State/LTV"][true][second_key]["FL"][key_val] = {}
-                    @data_hash["Jumbo/RefinanceOption/State/LTV"][true][second_key]["NV"][key_val] = value
-                    @data_hash["Jumbo/RefinanceOption/State/LTV"][true][second_key]["FL"][key_val] = value
+                    @data_hash["LoanSize/RefinanceOption/State/LTV"]["Jumbo"][second_key]["NV"][key_val] = {}
+                    @data_hash["LoanSize/RefinanceOption/State/LTV"]["Jumbo"][second_key]["FL"][key_val] = {}
+                    @data_hash["LoanSize/RefinanceOption/State/LTV"]["Jumbo"][second_key]["NV"][key_val] = value
+                    @data_hash["LoanSize/RefinanceOption/State/LTV"]["Jumbo"][second_key]["FL"][key_val] = value
                   end
 
                   # MISCELLANEOUS Adjustment
@@ -2241,17 +2247,27 @@ class ObCmgWholesalesController < ApplicationController
 
                   # MAX PRICE AFTER ADJUSTMENTS
                   if value == "MAX PRICE AFTER ADJUSTMENTS"
-                    second_key = "LoanAmount/RateType/Term"
+                    second_key = "LoanAmount/LoanType/Term"
                     @data_hash[second_key] = {}
+                    @data_hash["LoanAmount/LoanType"] = {}
                   end
                   if r >= 84 && r <= 85 && cc == 1
-                    cltv_key = get_value value
+                    if value.include?('<')
+                      cltv_key = "0-1000000"
+                    else
+                      cltv_key = "1000000-Inf"
+                    end
                     @data_hash[second_key][cltv_key] = {}
                     @data_hash[second_key][cltv_key]["Fixed"] = {}
+                    @data_hash["LoanAmount/LoanType"][cltv_key] = {}
+                    @data_hash["LoanAmount/LoanType"][cltv_key]["ARM"] = {}
                   end
-                  if r >= 84 && r <= 85 && cc >= 2 && cc <= 4
-                    key_val = @key2_data[cc-1]
+                  if r >= 84 && r <= 85 && cc >= 2 && cc <= 3
+                    key_val = @key2_data[cc-1].tr('A-Za-z ','')
                     @data_hash[second_key][cltv_key]["Fixed"][key_val] = value
+                  end
+                  if r >= 84 && r <= 85 && cc == 4
+                    @data_hash["LoanAmount/LoanType"][cltv_key]["ARM"] = value
                   end
                 end
               rescue Exception => e
@@ -2306,7 +2322,7 @@ class ObCmgWholesalesController < ApplicationController
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   program_property sheet
                   @programs_ids << @program.id
-                  # @program.adjustments.destroy_all
+                  @program.adjustments.destroy_all
                   @block_hash = {}
                   key = ''
                   (1..50).each do |max_row|
@@ -2420,7 +2436,9 @@ class ObCmgWholesalesController < ApplicationController
                     @rate_adjustment[primary_key]["Rate and Term"] = {}
                   elsif value == "Cash Out Transaction"
                     @rate_adjustment[primary_key]["Cash Out"] = {}
-                    @rate_adjustment[primary_key]["Cash Out"]["LoanAmount"] = {}
+                    @rate_adjustment["RefinanceOption/LoanAmount/LTV"] = {}
+                    @rate_adjustment["RefinanceOption/LoanAmount/LTV"]["Cash Out"] = {}
+                    # @rate_adjustment[primary_key]["Cash Out"]["LoanAmount"] = {}
                     @rate_adjustment["RefinanceOption/PropertyType/LTV"] = {}
                     @rate_adjustment["RefinanceOption/PropertyType/LTV"]["Cash Out"] = {}
                     @rate_adjustment["RefinanceOption/LoanType/Term/State/LTV"] = {}
@@ -2474,19 +2492,25 @@ class ObCmgWholesalesController < ApplicationController
                   end
                   if r >= 35 && r <= 38 && cc == 6
                     if value.include?("-")
-                      secondary_key = value.tr('A-Za-z$ ','')
+                      secondary_key = value.tr('A-Za-z$, ','')
                     else
                       secondary_key = get_value value
                     end
-                    @rate_adjustment[primary_key]["Cash Out"]["LoanAmount"][secondary_key] = {}
+                    @rate_adjustment["RefinanceOption/LoanAmount/LTV"]["Cash Out"][secondary_key] = {}
                   end
                   if r >= 35 && r <= 38 && cc >= 10 && cc <= 16
                     cltv_key = get_value @cltv_data[cc-1]
-                    @rate_adjustment[primary_key]["Cash Out"]["LoanAmount"][secondary_key][cltv_key] = {}
-                    @rate_adjustment[primary_key]["Cash Out"]["LoanAmount"][secondary_key][cltv_key] = value
+                    @rate_adjustment["RefinanceOption/LoanAmount/LTV"]["Cash Out"][secondary_key][cltv_key] = {}
+                    @rate_adjustment["RefinanceOption/LoanAmount/LTV"]["Cash Out"][secondary_key][cltv_key] = value
                   end
                   if r >= 39 && r <= 42 && cc == 6
-                    secondary_key = value
+                    if value.downcase.include?('units')
+                      secondary_key = value.split('s').first
+                    elsif value.downcase.include?('investment')
+                       secondary_key = "Investment Property"
+                    else
+                      secondary_key = value
+                    end
                     @rate_adjustment["RefinanceOption/PropertyType/LTV"]["Cash Out"][secondary_key] = {}
                   end
                   if r >= 39 && r <= 42 && cc >= 10 && cc <= 16
@@ -2558,20 +2582,20 @@ class ObCmgWholesalesController < ApplicationController
                   # MAX PRICE AFTER ADJUSTMENTS
                   if r == 29 && cc == 1
                     @other_adjustment["LoanAmount/LoanType/Term"] = {}
-                    @other_adjustment["LoanAmount/LoanType/Term"]["0-1,000,000"] = {}
-                    @other_adjustment["LoanAmount/LoanType/Term"]["0-1,000,000"]["Fixed"] = {}
-                    @other_adjustment["LoanAmount/LoanType/Term"]["0-1,000,000"]["Fixed"][30] = {}
+                    @other_adjustment["LoanAmount/LoanType/Term"]["0-1000000"] = {}
+                    @other_adjustment["LoanAmount/LoanType/Term"]["0-1000000"]["Fixed"] = {}
+                    @other_adjustment["LoanAmount/LoanType/Term"]["0-1000000"]["Fixed"][30] = {}
                   end
                   if r == 29 && cc == 4
-                    @other_adjustment["LoanAmount/LoanType/Term"]["0-1,000,000"]["Fixed"][30] = value
+                    @other_adjustment["LoanAmount/LoanType/Term"]["0-1000000"]["Fixed"][30] = value
                   end
                   if r == 30 && cc == 1
-                    @other_adjustment["LoanAmount/LoanType/Term"]["1,000,000-Inf"] = {}
-                    @other_adjustment["LoanAmount/LoanType/Term"]["1,000,000-Inf"]["Fixed"] = {}
-                    @other_adjustment["LoanAmount/LoanType/Term"]["1,000,000-Inf"]["Fixed"][30] = {}
+                    @other_adjustment["LoanAmount/LoanType/Term"]["1000000-Inf"] = {}
+                    @other_adjustment["LoanAmount/LoanType/Term"]["1000000-Inf"]["Fixed"] = {}
+                    @other_adjustment["LoanAmount/LoanType/Term"]["1000000-Inf"]["Fixed"][30] = {}
                   end
                   if r == 30 && cc == 4
-                    @other_adjustment["LoanAmount/LoanType/Term"]["1,000,000-Inf"]["Fixed"][30] = value
+                    @other_adjustment["LoanAmount/LoanType/Term"]["1000000-Inf"]["Fixed"][30] = value
                   end
                 end
               rescue Exception => e
@@ -2581,8 +2605,8 @@ class ObCmgWholesalesController < ApplicationController
             end
           end
         end
-
-        adjustment = [@purchase_adjustment,@rate_adjustment,@adjustment_hash,@other_adjustment]
+        
+        adjustment = [@purchase_adjustment,@rate_adjustment,@other_adjustment]
         make_adjust(adjustment,sheet)
         (56..77).each do |r|
           row = sheet_data.row(r)
@@ -2593,14 +2617,14 @@ class ObCmgWholesalesController < ApplicationController
               begin
                 if value.present?
                   if value == "Purchase Transaction"
-                    primary_key = "Jumbo/LoanPurpose/FICO/LTV"
+                    primary_key = "LoanSize/LoanPurpose/FICO/LTV"
                     @jumbo_purchase_adjustment[primary_key] = {}
-                    @jumbo_purchase_adjustment[primary_key][true] = {}
-                    @jumbo_purchase_adjustment[primary_key][true]["Purchase"] = {}
+                    @jumbo_purchase_adjustment[primary_key]["Jumbo"] = {}
+                    @jumbo_purchase_adjustment[primary_key]["Jumbo"]["Purchase"] = {}
                   elsif value == "Rate/Term Transaction"
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/FICO/LTV"] = {}
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/FICO/LTV"][true] = {}
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/FICO/LTV"][true]["Rate and Term"] = {}
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/FICO/LTV"] = {}
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/FICO/LTV"]["Jumbo"] = {}
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/FICO/LTV"]["Jumbo"]["Rate and Term"] = {}
                   elsif value == "MISCELLANEOUS"
                     primary_key = "Jumbo/NY/FICO/LTV"
                     @jumbo_other_adjustment[primary_key] = {}
@@ -2612,12 +2636,12 @@ class ObCmgWholesalesController < ApplicationController
                     else
                       secondary_key = get_value value
                     end
-                    @jumbo_purchase_adjustment[primary_key][true]["Purchase"][secondary_key] = {}
+                    @jumbo_purchase_adjustment[primary_key]["Jumbo"]["Purchase"][secondary_key] = {}
                   end
                   if r >= 60 && r <= 63 && cc >= 15 && cc <= 16
                     ltv_key = get_value @ltv_data[cc-1]
-                    @jumbo_purchase_adjustment[primary_key][true]["Purchase"][secondary_key][ltv_key] = {}
-                    @jumbo_purchase_adjustment[primary_key][true]["Purchase"][secondary_key][ltv_key] = value
+                    @jumbo_purchase_adjustment[primary_key]["Jumbo"]["Purchase"][secondary_key][ltv_key] = {}
+                    @jumbo_purchase_adjustment[primary_key]["Jumbo"]["Purchase"][secondary_key][ltv_key] = value
                   end
 
                   # Rate/Term Transaction Adjustment
@@ -2627,69 +2651,69 @@ class ObCmgWholesalesController < ApplicationController
                     else
                       secondary_key = get_value value
                     end
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/FICO/LTV"][true]["Rate and Term"][secondary_key] = {}
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/FICO/LTV"]["Jumbo"]["Rate and Term"][secondary_key] = {}
                   end
                   if r >= 66 && r <= 69 && cc >= 15 && cc <= 16
                     ltv_key = get_value @ltv_data[cc-1]
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/FICO/LTV"][true]["Rate and Term"][secondary_key][ltv_key] = {}
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/FICO/LTV"][true]["Rate and Term"][secondary_key][ltv_key] = value
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/FICO/LTV"]["Jumbo"]["Rate and Term"][secondary_key][ltv_key] = {}
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/FICO/LTV"]["Jumbo"]["Rate and Term"][secondary_key][ltv_key] = value
                   end
                   if r == 70 && cc == 10
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/LoanAmount/LTV"] = {}
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/LoanAmount/LTV"][true] = {}
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/LoanAmount/LTV"][true]["Rate and Term"] = {}
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/LoanAmount/LTV"][true]["Rate and Term"]["0-1,000,000"] = {}
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/LoanAmount/LTV"] = {}
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/LoanAmount/LTV"]["Jumbo"] = {}
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/LoanAmount/LTV"]["Jumbo"]["Rate and Term"] = {}
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/LoanAmount/LTV"]["Jumbo"]["Rate and Term"]["0-1000000"] = {}
                   end
                   if r == 70 && cc >= 15 && cc <= 16
                     ltv_key = get_value @ltv_data[cc-1]
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/LoanAmount/LTV"][true]["Rate and Term"]["0-1,000,000"][ltv_key] = {}
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/LoanAmount/LTV"][true]["Rate and Term"]["0-1,000,000"][ltv_key] = value
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/LoanAmount/LTV"]["Jumbo"]["Rate and Term"]["0-1000000"][ltv_key] = {}
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/LoanAmount/LTV"]["Jumbo"]["Rate and Term"]["0-1000000"][ltv_key] = value
                   end
                   if r == 71 && cc == 10
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/LoanAmount/LTV"][true]["Rate and Term"]["1,000,000-Inf"] = {}
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/LoanAmount/LTV"]["Jumbo"]["Rate and Term"]["1000000-Inf"] = {}
                   end
                   if r == 71 && cc >= 15 && cc <= 16
                     ltv_key = get_value @ltv_data[cc-1]
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/LoanAmount/LTV"][true]["Rate and Term"]["1,000,000-Inf"][ltv_key] = {}
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/LoanAmount/LTV"][true]["Rate and Term"]["1,000,000-Inf"][ltv_key] = value
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/LoanAmount/LTV"]["Jumbo"]["Rate and Term"]["1000000-Inf"][ltv_key] = {}
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/LoanAmount/LTV"]["Jumbo"]["Rate and Term"]["1000000-Inf"][ltv_key] = value
                   end
                   if r == 72 && cc == 10
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/State/LTV"] = {}
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/State/LTV"][true] = {}
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/State/LTV"][true]["Rate and Term"] = {}
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/State/LTV"][true]["Rate and Term"]["FL"] = {}
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/State/LTV"][true]["Rate and Term"]["NV"] = {}
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/State/LTV"] = {}
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/State/LTV"]["Jumbo"] = {}
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/State/LTV"]["Jumbo"]["Rate and Term"] = {}
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/State/LTV"]["Jumbo"]["Rate and Term"]["FL"] = {}
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/State/LTV"]["Jumbo"]["Rate and Term"]["NV"] = {}
                   end
                   if r == 72 && cc >= 15 && cc <= 16
                     ltv_key = get_value @ltv_data[cc-1]
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/State/LTV"][true]["Rate and Term"]["FL"][ltv_key] = {}
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/State/LTV"][true]["Rate and Term"]["NV"][ltv_key] = {}
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/State/LTV"][true]["Rate and Term"]["FL"][ltv_key] = value
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/State/LTV"][true]["Rate and Term"]["NV"][ltv_key] = value
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/State/LTV"]["Jumbo"]["Rate and Term"]["FL"][ltv_key] = {}
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/State/LTV"]["Jumbo"]["Rate and Term"]["NV"][ltv_key] = {}
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/State/LTV"]["Jumbo"]["Rate and Term"]["FL"][ltv_key] = value
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/State/LTV"]["Jumbo"]["Rate and Term"]["NV"][ltv_key] = value
                   end
                   if r == 73 && cc == 10
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/State/LTV"][true]["Rate and Term"]["CA"] = {}
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/State/LTV"]["Jumbo"]["Rate and Term"]["CA"] = {}
                   end
                   if r == 73 && cc >= 15 && cc <= 16
                     ltv_key = get_value @ltv_data[cc-1]
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/State/LTV"][true]["Rate and Term"]["CA"][ltv_key] = {}
-                    @jumbo_rate_adjustment["Jumbo/RefinanceOption/State/LTV"][true]["Rate and Term"]["CA"][ltv_key] = value
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/State/LTV"]["Jumbo"]["Rate and Term"]["CA"][ltv_key] = {}
+                    @jumbo_rate_adjustment["LoanSize/RefinanceOption/State/LTV"]["Jumbo"]["Rate and Term"]["CA"][ltv_key] = value
                   end
                   if r == 74 && cc == 10
-                    @jumbo_rate_adjustment["Jumbo/MiscAdjuster/LTV"] = {}
-                    @jumbo_rate_adjustment["Jumbo/MiscAdjuster/LTV"][true] = {}
-                    @jumbo_rate_adjustment["Jumbo/MiscAdjuster/LTV"][true]["Escrow Waiver"] = {}
+                    @jumbo_rate_adjustment["LoanSize/MiscAdjuster/LTV"] = {}
+                    @jumbo_rate_adjustment["LoanSize/MiscAdjuster/LTV"]["Jumbo"] = {}
+                    @jumbo_rate_adjustment["LoanSize/MiscAdjuster/LTV"]["Jumbo"]["Escrow Waiver"] = {}
                   end
                   if r == 74 && cc >= 15 && cc <= 16
                     ltv_key = get_value @ltv_data[cc-1]
-                    @jumbo_rate_adjustment["Jumbo/MiscAdjuster/LTV"][true]["Escrow Waiver"][ltv_key] = {}
-                    @jumbo_rate_adjustment["Jumbo/MiscAdjuster/LTV"][true]["Escrow Waiver"][ltv_key] = value
+                    @jumbo_rate_adjustment["LoanSize/MiscAdjuster/LTV"]["Jumbo"]["Escrow Waiver"][ltv_key] = {}
+                    @jumbo_rate_adjustment["LoanSize/MiscAdjuster/LTV"]["Jumbo"]["Escrow Waiver"][ltv_key] = value
                   end
                   if r == 77 && cc == 10
-                    @jumbo_rate_adjustment["Jumbo/MiscAdjuster/LTV"][true]["Miscellaneous"] = {}
+                    @jumbo_rate_adjustment["LoanSize/MiscAdjuster/LTV"]["Jumbo"]["Miscellaneous"] = {}
                   end
                   if r == 77 && cc >= 16
-                    @jumbo_rate_adjustment["Jumbo/MiscAdjuster/LTV"][true]["Miscellaneous"] = value
+                    @jumbo_rate_adjustment["LoanSize/MiscAdjuster/LTV"]["Jumbo"]["Miscellaneous"] = value
                   end
                 end
               rescue Exception => e
@@ -2701,18 +2725,18 @@ class ObCmgWholesalesController < ApplicationController
               value = sheet_data.cell(r,cc)
               if value.present?
                 if r == 71 && cc == 1
-                  @jumbo_other_adjustment["Jumbo/LoanAmount"] = {}
-                  @jumbo_other_adjustment["Jumbo/LoanAmount"][true] = {}
-                  @jumbo_other_adjustment["Jumbo/LoanAmount"][true]["0-1,000,000"] = {}
+                  @jumbo_other_adjustment["LoanSize/LoanAmount"] = {}
+                  @jumbo_other_adjustment["LoanSize/LoanAmount"]["Jumbo"] = {}
+                  @jumbo_other_adjustment["LoanSize/LoanAmount"]["Jumbo"]["0-1000000"] = {}
                 end
                 if r == 71 && cc == 3
-                  @jumbo_other_adjustment["Jumbo/LoanAmount"][true]["0-1,000,000"] = value
+                  @jumbo_other_adjustment["LoanSize/LoanAmount"]["Jumbo"]["0-1000000"] = value
                 end
                 if r == 72 && cc == 1
-                  @jumbo_other_adjustment["Jumbo/LoanAmount"][true]["1,000,000-Inf"] = {}
+                  @jumbo_other_adjustment["LoanSize/LoanAmount"]["Jumbo"]["1000000-Inf"] = {}
                 end
                 if r == 72 && cc == 3
-                  @jumbo_other_adjustment["Jumbo/LoanAmount"][true]["1,000,000-Inf"] = value
+                  @jumbo_other_adjustment["LoanSize/LoanAmount"]["Jumbo"]["1000000-Inf"] = value
                 end
               end
             end
@@ -2917,34 +2941,34 @@ class ObCmgWholesalesController < ApplicationController
                   end
                   if r == 83 && cc == 1
                     @other_adjustment["LoanAmount/Term"] = {}
-                    @other_adjustment["LoanAmount/Term"]["0-1,000,000"] = {}
-                    @other_adjustment["LoanAmount/Term"]["0-1,000,000"]["30"] = {}
-                    @other_adjustment["LoanAmount/Term"]["0-1,000,000"]["15"] = {}
-                    @other_adjustment["LoanAmount/Term"]["0-1,000,000"]["ARM"] = {}
+                    @other_adjustment["LoanAmount/Term"]["0-1000000"] = {}
+                    @other_adjustment["LoanAmount/Term"]["0-1000000"]["30"] = {}
+                    @other_adjustment["LoanAmount/Term"]["0-1000000"]["15"] = {}
+                    @other_adjustment["LoanAmount/Term"]["0-1000000"]["ARM"] = {}
                   end
                   if r == 83 && cc == 2
-                    @other_adjustment["LoanAmount/Term"]["0-1,000,000"]["30"] = value
+                    @other_adjustment["LoanAmount/Term"]["0-1000000"]["30"] = value
                   end
                   if r == 83 && cc == 3
-                    @other_adjustment["LoanAmount/Term"]["0-1,000,000"]["15"] = value
+                    @other_adjustment["LoanAmount/Term"]["0-1000000"]["15"] = value
                   end
                   if r == 83 && cc == 4
-                    @other_adjustment["LoanAmount/Term"]["0-1,000,000"]["ARM"] = value
+                    @other_adjustment["LoanAmount/Term"]["0-1000000"]["ARM"] = value
                   end
                   if r == 84 && cc == 1
-                    @other_adjustment["LoanAmount/Term"]["1,000,000-Inf"] = {}
-                    @other_adjustment["LoanAmount/Term"]["1,000,000-Inf"]["30"] = {}
-                    @other_adjustment["LoanAmount/Term"]["1,000,000-Inf"]["15"] = {}
-                    @other_adjustment["LoanAmount/Term"]["1,000,000-Inf"]["ARM"] = {}
+                    @other_adjustment["LoanAmount/Term"]["1000000-Inf"] = {}
+                    @other_adjustment["LoanAmount/Term"]["1000000-Inf"]["30"] = {}
+                    @other_adjustment["LoanAmount/Term"]["1000000-Inf"]["15"] = {}
+                    @other_adjustment["LoanAmount/Term"]["1000000-Inf"]["ARM"] = {}
                   end
                   if r == 84 && cc == 2
-                    @other_adjustment["LoanAmount/Term"]["1,000,000-Inf"]["30"] = value
+                    @other_adjustment["LoanAmount/Term"]["1000000-Inf"]["30"] = value
                   end
                   if r == 84 && cc == 3
-                    @other_adjustment["LoanAmount/Term"]["1,000,000-Inf"]["15"] = value
+                    @other_adjustment["LoanAmount/Term"]["1000000-Inf"]["15"] = value
                   end
                   if r == 84 && cc == 4
-                    @other_adjustment["LoanAmount/Term"]["1,000,000-Inf"]["ARM"] = value
+                    @other_adjustment["LoanAmount/Term"]["1000000-Inf"]["ARM"] = value
                   end
                 end
               rescue Exception => e
@@ -3152,34 +3176,34 @@ class ObCmgWholesalesController < ApplicationController
                   end
                   if r == 84 && cc == 1
                     @other_adjustment["LoanAmount/Term"] = {}
-                    @other_adjustment["LoanAmount/Term"]["0-1,000,000"] = {}
-                    @other_adjustment["LoanAmount/Term"]["0-1,000,000"]["30"] = {}
-                    @other_adjustment["LoanAmount/Term"]["0-1,000,000"]["15"] = {}
-                    @other_adjustment["LoanAmount/Term"]["0-1,000,000"]["ARM"] = {}
+                    @other_adjustment["LoanAmount/Term"]["0-1000000"] = {}
+                    @other_adjustment["LoanAmount/Term"]["0-1000000"]["30"] = {}
+                    @other_adjustment["LoanAmount/Term"]["0-1000000"]["15"] = {}
+                    @other_adjustment["LoanAmount/Term"]["0-1000000"]["ARM"] = {}
                   end
                   if r == 84 && cc == 2
-                    @other_adjustment["LoanAmount/Term"]["0-1,000,000"]["30"] = value
+                    @other_adjustment["LoanAmount/Term"]["0-1000000"]["30"] = value
                   end
                   if r == 84 && cc == 3
-                    @other_adjustment["LoanAmount/Term"]["0-1,000,000"]["15"] = value
+                    @other_adjustment["LoanAmount/Term"]["0-1000000"]["15"] = value
                   end
                   if r == 84 && cc == 4
-                    @other_adjustment["LoanAmount/Term"]["0-1,000,000"]["ARM"] = value
+                    @other_adjustment["LoanAmount/Term"]["0-1000000"]["ARM"] = value
                   end
                   if r == 85 && cc == 1
-                    @other_adjustment["LoanAmount/Term"]["1,000,000-Inf"] = {}
-                    @other_adjustment["LoanAmount/Term"]["1,000,000-Inf"]["30"] = {}
-                    @other_adjustment["LoanAmount/Term"]["1,000,000-Inf"]["15"] = {}
-                    @other_adjustment["LoanAmount/Term"]["1,000,000-Inf"]["ARM"] = {}
+                    @other_adjustment["LoanAmount/Term"]["1000000-Inf"] = {}
+                    @other_adjustment["LoanAmount/Term"]["1000000-Inf"]["30"] = {}
+                    @other_adjustment["LoanAmount/Term"]["1000000-Inf"]["15"] = {}
+                    @other_adjustment["LoanAmount/Term"]["1000000-Inf"]["ARM"] = {}
                   end
                   if r == 85 && cc == 2
-                    @other_adjustment["LoanAmount/Term"]["1,000,000-Inf"]["30"] = value
+                    @other_adjustment["LoanAmount/Term"]["1000000-Inf"]["30"] = value
                   end
                   if r == 85 && cc == 3
-                    @other_adjustment["LoanAmount/Term"]["1,000,000-Inf"]["15"] = value
+                    @other_adjustment["LoanAmount/Term"]["1000000-Inf"]["15"] = value
                   end
                   if r == 85 && cc == 4
-                    @other_adjustment["LoanAmount/Term"]["1,000,000-Inf"]["ARM"] = value
+                    @other_adjustment["LoanAmount/Term"]["1000000-Inf"]["ARM"] = value
                   end
                 end
               rescue Exception => e
@@ -3793,34 +3817,34 @@ class ObCmgWholesalesController < ApplicationController
                 if r == 33 && cc == 13
                   @other_adjustment["ProgramCategory/LoanAmount/Term"] = {}
                   @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"] = {}
-                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["0-1,000,000"] = {}
-                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["0-1,000,000"]["30"] = {}
-                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["0-1,000,000"]["15"] = {}
-                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["0-1,000,000"]["ARM"] = {}
+                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["0-1000000"] = {}
+                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["0-1000000"]["30"] = {}
+                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["0-1000000"]["15"] = {}
+                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["0-1000000"]["ARM"] = {}
                 end
                 if r == 33 && cc == 14
-                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["0-1,000,000"]["30"] = value
+                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["0-1000000"]["30"] = value
                 end
                 if r == 33 && cc == 15
-                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["0-1,000,000"]["15"] = value
+                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["0-1000000"]["15"] = value
                 end
                 if r == 33 && cc == 16
-                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["0-1,000,000"]["ARM"] = value
+                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["0-1000000"]["ARM"] = value
                 end
                 if r == 34 && cc == 13
-                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["1,000,000-Inf"] = {}
-                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["1,000,000-Inf"]["30"] = {}
-                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["1,000,000-Inf"]["15"] = {}
-                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["1,000,000-Inf"]["ARM"] = {}
+                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["1000000-Inf"] = {}
+                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["1000000-Inf"]["30"] = {}
+                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["1000000-Inf"]["15"] = {}
+                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["1000000-Inf"]["ARM"] = {}
                 end
                 if r == 34 && cc == 14
-                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["1,000,000-Inf"]["30"] = value
+                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["1000000-Inf"]["30"] = value
                 end
                 if r == 34 && cc == 15
-                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["1,000,000-Inf"]["15"] = value
+                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["1000000-Inf"]["15"] = value
                 end
                 if r == 34 && cc == 16
-                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["1,000,000-Inf"]["ARM"] = value
+                  @other_adjustment["ProgramCategory/LoanAmount/Term"]["QM 6900"]["1000000-Inf"]["ARM"] = value
                 end
               end
             end
@@ -3912,34 +3936,34 @@ class ObCmgWholesalesController < ApplicationController
                 if r == 74 && cc == 13
                   @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"] = {}
                   @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"] = {}
-                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["0-1,000,000"] = {}
-                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["0-1,000,000"]["30"] = {}
-                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["0-1,000,000"]["15"] = {}
-                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["0-1,000,000"]["ARM"] = {}
+                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["0-1000000"] = {}
+                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["0-1000000"]["30"] = {}
+                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["0-1000000"]["15"] = {}
+                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["0-1000000"]["ARM"] = {}
                 end
                 if r == 74 && cc == 14
-                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["0-1,000,000"]["30"] = value
+                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["0-1000000"]["30"] = value
                 end
                 if r == 74 && cc == 15
-                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["0-1,000,000"]["15"] = value
+                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["0-1000000"]["15"] = value
                 end
                 if r == 74 && cc == 16
-                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["0-1,000,000"]["ARM"] = value
+                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["0-1000000"]["ARM"] = value
                 end
                 if r == 75 && cc == 13
-                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["1,000,000-Inf"] = {}
-                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["1,000,000-Inf"]["30"] = {}
-                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["1,000,000-Inf"]["15"] = {}
-                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["1,000,000-Inf"]["ARM"] = {}
+                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["1000000-Inf"] = {}
+                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["1000000-Inf"]["30"] = {}
+                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["1000000-Inf"]["15"] = {}
+                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["1000000-Inf"]["ARM"] = {}
                 end
                 if r == 75 && cc == 14
-                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["1,000,000-Inf"]["30"] = value
+                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["1000000-Inf"]["30"] = value
                 end
                 if r == 75 && cc == 15
-                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["1,000,000-Inf"]["15"] = value
+                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["1000000-Inf"]["15"] = value
                 end
                 if r == 75 && cc == 16
-                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["1,000,000-Inf"]["ARM"] = value
+                  @jumbo_other_adjustment["ProgramCategory/LoanAmount/Term"]["Non-Qm 7900"]["1000000-Inf"]["ARM"] = value
                 end
               end
             end
