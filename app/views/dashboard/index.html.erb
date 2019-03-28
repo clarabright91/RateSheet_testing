@@ -7,7 +7,7 @@
         <div class="panel-heading">Program Inputs</div>
         <div class="panel-body">
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-7">
               <div class="program-panel panel-basic">
                 <div class="input-grp"><h5>Program Info</h5></div>
                 <div class="row panel-body">
@@ -38,7 +38,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-5">
               <div class="panel-basic">
                 <div class="input-grp"><h5>Loan Property</h5></div>
                 <div class="row panel-body">
@@ -97,7 +97,7 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-7">
               <div class="program-panel panel-basic">
                 <div class="input-grp"><h5>FM</h5></div>
                 <div class="row panel-body">
@@ -484,5 +484,18 @@
      }
    });
   });
+  $('#du, #lp').click(function(){
+    if ($('#du').prop("checked")) {
+      $('#fannie_mae').attr('checked', true);
+    }else {
+      $('#fannie_mae').attr('checked', false);
+    }
+    if ($('#lp').prop("checked")) {
+      $('#freddie_mac').attr('checked', true);
+    }else {
+      $('#freddie_mac').attr('checked', false);
+    }  
+  })
+  
 
 </script>

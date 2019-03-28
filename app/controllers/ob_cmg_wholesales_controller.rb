@@ -4170,3 +4170,4 @@ class ObCmgWholesalesController < ApplicationController
     end
   end
 end
+# Program.all.collect{|p| hash[p.program_name] = p.term, p.loan_type, p.program_category, p.streamline, p.fha, p.va, p.usda, p.arm_basic, p.sheet, p.fannie_mae_product, p.freddie_mac_product, p.loan_size, p.bank_name, p.loan_purpose, p.du, p.lp}
