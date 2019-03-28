@@ -2835,8 +2835,8 @@ class ObCmgWholesalesController < ApplicationController
                   elsif value == "Cash Out Transaction"
                     @adjustment_hash["RefinanceOption/FICO/LTV"] = {}
                     @adjustment_hash["RefinanceOption/FICO/LTV"]["Cash Out"] = {}
-                    @adjustment_hash["RefinanceOption/LoanAmount/FICO/LTV"] = {}
-                    @adjustment_hash["RefinanceOption/LoanAmount/FICO/LTV"]["Cash Out"] = {}
+                    @adjustment_hash["RefinanceOption/LoanAmount/LTV"] = {}
+                    @adjustment_hash["RefinanceOption/LoanAmount/LTV"]["Cash Out"] = {}
                     @adjustment_hash["RefinanceOption/PropertyType/LTV"] = {}
                     @adjustment_hash["RefinanceOption/PropertyType/LTV"]["Cash Out"] = {}
                   elsif value == "MISCELLANEOUS"
@@ -2896,15 +2896,19 @@ class ObCmgWholesalesController < ApplicationController
                     else
                       secondary_key = get_value value
                     end
-                    @adjustment_hash["RefinanceOption/LoanAmount/FICO/LTV"]["Cash Out"][secondary_key] = {}
+                    @adjustment_hash["RefinanceOption/LoanAmount/LTV"]["Cash Out"][secondary_key] = {}
                   end
                   if r >= 66 && r <= 68 && cc >= 6 && cc <= 14
                     cltv_key = get_value @cltv_data[cc-1]
-                    @adjustment_hash["RefinanceOption/LoanAmount/FICO/LTV"]["Cash Out"][secondary_key][cltv_key] = {}
-                    @adjustment_hash["RefinanceOption/LoanAmount/FICO/LTV"]["Cash Out"][secondary_key][cltv_key] = value
+                    @adjustment_hash["RefinanceOption/LoanAmount/LTV"]["Cash Out"][secondary_key][cltv_key] = {}
+                    @adjustment_hash["RefinanceOption/LoanAmount/LTV"]["Cash Out"][secondary_key][cltv_key] = value
                   end
                   if r >= 69 && r <= 74 && cc == 1
-                    secondary_key = value.split("s").first
+                    if value.downcase.include?('units')
+                      secondary_key = value.split("s").first
+                    else
+                      secondary_key = value
+                    end 
                     @adjustment_hash["RefinanceOption/PropertyType/LTV"]["Cash Out"][secondary_key] = {}
                   end
                   if r >= 69 && r <= 74 && cc >= 6 && cc <= 14
@@ -3071,8 +3075,8 @@ class ObCmgWholesalesController < ApplicationController
                   elsif value == "Cash Out Transaction"
                     @adjustment_hash["RefinanceOption/FICO/LTV"] = {}
                     @adjustment_hash["RefinanceOption/FICO/LTV"]["Cash Out"] = {}
-                    @adjustment_hash["RefinanceOption/LoanAmount/FICO/LTV"] = {}
-                    @adjustment_hash["RefinanceOption/LoanAmount/FICO/LTV"]["Cash Out"] = {}
+                    @adjustment_hash["RefinanceOption/LoanAmount/LTV"] = {}
+                    @adjustment_hash["RefinanceOption/LoanAmount/LTV"]["Cash Out"] = {}
                     @adjustment_hash["RefinanceOption/PropertyType/LTV"] = {}
                     @adjustment_hash["RefinanceOption/PropertyType/LTV"]["Cash Out"] = {}
                   elsif value == "MISCELLANEOUS"
@@ -3130,12 +3134,12 @@ class ObCmgWholesalesController < ApplicationController
                     else
                       secondary_key = get_value value
                     end
-                    @adjustment_hash["RefinanceOption/LoanAmount/FICO/LTV"]["Cash Out"][secondary_key] = {}
+                    @adjustment_hash["RefinanceOption/LoanAmount/LTV"]["Cash Out"][secondary_key] = {}
                   end
                   if r >= 67 && r <= 69 && cc >= 6 && cc <= 14
                     cltv_key = get_value @cltv_data[cc-1]
-                    @adjustment_hash["RefinanceOption/LoanAmount/FICO/LTV"]["Cash Out"][secondary_key][cltv_key] = {}
-                    @adjustment_hash["RefinanceOption/LoanAmount/FICO/LTV"]["Cash Out"][secondary_key][cltv_key] = value
+                    @adjustment_hash["RefinanceOption/LoanAmount/LTV"]["Cash Out"][secondary_key][cltv_key] = {}
+                    @adjustment_hash["RefinanceOption/LoanAmount/LTV"]["Cash Out"][secondary_key][cltv_key] = value
                   end
                   if r >= 70 && r <= 75 && cc == 1
                     secondary_key = value
@@ -3305,7 +3309,7 @@ class ObCmgWholesalesController < ApplicationController
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   program_property sheet
                   @programs_ids << @program.id
-                  # @program.adjustments.destroy_all
+                  @program.adjustments.destroy_all
 
                   @block_hash = {}
                   key = ''
@@ -4121,6 +4125,7 @@ class ObCmgWholesalesController < ApplicationController
     # Program Property
     if @program.program_name.split("-").count > 1
       program_category = @program.program_name.split("-").last
+      program_category = program_category.squish
     end
        # Loan Limit Type
     if @program.program_name.include?("Non-Conforming")
