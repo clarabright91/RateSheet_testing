@@ -55,7 +55,7 @@
                     <div class="form-group">
                       <label>Loan Size</label>
                       <div class="input-group">
-                        <% loan_size_list =[ ["Conforming"], ["Non-Conforming"], ["Jumbo"], ["High-Balance"]]%>
+                        <% loan_size_list =[ ["Conforming"], ["Non-Conforming"], ["Super Conforming"], ["Jumbo"], ["High-Balance"]]%>
                         <%= select_tag 'loan_size', options_for_select(loan_size_list, (params[:loan_size] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control" }%>
                       </div>
                     </div>
@@ -494,8 +494,8 @@
       $('#freddie_mac').attr('checked', true);
     }else {
       $('#freddie_mac').attr('checked', false);
-    }  
+    }
   })
-  
+
 
 </script>
