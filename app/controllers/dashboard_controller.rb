@@ -38,7 +38,7 @@ class DashboardController < ApplicationController
     @program_categories = @all_n_banks_programs.pluck(:program_category).uniq.compact
 
     if @program_categories.present?
-      @program_categories = @program_categories.map{|c| c.strip.split("&")}.flatten
+      # @program_categories = @program_categories.map{|c| c.strip.split("&")}.flatten
       @program_categories.prepend(["All"])
     else
       @program_categories << "No Category"
