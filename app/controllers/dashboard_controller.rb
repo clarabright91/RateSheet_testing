@@ -32,10 +32,13 @@ class DashboardController < ApplicationController
         @all_n_banks_programs = @all_n_banks_programs.where(program_category: params[:pro_category])
       end
     end
+
     @program_names = @all_n_banks_programs.pluck(:program_name).uniq.compact
     @loan_categories = @all_n_banks_programs.pluck(:loan_category).uniq.compact
     @program_categories = @all_n_banks_programs.pluck(:program_category).uniq.compact
+
     if @program_categories.present?
+      @program_categories = @program_categories.map{|c| c.strip.split("&")}.flatten
       @program_categories.prepend(["All"])
     else
       @program_categories << "No Category"
@@ -3103,5 +3106,4 @@ class DashboardController < ApplicationController
     end
   end
 
-  # render :index
 end
