@@ -426,7 +426,7 @@
     $('#loan_category').change(function(){
       var loan_category =  $(this).val();
       var bank_name = $('#bank_name').val()
-      var pro_category ="All"
+      var pro_category_list ="All"
       $.ajax({
         type:'GET',
         url:'/dashboard/fetch_programs_by_bank',
@@ -451,7 +451,7 @@
     $('#pro_category').change(function(){
       var pro_category =  $(this).val();
       var bank_name = $('#bank_name').val()
-      var loan_category = $('#bank_name').val()
+      var loan_category = $('#loan_category').val()
       $.ajax({
         type:'GET',
         url:'/dashboard/fetch_programs_by_bank',
