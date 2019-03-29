@@ -29,6 +29,12 @@ class Program < ApplicationRecord
     return conforming
   end
 
+  def get_super_conforming
+    sup_conf = ["Super Conforming"," SC "]
+    sup_conf += sup_conf.map(&:downcase)
+    return sup_conf
+  end
+
   def get_non_conf_hb
     non_conf_hb = ["Non-Conforming Jumbo"]
     non_conf_hb += non_conf_hb.map(&:downcase)
@@ -36,7 +42,7 @@ class Program < ApplicationRecord
   end
   
   def get_conf
-    conf = ["CONF HB","Conf High Bal"]
+    conf = ["CONF HB","Conf High Bal", "Conforming High Balance"]
     # conforming += Acronym.new(conforming).to_a
     conf += conf.map(&:downcase)
     return conf
@@ -69,7 +75,7 @@ class Program < ApplicationRecord
   end
 
   def fetch_loan_size_fields
-    loan_size = get_conforming + get_non_conforming + get_high_balance + get_jumbo + get_conf + get_non_conf_hb
+    loan_size = get_conforming + get_non_conforming + get_high_balance + get_jumbo + get_conf + get_non_conf_hb + get_super_conforming
     return loan_size
   end
 
@@ -172,7 +178,7 @@ class Program < ApplicationRecord
     fetch_loan_size_fields.each{ |word|
       present_word = word if p_name.downcase.include?(word.downcase)
     }
-    loan_size = get_high_balance.include?(present_word) ? "High-Balance" : get_jumbo.include?(present_word) ? "Jumbo" : get_conforming.include?(present_word) ? "Conforming" : get_non_conforming.include?(present_word) ? "Non-Conforming" : get_conf.include?(present_word) ? "Conforming and High-Balance" : get_non_conf_hb.include?(present_word) ? "Non-Conforming and Jumbo" : nil
+    loan_size = get_high_balance.include?(present_word) ? "High-Balance" : get_jumbo.include?(present_word) ? "Jumbo" : get_super_conforming.include?(present_word) ? "Super Conforming" : get_non_conforming.include?(present_word) ? "Non-Conforming" : get_conforming.include?(present_word) ? "Conforming" : get_conf.include?(present_word) ? "Conforming and High-Balance" : get_non_conf_hb.include?(present_word) ? "Non-Conforming and Jumbo" : nil
     self.loan_size = loan_size
   end
 
