@@ -403,7 +403,7 @@
           selectBox.options.length = 0
           selectBox.options.add( new Option('All', 'All'));
           response.program_list.map((program)=>{
-            selectBox.options.add( new Option(program.program_name, program.program_name));
+            selectBox.options.add( new Option(program.name, program.name));
           });
 
           var selectBox2 = document.getElementById('loan_category');
@@ -435,7 +435,7 @@
           selectBox.options.length = 0
           selectBox.options.add( new Option('All', 'All'));
           response.program_list.map((program)=>{
-            selectBox.options.add( new Option(program.program_name, program.program_name));
+            selectBox.options.add( new Option(program.name, program.name));
           });
 
           var selectBox2 = document.getElementById('pro_category');
@@ -459,7 +459,7 @@
           selectBox.options.length = 0
           selectBox.options.add( new Option('All', 'All'));
           response.program_list.map((program)=>{
-            selectBox.options.add( new Option(program.program_name, program.program_name));
+            selectBox.options.add( new Option(program.name, program.name));
           });
         }
       });
