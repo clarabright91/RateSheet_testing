@@ -3396,8 +3396,8 @@ class ObCmgWholesalesController < ApplicationController
               begin
                 if value.present?
                   if value == "FLEX JUMBO 6400 SERIES ADJUSTMENTS"
-                    @jumbo_flex_hash["Jumbo/LoanAmount"] = {}
-                    @jumbo_flex_hash["Jumbo/LoanAmount"][true] = {}
+                    @jumbo_flex_hash["LoanSize/LoanAmount"] = {}
+                    @jumbo_flex_hash["LoanSize/LoanAmount"]["Jumbo"] = {}
                     @jumbo_flex_hash["Jumbo/PropertyType"] = {}
                     @jumbo_flex_hash["Jumbo/PropertyType"][true] = {}
                   end
@@ -3407,10 +3407,10 @@ class ObCmgWholesalesController < ApplicationController
                     else
                       secondary_key = get_value value
                     end
-                    @jumbo_flex_hash["Jumbo/LoanAmount"][true][secondary_key] = {}
+                    @jumbo_flex_hash["LoanSize/LoanAmount"]["Jumbo"][secondary_key] = {}
                   end
                   if r >= 23 && r <= 24 && cc == 16
-                    @jumbo_flex_hash["Jumbo/LoanAmount"][true][secondary_key] = value
+                    @jumbo_flex_hash["LoanSize/LoanAmount"]["Jumbo"][secondary_key] = value
                   end
                   if r >= 25 && r <= 31 && cc == 10
                     if value.include?("(N/A for Investment Properties)")
@@ -3487,7 +3487,6 @@ class ObCmgWholesalesController < ApplicationController
             end
           end
         end
-
         adjustment = [@jumbo_flex_hash]
         make_adjust(adjustment,sheet)
         create_program_association_with_adjustment(sheet)
