@@ -20,13 +20,13 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label>Loan Category</label>
-                      <%= select_tag 'loan_category', options_for_select(Program.all.pluck(:loan_category).uniq.compact.reject { |c| c.empty? }.map{ |lc| [lc]}.prepend(["All"]), (params[:loan_category] rescue nil)), { :class=> "form-control", :required => true} %>
+                      <%= select_tag 'loan_category', options_for_select(Program.pluck(:loan_category).uniq.compact.reject { |c| c.empty? }.map{ |lc| [lc]}.prepend(["All"]), (params[:loan_category] rescue nil)), { :class=> "form-control", :required => true} %>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
                       <label>Program Category</label>
-                      <%= select_tag 'pro_category', options_for_select(Program.all.pluck(:program_category).uniq.compact.reject { |c| c.empty? }.map{ |pc| [pc.strip]}.prepend(["All"]), (params[:pro_category] rescue nil)), { :class=> "form-control", :required => true} %>
+                      <%= select_tag 'pro_category', options_for_select(Program.pluck(:program_category).uniq.compact.reject { |c| c.empty? }.map{|c| c.strip.split("&")}.flatten.map{ |pc| [pc.strip]}.prepend(["All"]), (params[:pro_category] rescue nil)), { :class=> "form-control", :required => true} %>
                     </div>
                   </div>
                   <div class="col-md-6">
@@ -71,7 +71,7 @@
                     <div class="form-group">
                       <label>Term</label>
                       <div class="input-group">
-                       <% @term_list = (Program.all.pluck(:term).reject(&:blank?).uniq.map{|n| n if n.to_s.length < 3}.reject(&:blank?).push(5,10,15,20,25,30).uniq.sort).map{|y| [y.to_s + " yrs" , y]} %>
+                       <% @term_list = (Program.pluck(:term).reject(&:blank?).uniq.map{|n| n if n.to_s.length < 3}.reject(&:blank?).push(5,10,15,20,25,30).uniq.sort).map{|y| [y.to_s + " yrs" , y]} %>
                         <%= select_tag 'term', options_for_select(@term_list, (params[:term] rescue nil)), { prompt: 'Select Term', :class=> "form-control"} %>
                       </div>
                     </div>
@@ -391,8 +391,8 @@
   $(document).ready(function(){
     $('#bank_name').change(function(){
       var bank_name =  $(this).val();
-      loan_category = "All"
-      pro_category = "All"
+      var loan_category = "All"
+      var pro_category = "All"
 
       $.ajax({
         type:'GET',
@@ -426,6 +426,7 @@
     $('#loan_category').change(function(){
       var loan_category =  $(this).val();
       var bank_name = $('#bank_name').val()
+      var pro_category = "All"
       $.ajax({
         type:'GET',
         url:'/dashboard/fetch_programs_by_bank',
@@ -450,6 +451,7 @@
     $('#pro_category').change(function(){
       var pro_category =  $(this).val();
       var bank_name = $('#bank_name').val()
+      var loan_category = $('#loan_category').val()
       $.ajax({
         type:'GET',
         url:'/dashboard/fetch_programs_by_bank',
@@ -464,6 +466,7 @@
         }
       });
     });
+
 
     $(".alert-error" ).fadeOut(3000);
     if ($("#loan_type").val() == "ARM") {
