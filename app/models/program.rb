@@ -176,7 +176,7 @@ class Program < ApplicationRecord
   def set_loan_size p_name
     present_word = nil
     fetch_loan_size_fields.each{ |word|
-      present_word = word if p_name.downcase.include?(word.downcase)
+      present_word = word if p_name.squish.downcase.include?(word.downcase)
     }
     loan_size = get_high_balance.include?(present_word) ? "High-Balance" : get_jumbo.include?(present_word) ? "Jumbo" : get_super_conforming.include?(present_word) ? "Super Conforming" : get_non_conforming.include?(present_word) ? "Non-Conforming" : get_conforming.include?(present_word) ? "Conforming" : get_conf.include?(present_word) ? "Conforming and High-Balance" : get_non_conf_hb.include?(present_word) ? "Non-Conforming and Jumbo" : nil
     self.loan_size = loan_size
