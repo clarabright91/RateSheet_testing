@@ -138,11 +138,11 @@ class DashboardController < ApplicationController
       end
     end
 
-    # if params[:pro_category].present?
-    #   unless (params[:pro_category] == "All")
-    #     @filter_data[:program_category] = params[:pro_category]
-    #   end
-    # end
+    if params[:pro_category].present?
+      unless (params[:pro_category] == "All")
+        @filter_data[:program_category] = params[:pro_category]
+      end
+    end
 
     if params[:loan_category].present?
       unless (params[:loan_category] == "All")
@@ -257,27 +257,27 @@ class DashboardController < ApplicationController
         end
       end
 
-      if @program_list3.present?
-        @program_list4 = []
-        if params[:pro_category].present?
-          @program_list3 = @program_list3.map{ |pro| pro if pro.program_category!=nil}.compact
-          if params[:pro_category] == "All"
-            @program_list4 = @program_list3
-          else
-            @program_list3.each do |pro|
-              if(pro.program_category.split("&").map{ |l| l.strip }.include?(params[:pro_category]))
-                @program_list4 << pro
-              end
-            end
-          end
-        else
-          @program_list4 = @program_list3
-        end
-      end
+      # if @program_list3.present?
+      #   @program_list4 = []
+      #   if params[:pro_category].present?
+      #     @program_list3 = @program_list3.map{ |pro| pro if pro.program_category!=nil}.compact
+      #     if params[:pro_category] == "All"
+      #       @program_list4 = @program_list3
+      #     else
+      #       @program_list3.each do |pro|
+      #         if(pro.program_category.split("&").map{ |l| l.strip }.include?(params[:pro_category]))
+      #           @program_list4 << pro
+      #         end
+      #       end
+      #     end
+      #   else
+      #     @program_list4 = @program_list3
+      #   end
+      # end
 
       @programs =[]
-      if @program_list4.present?
-        @program_list4.each do |program|
+      if @program_list3.present?
+        @program_list3.each do |program|
           if program.base_rate.present?
             if(program.base_rate.keys.include?(@interest.to_f.to_s))
               if(program.base_rate[@interest.to_f.to_s].keys.include?(@lock_period))
