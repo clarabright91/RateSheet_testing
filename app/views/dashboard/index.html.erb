@@ -14,25 +14,26 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label>Bank Name</label>
-                      <%= select_tag 'bank_name', options_for_select(@all_banks_name, :selected => params[:bank_name]), { :class=> "form-control" ,:include_blank => 'All'} %>
+                      <%= select_tag 'bank_name', options_for_select(@all_banks_name, params[:bank_name]), { :class=> "form-control" ,:include_blank => 'All'} %>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
                       <label>Loan Category</label>
-                      <%= select_tag 'loan_category', options_for_select(@loan_categories,:selected => params[:loan_category]), { :class=> "form-control" ,:include_blank => 'All'} %>
+                      <%= select_tag 'loan_category', options_for_select(@loan_categories, params[:loan_category]), { :class=> "form-control" ,:include_blank => 'All'} %>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
                       <label>Program Category</label>
-                      <%= select_tag 'pro_category', options_for_select(@program_categories,:selected => params[:pro_category]), { :class=> "form-control"} %>
+                      <%= select_tag 'pro_category', options_for_select(@program_categories, params[:pro_category]), { :class=> "form-control", :include_blank => 'All'} %>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
                       <label>Program Name</label>
-                      <%= select_tag 'program_name', options_for_select(@program_names, :selected => params[:program_name]), { prompt: 'All', :class=> "form-control"} %>
+                      <%= select_tag 'program_name', options_for_select(@program_names, params[:program_name]), { :include_blank => 'All', :class=> "form-control"} %>
+
                     </div>
                   </div>
                 </div>
@@ -405,14 +406,12 @@
           response.program_list.map((program)=>{
             selectBox.options.add( new Option(program.name, program.name));
           });
-
           var selectBox2 = document.getElementById('loan_category');
           selectBox2.options.length = 0
           selectBox2.options.add( new Option('All', 'All'));
           response.loan_category_list.map((loan_category)=>{
             selectBox2.options.add( new Option(loan_category.name, loan_category.name));
           });
-
           var selectBox3 = document.getElementById('pro_category');
           selectBox3.options.length = 0
           response.pro_category_list.map((pro_category)=>{
@@ -426,7 +425,7 @@
     $('#loan_category').change(function(){
       var loan_category =  $(this).val();
       var bank_name = $('#bank_name').val()
-      var pro_category_list ="All"
+      var pro_category ="All"
       $.ajax({
         type:'GET',
         url:'/dashboard/fetch_programs_by_bank',
