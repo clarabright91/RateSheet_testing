@@ -139,7 +139,7 @@ Rails.application.routes.draw do
     member do
       get :programs
       get :ratesheet
-      get :single_program 
+      get :single_program
       get :agency_conforming_programs
       get :fhlmc_home_possible
       get :non_conforming_sigma_qm_prime_jumbo

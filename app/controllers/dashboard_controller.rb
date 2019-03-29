@@ -3,61 +3,44 @@ class DashboardController < ApplicationController
 
   def index
     @banks = Bank.all
+    @all_banks_name = @banks.pluck(:name)
     if params["commit"].present?
       set_variable
       find_base_rate
     end
+    fetch_programs_by_bank(true)
   end
 
   def banks
     @banks = Bank.all
   end
 
-  def fetch_programs_by_bank
-    @all_programs = Program.all
+  def fetch_programs_by_bank(html_type=false)
+    @all_n_banks_programs = Program.all
     if params[:bank_name].present?
-      if (params[:bank_name] == "All")
-        @all_n_banks_programs = @all_programs
-        @program_names = @all_programs.pluck(:program_name).uniq.compact
-        @loan_categories = @all_programs.pluck(:loan_category).uniq.compact
-        @program_categories = @all_programs.pluck(:program_category).uniq.compact
-      else
-        @all_n_banks_programs = @all_programs.where(bank_name: params[:bank_name])
-        @program_names = @all_n_banks_programs.pluck(:program_name).uniq.compact
-        @loan_categories = @all_n_banks_programs.pluck(:loan_category).uniq.compact
-        @program_categories = @all_n_banks_programs.pluck(:program_category).uniq.compact
+      if (params[:bank_name] != "All")
+        @all_n_banks_programs = @all_n_banks_programs.where(bank_name: params[:bank_name])
       end
     end
     if params[:loan_category].present?
-      if (params[:loan_category] == "All")
-        @program_names = @all_n_banks_programs.pluck(:program_name).uniq.compact
-        @loan_categories = @all_n_banks_programs.pluck(:loan_category).uniq.compact
-        @program_categories = @all_n_banks_programs.pluck(:program_category).uniq.compact
-      else
+      if (params[:loan_category] != "All")
         @all_n_banks_programs = @all_n_banks_programs.where(loan_category: params[:loan_category])
-        @program_names = @all_n_banks_programs.pluck(:program_name).uniq.compact
-        @loan_categories = @all_n_banks_programs.pluck(:loan_category).uniq.compact
-        @program_categories = @all_n_banks_programs.pluck(:program_category).uniq.compact
       end
     end
     if params[:pro_category].present?
-      if (params[:pro_category] == "All")
-        @program_names = @all_n_banks_programs.pluck(:program_name).uniq.compact
-        @loan_categories = @all_n_banks_programs.pluck(:loan_category).uniq.compact
-        @program_categories = @all_n_banks_programs.pluck(:program_category).uniq.compact
-      else
+      if (params[:pro_category] != "All")
         @all_n_banks_programs = @all_n_banks_programs.where(program_category: params[:pro_category])
-        @program_names = @all_n_banks_programs.pluck(:program_name).uniq.compact
-        @loan_categories = @all_n_banks_programs.pluck(:loan_category).uniq.compact
-        @program_categories = @all_n_banks_programs.pluck(:program_category).uniq.compact
       end
     end
+    @program_names = @all_n_banks_programs.pluck(:program_name).uniq.compact
+    @loan_categories = @all_n_banks_programs.pluck(:loan_category).uniq.compact
+    @program_categories = @all_n_banks_programs.pluck(:program_category).uniq.compact
     if @program_categories.present?
       @program_categories.prepend(["All"])
     else
       @program_categories << "No Category"
     end
-    render json: {program_list: @program_names.map{ |lc| {name: lc}}, loan_category_list: @loan_categories.map{ |lc| {name: lc}}, pro_category_list: @program_categories.map{ |lc| {name: lc}}}
+    render json: {program_list: @program_names.map{ |lc| {name: lc}}, loan_category_list: @loan_categories.map{ |lc| {name: lc}}, pro_category_list: @program_categories.map{ |lc| {name: lc}}} unless html_type
   end
 
   def set_default
@@ -3120,5 +3103,5 @@ class DashboardController < ApplicationController
     end
   end
 
-  render :index
+  # render :index
 end
