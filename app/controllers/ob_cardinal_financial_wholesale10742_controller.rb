@@ -1252,8 +1252,13 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
 
     def program_property title
       @arm_advanced = ''
-      if title.downcase.exclude?("arm") 
+      if title.downcase.exclude?("arm")
         term = title.downcase.split("fixed").first.tr('A-Za-z/ ','')
+        if term.length == 4 && term.last(2).to_i < term.first(2).to_i
+          term = term.last(2) + term.first(2)
+        else
+          term
+        end
       end
          # Arm Basic
       if title.include?("3/1") || title.include?("3 / 1")

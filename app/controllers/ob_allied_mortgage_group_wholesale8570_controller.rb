@@ -186,7 +186,8 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                     @loan_adj["LoanAmount"] = {}
                     @loan_adj["LoanType/Term"] = {}
                     @loan_adj["LoanType/Term"]["Fixed"] = {}
-                    @loan_adj["LoanType/Term"]["ARM"] = {}
+                    @loan_adj["LoanType"] = {}
+                    @loan_adj["LoanType"]["ARM"] = {}
                   end
                   if r >= 87 && r <= 95 && cc == 17
                     if value.include?(">")
@@ -206,8 +207,8 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   end
                   if r == 94 && cc >= 7 && cc <= 9
                     first_key = @term_data[cc-2].tr('A-Za-z ','')
-                    @loan_adj["LoanType/Term"]["ARM"][first_key] = {}
-                    @loan_adj["LoanType/Term"]["ARM"][first_key] = value
+                    @loan_adj["LoanType"]["ARM"][first_key] = {}
+                    @loan_adj["LoanType"]["ARM"][first_key] = value
                   end
                 end
               rescue Exception => e
@@ -297,14 +298,19 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   if value == "VA Loan Level Adjustments"
                     @adjustment_hash["VA/FICO"] = {}
                     @adjustment_hash["VA/FICO"][true] = {}
-                    @adjustment_hash["VA/LTV"] = {}
-                    @adjustment_hash["VA/LTV"][true] = {}
+                    @adjustment_hash["VA/LoanPurpose/LTV"] = {}
+                    @adjustment_hash["VA/LoanPurpose/LTV"][true] = {}
+                    @adjustment_hash["VA/LoanPurpose/LTV"][true]["Refinance"] = {}
+                    @adjustment_hash["VA/RefinanceOption/LoanAmount"] = {}
+                    @adjustment_hash["VA/RefinanceOption/LoanAmount"][true] = {}
+                    @adjustment_hash["VA/RefinanceOption/LoanAmount"][true]["IRRRL"] = {}
                   end
                   if value == "Allied Wholesale Loan Amt Adj *"
                     @loan_amount["LoanAmount"] = {}
                     @loan_amount["LoanType/Term"] = {}
                     @loan_amount["LoanType/Term"]["Fixed"] = {}
-                    @loan_amount["LoanType/Term"]["ARM"] = {}
+                    @loan_amount["LoanType"] = {}
+                    @loan_amount["LoanType"]["ARM"] = {}
                   end
                   # VA Loan Level Adjustments
                   if r >=17 && r <= 21 && cc == 17
@@ -322,24 +328,54 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                     new_val = sheet_data.cell(r,cc+3)
                     @adjustment_hash["VA/LoanSize/FICO"][true]["High-Balance"]["0-680"] = new_val
                   end
-                  if r == 23 && cc == 17
-                    @adjustment_hash["VA/LTV"][true]["90-95"] = {}
+                  if r == 23 && cc == 20
+                    primary_key = "90-95"
+                    @adjustment_hash["VA/LoanPurpose/LTV"][true]["Refinance"][primary_key] = {}
+                    @adjustment_hash["VA/LoanPurpose/LTV"][true]["Refinance"][primary_key] = value
+                  end
+                  if r == 24 && cc == 20
+                    primary_key = "95-Inf"
+                    @adjustment_hash["VA/LoanPurpose/LTV"][true]["Refinance"][primary_key] = {}
+                    @adjustment_hash["VA/LoanPurpose/LTV"][true]["Refinance"][primary_key] = value
+                  end
+                  if r == 25 && cc == 17
+                    @adjustment_hash["VA/RefinanceOption/LTV"] = {}
+                    @adjustment_hash["VA/RefinanceOption/LTV"][true] = {}
+                    @adjustment_hash["VA/RefinanceOption/LTV"][true]["IRRRL"] = {}
+                    @adjustment_hash["VA/RefinanceOption/LTV"][true]["IRRRL"]["105-Inf"] = {}
                     cc = cc + 3
                     new_val = sheet_data.cell(r,cc)
-                    @adjustment_hash["VA/LTV"][true]["90-95"] = new_val
+                    @adjustment_hash["VA/RefinanceOption/LTV"][true]["IRRRL"]["105-Inf"] = new_val
                   end
-                  if r == 24 && cc == 14
-                    @adjustment_hash["VA/LTV"][true]["95-Inf"] = {}
-                    cc = cc + 3
-                    new_val = sheet_data.cell(r,cc+3)
-                    @adjustment_hash["VA/LTV"][true]["95-Inf"] = new_val
-                  end
-                  if r == 25 && cc == 14
+                  if r == 26 && cc == 17
                     @adjustment_hash["State"] = {}
                     @adjustment_hash["State"]["NY"] = {}
                     cc = cc + 3
                     new_val = sheet_data.cell(r,cc + 3)
                     @adjustment_hash["State"]["NY"] = new_val
+                  end
+                  if r == 28 && cc == 17
+                    @adjustment_hash["VA/LoanAmount/FICO"] = {}
+                    @adjustment_hash["VA/LoanAmount/FICO"][true] = {}
+                    @adjustment_hash["VA/LoanAmount/FICO"][true]["0-100000"] = {}
+                    @adjustment_hash["VA/LoanAmount/FICO"][true]["0-100000"]["0-640"] = {}
+                    cc = cc + 3
+                    new_val = sheet_data.cell(r,cc + 3)
+                    @adjustment_hash["VA/LoanAmount/FICO"][true]["0-100000"]["0-640"] = new_val
+                  end
+                  if r == 30 && cc == 17
+                    primary_key = "0-75000"
+                    @adjustment_hash["VA/RefinanceOption/LoanAmount"][true]["IRRRL"][primary_key] = {}
+                    cc = cc + 3
+                    new_val = sheet_data.cell(r,cc)
+                    @adjustment_hash["VA/RefinanceOption/LoanAmount"][true]["IRRRL"][primary_key] = new_val
+                  end
+                  if r == 31 && cc == 17
+                    primary_key = "75000-99999"
+                    @adjustment_hash["VA/RefinanceOption/LoanAmount"][true]["IRRRL"][primary_key] = {}
+                    cc = cc + 3
+                    new_val = sheet_data.cell(r,cc)
+                    @adjustment_hash["VA/RefinanceOption/LoanAmount"][true]["IRRRL"][primary_key] = new_val
                   end
                   if r >= 37 && r <= 45 && cc == 17
                     if value.include?("to")
@@ -359,8 +395,8 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   end
                   if r == 90 && cc >= 7 && cc <= 9
                     primary_key = @term_data[cc-2].tr('A-Za-z ','')
-                    @loan_amount["LoanType/Term"]["ARM"][primary_key] = {}
-                    @loan_amount["LoanType/Term"]["ARM"][primary_key] = value
+                    @loan_amount["LoanType"]["ARM"][primary_key] = {}
+                    @loan_amount["LoanType"]["ARM"][primary_key] = value
                   end
                 end
               rescue Exception => e
@@ -461,7 +497,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                     @adjustment_hash["FICO/LTV"] = {}
                     @cash_out["RefinanceOption/FICO/LTV"] = {}
                     @cash_out["RefinanceOption/FICO/LTV"]["Cash Out"] = {}
-                    @property_hash["PropertyType/FICO/LTV"] = {}
+                    @property_hash["PropertyType/LTV"] = {}
                   end
                   if value == "SUBORDINATE FINANCING"
                     @subordinate_hash["FinancingType/LTV/CLTV/FICO"] = {}
@@ -470,7 +506,8 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                     @loan_amount["LoanAmount"] = {}
                     @loan_amount["LoanType/Term"] = {}
                     @loan_amount["LoanType/Term"]["Fixed"] = {}
-                    @loan_amount["LoanType/Term"]["ARM"] = {}
+                    @loan_amount["LoanType"] = {}
+                    @loan_amount["LoanType"]["ARM"] = {}
                   end
                   if r >=65 && r <= 71 && cc == 4
                     primary_key = get_value value
@@ -490,7 +527,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                     if value.include?("to")
                       ltv_key = value.sub('to','-').tr('$><% ','')
                     elsif value.include?("Any") || value.include?("ANY")
-                      ltv_key = value
+                      ltv_key = "0-Inf"
                     else
                       ltv_key = get_value value
                     end
@@ -585,7 +622,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                     else
                       primary_key = value
                     end
-                    @property_hash["PropertyType/FICO/LTV"][primary_key] = {}
+                    @property_hash["PropertyType/LTV"][primary_key] = {}
                   end
                   if r >= 79 && r <= 83 && cc >= 5 && cc <= 12
                     if @ltv_data[cc-2].include?("-")
@@ -593,8 +630,8 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                     else
                       secondary_key = get_value @ltv_data[cc-2]
                     end
-                    @property_hash["PropertyType/FICO/LTV"][primary_key][secondary_key] = {}
-                    @property_hash["PropertyType/FICO/LTV"][primary_key][secondary_key] = value
+                    @property_hash["PropertyType/LTV"][primary_key][secondary_key] = {}
+                    @property_hash["PropertyType/LTV"][primary_key][secondary_key] = value
                   end
                   if r == 83 && cc == 13
                     @other_adjustment["FannieMaeProduct/FreddieMacProduct/FICO/LTV"] = {}
@@ -631,8 +668,8 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   end
                   if r == 111 && cc >= 12 && cc <= 14
                     first_key = @term_data[cc-2].tr('A-Za-z ','')
-                    @loan_amount["LoanType/Term"]["ARM"][first_key] = {}
-                    @loan_amount["LoanType/Term"]["ARM"][first_key] = value
+                    @loan_amount["LoanType"]["ARM"][first_key] = {}
+                    @loan_amount["LoanType"]["ARM"][first_key] = value
                   end
                 end
               rescue Exception => e
@@ -688,7 +725,11 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
       if title.exclude?("ARM")
         # @term = title.gsub!(/[^0-9Yr]/, '').to_i
         @term = title.scan(/[0-9]/i).uniq.join()
-
+        if @term.length == 4 && @term.last(2).to_i < @term.first(2).to_i
+          @term = @term.last(2) + @term.first(2)
+        else
+          @term
+        end
       end
       # if @program.program_name.include?("30 Year") || @program.program_name.include?("30Yr") || @program.program_name.include?("30 Yr")
       #   term = 30
