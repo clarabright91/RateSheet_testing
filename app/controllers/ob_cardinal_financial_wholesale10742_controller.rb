@@ -63,6 +63,8 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         @subordinate_hash = {}
         @additional_hash = {}
         @lpmi_hash = {}
+        ltv_key = ''
+        primary_key = ''
         # Fannie Mae Programs
         (71..298).each do |r|
           row = sheet_data.row(r)
@@ -130,11 +132,11 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                     @adjustment_hash["FannieMae/Term/FICO/LTV"][true] = {}
                     @adjustment_hash["FannieMae/Term/FICO/LTV"][true]["15-Inf"] = {}
                   end
-                  if value == "Lender Paid Mortgage Insurance"
-                    @lpmi_hash["LPMI/Term/FICO/LTV"] = {}
-                    @lpmi_hash["LPMI/Term/FICO/LTV"][true] = {}
-                    @lpmi_hash["LPMI/Term/FICO/LTV"][true]["20-Inf"] = {}
-                  end
+                  # if value == "Lender Paid Mortgage Insurance"
+                  #   @lpmi_hash["LPMI/Term/FICO/LTV"] = {}
+                  #   @lpmi_hash["LPMI/Term/FICO/LTV"][true] = {}
+                  #   @lpmi_hash["LPMI/Term/FICO/LTV"][true]["20-Inf"] = {}
+                  # end
                   if value == "All Eligible Mortgages  Cash-Out Refinance  LLPAs"
                     @cashout_adjustment["FannieMae/RefinanceOption/FICO/LTV"] = {}
                     @cashout_adjustment["FannieMae/RefinanceOption/FICO/LTV"][true] = {}
@@ -325,44 +327,44 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                   end
                   # Lender Paid Mortgage Insurance
                   if r == 424 && cc == 7
-                    @lpmi_hash["LPMI/Term/LTV"] = {}
-                    @lpmi_hash["LPMI/Term/LTV"][true] = {}
-                    @lpmi_hash["LPMI/Term/LTV"][true]["0-25"] = {}
+                    @lpmi_hash["LPMI/Term/FICO"] = {}
+                    @lpmi_hash["LPMI/Term/FICO"][true] = {}
+                    @lpmi_hash["LPMI/Term/FICO"][true]["0-25"] = {}
                   end
                   if r == 424 && cc >= 15 && cc <= 33
                     lpmi_key = get_value @lpmi_data[cc-2]
-                    @lpmi_hash["LPMI/Term/LTV"][true]["0-25"][lpmi_key] = {}
-                    @lpmi_hash["LPMI/Term/LTV"][true]["0-25"][lpmi_key] = value
+                    @lpmi_hash["LPMI/Term/FICO"][true]["0-25"][lpmi_key] = {}
+                    @lpmi_hash["LPMI/Term/FICO"][true]["0-25"][lpmi_key] = value
                   end
                   if r == 425 && cc == 7
-                    @lpmi_hash["LPMI/RefinanceOption/LTV"] = {}
-                    @lpmi_hash["LPMI/RefinanceOption/LTV"][true] = {}
-                    @lpmi_hash["LPMI/RefinanceOption/LTV"][true]["Cash Out"] = {}
+                    @lpmi_hash["LPMI/RefinanceOption/FICO"] = {}
+                    @lpmi_hash["LPMI/RefinanceOption/FICO"][true] = {}
+                    @lpmi_hash["LPMI/RefinanceOption/FICO"][true]["Cash Out"] = {}
                   end
                   if r == 425 && cc >= 15 && cc <= 33
                     lpmi_key = get_value @lpmi_data[cc-2]
-                    @lpmi_hash["LPMI/RefinanceOption/LTV"][true]["Cash Out"][lpmi_key] = {}
-                    @lpmi_hash["LPMI/RefinanceOption/LTV"][true]["Cash Out"][lpmi_key] = value
+                    @lpmi_hash["LPMI/RefinanceOption/FICO"][true]["Cash Out"][lpmi_key] = {}
+                    @lpmi_hash["LPMI/RefinanceOption/FICO"][true]["Cash Out"][lpmi_key] = value
                   end
                   if r == 426 && cc == 7
-                    @lpmi_hash["LPMI/PropertyType/LTV"] = {}
-                    @lpmi_hash["LPMI/PropertyType/LTV"][true] = {}
-                    @lpmi_hash["LPMI/PropertyType/LTV"][true]["Investment Property"] = {}
+                    @lpmi_hash["LPMI/PropertyType/FICO"] = {}
+                    @lpmi_hash["LPMI/PropertyType/FICO"][true] = {}
+                    @lpmi_hash["LPMI/PropertyType/FICO"][true]["Investment Property"] = {}
                   end
                   if r == 426 && cc >= 15 && cc <= 33
                     lpmi_key = get_value @lpmi_data[cc-2]
-                    @lpmi_hash["LPMI/PropertyType/LTV"][true]["Investment Property"][lpmi_key] = {}
-                    @lpmi_hash["LPMI/PropertyType/LTV"][true]["Investment Property"][lpmi_key] = value
+                    @lpmi_hash["LPMI/PropertyType/FICO"][true]["Investment Property"][lpmi_key] = {}
+                    @lpmi_hash["LPMI/PropertyType/FICO"][true]["Investment Property"][lpmi_key] = value
                   end
                   if r == 427 && cc == 7
-                    @lpmi_hash["LPMI/LoanAmount/LTV"] = {}
-                    @lpmi_hash["LPMI/LoanAmount/LTV"][true] = {}
-                    @lpmi_hash["LPMI/LoanAmount/LTV"][true]["484350-Inf"] = {}
+                    @lpmi_hash["LPMI/LoanAmount/FICO"] = {}
+                    @lpmi_hash["LPMI/LoanAmount/FICO"][true] = {}
+                    @lpmi_hash["LPMI/LoanAmount/FICO"][true]["484350-Inf"] = {}
                   end
                   if r == 427 && cc >= 15 && cc <= 33
                     lpmi_key = get_value @lpmi_data[cc-2]
-                    @lpmi_hash["LPMI/LoanAmount/LTV"][true]["484350-Inf"][lpmi_key] = {}
-                    @lpmi_hash["LPMI/LoanAmount/LTV"][true]["484350-Inf"][lpmi_key] = value
+                    @lpmi_hash["LPMI/LoanAmount/FICO"][true]["484350-Inf"][lpmi_key] = {}
+                    @lpmi_hash["LPMI/LoanAmount/FICO"][true]["484350-Inf"][lpmi_key] = value
                   end
                   if r == 428 && cc == 7
                     @lpmi_hash["LPMI/RefinanceOption/LTV"][true]["Rate and Term"] = {}
@@ -406,6 +408,8 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         @sub_hash = {}
         @property_hash = {}
         @sub_hash = {}
+        ltv_key = ''
+        primary_key = ''
         (458..684).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count > 1) && (row.compact.count <= 4))
@@ -673,7 +677,11 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                   end
                   # Mortgages with Subordinate Financing7- Relief Refinance Mortgages
                   if r >= 796 && r <= 802 && cc == 7
-                    primary_key = get_value value
+                    if value.downcase.include?('all')
+                      primary_key = "0-Inf"
+                    else
+                      primary_key = get_value value
+                    end
                     @sub_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"][primary_key] = {}
                   end
                   if r >= 796 && r <= 802 && cc == 11
@@ -909,6 +917,8 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         sheet_data = @xlsx.sheet(sheet)
          @programs_ids = []
          @jumbo_hash = {}
+         primary_key = ''
+         ltv_key = ''
          # Non Conforming programs
         (1126..1145).each do |r|
           row = sheet_data.row(r)
@@ -969,33 +979,42 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                 value = sheet_data.cell(r,cc)
                 if value.present?
                   if value == "Non-Conforming Jumbo CORE Loan Level Price Adjustments"
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"] = {}
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true] = {}
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"] = {}
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1000000"] = {}
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1000000-Inf"] = {}
+                    @jumbo_hash["LoanSize/LoanAmount/FICO/LTV"] = {}
+                    @jumbo_hash["LoanSize/LoanAmount/FICO/LTV"]["Jumbo"] = {}
+                    @jumbo_hash["LoanSize/LoanAmount/FICO/LTV"]["Non-Conforming"] = {}
+                    @jumbo_hash["LoanSize/LoanAmount/FICO/LTV"]["Jumbo"]["0-1000000"] = {}
+                    @jumbo_hash["LoanSize/LoanAmount/FICO/LTV"]["Jumbo"]["1000000-Inf"] = {}
+                    @jumbo_hash["LoanSize/LoanAmount/FICO/LTV"]["Non-Conforming"]["0-1000000"] = {}
+                    @jumbo_hash["LoanSize/LoanAmount/FICO/LTV"]["Non-Conforming"]["1000000-Inf"] = {}
                   end
                   if value == "Other Specific Adjustments"
                     @jumbo_hash["PropertyType/LTV"] = {}
+                    @jumbo_hash["RefinanceOption/LTV"] = {}
                   end
                   # Non-Conforming Jumbo CORE Loan Level Price Adjustments
                   if r >= 1158 && r <= 1164 && cc == 8
                     primary_key = get_value value
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1000000"][primary_key] = {}
+                    @jumbo_hash["LoanSize/LoanAmount/FICO/LTV"]["Jumbo"]["0-1000000"][primary_key] = {}
+                    @jumbo_hash["LoanSize/LoanAmount/FICO/LTV"]["Non-Conforming"]["0-1000000"][primary_key] = {}
                   end
                   if r >= 1158 && r <= 1164 && cc >= 15 && cc <= 39
                     ltv_key = get_value @jumbo_data[cc-2]
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1000000"][primary_key][ltv_key] = {}
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["0-1000000"][primary_key][ltv_key] = value
+                    @jumbo_hash["LoanSize/LoanAmount/FICO/LTV"]["Jumbo"]["0-1000000"][primary_key][ltv_key] = {}
+                    @jumbo_hash["LoanSize/LoanAmount/FICO/LTV"]["Jumbo"]["0-1000000"][primary_key][ltv_key] = value
+                    @jumbo_hash["LoanSize/LoanAmount/FICO/LTV"]["Non-Conforming"]["0-1000000"][primary_key][ltv_key] = {}
+                    @jumbo_hash["LoanSize/LoanAmount/FICO/LTV"]["Non-Conforming"]["0-1000000"][primary_key][ltv_key] = value
                   end
                   if r >= 1167 && r <= 1173 && cc == 8
                     primary_key = get_value value
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1000000-Inf"][primary_key] = {}
+                    @jumbo_hash["LoanSize/LoanAmount/FICO/LTV"]["Jumbo"]["1000000-Inf"][primary_key] = {}
+                    @jumbo_hash["LoanSize/LoanAmount/FICO/LTV"]["Non-Conforming"]["1000000-Inf"][primary_key] = {}
                   end
                   if r >= 1167 && r <= 1173 && cc >= 15 && cc <= 39
                     ltv_key = get_value @jumbo_data[cc-2]
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1000000-Inf"][primary_key][ltv_key] = {}
-                    @jumbo_hash["Jumbo/LoanSize/LoanAmount/FICO/LTV"][true]["Non-Conforming"]["1000000-Inf"][primary_key][ltv_key] = value
+                    @jumbo_hash["LoanSize/LoanAmount/FICO/LTV"]["Jumbo"]["1000000-Inf"][primary_key][ltv_key] = {}
+                    @jumbo_hash["LoanSize/LoanAmount/FICO/LTV"]["Jumbo"]["1000000-Inf"][primary_key][ltv_key] = value
+                    @jumbo_hash["LoanSize/LoanAmount/FICO/LTV"]["Non-Conforming"]["1000000-Inf"][primary_key][ltv_key] = {}
+                    @jumbo_hash["LoanSize/LoanAmount/FICO/LTV"]["Non-Conforming"]["1000000-Inf"][primary_key][ltv_key] = value
                   end
                   # Other Specific Adjustments
                   if r == 1176 && cc == 8
@@ -1023,12 +1042,12 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                     @jumbo_hash["PropertyType/LTV"]["Investment Property"][ltv_key] = value
                   end
                   if r == 1179 && cc == 8
-                    @jumbo_hash["PropertyType/LTV"]["Cash Out"] = {}
+                    @jumbo_hash["RefinanceOption/LTV"]["Cash Out"] = {}
                   end
                   if r == 1179 && cc >= 15 && cc <= 39
                     ltv_key = get_value @jumbo_data[cc-2]
-                    @jumbo_hash["PropertyType/LTV"]["Cash Out"][ltv_key] = {}
-                    @jumbo_hash["PropertyType/LTV"]["Cash Out"][ltv_key] = value
+                    @jumbo_hash["RefinanceOption/LTV"]["Cash Out"][ltv_key] = {}
+                    @jumbo_hash["RefinanceOption/LTV"]["Cash Out"][ltv_key] = value
                   end
                   if r == 1180 && cc == 8
                     @jumbo_hash["PropertyType/LTV"]["2 Unit"] = {}
@@ -1047,14 +1066,14 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                     @jumbo_hash["PropertyType/LTV"]["3-4 Unit"][ltv_key] = value
                   end
                   if r == 1182 && cc == 8
-                    @jumbo_hash["MiscAdjuster/State"] = {}
-                    @jumbo_hash["MiscAdjuster/State"]["Escrow Waiver"] = {}
-                    @jumbo_hash["MiscAdjuster/State"]["Escrow Waiver"]["CA"] = {}
+                    @jumbo_hash["MiscAdjuster/State/LTV"] = {}
+                    @jumbo_hash["MiscAdjuster/State/LTV"]["Escrow Waiver"] = {}
+                    @jumbo_hash["MiscAdjuster/State/LTV"]["Escrow Waiver"]["CA"] = {}
                   end
                   if r == 1182 && cc >= 15 && cc <= 39
                     ltv_key = get_value @jumbo_data[cc-2]
-                    @jumbo_hash["MiscAdjuster/State"]["Escrow Waiver"]["CA"][ltv_key] = {}
-                    @jumbo_hash["MiscAdjuster/State"]["Escrow Waiver"]["CA"][ltv_key] = value
+                    @jumbo_hash["MiscAdjuster/State/LTV"]["Escrow Waiver"]["CA"][ltv_key] = {}
+                    @jumbo_hash["MiscAdjuster/State/LTV"]["Escrow Waiver"]["CA"][ltv_key] = value
                   end
                 end
               rescue Exception => e
@@ -1078,6 +1097,8 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @non_jumbo_hash = {}
+        ltv_key = ''
+        primary_key = ''
         (1223..1260).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count >= 1) && (row.compact.count <= 4))
@@ -1132,19 +1153,22 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                 value = sheet_data.cell(r,cc)
                 if value.present?
                   if value == "Non-Conforming Jumbo X Loan Level Price Adjustments"
-                    @non_jumbo_hash["Jumbo/LoanSize/FICO/LTV"] = {}
-                    @non_jumbo_hash["Jumbo/LoanSize/FICO/LTV"][true] = {}
-                    @non_jumbo_hash["Jumbo/LoanSize/FICO/LTV"][true]["Non-Conforming"] = {}
+                    @non_jumbo_hash["LoanSize/FICO/LTV"] = {}
+                    @non_jumbo_hash["LoanSize/FICO/LTV"]["Jumbo"] = {}
+                    @non_jumbo_hash["LoanSize/FICO/LTV"]["Non-Conforming"] = {}
                   end
                   # Non-Conforming Jumbo X Loan Level Price Adjustments
                   if r >= 1275 && r <= 1281 && cc == 8
                     primary_key = get_value value
-                    @non_jumbo_hash["Jumbo/LoanSize/FICO/LTV"][true]["Non-Conforming"][primary_key] = {}
+                    @non_jumbo_hash["LoanSize/FICO/LTV"]["Non-Conforming"][primary_key] = {}
+                    @non_jumbo_hash["LoanSize/FICO/LTV"]["Jumbo"][primary_key] = {}
                   end
                   if r >= 1275 && r <= 1281 && cc >= 13 && cc <= 41
                     ltv_key = get_value @non_jumbo[cc-2]
-                    @non_jumbo_hash["Jumbo/LoanSize/FICO/LTV"][true]["Non-Conforming"][primary_key][ltv_key] = {}
-                    @non_jumbo_hash["Jumbo/LoanSize/FICO/LTV"][true]["Non-Conforming"][primary_key][ltv_key] = value
+                    @non_jumbo_hash["LoanSize/FICO/LTV"]["Non-Conforming"][primary_key][ltv_key] = {}
+                    @non_jumbo_hash["LoanSize/FICO/LTV"]["Non-Conforming"][primary_key][ltv_key] = value
+                    @non_jumbo_hash["LoanSize/FICO/LTV"]["Jumbo"][primary_key][ltv_key] = {}
+                    @non_jumbo_hash["LoanSize/FICO/LTV"]["Jumbo"][primary_key][ltv_key] = value
                   end
                   if r == 1284 && cc == 6
                     @non_jumbo_hash["RefinanceOption/LTV"] = {}
