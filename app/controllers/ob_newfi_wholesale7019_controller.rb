@@ -166,12 +166,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 if r == 123 && cc == 4
                   @purpose_adjustment5 ={}
                   @purpose_adjustment5["LTV/CLTV"] = {}
-                  @purpose_adjustment5["LTV/CLTV"]["80-80"] = {}
+                  @purpose_adjustment5["LTV/CLTV"]["80-Inf"] = {}
                 end
                 if r == 123 && cc >= 5 && cc <= 12
                   cltv_key = get_value @ltv_data[cc-3]
-                  @purpose_adjustment5["LTV/CLTV"]["80-80"][cltv_key] = {}
-                  @purpose_adjustment5["LTV/CLTV"]["80-80"][cltv_key] = value
+                  @purpose_adjustment5["LTV/CLTV"]["80-Inf"][cltv_key] = {}
+                  @purpose_adjustment5["LTV/CLTV"]["80-Inf"][cltv_key] = value
                 end
 
                 if r == 125 && cc == 4
@@ -616,25 +616,10 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   end
 
                   if r >= 105 && r <= 110 && cc > 5 && cc <= 8
-                      str = ""
-                      if @ltv_data[cc-1] == "> $110k <= $225k"
-                        ltv_key = @ltv_data[cc-1].sub('<=','-').tr('<>$ ','')
-                      else
-                        ltv_key = get_value @ltv_data[cc-1]
-                      end
-                      if ltv_key.include?("k")
-                        if ltv_key.split("-").first.include?("k")
-                          str =  ltv_key.split("-").first.split("k").first+"000"
-                        else
-                          str =  ltv_key.split("-").first
-                        end
-
-                        if ltv_key.split("-").last.include?("k")
-                          ltv_key = str +"-"+ ltv_key.split("-").last.split("k").last+"000"
-                        else
-                          ltv_key = str +"-"+ ltv_key.split("-").last
-                        end
-                      end
+                    if @ltv_data[cc-1].include?('k')
+                      ltv_key = get_value @ltv_data[cc-1]
+                      ltv_key = get_value @ltv_data[cc-1] + "000"
+                    end
                     @adjustment_hash["FICO/LoanAmount"][secondary_key][ltv_key] = {}
                     @adjustment_hash["FICO/LoanAmount"][secondary_key][ltv_key] = value
                   end
@@ -1079,7 +1064,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @other_adjustment["LoanAmount"] = {}
                 cc = cc + 4
                 new_value = sheet_data.cell(r,cc)
-                @other_adjustment["LoanAmount"]["0-150,000"] = new_value
+                @other_adjustment["LoanAmount"]["0-150000"] = new_value
               end
               if value == "LTV / FICO (Terms > 15 years only)"
                 first_row = 105
@@ -1151,7 +1136,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @other_adjustment["LoanAmount"] = {}
                 cc = cc + 4
                 new_value = sheet_data.cell(r,cc)
-                @other_adjustment["LoanAmount"]["0-150,000"] = new_value
+                @other_adjustment["LoanAmount"]["0-150000"] = new_value
               end
             end
           end
@@ -1296,17 +1281,17 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["0-20"][primary_key][ltv_key] = value
               end
               if r == 178 && cc == 2
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/LTV"] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/LTV"][true] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/LTV"][true]["Fixed"] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/LTV"][true]["Fixed"]["2nd Home"] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/LTV"][true]["Fixed"]["2nd Home"]["Rate and Term"] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/LTV"][true]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"]["2nd Home"] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"]["2nd Home"]["Rate and Term"] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"] = {}
               end
               if r == 178 && cc >= 5 && cc <= 11
                 ltv_key = get_value @lpmi_data[cc-1]
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/LTV"][true]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"][ltv_key] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/LTV"][true]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"][ltv_key] = value
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"][ltv_key] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"][ltv_key] = value
               end
               # Other Adjustments
               if r == 141 && cc == 14
@@ -1374,22 +1359,22 @@ class ObNewfiWholesale7019Controller < ApplicationController
               end
               if r == 167 && cc == 13
                 @other_adjustment["LoanAmount"] = {}
-                @other_adjustment["LoanAmount"]["150,000"] = {}
+                @other_adjustment["LoanAmount"]["150000"] = {}
                 cc = cc + 4
                 new_value = sheet_data.cell(r,cc)
-                @other_adjustment["LoanAmount"]["150,000"] = new_value
+                @other_adjustment["LoanAmount"]["150000"] = new_value
               end
               if r == 168 && cc == 13
-                @other_adjustment["LoanAmount"]["250,000-Inf"] = {}
+                @other_adjustment["LoanAmount"]["250000-Inf"] = {}
                 cc = cc + 4
                 new_value = sheet_data.cell(r,cc)
-                @other_adjustment["LoanAmount"]["250,000-Inf"] = new_value
+                @other_adjustment["LoanAmount"]["250000-Inf"] = new_value
               end
               if r == 169 && cc == 13
-                @other_adjustment["LoanAmount"]["200,000-250,000"] = {}
+                @other_adjustment["LoanAmount"]["200000-250000"] = {}
                 cc = cc + 4
                 new_value = sheet_data.cell(r,cc)
-                @other_adjustment["LoanAmount"]["200,000-250,000"] = new_value
+                @other_adjustment["LoanAmount"]["200000-250000"] = new_value
               end
               if r == 170 && cc == 13
                 primary_key = "FICO"
@@ -1402,18 +1387,18 @@ class ObNewfiWholesale7019Controller < ApplicationController
               end
               if r == 171 && cc == 13
                 @other_adjustment["LoanAmount/State"] = {}
-                @other_adjustment["LoanAmount/State"]["275,000-Inf"] = {}
-                @other_adjustment["LoanAmount/State"]["275,000-Inf"]["CA"] = {}
+                @other_adjustment["LoanAmount/State"]["275000-Inf"] = {}
+                @other_adjustment["LoanAmount/State"]["275000-Inf"]["CA"] = {}
                 cc = cc + 4
                 new_value = sheet_data.cell(r,cc)
-                @other_adjustment["LoanAmount/State"]["275,000-Inf"]["CA"] = new_value
+                @other_adjustment["LoanAmount/State"]["275000-Inf"]["CA"] = new_value
               end
               if r == 172 && cc == 13
-                @other_adjustment["LoanAmount/State"]["200,000-275,000"] = {}
-                @other_adjustment["LoanAmount/State"]["200,000-275,000"]["CA"] = {}
+                @other_adjustment["LoanAmount/State"]["200000-275000"] = {}
+                @other_adjustment["LoanAmount/State"]["200000-275000"]["CA"] = {}
                 cc = cc + 4
                 new_value = sheet_data.cell(r,cc)
-                @other_adjustment["LoanAmount/State"]["200,000-275,000"]["CA"] = new_value
+                @other_adjustment["LoanAmount/State"]["200000-275000"]["CA"] = new_value
               end
               # Loans With Secondary Financing
               if value == "Loans With Secondary Financing"
@@ -1595,17 +1580,17 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["0-20"][primary_key][ltv_key] = value
               end
               if r == 184 && cc == 2
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/LTV"] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/LTV"][true] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/LTV"][true]["Fixed"] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/LTV"][true]["Fixed"]["2nd Home"] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/LTV"][true]["Fixed"]["2nd Home"]["Rate and Term"] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/LTV"][true]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"]["2nd Home"] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"]["2nd Home"]["Rate and Term"] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"] = {}
               end
               if r == 184 && cc >= 5 && cc <= 11
                 ltv_key = get_value @lpmi_data[cc-1]
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/LTV"][true]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"][ltv_key] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/LTV"][true]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"][ltv_key] = value
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"][ltv_key] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"][ltv_key] = value
               end
               # Other Adjustments
               if r == 141 && cc == 14
@@ -1667,22 +1652,22 @@ class ObNewfiWholesale7019Controller < ApplicationController
               end
               if r == 167 && cc == 14
                 @other_adjustment["LoanAmount"] = {}
-                @other_adjustment["LoanAmount"]["0-150,000"] = {}
+                @other_adjustment["LoanAmount"]["0-150000"] = {}
                 cc = cc + 1
                 new_value = sheet_data.cell(r,cc)
-                @other_adjustment["LoanAmount"]["0-150,000"] = new_value
+                @other_adjustment["LoanAmount"]["0-150000"] = new_value
               end
               if r == 168 && cc == 14
-                @other_adjustment["LoanAmount"]["300,000-Inf"] = {}
+                @other_adjustment["LoanAmount"]["300000-Inf"] = {}
                 cc = cc + 1
                 new_value = sheet_data.cell(r,cc)
-                @other_adjustment["LoanAmount"]["300,000-Inf"] = new_value
+                @other_adjustment["LoanAmount"]["300000-Inf"] = new_value
               end
               if r == 169 && cc == 14
-                @other_adjustment["LoanAmount"]["200,000-300,000"] = {}
+                @other_adjustment["LoanAmount"]["200000-300000"] = {}
                 cc = cc + 1
                 new_value = sheet_data.cell(r,cc)
-                @other_adjustment["LoanAmount"]["200,000-300,000"] = new_value
+                @other_adjustment["LoanAmount"]["200000-300000"] = new_value
               end
               if r == 170 && cc == 14
                 primary_key = "FICO"
@@ -1933,22 +1918,22 @@ class ObNewfiWholesale7019Controller < ApplicationController
               end
               if r == 166 && cc == 12
                 @other_adjustment["LoanAmount"] = {}
-                @other_adjustment["LoanAmount"]["0-150,000"] = {}
+                @other_adjustment["LoanAmount"]["0-150000"] = {}
                 cc = cc + 4
                 new_value = sheet_data.cell(r,cc)
-                @other_adjustment["LoanAmount"]["0-150,000"] = new_value
+                @other_adjustment["LoanAmount"]["0-150000"] = new_value
               end
               if r == 167 && cc == 12
-                @other_adjustment["LoanAmount"]["250,000-Inf"] = {}
+                @other_adjustment["LoanAmount"]["250000-Inf"] = {}
                 cc = cc + 4
                 new_value = sheet_data.cell(r,cc)
-                @other_adjustment["LoanAmount"]["250,000-Inf"] = new_value
+                @other_adjustment["LoanAmount"]["250000-Inf"] = new_value
               end
               if r == 168 && cc == 12
-                @other_adjustment["LoanAmount"]["200,000-250,000"] = {}
+                @other_adjustment["LoanAmount"]["200000-250000"] = {}
                 cc = cc + 4
                 new_value = sheet_data.cell(r,cc)
-                @other_adjustment["LoanAmount"]["200,000-250,000"] = new_value
+                @other_adjustment["LoanAmount"]["200000-250000"] = new_value
               end
               if r == 169 && cc == 12
                 primary_key = "FICO"
@@ -1961,17 +1946,17 @@ class ObNewfiWholesale7019Controller < ApplicationController
               end
               if r == 170 && cc == 12
                 @other_adjustment["LoanAmount/State"] = {}
-                @other_adjustment["LoanAmount/State"]["275,000-Inf"] = {}
-                @other_adjustment["LoanAmount/State"]["275,000-Inf"]["CA"] = {}
+                @other_adjustment["LoanAmount/State"]["275000-Inf"] = {}
+                @other_adjustment["LoanAmount/State"]["275000-Inf"]["CA"] = {}
                 cc = cc + 4
                 new_value = sheet_data.cell(r,cc)
-                @other_adjustment["LoanAmount/State"]["275,000-Inf"]["CA"] = new_value
+                @other_adjustment["LoanAmount/State"]["275000-Inf"]["CA"] = new_value
               end
               if r == 171 && cc == 12
-                @other_adjustment["LoanAmount/State"]["200,000-275,000"] = {}
+                @other_adjustment["LoanAmount/State"]["200000-275000"] = {}
                 cc = cc + 4
                 new_value = sheet_data.cell(r,cc)
-                @other_adjustment["LoanAmount/State"]["200,000-275,000"] = new_value
+                @other_adjustment["LoanAmount/State"]["200000-275000"] = new_value
               end
 
               # Loans With Secondary Financing
@@ -2135,13 +2120,13 @@ class ObNewfiWholesale7019Controller < ApplicationController
               end
               # OLYMPIC FIXED 2ND MORTGAGE
               if r == 168 && cc == 4
-                @property_hash["LoanType/RefinanceOption/LTV"] = {}
-                @property_hash["LoanType/RefinanceOption/LTV"]["Fixed"] = {}
-                @property_hash["LoanType/RefinanceOption/LTV"]["Fixed"]["Cash Out"] = {}
-                @property_hash["LoanType/RefinanceOption/LTV"]["Fixed"]["Cash Out"]["100000"] = {}
+                @property_hash["LoanType/RefinanceOption/LoanAmount"] = {}
+                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"] = {}
+                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"] = {}
+                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"]["100000"] = {}
                 cc = cc + 2
                 new_val = sheet_data.cell(r,cc)
-                @property_hash["LoanType/RefinanceOption/LTV"]["Fixed"]["Cash Out"]["100000"] = new_val
+                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"]["100000"] = new_val
               end
               if r == 169 && cc == 4
                 @property_hash["LoanType/PropertyType"] = {}
@@ -2219,10 +2204,10 @@ class ObNewfiWholesale7019Controller < ApplicationController
               end
               if r == 169 && cc == 12
                 @other_adjustment["LoanAmount"] = {}
-                @other_adjustment["LoanAmount"]["0-150,000"] = {}
+                @other_adjustment["LoanAmount"]["0-150000"] = {}
                 cc = cc + 1
                 new_value = sheet_data.cell(r,cc)
-                @other_adjustment["LoanAmount"]["0-150,000"] = new_value
+                @other_adjustment["LoanAmount"]["0-150000"] = new_value
                 if r >= 155 && r <= 158 && cc == 12
                   ltv_key = get_value value
                   @secondary_hash["LTV/CLTV/FICO"][ltv_key] = {}
@@ -2247,10 +2232,10 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 end
                 if r == 169 && cc == 12
                   @other_adjustment["LoanAmount"] = {}
-                  @other_adjustment["LoanAmount"]["0-150,000"] = {}
+                  @other_adjustment["LoanAmount"]["0-150000"] = {}
                   cc = cc + 1
                   new_value = sheet_data.cell(r,cc)
-                  @other_adjustment["LoanAmount"]["0-150,000"] = new_value
+                  @other_adjustment["LoanAmount"]["0-150000"] = new_value
                 end
               end
             rescue Exception => e
@@ -2368,13 +2353,13 @@ class ObNewfiWholesale7019Controller < ApplicationController
               end
               # OLYMPIC FIXED 2ND MORTGAGE
               if r == 166 && cc == 4
-                @property_hash["LoanType/RefinanceOption/LTV"] = {}
-                @property_hash["LoanType/RefinanceOption/LTV"]["Fixed"] = {}
-                @property_hash["LoanType/RefinanceOption/LTV"]["Fixed"]["Cash Out"] = {}
-                @property_hash["LoanType/RefinanceOption/LTV"]["Fixed"]["Cash Out"]["100000"] = {}
+                @property_hash["LoanType/RefinanceOption/LoanAmount"] = {}
+                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"] = {}
+                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"] = {}
+                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"]["100000"] = {}
                 cc = cc + 2
                 new_val = sheet_data.cell(r,cc)
-                @property_hash["LoanType/RefinanceOption/LTV"]["Fixed"]["Cash Out"]["100000"] = new_val
+                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"]["100000"] = new_val
               end
               if r == 167 && cc == 4
                 @property_hash["LoanType/PropertyType"] = {}
@@ -2584,13 +2569,13 @@ class ObNewfiWholesale7019Controller < ApplicationController
               end
               # OLYMPIC FIXED 2ND MORTGAGE
               if r == 169 && cc == 4
-                @property_hash["LoanType/RefinanceOption/LTV"] = {}
-                @property_hash["LoanType/RefinanceOption/LTV"]["Fixed"] = {}
-                @property_hash["LoanType/RefinanceOption/LTV"]["Fixed"]["Cash Out"] = {}
-                @property_hash["LoanType/RefinanceOption/LTV"]["Fixed"]["Cash Out"]["100000"] = {}
+                @property_hash["LoanType/RefinanceOption/LoanAmount"] = {}
+                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"] = {}
+                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"] = {}
+                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"]["100000"] = {}
                 cc = cc + 2
                 new_val = sheet_data.cell(r,cc)
-                @property_hash["LoanType/RefinanceOption/LTV"]["Fixed"]["Cash Out"]["100000"] = new_val
+                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"]["100000"] = new_val
               end
               if r == 170 && cc == 4
                 @property_hash["LoanType/PropertyType"] = {}
@@ -2662,10 +2647,10 @@ class ObNewfiWholesale7019Controller < ApplicationController
               end
               if r == 171 && cc == 12
                 @other_adjustment["LoanAmount"] = {}
-                @other_adjustment["LoanAmount"]["0-150,000"] = {}
+                @other_adjustment["LoanAmount"]["0-150000"] = {}
                 cc = cc + 1
                 new_value = sheet_data.cell(r,cc)
-                @other_adjustment["LoanAmount"]["0-150,000"] = new_value
+                @other_adjustment["LoanAmount"]["0-150000"] = new_value
               end
               # Loans With Secondary Financing
               if value == "Loans With Secondary Financing"
@@ -2711,9 +2696,11 @@ class ObNewfiWholesale7019Controller < ApplicationController
   def get_value value1
     if value1.present?
       if value1.include?("<=") || value1.include?("<")
-        value1 = "0-"+value1.split("<=").last.tr('A-Za-z%$><=/ ','')
-      elsif value1.include?(">") || value1.include?("+")
-        value1 = value1.split(">").last.tr('^0-9 ', '')+"-Inf"
+        value1 = "0-"+value1.split("<=").last.tr('A-Za-z%$><=/, ','')
+      elsif value1.include?(">")
+        value1 = value1.split(">").last.tr('A-Za-z%$><=, ', '')+"-Inf"
+      elsif value1.include?("+")
+        value1.split("+")[0] + "-Inf"
       else
         value1 = value1.tr('% ','')
       end
