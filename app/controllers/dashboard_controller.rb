@@ -128,14 +128,18 @@ class DashboardController < ApplicationController
     @payment_type =  params[:payment_type] if params[:payment_type].present?
 
     if params[:fannie_mae_product].present?
-      unless (params[:fannie_mae_product] == "All")
+      if (params[:fannie_mae_product] == "All")
+        @filter_not_nil[:fannie_mae_product] = nil
+      else
         @filter_data[:fannie_mae_product] = params[:fannie_mae_product]
         @fannie_mae_product = params[:fannie_mae_product]
       end
     end
 
     if params[:freddie_mac_product].present?
-      unless (params[:freddie_mac_product] == "All")
+      if (params[:freddie_mac_product] == "All")
+        @filter_not_nil[:freddie_mac_product] =nil
+      else
         @filter_data[:freddie_mac_product] = params[:freddie_mac_product]
         @freddie_mac_product = params[:freddie_mac_product]
       end
@@ -154,7 +158,7 @@ class DashboardController < ApplicationController
     end
 
     if params[:pro_category].present?
-      unless (params[:pro_category] == "All")
+      unless (params[:pro_category] == "All" || params[:pro_category] == "No Category")
         @filter_data[:program_category] = params[:pro_category]
       end
     end
@@ -167,7 +171,7 @@ class DashboardController < ApplicationController
 
     if params[:loan_purpose].present?
       if (params[:loan_purpose] == "All")
-        @filter_not_nil[:loan_purpose] = params[:loan_purpose]
+        @filter_not_nil[:loan_purpose] = nil
       else
         @filter_data[:loan_purpose] = params[:loan_purpose]
       end
@@ -176,42 +180,38 @@ class DashboardController < ApplicationController
 
    if params[:loan_type].present?
       @loan_type = params[:loan_type]
-      @filter_data[:loan_type] = params[:loan_type]
-      if params[:loan_type] =="ARM" && params[:arm_basic].present?
-        @arm_basic = params[:arm_basic]
-        if (params[:arm_basic] == "All")
-          @filter_not_nil[:arm_basic] = params[:arm_basic]
-        else
-          if params[:arm_basic].include?("/")
-            @filter_data[:arm_basic] = params[:arm_basic].split("/").first
-          end
-          if params[:arm_basic].include?("-")
-            @filter_data[:arm_basic] = params[:arm_basic].split("-").first
+      if params[:loan_type] == "All"
+        @filter_not_nil[:loan_type] = nil
+      else
+        @filter_data[:loan_type] = params[:loan_type]
+        if params[:loan_type] =="ARM" && params[:arm_basic].present?
+          @arm_basic = params[:arm_basic]
+          unless (params[:arm_basic] == "All")
+            if params[:arm_basic].include?("/")
+              @filter_data[:arm_basic] = params[:arm_basic].split("/").first
+            end
+            if params[:arm_basic].include?("-")
+              @filter_data[:arm_basic] = params[:arm_basic].split("-").first
+            end
           end
         end
-      end
-      if params[:loan_type] =="ARM" && params[:arm_advanced].present?
-        @arm_advanced = params[:arm_advanced]
-        if params[:arm_advanced] == "All"
-          @filter_not_nil[:arm_advanced] = params[:arm_advanced]
-        else
-          @filter_data[:arm_advanced] = params[:arm_advanced]
+        if params[:loan_type] =="ARM" && params[:arm_advanced].present?
+          @arm_advanced = params[:arm_advanced]
+          unless params[:arm_advanced] == "All"
+            @filter_data[:arm_advanced] = params[:arm_advanced]
+          end
         end
       end
     end
 
     if (params[:term].present? && params[:loan_type] != "ARM")
-      if params[:term] == "All"
-        @filter_not_nil[:term] = params[:term]
-      else
         @term = params[:term].to_i
         @program_term = params[:term].to_i
-      end
     end
 
     if params[:loan_size].present?
       if params[:loan_size] == "All"
-        @filter_not_nil[:loan_size] = params[:loan_size]
+        @filter_not_nil[:loan_size] = nil
       else
         @loan_size = params[:loan_size]
       end
@@ -231,6 +231,7 @@ class DashboardController < ApplicationController
 
   def find_base_rate
     @program_list = Program.where(@filter_data)
+    @program_list = @program_list.where.not(@filter_not_nil)
     @program_list2 = []
     if @program_list.present?
       if @program_term.present?
@@ -347,6 +348,7 @@ class DashboardController < ApplicationController
           first_key = adj.data.keys.first
           key_list = first_key.split("/")
           adj_key_hash = {}
+
           key_list.each_with_index do |key_name, key_index|
             if(Adjustment::INPUT_VALUES.include?(key_name))
               if key_index==0

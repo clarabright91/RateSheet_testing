@@ -47,7 +47,7 @@
                     <div class="form-group">
                       <label>Loan Purpose</label>
                       <div class="input-group">
-                        <% loan_purpose_list =[["Purchase"], ["Refinance"]]%>
+                        <% loan_purpose_list =[["All"], ["Purchase"], ["Refinance"]]%>
                         <%= select_tag 'loan_purpose', options_for_select(loan_purpose_list, (params[:loan_purpose] rescue nil)), { prompt: 'Select Loan Purpose', :class=> "form-control" }%>
                       </div>
                     </div>
@@ -56,19 +56,19 @@
                     <div class="form-group">
                       <label>Loan Size</label>
                       <div class="input-group">
-                        <% loan_size_list =[ ["Conforming"], ["Non-Conforming"], ["Super Conforming"], ["Jumbo"], ["High-Balance"]]%>
-                        <%= select_tag 'loan_size', options_for_select(loan_size_list, (params[:loan_size] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control" }%>
+                        <% loan_size_list =[ ["All"], ["Conforming"], ["Non-Conforming"], ["Super Conforming"], ["Jumbo"], ["High-Balance"]]%>
+                        <%= select_tag 'loan_size', options_for_select(loan_size_list, (params[:loan_size] rescue nil)), { prompt: 'Select Loan Size', :class=> "form-control" }%>
                       </div>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>Loan Type</label>
-                      <% @loan_type_list =[["Fixed"], ["ARM"], ["Hybrid"], ["Floating"], ["Variable"]]%>
+                      <% @loan_type_list =[["All"], ["Fixed"], ["ARM"], ["Hybrid"], ["Floating"], ["Variable"]]%>
                       <%= select_tag 'loan_type', options_for_select(@loan_type_list, (params[:loan_type] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control"} %>
                     </div>
                   </div>
-                  <div class="col-md-4 term">
+                  <div class="col-md-5 term">
                     <div class="form-group">
                       <label>Term</label>
                       <div class="input-group">
@@ -90,7 +90,7 @@
                     <div class="form-group">
                       <label>ARM Advance</label>
                       <% @arm_advanced_list = Program.pluck(:arm_advanced).push("10/5", "5/1 3-2-5").uniq.compact.reject { |c| c.empty? }.map{|c| [c]} %>
-                      <%= select_tag 'arm_advanced', options_for_select( @arm_advanced_list, (params[:arm_advanced] rescue nil)), { :class=> "form-control"} %>
+                      <%= select_tag 'arm_advanced', options_for_select( @arm_advanced_list, (params[:arm_advanced] rescue nil)), { prompt: 'Select ARM Advance', :class=> "form-control"} %>
                     </div>
                   </div>
                 </div>
@@ -122,14 +122,14 @@
                     <div class="form-group">
                       <label>Fannie Mae Product</label>
                       <% @fannie_mae_product_list =[["All"], ["HomeReady"]]%>
-                      <%= select_tag 'fannie_mae_product', options_for_select(@fannie_mae_product_list, (params[:fannie_mae_product] rescue nil)), { :class=> "form-control", :required => true} %>
+                      <%= select_tag 'fannie_mae_product', options_for_select(@fannie_mae_product_list, (params[:fannie_mae_product] rescue nil)), { prompt: 'Select Fannie Mae Product', :class=> "form-control" } %>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>Freddie Mac Product</label>
                       <% @freddie_mac_product_list =[["All"], ["Home Possible"]]%>
-                      <%= select_tag 'freddie_mac_product', options_for_select(@freddie_mac_product_list, (params[:freddie_mac_product] rescue nil)), { :class=> "form-control", :required => true} %>
+                      <%= select_tag 'freddie_mac_product', options_for_select(@freddie_mac_product_list, (params[:freddie_mac_product] rescue nil)), { prompt: 'Select Freddie Mac Product', :class=> "form-control" } %>
                     </div>
                   </div>
                 </div>
@@ -468,7 +468,7 @@
 
 
     $(".alert-error" ).fadeOut(3000);
-    if ($("#loan_type").val() == "ARM") {
+     if ($("#loan_type").val() == "ARM") {
       $(".arm-basic").show()
       $(".term").hide()
     }else{
@@ -481,23 +481,44 @@
       $(".term").hide()
       $(".arm-basic").show()
      }else{
-      $(".term").show()
-      $(".arm-basic").hide()
+        $(".arm-basic").hide()
+        $(".term").show()
      }
    });
   });
-  $('#du, #lp').click(function(){
-    if ($('#du').prop("checked")) {
+  
+  // $('#du, #lp').click(function(){
+  //   if ($('#du').prop("checked")) {
+  //     $('#fannie_mae').attr('checked', true);
+  //   }else {
+  //     $('#fannie_mae').attr('checked', false);
+  //   }
+  //   if ($('#lp').prop("checked")) {
+  //     $('#freddie_mac').attr('checked', true);
+  //   }else {
+  //     $('#freddie_mac').attr('checked', false);
+  //   }
+  // })
+
+
+  $('#du').click(function(){
+    debugger
+    if($(this).prop("checked") == true){
       $('#fannie_mae').attr('checked', true);
-    }else {
+    }
+    else{
       $('#fannie_mae').attr('checked', false);
     }
-    if ($('#lp').prop("checked")) {
+  });
+
+   $('#lp').click(function(){
+    if($(this).prop("checked") == true){
       $('#freddie_mac').attr('checked', true);
-    }else {
+    }
+    else{
       $('#freddie_mac').attr('checked', false);
     }
-  })
+  });
 
 
 </script>
