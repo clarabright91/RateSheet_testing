@@ -92,7 +92,7 @@ class Program < ApplicationRecord
     set_lp                          if p_name.downcase.include?("lp ")
     set_va                          if p_name.downcase.include?("va")
     set_usda                        if p_name.downcase.include?("usda")
-    set_streamline                  if p_name.downcase.include?("streamline")
+    set_streamline(p_name)          if ["streamline","SL"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_full_doc                    if p_name.downcase.include?("full doc")
     # set_loan_purpose(p_name)        if ["Purchase", "Refinance"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_loan_purpose(p_name)        if fetch_loan_purpose_fields.each{ |word| p_name.downcase.include?(word.downcase) }
@@ -144,8 +144,12 @@ class Program < ApplicationRecord
     self.usda = true
   end
 
-  def set_streamline
-    self.streamline = true
+  def set_streamline(prog_name)
+    present_word = nil
+    ["streamline","SL"].map { |word| 
+      present_word = true if prog_name.downcase.include?(word.downcase) 
+    }
+    self.streamline = present_word
   end
 
   def set_full_doc
