@@ -77,108 +77,78 @@ class DashboardController < ApplicationController
     @freddie_mac_product = "Home Possible"
   end
 
+  def modified_ltv_cltv_credit_score
+    %w[ltv cltv credit_score].each do |key|
+      array_data = []
+      key_value = params[key.to_sym]
+      if key_value.present?
+        if key_value.include?("-")
+          key_range = (key_value.split("-").first.to_f..key_value.split("-").last.to_f)
+          key_range.step(0.01) { |f| array_data << f }
+          instance_variable_set("@#{key}", array_data.uniq)
+        elsif key_value.include?("+")
+          score = key.eql?('credit_score') ? 100 : 60
+          key_range = (key_value.to_f..(key_value.to_f+score))
+          key_range.step(0.01) { |f| array_data << f }
+          instance_variable_set("@#{key}", array_data.uniq)
+        end
+      end
+    end
+  end
+
+  def modified_condition
+    %w[fannie_mae_product freddie_mac_product bank_name program_name pro_category loan_category loan_purpose loan_size term].each do |key|
+      key_value = params[key.to_sym]
+      if key_value.present?
+        unless (key_value == "All")
+          if key == "pro_category"
+            unless (key_value == "No Category")
+              @filter_data[:program_category] = key_value
+            end
+          else
+            @filter_data[key.to_sym] = key_value
+          end
+          #need to discuss
+          if %w[fannie_mae_product freddie_mac_product loan_purpose loan_size].include?(key)
+            instance_variable_set("@#{key}", key_value)
+            @filter_not_nil[key.to_sym] = nil
+          end
+
+          if %w[term].include?(key)
+            if (params[:loan_type] != "ARM")
+              instance_variable_set("@#{key}", key_value)
+              @program_term = key_value.to_i
+            end
+          end
+        end
+      end
+    end
+  end
+
+  def modified_true_condition
+    %w[fannie_mae freddie_mac du lp fha va usda streamline full_doc].each do |key|
+      key_value = params[key.to_sym]
+      if key_value.present?
+        @filter_data[key.to_sym] = true
+      end
+    end
+  end
+
+  def modified_variables
+    %w[state property_type financing_type refinance_option refinance_option misc_adjuster premium_type interest lock_period loan_amount program_category payment_type].each do |key|
+      key_value = params[key.to_sym]
+      key_value = key_value.to_i if key_value.present? && key.eql?('loan_amount')
+      instance_variable_set("@#{key}", key_value) if key_value.present?
+    end
+  end
+
   def set_variable
-    if params[:ltv].present?
-      if params[:ltv].include?("-")
-        ltv_range = (params[:ltv].split("-").first.to_f..params[:ltv].split("-").last.to_f)
-        ltv_range.step(0.01) { |f| @ltv << f }
-        @ltv = @ltv.uniq
-      elsif params[:ltv].include?("+")
-        ltv_range = (params[:ltv].to_f..(params[:ltv].to_f+60))
-        ltv_range.step(0.01) { |f| @ltv << f }
-        @ltv = @ltv.uniq
-      end
-    end
+    modified_ltv_cltv_credit_score
+    modified_condition
+    modified_true_condition
+    modified_variables
 
-    if params[:cltv].present?
-      if params[:cltv].include?("-")
-        cltv_range = (params[:cltv].split("-").first.to_f..params[:cltv].split("-").last.to_f)
-        cltv_range.step(0.01) { |f| @cltv << f }
-        @cltv = @cltv.uniq
-      elsif params[:cltv].include?("+")
-        cltv_range = (params[:cltv].to_f..(params[:cltv].to_f+60))
-        cltv_range.step(0.01) { |f| @cltv << f }
-        @cltv = @cltv.uniq
-      end
-    end
-
-    if params[:credit_score].present?
-      if  params[:credit_score].include?("-")
-        credit_score_range = (params[:credit_score].split("-").first.to_f..params[:credit_score].split("-").last.to_f)
-        credit_score_range.step(0.01) { |f| @credit_score << f }
-        @credit_score = @credit_score.uniq
-      elsif params[:credit_score].include?("+")
-          credit_score_range = (params[:credit_score].to_f..(params[:credit_score].to_f+100))
-          credit_score_range.step(0.01) { |f| @credit_score << f }
-          @credit_score = @credit_score.uniq
-      end
-    end
-
-    @state = params[:state] if params[:state].present?
-
-    @property_type = params[:property_type] if params[:property_type].present?
-    @financing_type = params[:financing_type] if params[:financing_type].present?
-    @refinance_option = params[:refinance_option] if params[:refinance_option].present?
-    @misc_adjuster = params[:misc_adjuster] if params[:misc_adjuster].present?
-    @premium_type = params[:premium_type] if params[:premium_type].present?
-    @interest = params[:interest] if params[:interest].present?
-    @lock_period = params[:lock_period] if params[:lock_period].present?
-    @loan_amount = params[:loan_amount].to_i if params[:loan_amount].present?
-    @program_category = params[:program_category] if params[:program_category].present?
-    @payment_type =  params[:payment_type] if params[:payment_type].present?
-
-    if params[:fannie_mae_product].present?
-      if (params[:fannie_mae_product] == "All")
-        @filter_not_nil[:fannie_mae_product] = nil
-      else
-        @filter_data[:fannie_mae_product] = params[:fannie_mae_product]
-        @fannie_mae_product = params[:fannie_mae_product]
-      end
-    end
-
-    if params[:freddie_mac_product].present?
-      if (params[:freddie_mac_product] == "All")
-        @filter_not_nil[:freddie_mac_product] =nil
-      else
-        @filter_data[:freddie_mac_product] = params[:freddie_mac_product]
-        @freddie_mac_product = params[:freddie_mac_product]
-      end
-    end
-
-    if params[:bank_name].present?
-      unless (params[:bank_name] == "All")
-        @filter_data[:bank_name] = params[:bank_name]
-      end
-    end
-
-    if params[:program_name].present?
-      unless (params[:program_name] == "All")
-        @filter_data[:program_name] = params[:program_name]
-      end
-    end
-
-    if params[:pro_category].present?
-      unless (params[:pro_category] == "All" || params[:pro_category] == "No Category")
-        @filter_data[:program_category] = params[:pro_category]
-      end
-    end
-
-    if params[:loan_category].present?
-      unless (params[:loan_category] == "All")
-        @filter_data[:loan_category] = params[:loan_category]
-      end
-    end
-
-    if params[:loan_purpose].present?
-      if (params[:loan_purpose] == "All")
-        @filter_not_nil[:loan_purpose] = nil
-      else
-        @filter_data[:loan_purpose] = params[:loan_purpose]
-      end
-      @loan_purpose = params[:loan_purpose]
-    end
-
-   if params[:loan_type].present?
+    if params[:loan_type].present?
       @loan_type = params[:loan_type]
       if params[:loan_type] == "All"
         @filter_not_nil[:loan_type] = nil
@@ -203,30 +173,6 @@ class DashboardController < ApplicationController
         end
       end
     end
-
-    if (params[:term].present? && params[:loan_type] != "ARM")
-        @term = params[:term].to_i
-        @program_term = params[:term].to_i
-    end
-
-    if params[:loan_size].present?
-      if params[:loan_size] == "All"
-        @filter_not_nil[:loan_size] = nil
-      else
-        @loan_size = params[:loan_size]
-      end
-    end
-
-    @filter_data[:fannie_mae] = true if params[:fannie_mae].present?
-    @filter_data[:freddie_mac] = true if params[:freddie_mac].present?
-    @filter_data[:du] = true if params[:du].present?
-    @filter_data[:lp] = true if params[:lp].present?
-
-    @filter_data[:fha] = true if params[:fha].present?
-    @filter_data[:va] = true if params[:va].present?
-    @filter_data[:usda] = true if params[:usda].present?
-    @filter_data[:streamline] = true if params[:streamline].present?
-    @filter_data[:full_doc] = true if params[:full_doc].present?
   end
 
   def find_base_rate
@@ -235,22 +181,24 @@ class DashboardController < ApplicationController
     @program_list2 = []
     if @program_list.present?
       if @program_term.present?
+        @program_list = @program_list.where.not(term:nil)
         @program_list.each do |program|
-          if (program.term.to_s.length == 2 || program.term.to_s.length == 1)
-            if (program.term == @program_term)
+           pro_term = program.term
+          if (pro_term.to_s.length <=2 )
+            if (pro_term == @program_term)
               @program_list2 << program
             end
-          elsif (program.term.to_s.length == 4)
-            first = program.term/100
-            last = program.term%100
+          else
+            first = pro_term/100
+            last = pro_term%100
+            term_arr = []
             if first < last
-              if ((first..last).to_a).include?(@program_term)
-                @program_list2 << program
-              end
+              term_arr = (first..last).to_a
             else
-              if ((last..first).to_a).include?(@program_term)
-                @program_list2 << program
-              end
+              term_arr = (last..first).to_a
+            end
+            if term_arr.include?(@program_term)
+              @program_list2 << program
             end
           end
         end
@@ -273,24 +221,6 @@ class DashboardController < ApplicationController
         end
       end
 
-      # if @program_list3.present?
-      #   @program_list4 = []
-      #   if params[:pro_category].present?
-      #     @program_list3 = @program_list3.map{ |pro| pro if pro.program_category!=nil}.compact
-      #     if params[:pro_category] == "All"
-      #       @program_list4 = @program_list3
-      #     else
-      #       @program_list3.each do |pro|
-      #         if(pro.program_category.split("&").map{ |l| l.strip }.include?(params[:pro_category]))
-      #           @program_list4 << pro
-      #         end
-      #       end
-      #     end
-      #   else
-      #     @program_list4 = @program_list3
-      #   end
-      # end
-
       @programs =[]
       if @program_list3.present?
         @program_list3.each do |program|
@@ -307,7 +237,6 @@ class DashboardController < ApplicationController
           end
         end
       end
-
       @result= []
       if @programs.present?
         find_points_of_the_loan @programs
