@@ -92,11 +92,11 @@ class Program < ApplicationRecord
     set_lp                          if p_name.downcase.include?("lp ")
     set_va                          if p_name.downcase.include?("va")
     set_usda                        if p_name.downcase.include?("usda")
-    set_streamline                  if p_name.downcase.include?("streamline")
+    set_streamline(p_name)          if ["streamline","SL"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_full_doc                    if p_name.downcase.include?("full doc")
     # set_loan_purpose(p_name)        if ["Purchase", "Refinance"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_loan_purpose(p_name)        if fetch_loan_purpose_fields.each{ |word| p_name.downcase.include?(word.downcase) }
-    set_conforming                  if get_conforming.each{ |word| p_name.downcase.include?(word.downcase) }
+    set_conforming(p_name)          if ["Conforming","Conf","fcf"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_fannie_mae(p_name)          if ["Fannie Mae", "FNMA"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_freddie_mac(p_name)         if ["Freddie Mac", "FHLMC"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_freddie_mac_product(p_name) if ["Home Possible","HOME POSSIBLE"].each{ |word| p_name.downcase.include?(word.downcase) }
@@ -115,8 +115,13 @@ class Program < ApplicationRecord
     self.loan_type = present_word
   end
 
-  def set_conforming
-    self.conforming = true
+  def set_conforming(prog_name)
+    present_word = nil
+    # self.conforming = true
+    ["Conforming","Conf","fcf"].map { |word| 
+      present_word = true if prog_name.downcase.include?(word.downcase) 
+    }
+    self.conforming = present_word 
   end
 
   def set_du
@@ -139,8 +144,12 @@ class Program < ApplicationRecord
     self.usda = true
   end
 
-  def set_streamline
-    self.streamline = true
+  def set_streamline(prog_name)
+    present_word = nil
+    ["streamline","SL"].map { |word| 
+      present_word = true if prog_name.downcase.include?(word.downcase) 
+    }
+    self.streamline = present_word
   end
 
   def set_full_doc
