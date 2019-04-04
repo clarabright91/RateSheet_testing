@@ -97,28 +97,29 @@ class DashboardController < ApplicationController
   end
 
   def modified_condition
-    %w[fannie_mae_product freddie_mac_product bank_name program_name pro_category loan_category loan_purpose loan_size term].each do |key|
+    %w[fannie_mae_product freddie_mac_product bank_name program_name pro_category loan_category loan_purpose term].each do |key|
       key_value = params[key.to_sym]
       if key_value.present?
         unless (key_value == "All")
-          if key == "pro_category"
+          if (key == "pro_category")
             unless (key_value == "No Category")
               @filter_data[:program_category] = key_value
             end
           else
             @filter_data[key.to_sym] = key_value
           end
-          #need to discuss
-          if %w[fannie_mae_product freddie_mac_product loan_purpose loan_size].include?(key)
+          if %w[fannie_mae_product freddie_mac_product loan_size].include?(key)
             instance_variable_set("@#{key}", key_value)
-            @filter_not_nil[key.to_sym] = nil
           end
-
           if %w[term].include?(key)
             if (params[:loan_type] != "ARM")
               instance_variable_set("@#{key}", key_value)
               @program_term = key_value.to_i
             end
+          end
+        else
+          if %w[fannie_mae_product freddie_mac_product loan_purpose loan_size].include?(key)
+            @filter_not_nil[key.to_sym] = nil
           end
         end
       end
