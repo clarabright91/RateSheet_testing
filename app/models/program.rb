@@ -6,6 +6,12 @@ class Program < ApplicationRecord
   belongs_to :sub_sheet, optional: true
   before_save :add_bank_name
 
+  STATE = [["All"], ["AL"],["AK"],["AZ"],["AR"],["CA"],["CO"],["CT"],["DE"],["FL"],["GA"],["HI"],["ID"],["IL"],["IN"],["IA"],["KS"],["KY"],["LA"],["ME"],["MD"],["MA"],["MI"],["MN"],["MS"],["MO"],["MT"],["NE"],["NV"],["NH"],["NJ"],["NM"],["NY"],["NC"],["ND"],["OH"],["OK"],["OR"],["PA"],["RI"],["SC"],["SD"],["TN"],["TX"],["UT"],["VT"],["VA"],["WA"],["WV"],["WI"],["WY"],["AS"],["DC"],["FM"],["GU"],["MH"],["MP"],["PW"],["PR"],["VI"]]
+
+  LOAN_TYPE = [["All"], ["Fixed"], ["ARM"], ["Hybrid"], ["Floating"], ["Variable"]]
+
+  LOAN_AMOUNT = [["$0-$50,000",50000], ["$500,00 - $100,000", 100000], ["$100,000 - $150,000", 100000], ["$150,000 - $200,000", 150000], ["$250,000 - $300,000", 250000], ["$300,000 - $350,000", 300000], ["$350,000 - $400,000", 350000], ["$400,000 - $450,000", 400000], ["$450,000 - $500,000", 450000], ["$500,000 - $550,000", 500000], ["$550,000 - $600,000", 550000], ["$600,000 - $650,000", 600000], ["$650,000 - $700,000", 650000], ["$700,000 - $750,000", 700000], ["$750,000 - $800,000", 750000], ["$800,000 - $850,000", 800000], ["$850,000 +", 850000]]
+
   def add_bank_name
     self.bank_name = self.sheet.bank.name if self.sheet.present?
     self.bank_name = self.sub_sheet.sheet.bank.name if self.sub_sheet.present?
@@ -40,14 +46,14 @@ class Program < ApplicationRecord
     non_conf_hb += non_conf_hb.map(&:downcase)
     return non_conf_hb
   end
-  
+
   def get_conf
     conf = ["CONF HB","Conf High Bal", "Conforming High Balance"]
     # conforming += Acronym.new(conforming).to_a
     conf += conf.map(&:downcase)
     return conf
   end
-  
+
   def get_high_balance
     high_balance = ["High-Balance", "HIGH BAL", "High Balance", "HB"]
     # high_balance += Acronym.new(high_balance).to_a
@@ -118,10 +124,10 @@ class Program < ApplicationRecord
   def set_conforming(prog_name)
     present_word = nil
     # self.conforming = true
-    ["Conforming","Conf","fcf"].map { |word| 
-      present_word = true if prog_name.downcase.include?(word.downcase) 
+    ["Conforming","Conf","fcf"].map { |word|
+      present_word = true if prog_name.downcase.include?(word.downcase)
     }
-    self.conforming = present_word 
+    self.conforming = present_word
   end
 
   def set_du
@@ -146,8 +152,8 @@ class Program < ApplicationRecord
 
   def set_streamline(prog_name)
     present_word = nil
-    ["streamline","SL"].map { |word| 
-      present_word = true if prog_name.downcase.include?(word.downcase) 
+    ["streamline","SL"].map { |word|
+      present_word = true if prog_name.downcase.include?(word.downcase)
     }
     self.streamline = present_word
   end
