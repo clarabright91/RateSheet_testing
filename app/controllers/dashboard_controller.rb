@@ -61,6 +61,8 @@ class DashboardController < ApplicationController
   end
 
   def set_default
+    @term_list = (Program.pluck(:term).reject(&:blank?).uniq.map{|n| n if n.to_s.length < 3}.reject(&:blank?).push(5,10,15,20,25,30).uniq.sort).map{|y| [y.to_s + " yrs" , y]}
+    @arm_advanced_list = Program.pluck(:arm_advanced).push("10/5", "5/1 3-2-5").uniq.compact.reject { |c| c.empty? }.map{|c| [c]}
     @base_rate = 0.0
     @filter_data = {}
     @filter_not_nil = {}

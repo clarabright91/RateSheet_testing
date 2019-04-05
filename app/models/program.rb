@@ -6,6 +6,49 @@ class Program < ApplicationRecord
   belongs_to :sub_sheet, optional: true
   before_save :add_bank_name
 
+  STATE = [["All"], ["AL"],["AK"],["AZ"],["AR"],["CA"],["CO"],["CT"],["DE"],["FL"],["GA"],["HI"],["ID"],["IL"],["IN"],["IA"],["KS"],["KY"],["LA"],["ME"],["MD"],["MA"],["MI"],["MN"],["MS"],["MO"],["MT"],["NE"],["NV"],["NH"],["NJ"],["NM"],["NY"],["NC"],["ND"],["OH"],["OK"],["OR"],["PA"],["RI"],["SC"],["SD"],["TN"],["TX"],["UT"],["VT"],["VA"],["WA"],["WV"],["WI"],["WY"],["AS"],["DC"],["FM"],["GU"],["MH"],["MP"],["PW"],["PR"],["VI"]]
+
+  LOAN_TYPE = [["All"], ["Fixed"], ["ARM"], ["Hybrid"], ["Floating"], ["Variable"]]
+  LOAN_PURPOSE = [["All"], ["Purchase"], ["Refinance"]]
+
+  LOAN_SIZE = [["All"], ["Conforming"], ["Non-Conforming"], ["Super Conforming"], ["Jumbo"], ["High-Balance"]]
+
+  ARN_BASIC = [["1/1 ARM"],["2/1 ARM"],["3/1 ARM"],["7/1 ARM"],["10/1 ARM"],["5-1"],["5/1"]]
+
+  INTEREST_LIST =[["3.250"],["3.375"],["3.500"],["3.625"],["3.750"],["3.875"],["4.000"],["4.125"],["4.250"],["4.375"],["4.500"],["4.625"],["4.750"],["4.875"],["5.000"],["5.125"],["5.250"],["5.375"],["5.500"],["5.625"],["5.750"],["5.875"]]
+
+  LOCK_PERIOD_LIST =[["15 days","15"], ["30 days","30"], ["45 days","45"], ["60 days","60"], ["75 days","75"], ["90 days","90"]]
+
+  FANNIE_MAE_PRODUCT_LIST =[["All"], ["HomeReady"]]
+
+  FREDDIE_MAC_PRODUCT_LIST =[["All"], ["Home Possible"]]
+
+  CREDIT_SCORE_LIST = [["760 +", "760 +"], ["740-759", "740-759"], ["720-739", "720-739"], ["700-719", "700-719"], ["680-699", "680-699"], ["660-679", "660-679"], ["640-659", "640-659"], ["620-639", "620-639"]]
+
+  LTV_VALUES = [["97 +","97 +"], ["96-97", "96-97"], ["91-95", "91-95"], ["86-90", "86-90"], ["81-85", "81-85"], ["76-80", "76-80"], ["71-75", "71-75"], ["61-70", "61-70"],["0-60","0-60"]]
+
+  CLTV_VALUES = [["97 +","97 +"], ["96-97", "96-97"], ["91-95", "91-95"], ["86-90", "86-90"], ["81-85", "81-85"], ["76-80", "76-80"], ["71-75", "71-75"], ["61-70", "61-70"],["0-60","0-60"]]
+
+  LOAN_AMOUNT = [["$0-$50,000",50000], ["$500,00 - $100,000", 100000], ["$100,000 - $150,000", 100000], ["$150,000 - $200,000", 150000], ["$250,000 - $300,000", 250000], ["$300,000 - $350,000", 300000], ["$350,000 - $400,000", 350000], ["$400,000 - $450,000", 400000], ["$450,000 - $500,000", 450000], ["$500,000 - $550,000", 500000], ["$550,000 - $600,000", 550000], ["$600,000 - $650,000", 600000], ["$650,000 - $700,000", 650000], ["$700,000 - $750,000", 700000], ["$750,000 - $800,000", 750000], ["$800,000 - $850,000", 800000], ["$850,000 +", 850000]]
+
+  PROGRAM_CATEGORY_LIST =[["Non-Qm 7900"], ["QM 6900"]]
+
+  PROPERTY_TYPE_VALUES = [["Manufactured Home"],["2nd Home"],["3-4 Unit"],["Non-Owner Occupied"],["Condo"],["2-Unit"], ["2-4 Unit"],["Investment Property"], ["Gov'n Non Owner"], ["NOO"]]
+
+  FINANCING_TYPE_VALUES = [["Subordinate Financing"]]
+
+  REFINANCE_OPTION_VALUES = [["Cash Out"], ["Rate and Term"], ["IRRRL"]]
+
+  MISC_ADJUSTER_VALUES = [["CA Escrow Waiver (Full or Taxes Only)"], ["CA Escrow Waiver (Insurance Only)"], ["Miscellaneous"], ["Escrow Waiver Fee"], ["Escrow Waiver (LTVs >80%; CA only)"]]
+
+  PATMENT_TYPE_VALUES = [["Principal and Interest"], ["Interest Only"]]
+
+  DTI_VALUES = [["25.6%"]]
+
+  COVERAGE_VALUES = [["30.5%"]]
+
+  MARGIN_VALUES = [["2.0"]]
+
   def add_bank_name
     self.bank_name = self.sheet.bank.name if self.sheet.present?
     self.bank_name = self.sub_sheet.sheet.bank.name if self.sub_sheet.present?
@@ -40,14 +83,14 @@ class Program < ApplicationRecord
     non_conf_hb += non_conf_hb.map(&:downcase)
     return non_conf_hb
   end
-  
+
   def get_conf
     conf = ["CONF HB","Conf High Bal", "Conforming High Balance"]
     # conforming += Acronym.new(conforming).to_a
     conf += conf.map(&:downcase)
     return conf
   end
-  
+
   def get_high_balance
     high_balance = ["High-Balance", "HIGH BAL", "High Balance", "HB"]
     # high_balance += Acronym.new(high_balance).to_a
@@ -118,10 +161,10 @@ class Program < ApplicationRecord
   def set_conforming(prog_name)
     present_word = nil
     # self.conforming = true
-    ["Conforming","Conf","fcf"].map { |word| 
-      present_word = true if prog_name.downcase.include?(word.downcase) 
+    ["Conforming","Conf","fcf"].map { |word|
+      present_word = true if prog_name.downcase.include?(word.downcase)
     }
-    self.conforming = present_word 
+    self.conforming = present_word
   end
 
   def set_du
@@ -146,8 +189,8 @@ class Program < ApplicationRecord
 
   def set_streamline(prog_name)
     present_word = nil
-    ["streamline","SL"].map { |word| 
-      present_word = true if prog_name.downcase.include?(word.downcase) 
+    ["streamline","SL"].map { |word|
+      present_word = true if prog_name.downcase.include?(word.downcase)
     }
     self.streamline = present_word
   end
