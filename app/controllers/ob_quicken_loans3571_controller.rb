@@ -284,22 +284,22 @@ class ObQuickenLoans3571Controller < ApplicationController
                   # Multiple Unit Property
                   if r == 50 && cc == 3
                     secondary_key = value.split("Property").first
-                    @property_hash["FannieMae/FreddieMac/PropertyType/"] = {}
-                    @property_hash["FannieMae/FreddieMac/PropertyType/"][true] = {}
-                    @property_hash["FannieMae/FreddieMac/PropertyType/"][true][true] = {}
-                    @property_hash["FannieMae/FreddieMac/PropertyType/"][true][true][secondary_key] = {}
+                    @property_hash["FannieMae/FreddieMac/PropertyType"] = {}
+                    @property_hash["FannieMae/FreddieMac/PropertyType"][true] = {}
+                    @property_hash["FannieMae/FreddieMac/PropertyType"][true][true] = {}
+                    @property_hash["FannieMae/FreddieMac/PropertyType"][true][true][secondary_key] = {}
                     cc = cc + 6
                     new_value = sheet_data.cell(r,cc)
-                    @property_hash["FannieMae/FreddieMac/PropertyType/"][true][true][secondary_key] = new_value
+                    @property_hash["FannieMae/FreddieMac/PropertyType"][true][true][secondary_key] = new_value
                   end
                   if r == 51 && cc == 3
                     secondary_key = value.split("Property").first
-                    @property_hash["FannieMae/PropertyType/"] = {}
-                    @property_hash["FannieMae/PropertyType/"][true] = {}
-                    @property_hash["FannieMae/PropertyType/"][true][secondary_key] = {}
+                    @property_hash["FannieMae/PropertyType"] = {}
+                    @property_hash["FannieMae/PropertyType"][true] = {}
+                    @property_hash["FannieMae/PropertyType"][true][secondary_key] = {}
                     cc = cc + 6
                     new_value = sheet_data.cell(r,cc)
-                    @property_hash["FannieMae/PropertyType/"][true][secondary_key] = new_value
+                    @property_hash["FannieMae/PropertyType"][true][secondary_key] = new_value
                   end
                   if r >= 52 && r <= 54 && cc == 3
                     if value.include?("<")
@@ -319,7 +319,11 @@ class ObQuickenLoans3571Controller < ApplicationController
                     @property_hash["FannieMaeProduct/FreddieMacProduct/LTV/FICO"]["Home Ready"]["Home Possible"][secondary_key] = {}
                   end
                   if r >= 58 && r <= 59 && cc == 5
-                    ltv_key = get_value value
+                    if value.downcase.include?('all')
+                      ltv_key = "0-Inf"
+                    else
+                      ltv_key = get_value value
+                    end
                     @property_hash["FannieMaeProduct/FreddieMacProduct/LTV/FICO"]["Home Ready"]["Home Possible"][secondary_key][ltv_key] = {}
                     cc = cc + 4
                     new_value = sheet_data.cell(r,cc)
@@ -668,7 +672,7 @@ class ObQuickenLoans3571Controller < ApplicationController
                   end
                   # High LTV
                   if r >= 67 && r <= 68 && cc == 16
-                    secondary_key = get_value value
+                    secondary_key = value.tr('A-Za-z()&% ','')
                     @other_adjustment["FannieMae/FreddieMac/LTV"][true][true][secondary_key] = {}
                     cc = cc + 9
                     new_value = sheet_data.cell(r,cc)
@@ -752,7 +756,11 @@ class ObQuickenLoans3571Controller < ApplicationController
                     @subordinate_hash["FinancingType/FreddieMac/LTV/CLTV/FICO"]["Subordinate Financing"][true][secondary_key][cltv_key][ltv_key] = value
                   end
                   if r == 60 && cc == 5
-                    secondary_key = get_value value
+                    if value.downcase.include?("all")
+                      secondary_key = "0-Inf"
+                    else
+                      secondary_key = get_value value
+                    end
                     @subordinate_hash["FinancingType/LTV/CLTV/FICO"] = {}
                     @subordinate_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"] = {}
                     @subordinate_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"][secondary_key] = {}
@@ -769,22 +777,22 @@ class ObQuickenLoans3571Controller < ApplicationController
                   # Multiple Unit Property
                   if r == 63 && cc == 3
                     secondary_key = value.split("Property").first
-                    @property_hash["FannieMae/FreddieMac/PropertyType/"] = {}
-                    @property_hash["FannieMae/FreddieMac/PropertyType/"][true] = {}
-                    @property_hash["FannieMae/FreddieMac/PropertyType/"][true][true] = {}
-                    @property_hash["FannieMae/FreddieMac/PropertyType/"][true][true][secondary_key] = {}
+                    @property_hash["FannieMae/FreddieMac/PropertyType"] = {}
+                    @property_hash["FannieMae/FreddieMac/PropertyType"][true] = {}
+                    @property_hash["FannieMae/FreddieMac/PropertyType"][true][true] = {}
+                    @property_hash["FannieMae/FreddieMac/PropertyType"][true][true][secondary_key] = {}
                     cc = cc + 9
                     new_value = sheet_data.cell(r,cc)
-                    @property_hash["FannieMae/FreddieMac/PropertyType/"][true][true][secondary_key] = new_value
+                    @property_hash["FannieMae/FreddieMac/PropertyType"][true][true][secondary_key] = new_value
                   end
                   if r == 64 && cc == 3
                     secondary_key = value.split("Property").first
-                    @property_hash["FannieMae/PropertyType/"] = {}
-                    @property_hash["FannieMae/PropertyType/"][true] = {}
-                    @property_hash["FannieMae/PropertyType/"][true][secondary_key] = {}
+                    @property_hash["FannieMae/PropertyType"] = {}
+                    @property_hash["FannieMae/PropertyType"][true] = {}
+                    @property_hash["FannieMae/PropertyType"][true][secondary_key] = {}
                     cc = cc + 9
                     new_value = sheet_data.cell(r,cc)
-                    @property_hash["FannieMae/PropertyType/"][true][secondary_key] = new_value
+                    @property_hash["FannieMae/PropertyType"][true][secondary_key] = new_value
                   end
                   if r >= 65 && r <= 67 && cc == 3
                     if value.include?("<")
@@ -856,7 +864,7 @@ class ObQuickenLoans3571Controller < ApplicationController
             end
           end
         end
-        adjustment = [@adjustment_hash,@lp_adjustment,@subordinate_hash,@property_hash,@cashout_hash,@pricing_cap,@other_adjustment]
+        adjustment = [@adjustment_hash,@lp_adjustment,@subordinate_hash,@property_hash,@pricing_cap,@other_adjustment]
         make_adjust(adjustment,@sheet_name)
         create_program_association_with_adjustment(@sheet_name)
       end
@@ -1111,6 +1119,9 @@ class ObQuickenLoans3571Controller < ApplicationController
           				primary_key1 = "FICO"
           				@government_hash[primary_key1] = {}
           			end
+                if value == "Loan Ladder"
+                  @adjustment_hash["LoanAmount"] = {}
+                end
           			if r == 76 && cc == 5
           				primary_key = "LockDay"
           				@adjustment_hash[primary_key] = {}
@@ -1122,12 +1133,10 @@ class ObQuickenLoans3571Controller < ApplicationController
           			# Loan Ladder
           			if r >= 88 && r <= 91 && cc == 5
           				primary_key = get_value value
-          				@adjustment_hash[primary_key] = {}
-          				if @adjustment_hash[primary_key] = {}
-          					cc = cc + 10
-          					new_value = sheet_data.cell(r,cc)
-          					@adjustment_hash[primary_key] = new_value
-          				end
+          				@adjustment_hash["LoanAmount"][primary_key] = {}
+        					cc = cc + 10
+        					new_value = sheet_data.cell(r,cc)
+        					@adjustment_hash["LoanAmount"][primary_key] = new_value
           			end
           			# Government FICO Adjusters
           			if r >= 76 && r <= 79 && cc == 19
@@ -1190,6 +1199,7 @@ class ObQuickenLoans3571Controller < ApplicationController
             end
         	end
         end
+        # debugger
         adjustment = [@adjustment_hash,@government_hash]
         make_adjust(adjustment,@sheet_name)
         create_program_association_with_adjustment(@sheet_name)
@@ -1429,13 +1439,13 @@ class ObQuickenLoans3571Controller < ApplicationController
     def get_value value1
       if value1.present?
 				if value1.include?("<=") || value1.include?("<")
-          value1 = "0-"+value1.tr('A-Z<>=%$ ', '')
+          value1 = "0-"+value1.tr('A-Z<>=%$, ', '')
         elsif value1.include?(">=") || value1.include?(">") || value1.include?("+")
-        	value1 = value1.tr('A-Z<>$%=+ ','')+"-Inf"
+        	value1 = value1.tr('A-Z<>$%=+, ','')+"-Inf"
         elsif value1.include?("-")
           value1 = value1.tr('A-Z<>$%= ','')
         else
-          value1.tr('()&% ','')
+          value1.tr('A-Za-z/()&%, ','')
         end
       end
     end

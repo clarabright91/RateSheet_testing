@@ -57,7 +57,6 @@ class DashboardController < ApplicationController
     else
       @program_categories << "No Category"
     end
-
     render json: {program_list: @program_names.map{ |lc| {name: lc}}, loan_category_list: @loan_categories.map{ |lc| {name: lc}}, pro_category_list: @program_categories.map{ |lc| {name: lc}}} unless html_type
   end
 
@@ -106,7 +105,9 @@ class DashboardController < ApplicationController
               @filter_data[:program_category] = key_value
             end
           else
-            @filter_data[key.to_sym] = key_value
+            unless (key == "term")
+              @filter_data[key.to_sym] = key_value
+            end
           end
           if %w[fannie_mae_product freddie_mac_product loan_size].include?(key)
             instance_variable_set("@#{key}", key_value)
