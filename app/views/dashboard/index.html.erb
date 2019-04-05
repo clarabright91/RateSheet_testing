@@ -89,20 +89,6 @@
                   <div class="col-md-5">
                     <div class="form-group">
                       <label>Interest Rate</label>
-                      <%= select_tag 'interest', options_for_select(Program::INTEREST_LIST, @interest), :class=> "form-control" %>
-                    </div>
-                  </div>
-                  <div class="col-md-5">
-                    <div class="form-group">
-                      <label>Lock Period</label>
-                      <div class="input-group">
-                        <%= select_tag 'lock_period', options_for_select(Program::LOCK_PERIOD_LIST, @lock_period), :class=> "form-control" %>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-5">
-                    <div class="form-group">
-                      <label>Interest Rate</label>
                        <% @interest_list =[["3.250"],["3.375"],["3.500"],["3.625"],["3.750"],["3.875"],["4.000"],["4.125"],["4.250"],["4.375"],["4.500"],["4.625"],["4.750"],["4.875"],["5.000"],["5.125"],["5.250"],["5.375"],["5.500"],["5.625"],["5.750"],["5.875"]]%>
                       <%= select_tag 'interest', options_for_select(@interest_list, @interest), :class=> "form-control" %>
                     </div>
