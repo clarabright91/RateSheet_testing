@@ -97,8 +97,8 @@ class Program < ApplicationRecord
     # set_loan_purpose(p_name)        if ["Purchase", "Refinance"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_loan_purpose(p_name)        if fetch_loan_purpose_fields.each{ |word| p_name.downcase.include?(word.downcase) }
     set_conforming(p_name)          if ["Conforming","Conf","fcf"].each{ |word| p_name.downcase.include?(word.downcase) }
-    set_fannie_mae(p_name)          if ["Fannie Mae", "FNMA"].each{ |word| p_name.downcase.include?(word.downcase) }
-    set_freddie_mac(p_name)         if ["Freddie Mac", "FHLMC"].each{ |word| p_name.downcase.include?(word.downcase) }
+    set_fannie_mae(p_name)          if ["Fannie Mae", "FNMA", "Du "].each{ |word| p_name.downcase.include?(word.downcase) }
+    set_freddie_mac(p_name)         if ["Freddie Mac", "FHLMC", "Lp "].each{ |word| p_name.downcase.include?(word.downcase) }
     set_freddie_mac_product(p_name) if ["Home Possible","HOME POSSIBLE"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_fannie_mae_product(p_name)  if ["HOMEREADY", "Home Ready"].each{ |word| p_name.downcase.include?(word.downcase) }
     self.save
@@ -201,7 +201,7 @@ class Program < ApplicationRecord
 
   def set_fannie_mae p_name
     present_word = false
-    ["Fannie Mae", "FNMA"].each{ |word|
+    ["Fannie Mae", "FNMA", "DU "].each{ |word|
       present_word = true if p_name.downcase.include?(word.downcase)
     }
     self.fannie_mae = present_word
@@ -209,7 +209,7 @@ class Program < ApplicationRecord
 
   def set_freddie_mac p_name
     present_word = false
-    ["Freddie Mac", "FHLMC"].each{ |word|
+    ["Freddie Mac", "FHLMC", "LP "].each{ |word|
       present_word = true if p_name.downcase.include?(word.downcase)
     }
     self.freddie_mac = present_word

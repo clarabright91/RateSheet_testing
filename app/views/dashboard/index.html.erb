@@ -502,7 +502,6 @@
 
 
   $('#du').click(function(){
-    debugger
     if($(this).prop("checked") == true){
       $('#fannie_mae').attr('checked', true);
     }
@@ -517,6 +516,17 @@
     }
     else{
       $('#freddie_mac').attr('checked', false);
+    }
+  });
+
+
+  $('#streamline').click(function () {
+    if ($(this).prop("checked")) {
+      $("#loan_purpose").val('Purchase')
+      $('#fha').attr('checked', true);
+    } else {
+      $("#loan_purpose").val('')
+      $('#fha').attr('checked', false);
     }
   });
 
