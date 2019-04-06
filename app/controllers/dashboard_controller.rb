@@ -111,7 +111,7 @@ class DashboardController < ApplicationController
               @filter_data[key.to_sym] = key_value
             end
           end
-          if %w[fannie_mae_product freddie_mac_product loan_size].include?(key)
+          if %w[fannie_mae_product freddie_mac_product].include?(key)
             instance_variable_set("@#{key}", key_value)
           end
           if %w[term].include?(key)
@@ -121,7 +121,7 @@ class DashboardController < ApplicationController
             end
           end
         else
-          if %w[fannie_mae_product freddie_mac_product loan_purpose loan_size].include?(key)
+          if %w[fannie_mae_product freddie_mac_product loan_purpose].include?(key)
             @filter_not_nil[key.to_sym] = nil
           end
         end
@@ -177,6 +177,12 @@ class DashboardController < ApplicationController
         end
       end
     end
+
+    if params[:loan_size].present?
+      if params[:loan_size] == "All"
+        @filter_not_nil[:loan_size] = nil
+      end
+    end
   end
 
   def find_base_rate
@@ -213,11 +219,15 @@ class DashboardController < ApplicationController
       if @program_list2.present?
         @program_list3 = []
         if params[:loan_size].present?
-          @loan_size = params[:loan_size]
-          @program_list2 = @program_list2.map{ |pro| pro if pro.loan_size!=nil}.compact
-          @program_list2.each do |pro|
-            if(pro.loan_size.split("and").map{ |l| l.strip }.include?(params[:loan_size]))
-              @program_list3 << pro
+          if params[:loan_size] == "All"
+            @program_list3 = @program_list2
+          else
+            @loan_size = params[:loan_size]
+            @program_list2 = @program_list2.map{ |pro| pro if pro.loan_size!=nil}.compact
+            @program_list2.each do |pro|
+              if(pro.loan_size.split("and").map{ |l| l.strip }.include?(params[:loan_size]))
+                @program_list3 << pro
+              end
             end
           end
         else
