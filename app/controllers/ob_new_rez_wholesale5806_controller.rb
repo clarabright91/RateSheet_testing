@@ -112,7 +112,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   elsif @title.include?("Variable")
                     loan_type = "Variable"
                   else
-                    loan_type = nil
+                    loan_type = "Fixed"
                   end
 
                   # rate arm
@@ -141,6 +141,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   # High Balance
                   if @title.include?("High Balance")
                     loan_size = "High-Balance"
+                  else
+                    loan_size = "Conforming"
                   end
                   # Fha, va, usda
                   if @title.downcase.include?("fha")
@@ -393,13 +395,15 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 elsif @title.include?("Variable")
                   loan_type = "Variable"
                 else
-                  loan_type = nil
+                  loan_type = "Fixed"
                 end
 
                 # conforming
-                if @title.downcase.include?("conforming")
-                  loan_size = "Conforming"
+                if @title.downcase.include?("super conforming")
+                  loan_size = "Super Conforming"
                   conforming = true
+                else
+                  loan_size = "Conforming"
                 end
 
                 # freddie_mac
@@ -841,7 +845,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 elsif @title.include?("Variable")
                   loan_type = "Variable"
                 else
-                  loan_type = nil
+                  loan_type = "Fixed"
                 end
 
                 # conforming
@@ -862,6 +866,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 # High Balance
                 if @title.include?("High Balance")
                   loan_size = "High-Balance"
+                else
+                  loan_size = "Conforming"
                 end
 
                 # loan_purpose
@@ -1264,7 +1270,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 elsif @title.include?("Variable")
                   loan_type = "Variable"
                 else
-                  loan_type = nil
+                  loan_type = "Fixed"
                 end
 
                 # Arm Basic
@@ -1298,6 +1304,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   loan_purpose = "Purchase"
                 end
 
+                # loan_size
+                if @title.downcase.include?('high balance')
+                  loan_size = "High Balance"
+                else
+                  loan_size = "Conforming"
+                end
+
                 # lp and du
                 if @title.downcase.include?('du ')
                   du = true
@@ -1309,7 +1322,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @program_ids << @program.id
                 @program.adjustments.destroy_all
-                @program.update(term: term,loan_type: loan_type,freddie_mac: freddie_mac, fannie_mae: fannie_mae, loan_category: @sheet_name,arm_basic: arm_basic, freddie_mac_product: freddie_mac_product, arm_advanced: arm_advanced, loan_purpose: loan_purpose, du: du, lp: lp)
+                @program.update(term: term,loan_type: loan_type,freddie_mac: freddie_mac, fannie_mae: fannie_mae, loan_category: @sheet_name,arm_basic: arm_basic, freddie_mac_product: freddie_mac_product, arm_advanced: arm_advanced, loan_purpose: loan_purpose, du: du, lp: lp,loan_size: loan_size)
                 @block_hash = {}
                 key = ''
                 (0..50).each do |max_row|
@@ -2240,6 +2253,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 loan_type = program_heading[5]
                 if @title.downcase.include?("jumbo")
                   loan_size = "Jumbo"
+                else
+                  loan_size = "Conforming"
                 end
                 # loan_purpose
                 if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
@@ -2822,7 +2837,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 elsif @title.include?("Variable")
                   loan_type = "Variable"
                 else
-                  loan_type = nil
+                  loan_type = "Fixed"
                 end
 
                 # rate arm
@@ -2838,6 +2853,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 # Loan Size
                 if @title.downcase.include?("jumbo")
                   loan_size = "Jumbo"
+                else
+                  loan_size = "Conforming"
                 end
 
                 # loan_purpose
@@ -3370,7 +3387,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   elsif @title.include?("Variable")
                     loan_type = "Variable"
                   else
-                    loan_type = nil
+                    loan_type = "Fixed"
                   end
 
                   # rate arm
@@ -3398,6 +3415,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   # High Balance
                   if @title.downcase.include?("jumbo")
                     loan_size = "Jumbo"
+                  else
+                    loan_size = "Conforming"
                   end
 
                   # Purchase & Refinance
@@ -4194,7 +4213,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     elsif @title.include?("Variable")
                       loan_type = "Variable"
                     else
-                      loan_type = nil
+                      loan_type = "Fixed"
                     end
 
                     # rate arm
@@ -4211,6 +4230,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     loan_size = nil
                     if @title.include?("Jumbo")
                       loan_size = "Jumbo"
+                    else
+                      loan_size = "Conforming"
                     end
 
                     # loan_purpose
@@ -4811,12 +4832,14 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   elsif @title.include?("Variable")
                     loan_type = "Variable"
                   else
-                    loan_type = nil
+                    loan_type = "Fixed"
                   end
 
                   # Loan Size
                   if @title.downcase.include?("jumbo")
                     loan_size = "Jumbo"
+                  else
+                    loan_size = "Conforming"
                   end
                   # Arm basic
                   if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 LIBOR ARM") || @title.include?("7/1 LIBOR ARM") || @title.include?("10/1 LIBOR ARM")
@@ -5073,7 +5096,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 elsif @title.include?("Variable")
                   loan_type = "Variable"
                 else
-                  loan_type = nil
+                  loan_type = "Fixed"
                 end
 
                 # Arm basic
@@ -5088,6 +5111,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 # conforming
                 if @title.downcase.include?("conforming")
                   conforming = true
+                  loan_size = "Conforming"
+                else
+                  loan_size = "Conforming"
                 end
 
                 # freddie_mac
@@ -5116,7 +5142,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
 
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @program_ids << @program.id
-                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, loan_category: @sheet_name,arm_advanced: arm_advanced, loan_purpose: loan_purpose, du: du, lp: lp)
+                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, loan_category: @sheet_name,arm_advanced: arm_advanced, loan_purpose: loan_purpose, du: du, lp: lp, loan_size: loan_size)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -5380,7 +5406,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   elsif @title.include?("Variable")
                     loan_type = "Variable"
                   else
-                    loan_type = nil
+                    loan_type = "Fixed"
                   end
                   # rate arm
                   if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM")
@@ -5389,6 +5415,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   # High Balance
                   if @title.include?("High Balance")
                     loan_size = "High-Balance"
+                  else
+                    loan_size = "Conforming"
                   end
                   # loan_purpose
                   if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
@@ -5585,7 +5613,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 elsif @title.include?("Variable")
                   loan_type = "Variable"
                 else
-                  loan_type = nil
+                  loan_type = "Fixed"
                 end
 
                 # Arm Basic
@@ -5601,6 +5629,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 # conforming
                 if @title.downcase.include?("conforming") 
                   conforming = true
+                  loan_size = "Conforming"
+                else
                   loan_size = "Conforming"
                 end
 
@@ -6010,7 +6040,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 elsif @title.include?("Variable")
                   loan_type = "Variable"
                 else
-                  loan_type = nil
+                  loan_type = "Fixed"
                 end
 
                 # rate arm
@@ -6039,6 +6069,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 # High Balance
                 if @title.include?("High Balance")
                   loan_size = "High-Balance"
+                else
+                  loan_size = "Conforming"
                 end
 
                 # Fha, va, usda
@@ -6446,7 +6478,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 elsif @title.include?("Variable")
                   loan_type = "Variable"
                 else
-                  loan_type = nil
+                  loan_type = "Fixed"
                 end
 
                 # rate arm
@@ -6465,6 +6497,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   loan_purpose = "Purchase"
                 end
 
+                loan_size = "Conforming"
+
                 # lp and du
                 if @title.downcase.include?('du ')
                   du = true
@@ -6475,7 +6509,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
 
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_ids << @program.id
-                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, fannie_mae_product: fannie_mae_product, loan_category: @sheet_name, loan_purpose: loan_purpose, du: du, lp: lp)
+                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, fannie_mae_product: fannie_mae_product, loan_category: @sheet_name, loan_purpose: loan_purpose, du: du, lp: lp, loan_size: loan_size)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -6854,7 +6888,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 elsif @title.include?("Variable")
                   loan_type = "Variable"
                 else
-                  loan_type = nil
+                  loan_type = "Fixed"
                 end
 
                 # Arm Basic
@@ -6877,6 +6911,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 # Loan Size
                 if @title.downcase.include?("high balance") || @title.downcase.include?("hb")
                   loan_size = "High-Balance"
+                else
+                  loan_size = "Conforming"
                 end
                 # Fannie_mae_product
                 if @title.downcase.include?("homeready")

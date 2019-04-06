@@ -4138,7 +4138,7 @@ class ObCmgWholesalesController < ApplicationController
     elsif @program.program_name.include?("Variable")
       loan_type = "Variable"
     else
-      loan_type = nil
+      loan_type = "Fixed"
     end
     #Set Bank Name
     bank_name = @sheet_obj.bank.name
@@ -4162,6 +4162,8 @@ class ObCmgWholesalesController < ApplicationController
     if @program.program_name.downcase.include?("high bal") || @program.program_name.downcase.include?("high balance")
       high_balance = true
       loan_size = "High-Balance"
+    else
+      loan_size = "Conforming"
     end
      # Fannie mae Product
     if @program.program_name.include?("HomeReady")
