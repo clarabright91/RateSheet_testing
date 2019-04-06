@@ -46,7 +46,7 @@
                     <div class="form-group">
                       <label>Loan Purpose</label>
                       <div class="input-group">
-                        <%= select_tag 'loan_purpose', options_for_select(Program::LOAN_PURPOSE.flatten.sort_by!{ |m| m.downcase }, (params[:loan_purpose] rescue nil)), { prompt: 'Select Loan Purpose', :class=> "form-control" }%>
+                        <%= select_tag 'loan_purpose', options_for_select(Program::LOAN_PURPOSE.flatten.sort_by!{ |m| m.downcase }, (params[:loan_purpose] rescue nil)), { prompt: 'Select Loan Purpose', :class=> "form-control",required: true }%>
                       </div>
                     </div>
                   </div>
@@ -54,14 +54,14 @@
                     <div class="form-group">
                       <label>Loan Size</label>
                       <div class="input-group">
-                        <%= select_tag 'loan_size', options_for_select(Program::LOAN_SIZE.flatten.sort_by!{ |m| m.downcase }, (params[:loan_size] rescue nil)), { prompt: 'Select Loan Size', :class=> "form-control" }%>
+                        <%= select_tag 'loan_size', options_for_select(Program::LOAN_SIZE.flatten.sort_by!{ |m| m.downcase }, (params[:loan_size] rescue nil)), { prompt: 'Select Loan Size', :class=> "form-control",required: true }%>
                       </div>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>Loan Type</label>
-                      <%= select_tag 'loan_type', options_for_select(Program::LOAN_TYPE.flatten.sort_by!{ |m| m.downcase }, (params[:loan_type] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control"} %>
+                      <%= select_tag 'loan_type', options_for_select(Program::LOAN_TYPE.flatten.sort_by!{ |m| m.downcase }, (params[:loan_type] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control" ,required: true} %>
                     </div>
                   </div>
                   <div class="col-md-5 term">
@@ -360,6 +360,10 @@
       </tbody>
     </table>
   </div>
+  <div class="valid">
+    <div class='refi'>Please Select Refinance</div>
+    <div class='lp' >*Please select values</div>
+    <div>
   <br>
     <hr style="border-top: 3px double #8c8b8b;">
   <br>
@@ -465,20 +469,6 @@
    });
   });
 
-  // $('#du, #lp').click(function(){
-  //   if ($('#du').prop("checked")) {
-  //     $('#fannie_mae').attr('checked', true);
-  //   }else {
-  //     $('#fannie_mae').attr('checked', false);
-  //   }
-  //   if ($('#lp').prop("checked")) {
-  //     $('#freddie_mac').attr('checked', true);
-  //   }else {
-  //     $('#freddie_mac').attr('checked', false);
-  //   }
-  // })
-
-
   $('#du').click(function(){
     if($(this).prop("checked") == true){
       $('#fannie_mae').attr('checked', true);
@@ -500,13 +490,68 @@
 
   $('#streamline').click(function () {
     if ($(this).prop("checked")) {
-      $("#loan_purpose").val('Purchase')
+      $("#loan_purpose").val('Refinance')
       $('#fha').attr('checked', true);
     } else {
       $("#loan_purpose").val('')
       $('#fha').attr('checked', false);
     }
   });
+
+  // Validation
+  $('form').submit(function () {
+    // !$("#loan_purpose").val('Purchase')
+    var loan_purpose = $.trim($('#loan_purpose').val());
+    var loan_size = $.trim($('#loan_size').val());
+    var loan_type = $.trim($('#loan_type').val());
+    var term = $.trim($('#term').val());
+    streamline = $('#streamline').prop("checked")
+    // Check if empty loan_purpose
+    // if (loan_purpose  === '') {
+    //   $("#loan_purpose").css('border-color', 'red')
+    //   $("#loan_purpose").after($('.lp'));
+    //    // $("#loan_purpose").after("<b>Please select Loan Purpose</b>");
+    //   return false;
+    // }
+    // if (loan_size  === '') {
+    //   $("#loan_size").css('border-color', 'red')
+    //   $("#loan_size").after($('.lp'));
+    //    // $("#loan_purpose").after("<b>Please select Loan Purpose</b>");
+    //   return false;
+    // }
+    // if (loan_type  === '') {
+    //   $("#loan_type").css('border-color', 'red')
+    //   $("#loan_type").after($('.lp'));
+    //    // $("#loan_purpose").after("<b>Please select Loan Purpose</b>");
+    //   return false;
+    // }
+    // if (term  === '') {
+    //   $("#term").css('border-color', 'red')
+    //   $("#term").after($('.lp'));
+    //    // $("#loan_purpose").after("<b>Please select Loan Purpose</b>");
+    //   return false;
+    // }
+    if (loan_purpose != "Refinance" && streamline) {
+      $("#loan_purpose").css('border-color', 'red')
+      $("#loan_purpose").after($('.refi'));
+      // $("#loan_purpose").after("<b>Please select Refinance</b>");
+      return false;
+    }
+  });
+
+  $('#fannie_mae_product').change(function(){
+    var fannie_mae_product =  $(this).val();
+    if (fannie_mae_product == "HomeReady") {
+      $('#fannie_mae').attr('checked', true)
+    }
+  })
+
+  $('#freddie_mac_product').change(function(){
+    var freddie_mac_product =  $(this).val();
+    if (freddie_mac_product == "Home Possible") {
+      $('#freddie_mac').attr('checked', true)
+    }
+  })
 
 
 </script>

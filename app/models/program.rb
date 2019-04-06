@@ -202,19 +202,6 @@ class Program < ApplicationRecord
     self.full_doc = true
   end
 
-  # def set_loan_purpose p_name
-  #   present_word = nil
-  #   ["Purchase", "Refinance","Purch","Refi"].each{ |word|
-  #     debugger
-  #     if p_name.downcase.include?(word.downcase)
-  #       present_word = word
-  #     else
-  #       present_word = "Purchase"
-  #     end
-  #   }
-  #   self.loan_purpose = present_word.downcase.capitalize rescue nil
-  # end
-
   def set_loan_purpose p_name
     present_word = nil
     fetch_loan_purpose_fields.each{ |word|
