@@ -2,7 +2,7 @@
   <!-- searching form -->
   <div class="">
     <br/>
-    <%= form_tag('/dashboard/index', method: :get) do %>
+    <%= form_tag('/dashboard/index', method: :get, id: :search_form) do %>
       <div class="main-form panel">
         <div class="panel-heading">Program Inputs</div>
         <div class="panel-body">
@@ -46,7 +46,7 @@
                     <div class="form-group">
                       <label>Loan Purpose</label>
                       <div class="input-group">
-                        <%= select_tag 'loan_purpose', options_for_select(Program::LOAN_PURPOSE.flatten.sort_by!{ |m| m.downcase }, (params[:loan_purpose] rescue nil)), { prompt: 'Select Loan Purpose', :class=> "form-control",required: true }%>
+                        <%= select_tag 'loan_purpose', options_for_select(Program::LOAN_PURPOSE.flatten.sort_by!{ |m| m.downcase }, (params[:loan_purpose] rescue nil)), { prompt: 'Select Loan Purpose', :class=> "form-control" }%>
                       </div>
                     </div>
                   </div>
@@ -54,14 +54,14 @@
                     <div class="form-group">
                       <label>Loan Size</label>
                       <div class="input-group">
-                        <%= select_tag 'loan_size', options_for_select(Program::LOAN_SIZE.flatten.sort_by!{ |m| m.downcase }, (params[:loan_size] rescue nil)), { prompt: 'Select Loan Size', :class=> "form-control",required: true }%>
+                        <%= select_tag 'loan_size', options_for_select(Program::LOAN_SIZE.flatten.sort_by!{ |m| m.downcase }, (params[:loan_size] rescue nil)), { prompt: 'Select Loan Size', :class=> "form-control" }%>
                       </div>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>Loan Type</label>
-                      <%= select_tag 'loan_type', options_for_select(Program::LOAN_TYPE.flatten.sort_by!{ |m| m.downcase }, (params[:loan_type] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control" ,required: true} %>
+                      <%= select_tag 'loan_type', options_for_select(Program::LOAN_TYPE.flatten.sort_by!{ |m| m.downcase }, (params[:loan_type] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control" } %>
                     </div>
                   </div>
                   <div class="col-md-5 term">
@@ -89,16 +89,14 @@
                   <div class="col-md-5">
                     <div class="form-group">
                       <label>Interest Rate</label>
-                       <% @interest_list =[["3.250"],["3.375"],["3.500"],["3.625"],["3.750"],["3.875"],["4.000"],["4.125"],["4.250"],["4.375"],["4.500"],["4.625"],["4.750"],["4.875"],["5.000"],["5.125"],["5.250"],["5.375"],["5.500"],["5.625"],["5.750"],["5.875"]]%>
-                      <%= select_tag 'interest', options_for_select(@interest_list, @interest), :class=> "form-control" %>
+                      <%= select_tag 'interest', options_for_select(Program::INTEREST_LIST, @interest), :class=> "form-control" %>
                     </div>
                   </div>
                   <div class="col-md-5">
                     <div class="form-group">
                       <label>Lock Period</label>
                       <div class="input-group">
-                        <% @lock_period_list =[["15 days","15"], ["30 days","30"], ["45 days","45"], ["60 days","60"], ["75 days","75"], ["90 days","90"]]%>
-                        <%= select_tag 'lock_period', options_for_select(@lock_period_list, @lock_period), :class=> "form-control" %>
+                        <%= select_tag 'lock_period', options_for_select(Program::LOCK_PERIOD_LIST, @lock_period), :class=> "form-control" %>
                       </div>
                     </div>
                   </div>
@@ -223,14 +221,14 @@
             <div class="col-md-2">
               <div class="form-group">
                 <label>Program Category</label>
-                <%= select_tag 'program_category', options_for_select(Program::PROGRAM_CATEGORY_LIST, (params[:program_category] rescue nil)), { :class=> "form-control", :required => true} %>
+                <%= select_tag 'program_category', options_for_select(Program::PROGRAM_CATEGORY_LIST.sort, (params[:program_category] rescue nil)), { :class=> "form-control", :required => true} %>
               </div>
             </div>
             <div class="col-md-2">
               <div class="form-group">
                 <label>Property Type</label>
                 <div class="input-group">
-                  <%= select_tag 'property_type', options_for_select(Program::PROPERTY_TYPE_VALUES, (params[:property_type] rescue nil)), :class=> "form-control" %>
+                  <%= select_tag 'property_type', options_for_select(Program::PROPERTY_TYPE_VALUES.sort, (params[:property_type] rescue nil)), :class=> "form-control" %>
                 </div>
               </div>
             </div>
@@ -238,7 +236,7 @@
               <div class="form-group">
                 <label>Financing Type</label>
                 <div class="input-group">
-                  <%= select_tag 'financing_type', options_for_select(Program::FINANCING_TYPE_VALUES, (params[:financing_type] rescue nil)), :class=> "form-control" %>
+                  <%= select_tag 'financing_type', options_for_select(Program::FINANCING_TYPE_VALUES.sort, (params[:financing_type] rescue nil)), :class=> "form-control" %>
                 </div>
               </div>
             </div>
@@ -246,7 +244,7 @@
               <div class="form-group">
                 <label>Refinance Option</label>
                 <div class="input-group">
-                  <%= select_tag 'refinance_option', options_for_select(Program::REFINANCE_OPTION_VALUES, (params[:refinance_option] rescue nil)), :class=> "form-control" %>
+                  <%= select_tag 'refinance_option', options_for_select(Program::REFINANCE_OPTION_VALUES.sort, (params[:refinance_option] rescue nil)), :class=> "form-control" %>
                 </div>
               </div>
             </div>
@@ -254,7 +252,7 @@
               <div class="form-group">
                 <label>Misc Adjuster</label>
                 <div class="input-group">
-                  <%= select_tag 'misc_adjuster', options_for_select(Program::MISC_ADJUSTER_VALUES, (params[:misc_adjuster] rescue nil)), :class=> "form-control" %>
+                  <%= select_tag 'misc_adjuster', options_for_select(Program::MISC_ADJUSTER_VALUES.sort, (params[:misc_adjuster] rescue nil)), :class=> "form-control" %>
                 </div>
               </div>
             </div>
@@ -262,7 +260,7 @@
               <div class="form-group">
                 <label>Payment Type</label>
                 <div class="input-group">
-                  <%= select_tag 'payment_type', options_for_select(Program::PATMENT_TYPE_VALUES, (params[:payment_type] rescue nil)), :class=> "form-control" %>
+                  <%= select_tag 'payment_type', options_for_select(Program::PATMENT_TYPE_VALUES.sort, (params[:payment_type] rescue nil)), :class=> "form-control" %>
                 </div>
               </div>
             </div>
@@ -270,7 +268,7 @@
               <div class="form-group">
                 <label>DTI</label>
                 <div class="input-group">
-                  <%= select_tag 'dti', options_for_select(Program::DTI_VALUES, (params[:dti] rescue nil)), :class=> "form-control" %>
+                  <%= select_tag 'dti', options_for_select(Program::DTI_VALUES.sort, (params[:dti] rescue nil)), :class=> "form-control" %>
                 </div>
               </div>
             </div>
@@ -278,7 +276,7 @@
               <div class="form-group">
                 <label>Coverage</label>
                 <div class="input-group">
-                  <%= select_tag 'coverage', options_for_select(Program::COVERAGE_VALUES, (params[:coverage] rescue nil)), :class=> "form-control" %>
+                  <%= select_tag 'coverage', options_for_select(Program::COVERAGE_VALUES.sort, (params[:coverage] rescue nil)), :class=> "form-control" %>
                 </div>
               </div>
             </div>
@@ -286,7 +284,7 @@
               <div class="form-group">
                 <label>Margin</label>
                 <div class="input-group">
-                  <%= select_tag 'margin', options_for_select(Program::MARGIN_VALUES, (params[:margin] rescue nil)), :class=> "form-control" %>
+                  <%= select_tag 'margin', options_for_select(Program::MARGIN_VALUES.sort, (params[:margin] rescue nil)), :class=> "form-control" %>
                 </div>
               </div>
             </div>
@@ -499,45 +497,45 @@
   });
 
   // Validation
-  $('form').submit(function () {
-    // !$("#loan_purpose").val('Purchase')
-    var loan_purpose = $.trim($('#loan_purpose').val());
-    var loan_size = $.trim($('#loan_size').val());
-    var loan_type = $.trim($('#loan_type').val());
-    var term = $.trim($('#term').val());
-    streamline = $('#streamline').prop("checked")
-    // Check if empty loan_purpose
-    // if (loan_purpose  === '') {
-    //   $("#loan_purpose").css('border-color', 'red')
-    //   $("#loan_purpose").after($('.lp'));
-    //    // $("#loan_purpose").after("<b>Please select Loan Purpose</b>");
-    //   return false;
-    // }
-    // if (loan_size  === '') {
-    //   $("#loan_size").css('border-color', 'red')
-    //   $("#loan_size").after($('.lp'));
-    //    // $("#loan_purpose").after("<b>Please select Loan Purpose</b>");
-    //   return false;
-    // }
-    // if (loan_type  === '') {
-    //   $("#loan_type").css('border-color', 'red')
-    //   $("#loan_type").after($('.lp'));
-    //    // $("#loan_purpose").after("<b>Please select Loan Purpose</b>");
-    //   return false;
-    // }
-    // if (term  === '') {
-    //   $("#term").css('border-color', 'red')
-    //   $("#term").after($('.lp'));
-    //    // $("#loan_purpose").after("<b>Please select Loan Purpose</b>");
-    //   return false;
-    // }
-    if (loan_purpose != "Refinance" && streamline) {
-      $("#loan_purpose").css('border-color', 'red')
-      $("#loan_purpose").after($('.refi'));
-      // $("#loan_purpose").after("<b>Please select Refinance</b>");
-      return false;
-    }
-  });
+  // $('form').submit(function () {
+  //   // !$("#loan_purpose").val('Purchase')
+  //   var loan_purpose = $.trim($('#loan_purpose').val());
+  //   var loan_size = $.trim($('#loan_size').val());
+  //   var loan_type = $.trim($('#loan_type').val());
+  //   var term = $.trim($('#term').val());
+  //   streamline = $('#streamline').prop("checked")
+  //   // Check if empty loan_purpose
+  //   // if (loan_purpose  === '') {
+  //   //   $("#loan_purpose").css('border-color', 'red')
+  //   //   $("#loan_purpose").after($('.lp'));
+  //   //    // $("#loan_purpose").after("<b>Please select Loan Purpose</b>");
+  //   //   return false;
+  //   // }
+  //   // if (loan_size  === '') {
+  //   //   $("#loan_size").css('border-color', 'red')
+  //   //   $("#loan_size").after($('.lp'));
+  //   //    // $("#loan_purpose").after("<b>Please select Loan Purpose</b>");
+  //   //   return false;
+  //   // }
+  //   // if (loan_type  === '') {
+  //   //   $("#loan_type").css('border-color', 'red')
+  //   //   $("#loan_type").after($('.lp'));
+  //   //    // $("#loan_purpose").after("<b>Please select Loan Purpose</b>");
+  //   //   return false;
+  //   // }
+  //   // if (term  === '') {
+  //   //   $("#term").css('border-color', 'red')
+  //   //   $("#term").after($('.lp'));
+  //   //    // $("#loan_purpose").after("<b>Please select Loan Purpose</b>");
+  //   //   return false;
+  //   // }
+  //   if (loan_purpose != "Refinance" && streamline) {
+  //     $("#loan_purpose").css('border-color', 'red')
+  //     $("#loan_purpose").after($('.refi'));
+  //     // $("#loan_purpose").after("<b>Please select Refinance</b>");
+  //     return false;
+  //   }
+  // });
 
   $('#fannie_mae_product').change(function(){
     var fannie_mae_product =  $(this).val();
@@ -552,6 +550,73 @@
       $('#freddie_mac').attr('checked', true)
     }
   })
+
+
+
+
+  $("#search_form").validate({
+    errorPlacement: function(error, element) {
+// streamline
+// loan_purpose
+    // flag = false
+    // if ($("#streamline").is(":checked")) {
+    //    if ($("#loan_purpose").val() != "Refinance") {
+    //     flag = true
+    //    }
+    // }
+
+    var n = element.attr("name");
+
+      if (n == "loan_purpose"){
+        error.insertAfter(element);
+      }
+
+      if (n == "loan_size"){
+        error.insertAfter(element);
+      }
+
+      if (n == "loan_type"){
+        error.insertAfter(element);
+      }
+
+      // $("#streamline").val()
+    },
+
+    messages: {
+      'loan_purpose': {
+          required: "This field is required",
+      },
+      'loan_size': {
+          required: "This field is required",
+      },
+      'loan_type': {
+          required: "This field is required",
+      }
+    },
+
+    rules: {
+        loan_purpose: {
+          required: true
+        },
+        loan_size: {
+          required: true
+        },
+        loan_type: {
+          required: true
+        }
+    },
+
+    highlight: function(element) {
+       $(element).addClass('has_error');
+    },
+    unhighlight: function(element) {
+        // remove the class "has_error" from the element 
+        $(element).removeClass('has_error');
+    },
+    submitHandler: function(form) {
+      form.submit();
+    }
+});
 
 
 </script>
