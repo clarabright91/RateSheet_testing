@@ -1,5 +1,5 @@
 class ObNewRezWholesale5806Controller < ApplicationController
-  method_names = [:cover_zone_1, :heloc, :smartseries, :government, :programs, :freddie_fixed_rate, :conforming_fixed_rate, :home_possible, :conforming_arms, :lp_open_acces_arms, :lp_open_access_105, :lp_open_access, :du_refi_plus_arms, :du_refi_plus_fixed_rate_105, :du_refi_plus_fixed_rate, :dream_big, :high_balance_extra, :freddie_arms, :jumbo_series_d,:jumbo_series_f, :jumbo_series_h, :jumbo_series_i, :jumbo_series_jqm, :homeready, :homeready_hb]
+  method_names = [:government, :programs, :freddie_fixed_rate, :conforming_fixed_rate, :home_possible, :conforming_arms, :lp_open_acces_arms, :lp_open_access_105, :lp_open_access, :du_refi_plus_arms, :du_refi_plus_fixed_rate_105, :du_refi_plus_fixed_rate, :dream_big, :high_balance_extra, :freddie_arms, :jumbo_series_d,:jumbo_series_f, :jumbo_series_h, :jumbo_series_i, :jumbo_series_jqm, :homeready, :homeready_hb]
   before_action :read_sheet, only: method_names + [:index]
   before_action :get_sheet, only: method_names
   # before_action :check_sheet_empty , only: method_names
@@ -48,12 +48,19 @@ class ObNewRezWholesale5806Controller < ApplicationController
   end
 
   def cover_zone_1
+    redirect_to error_page_ob_new_rez_wholesale5806_path
   end
 
   def heloc
+    redirect_to error_page_ob_new_rez_wholesale5806_path
   end
 
   def smartseries
+    redirect_to error_page_ob_new_rez_wholesale5806_path
+  end
+
+  def jumbo_series_c
+    redirect_to error_page_ob_new_rez_wholesale5806_path
   end
 
   def government
@@ -1284,7 +1291,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
                 # freddie_mac
                 freddie_mac = false
-                if p_name.include?("Freddie Mac")
+                if p_name.include?("Freddie Mac") || p_name.downcase.include?("fhlmc")
                   freddie_mac = true
                 end
 
@@ -5633,7 +5640,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
 
                 # conforming
-                if p_name.downcase.include?("conforming") 
+                if p_name.downcase.include?("super conforming")
+                  loan_size = "Super Conforming"
+                elsif p_name.downcase.include?("conforming") 
                   conforming = true
                   loan_size = "Conforming"
                 else
@@ -6908,7 +6917,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   arm_advanced = @title.split("ARM").last.tr('A-Z- () ','')
                 end
 
-                if p_name.include?("Fannie Mae")
+                if p_name.include?("Fannie Mae") || p_name.downcase.include?("fnma")
                   fannie_mae = true
                 end
 

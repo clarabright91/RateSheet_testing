@@ -26,6 +26,7 @@ Rails.application.routes.draw do
       get :dream_big
       get :high_balance_extra
       get :freddie_arms
+      get :jumbo_series_c
       get :jumbo_series_d
       get :jumbo_series_f
       get :jumbo_series_h
@@ -34,6 +35,7 @@ Rails.application.routes.draw do
       get :homeready_hb
       get :homeready
       get :single_program
+      get :error_page
     end
   end
 
