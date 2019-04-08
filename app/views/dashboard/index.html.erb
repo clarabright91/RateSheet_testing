@@ -530,9 +530,10 @@
   $('#freddie_mac').click(function(){
     if($(this).prop("checked"))
       $('#lp').prop('checked', false);
-    else
+    else{
       $('#lp').prop('checked', false);
       $('#freddie_mac_product').val('')
+    }
   });
 
   // when streamline checked fha will be true and loan_purpose will be 'Refinance'
