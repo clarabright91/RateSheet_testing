@@ -110,54 +110,84 @@
               <div class="program-panel panel-basic">
                 <div class="input-grp"><h5>FM</h5></div>
                 <div class="row panel-body">
-                  <div class="col-md-4">
-                    <div class="form-group">
+                  <div class="row col-md-12">
+                    <div class="col-md-4">
                       <div class="checkbox">
                         <label> <%= check_box_tag 'fannie_mae', 'fannie_mae', params[:fannie_mae].present? %> Fannie Mae</label>
                       </div>
-                      <div class="checkbox">
-                        <label> <%= check_box_tag 'freddie_mac', 'freddie_mac', params[:freddie_mac].present? %> Freddie Mac</label>
-                      </div>
+                    </div>
+                    <div class="col-md-4">
                       <div class="checkbox">
                         <label> <%= check_box_tag 'du', 'du', params[:du].present? %> DU</label>
                       </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label>Fannie Mae Product</label>
+                        <%= select_tag 'fannie_mae_product', options_for_select(Program::FANNIE_MAE_PRODUCT_LIST.flatten.sort_by!{ |m| m.downcase }, (params[:fannie_mae_product] rescue nil)), { prompt: 'Select Product', :class=> "form-control" } %>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row col-md-12">
+                    <div class="col-md-4">
+                      <div class="checkbox">
+                        <label> <%= check_box_tag 'freddie_mac', 'freddie_mac', params[:freddie_mac].present? %> Freddie Mac</label>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
                       <div class="checkbox">
                         <label> <%= check_box_tag 'lp', 'lp', params[:lp].present? %> LP</label>
                       </div>
                     </div>
-                  </div>
-                  <div class="col-md-4">
-                    <div class="form-group">
-                      <label>Fannie Mae Product</label>
-                      <%= select_tag 'fannie_mae_product', options_for_select(Program::FANNIE_MAE_PRODUCT_LIST.flatten.sort_by!{ |m| m.downcase }, (params[:fannie_mae_product] rescue nil)), { prompt: 'Select Fannie Mae Product', :class=> "form-control" } %>
-                    </div>
-                  </div>
-                  <div class="col-md-4">
-                    <div class="form-group">
-                      <label>Freddie Mac Product</label>
-                      <%= select_tag 'freddie_mac_product', options_for_select(Program::FREDDIE_MAC_PRODUCT_LIST.flatten.sort_by!{ |m| m.downcase }, (params[:freddie_mac_product] rescue nil)), { prompt: 'Select Freddie Mac Product', :class=> "form-control" } %>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <div class="form-group">
+                          <label>Freddie Mac Product</label>
+                          <%= select_tag 'freddie_mac_product', options_for_select(Program::FREDDIE_MAC_PRODUCT_LIST.flatten.sort_by!{ |m| m.downcase }, (params[:freddie_mac_product] rescue nil)), { prompt: 'Select Product', :class=> "form-control" } %>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-5">
               <div class="program-panel panel-basic">
                 <div class="input-grp"><h5>Government Program</h5></div>
                 <div class="row panel-body">
                   <div class="col-md-12">
-                    <div class="form-group">
-                      <div class="checkbox">
-                        <label> <%= check_box_tag 'fha', 'fha', params[:fha].present? %> FHA</label>
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <div class="checkbox">
+                            <label> <%= check_box_tag 'fha', 'fha', params[:fha].present? %> FHA</label>
+                          </div>
+                        </div>
                       </div>
-                      <div class="checkbox">
-                        <label><%= check_box_tag 'va', 'va', params[:va].present? %> VA</label>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <div class="checkbox">
+                            <label><%= check_box_tag 'streamline', 'streamline', params[:streamline].present? %> Streamline</label>
+                          </div>
+                        </div>
                       </div>
-                      <div class="checkbox">
-                        <label><%= check_box_tag 'usda', 'usda', params[:usda].present? %> USDA</label>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group">
+                          <div class="checkbox">
+                            <label><%= check_box_tag 'va', 'va', params[:va].present? %> VA</label>
+                          </div>
+                        </div>
                       </div>
-                      <div class="checkbox">
-                        <label><%= check_box_tag 'streamline', 'streamline', params[:streamline].present? %> Streamline</label>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group">
+                          <div class="checkbox">
+                            <label><%= check_box_tag 'usda', 'usda', params[:usda].present? %> USDA</label>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -469,55 +499,36 @@
   });
 
   $('#du').click(function(){
-    if($(this).prop("checked")){
+    if($(this).prop("checked"))
       $('#fannie_mae').prop('checked', true);
-    }
-    else{
+    else
       $('#fannie_mae').prop('checked', false);
-    }
   });
 
    $('#lp').click(function(){
-    if($(this).prop("checked")){
+    if($(this).prop("checked"))
       $('#freddie_mac').prop('checked', true);
-    }
-    else{
+    else
       $('#freddie_mac').prop('checked', false);
-    }
   });
 
   $('#fannie_mae').click(function(){
-    if($(this).prop("checked")){
+    if($(this).prop("checked"))
       $('#du').prop('checked', false);
-    }else{
+    else
       $('#du').prop('checked', false);
-    }
   });
 
   $('#freddie_mac').click(function(){
-    if($(this).prop("checked")){
+    if($(this).prop("checked"))
       $('#lp').prop('checked', false);
-    }else{
+    else
       $('#lp').prop('checked', false);
-    }
   });
 
-  $('#fha').click(function () {
-    if ($(this).prop("checked")) {
-      if ($('#streamline').prop("checked")) {
-        $("#loan_purpose").val('')
-      }
-      $('#streamline').prop('checked', false);
-    } else {
-      if ($('#streamline').prop("checked")) {
-        $("#loan_purpose").val('')
-      }
-      $('#streamline').prop('checked', false);
-    }
-  });
-
+  // when streamline checked fha will be true and loan_purpose will be 'Refinance'
   $('#streamline').click(function () {
-    if ($(this).prop("checked")) {
+    if ($(this).prop("checked")){
       $("#loan_purpose").val('Refinance')
       $('#fha').prop('checked', true);
     } else {
@@ -526,29 +537,44 @@
     }
   });
 
+  $('#fha').click(function () {
+    if ($(this).prop("checked")){
+      if ($('#streamline').prop("checked"))
+        $("#loan_purpose").val('')
+      $('#streamline').prop('checked', false);
+    } else {
+      if ($('#streamline').prop("checked"))
+        $("#loan_purpose").val('')
+      $('#streamline').prop('checked', false);
+    }
+  });
+
+  //loan_purpose default error hide
   $('#loan_purpose').change(function () {
     $('.error-loan-purpose').hide()
   });
 
-
+  //when select fannie_mae_product fannie_mae will be true
   $('#fannie_mae_product').change(function(){
-    var fannie_mae_product =  $(this).val();
-    if (fannie_mae_product == "HomeReady") {
+    if ($(this).val() == "")
+      $('#fannie_mae').prop('checked', false)
+    else
       $('#fannie_mae').prop('checked', true)
-    }
   })
 
+  //when select freddie_mac_product freddie_mac will be true
   $('#freddie_mac_product').change(function(){
-    var freddie_mac_product =  $(this).val();
-    if (freddie_mac_product == "Home Possible") {
+    if ($(this).val() == "")
+      $('#freddie_mac').prop('checked', false)
+    else
       $('#freddie_mac').prop('checked', true)
-    }
   })
 
 
+  // check Streamline and loan_purpose value
   function checkLoanPurposeValue() {
    var flag = true
-   if ($("#streamline").is(":checked")) {
+   if ($("#streamline").is(":checked")){
        if ($("#loan_purpose").val() != "Refinance") {
         flag = false
        }
@@ -556,8 +582,16 @@
     return flag
   }
 
+  // form validation
   $("#search_form").validate({
     errorPlacement: function(error, element) {
+      if(checkLoanPurposeValue() == false){
+        $('html, body').animate({
+            scrollTop: $(".error-loan-purpose").offset().top
+        }, 1);
+        $('.error-loan-purpose').show()
+      }
+
       var n = element.attr("name");
       if (n == "loan_purpose"){
         error.insertAfter(element);
@@ -569,7 +603,6 @@
         error.insertAfter(element);
       }
     },
-
     messages: {
       'loan_purpose': {
           required: "This field is required",
@@ -581,7 +614,6 @@
           required: "This field is required",
       }
     },
-
     rules: {
         loan_purpose: {
           required: true
@@ -593,7 +625,6 @@
           required: true
         }
     },
-
     highlight: function(element) {
        $(element).addClass('has_error');
     },
