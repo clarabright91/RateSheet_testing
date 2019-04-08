@@ -130,6 +130,7 @@ class Program < ApplicationRecord
 
   def update_fields p_name
     set_loan_size(p_name)           if fetch_loan_size_fields.each{ |word| p_name.downcase.include?(word.downcase) }
+    set_loan_purpose(p_name)        if fetch_loan_purpose_fields.each{ |word| p_name.downcase.include?(word.downcase) }
     set_load_type(p_name)           if ["Fixed", "ARM", "Hybrid", "Floating", "Variable"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_fha                         if p_name.downcase.include?("fha")
     set_du                          if p_name.downcase.include?("du ")
@@ -139,7 +140,6 @@ class Program < ApplicationRecord
     set_streamline(p_name)          if ["streamline","SL"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_full_doc                    if p_name.downcase.include?("full doc")
     # set_loan_purpose(p_name)        if ["Purchase", "Refinance"].each{ |word| p_name.downcase.include?(word.downcase) }
-    set_loan_purpose(p_name)        if fetch_loan_purpose_fields.each{ |word| p_name.downcase.include?(word.downcase) }
     set_conforming(p_name)          if ["Conforming","Conf","fcf"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_fannie_mae(p_name)          if ["Fannie Mae", "FNMA", "Du "].each{ |word| p_name.downcase.include?(word.downcase) }
     set_freddie_mac(p_name)         if ["Freddie Mac", "FHLMC", "Lp "].each{ |word| p_name.downcase.include?(word.downcase) }
@@ -173,10 +173,12 @@ class Program < ApplicationRecord
 
   def set_du
     self.du = true
+    self.fannie_mae = true
   end
 
   def set_lp
     self.lp = true
+    self.freddie_mac = true
   end
 
   def set_fha
@@ -197,6 +199,8 @@ class Program < ApplicationRecord
       present_word = true if prog_name.downcase.include?(word.downcase)
     }
     self.streamline = present_word
+    self.fha = present_word
+    self.loan_purpose = "Refinance" if present_word
   end
 
   def set_full_doc
