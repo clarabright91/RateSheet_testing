@@ -66,3 +66,7 @@ h4#sheet-title{
   .error {
     color: red
   }
+.error-loan-purpose{
+  color: red;
+  display:none;
+}

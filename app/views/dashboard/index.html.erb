@@ -26,13 +26,13 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label>Program Category</label>
-                      <%= select_tag 'pro_category', options_for_select(@program_categories.flatten.sort_by!{ |m| m.downcase }, params[:pro_category]), { :class=> "form-control", :include_blank => 'All'} %>
+                      <%= select_tag 'pro_category', options_for_select(@program_categories, params[:pro_category]), { :class=> "form-control"} %>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
                       <label>Program Name</label>
-                      <%= select_tag 'program_name', options_for_select(@program_names.sort_by!{ |m| m.downcase }, params[:program_name]), { :include_blank => 'All', :class=> "form-control"} %>
+                      <%= select_tag 'program_name', options_for_select(@program_names, params[:program_name]), { :include_blank => 'All', :class=> "form-control"} %>
                     </div>
                   </div>
                 </div>
@@ -48,6 +48,7 @@
                       <div class="input-group">
                         <%= select_tag 'loan_purpose', options_for_select(Program::LOAN_PURPOSE.flatten.sort_by!{ |m| m.downcase }, (params[:loan_purpose] rescue nil)), { prompt: 'Select Loan Purpose', :class=> "form-control" }%>
                       </div>
+                      <span class="error-loan-purpose">Please Select Refinance</span>
                     </div>
                   </div>
                   <div class="col-md-5">
@@ -496,46 +497,10 @@
     }
   });
 
-  // Validation
-  // $('form').submit(function () {
-  //   // !$("#loan_purpose").val('Purchase')
-  //   var loan_purpose = $.trim($('#loan_purpose').val());
-  //   var loan_size = $.trim($('#loan_size').val());
-  //   var loan_type = $.trim($('#loan_type').val());
-  //   var term = $.trim($('#term').val());
-  //   streamline = $('#streamline').prop("checked")
-  //   // Check if empty loan_purpose
-  //   // if (loan_purpose  === '') {
-  //   //   $("#loan_purpose").css('border-color', 'red')
-  //   //   $("#loan_purpose").after($('.lp'));
-  //   //    // $("#loan_purpose").after("<b>Please select Loan Purpose</b>");
-  //   //   return false;
-  //   // }
-  //   // if (loan_size  === '') {
-  //   //   $("#loan_size").css('border-color', 'red')
-  //   //   $("#loan_size").after($('.lp'));
-  //   //    // $("#loan_purpose").after("<b>Please select Loan Purpose</b>");
-  //   //   return false;
-  //   // }
-  //   // if (loan_type  === '') {
-  //   //   $("#loan_type").css('border-color', 'red')
-  //   //   $("#loan_type").after($('.lp'));
-  //   //    // $("#loan_purpose").after("<b>Please select Loan Purpose</b>");
-  //   //   return false;
-  //   // }
-  //   // if (term  === '') {
-  //   //   $("#term").css('border-color', 'red')
-  //   //   $("#term").after($('.lp'));
-  //   //    // $("#loan_purpose").after("<b>Please select Loan Purpose</b>");
-  //   //   return false;
-  //   // }
-  //   if (loan_purpose != "Refinance" && streamline) {
-  //     $("#loan_purpose").css('border-color', 'red')
-  //     $("#loan_purpose").after($('.refi'));
-  //     // $("#loan_purpose").after("<b>Please select Refinance</b>");
-  //     return false;
-  //   }
-  // });
+  $('#loan_purpose').change(function () {
+    $('.error-loan-purpose').hide()
+  });
+
 
   $('#fannie_mae_product').change(function(){
     var fannie_mae_product =  $(this).val();
@@ -552,34 +517,28 @@
   })
 
 
-
+  function checkLoanPurposeValue() {
+   var flag = true
+   if ($("#streamline").is(":checked")) {
+       if ($("#loan_purpose").val() != "Refinance") {
+        flag = false
+       }
+    }
+    return flag
+  }
 
   $("#search_form").validate({
     errorPlacement: function(error, element) {
-// streamline
-// loan_purpose
-    // flag = false
-    // if ($("#streamline").is(":checked")) {
-    //    if ($("#loan_purpose").val() != "Refinance") {
-    //     flag = true
-    //    }
-    // }
-
     var n = element.attr("name");
-
       if (n == "loan_purpose"){
         error.insertAfter(element);
       }
-
       if (n == "loan_size"){
         error.insertAfter(element);
       }
-
       if (n == "loan_type"){
         error.insertAfter(element);
       }
-
-      // $("#streamline").val()
     },
 
     messages: {
@@ -614,9 +573,17 @@
         $(element).removeClass('has_error');
     },
     submitHandler: function(form) {
-      form.submit();
+      if(checkLoanPurposeValue()){
+        form.submit();
+      }else{
+        $('html, body').animate({
+            scrollTop: $(".error-loan-purpose").offset().top
+        }, 1);
+        $('.error-loan-purpose').show()
+      }
     }
 });
+
 
 
 </script>

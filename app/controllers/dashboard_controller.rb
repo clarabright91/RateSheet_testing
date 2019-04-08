@@ -17,38 +17,38 @@ class DashboardController < ApplicationController
 
   def fetch_programs_by_bank(html_type=false)
     @all_programs = Program.all
-    @program_names = @all_programs.pluck(:program_name).uniq.compact
-    @loan_categories = @all_programs.pluck(:loan_category).uniq.compact
-    @program_categories = @all_programs.pluck(:program_category).uniq.compact
+    @program_names = @all_programs.pluck(:program_name).uniq.compact.sort
+    @loan_categories = @all_programs.pluck(:loan_category).uniq.compact.sort
+    @program_categories = @all_programs.pluck(:program_category).uniq.compact.sort
 
     if params[:bank_name].present?
       if (params[:bank_name] == "All")
-        @program_names = @all_programs.pluck(:program_name).uniq.compact
-        @loan_categories = @all_programs.pluck(:loan_category).uniq.compact
-        @program_categories = @all_programs.pluck(:program_category).uniq.compact
+        @program_names = @all_programs.pluck(:program_name).uniq.compact.sort
+        @loan_categories = @all_programs.pluck(:loan_category).uniq.compact.sort
+        @program_categories = @all_programs.pluck(:program_category).uniq.compact.sort
       else
         @all_programs = @all_programs.where(bank_name: params[:bank_name])
-        @program_names = @all_programs.pluck(:program_name).uniq.compact
-        @loan_categories = @all_programs.pluck(:loan_category).uniq.compact
-        @program_categories = @all_programs.pluck(:program_category).uniq.compact
+        @program_names = @all_programs.pluck(:program_name).uniq.compact.sort
+        @loan_categories = @all_programs.pluck(:loan_category).uniq.compact.sort
+        @program_categories = @all_programs.pluck(:program_category).uniq.compact.sort
       end
     end
     if params[:loan_category].present?
       if (params[:loan_category] == "All")
-        @program_names = @all_programs.pluck(:program_name).uniq.compact
-        @program_categories = @all_programs.pluck(:program_category).uniq.compact
+        @program_names = @all_programs.pluck(:program_name).uniq.compact.sort
+        @program_categories = @all_programs.pluck(:program_category).uniq.compact.sort
       else
         @all_programs = @all_programs.where(loan_category: params[:loan_category])
-        @program_names = @all_programs.pluck(:program_name).uniq.compact
-        @program_categories = @all_programs.pluck(:program_category).uniq.compact
+        @program_names = @all_programs.pluck(:program_name).uniq.compact.sort
+        @program_categories = @all_programs.pluck(:program_category).uniq.compact.sort
       end
     end
     if params[:pro_category].present?
       if (params[:pro_category] == "All" || params[:pro_category] == "No Category")
-        @program_names = @all_programs.pluck(:program_name).uniq.compact
+        @program_names = @all_programs.pluck(:program_name).uniq.compact.sort
       else
         @all_programs = @all_programs.where(program_category: params[:pro_category])
-        @program_names = @all_programs.pluck(:program_name).uniq.compact
+        @program_names = @all_programs.pluck(:program_name).uniq.compact.sort
       end
     end
 
