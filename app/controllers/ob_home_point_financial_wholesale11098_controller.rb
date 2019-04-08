@@ -41,7 +41,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != "Margin 2.25%; Caps 2/2/5, index Libor"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
                   @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
@@ -102,7 +103,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
   #               @title = sheet_data.cell(r,cc)
   #               if @title.present? && @title != "Margin 2.25%; Caps 2/2/5, index Libor"
   #                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-  #                 @program.update_fields @title
+  #                 p_name = @title + sheet
+                  # @program.update_fields p_name
   #                 @program.update(loan_category: sheet, loan_size: loan_size)
   #                 program_property @title
   #                 @programs_ids << @program.id
@@ -162,7 +164,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
                   @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
@@ -223,7 +226,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
                   @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
@@ -284,7 +288,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
                   @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
@@ -345,7 +350,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
                   @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
@@ -406,7 +412,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
                   @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
@@ -466,7 +473,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
                   @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
@@ -526,7 +534,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
                   @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
@@ -590,7 +599,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
                   @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
@@ -650,7 +660,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != "Margin 2.25%; Caps 2/2/5" && @title != "Margin 2.25%; Caps 5/2/5"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
                   @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
@@ -714,7 +725,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
                   @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
@@ -778,7 +790,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
                   @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
@@ -838,7 +851,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != "Margin 2.25%; Caps 2/2/5, index Libor"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
 
                   loan_size = nil
                   if @title.include?("CONF") && @title.include?("HB")
@@ -905,7 +919,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
                   @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
@@ -966,7 +981,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
                   @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
@@ -1139,7 +1155,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
                   @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
@@ -1199,7 +1216,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
                   @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
@@ -1259,7 +1277,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
                   @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
@@ -1323,7 +1342,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
               begin
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
                   @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
@@ -1383,7 +1403,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != "Margin 2.25%; Caps 2/2/5" && @title != "Margin 2.25%; Caps 5/2/5"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
                   @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
@@ -1448,7 +1469,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
                   @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id
@@ -1513,7 +1535,8 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
 
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
                   @program.update(loan_category: sheet)
                   program_property @title
                   @programs_ids << @program.id

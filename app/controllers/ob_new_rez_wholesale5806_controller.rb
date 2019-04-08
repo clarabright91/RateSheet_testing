@@ -90,6 +90,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program_ids << @program.id
                   @program.adjustments.destroy_all
+                  p_name = @title + " " + sheet
                   # rate arm
                   if @title.include?("10yr") || @title.include?("10 Yr")
                     term = 10
@@ -103,13 +104,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     term = 30
                   end
 
-                  if @title.include?("Fixed")
+                  if p_name.include?("Fixed")
                     loan_type = "Fixed"
-                  elsif @title.include?("ARM")
+                  elsif p_name.include?("ARM")
                     loan_type = "ARM"
-                  elsif @title.include?("Floating")
+                  elsif p_name.include?("Floating")
                     loan_type = "Floating"
-                  elsif @title.include?("Variable")
+                  elsif p_name.include?("Variable")
                     loan_type = "Variable"
                   else
                     loan_type = "Fixed"
@@ -121,17 +122,17 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
 
                   freddie_mac = false
-                  if @title.downcase.include?("freddie mac")
+                  if p_name.downcase.include?("freddie mac")
                     freddie_mac = true
                   end
 
                   conforming = false
-                  if @title.downcase.include?("conforming") 
+                  if p_name.downcase.include?("conforming") 
                     conforming = true
                   end
 
                   fannie_mae = false
-                  if @title.downcase.include?("Fannie Mae")
+                  if p_name.downcase.include?("Fannie Mae")
                     fannie_mae = true
                   end
                   # Arm Advanced
@@ -139,32 +140,32 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     arm_advanced = @title.split("ARM").last.tr('A-Za-z ()', '')
                   end
                   # High Balance
-                  if @title.include?("High Balance")
+                  if p_name.include?("High Balance")
                     loan_size = "High-Balance"
                   else
                     loan_size = "Conforming"
                   end
                   # Fha, va, usda
-                  if @title.downcase.include?("fha")
+                  if p_name.downcase.include?("fha")
                     fha = true
                   end
-                  if @title.downcase.include?("va")
+                  if p_name.downcase.include?("va")
                     va = true
                   end
-                  if @title.downcase.include?("usda")
+                  if p_name.downcase.include?("usda")
                     usda = true
                   end
                   # LoanPurpose
-                  if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                  if p_name.downcase.include?('refinance') || p_name.downcase.include?('refi')
                     loan_purpose = "Refinance"
                   else
                     loan_purpose = "Purchase"
                   end
                   # lp and du
-                  if @title.downcase.include?('du ')
+                  if p_name.downcase.include?('du ')
                     du = true
                   end
-                  if @title.downcase.include?('lp ')
+                  if p_name.downcase.include?('lp ')
                     lp = true
                   end
                   @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fha: fha, va: va, usda: usda, fannie_mae: fannie_mae, loan_size: loan_size, loan_category: @sheet_name, arm_basic: arm_basic, arm_advanced: arm_advanced, loan_purpose: loan_purpose, du: du, lp: lp)
@@ -370,7 +371,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
               begin
                 #title
                 @title = sheet_data.cell(r,cc)
-
+                p_name = @title + " " + sheet
                 #term
                 term = nil
                 if @title.include?("10yr") || @title.include?("10 Yr")
@@ -386,20 +387,20 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
 
                 # interest type
-                if @title.include?("Fixed")
+                if p_name.include?("Fixed")
                   loan_type = "Fixed"
-                elsif @title.include?("ARM")
+                elsif p_name.include?("ARM")
                   loan_type = "ARM"
-                elsif @title.include?("Floating")
+                elsif p_name.include?("Floating")
                   loan_type = "Floating"
-                elsif @title.include?("Variable")
+                elsif p_name.include?("Variable")
                   loan_type = "Variable"
                 else
                   loan_type = "Fixed"
                 end
 
                 # conforming
-                if @title.downcase.include?("super conforming")
+                if p_name.downcase.include?("super conforming")
                   loan_size = "Super Conforming"
                   conforming = true
                 else
@@ -407,27 +408,27 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
 
                 # freddie_mac
-                if @title.include?("Freddie Mac")
+                if p_name.include?("Freddie Mac")
                   freddie_mac = true
                 end
 
                 # fannie_mae
-                if @title.downcase.include?("fannie mae")
+                if p_name.downcase.include?("fannie mae")
                   fannie_mae = true
                 end
 
                 # loan_purpose
-                if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                if p_name.downcase.include?('refinance') || p_name.downcase.include?('refi')
                   loan_purpose = "Refinance"
                 else
                   loan_purpose = "Purchase"
                 end
 
                 # lp and du
-                if @title.downcase.include?('du ')
+                if p_name.downcase.include?('du ')
                   du = true
                 end
-                if @title.downcase.include?('lp ')
+                if p_name.downcase.include?('lp ')
                   lp = true
                 end
 
@@ -820,7 +821,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
               begin
                 #title
                 @title = sheet_data.cell(r,cc)
-
+                p_name = @title + " " + sheet
                 #term
                 term = nil
                 if @title.include?("10yr") || @title.include?("10 Yr")
@@ -836,52 +837,52 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
 
                 # interest type
-                if @title.include?("Fixed")
+                if p_name.include?("Fixed")
                   loan_type = "Fixed"
-                elsif @title.include?("ARM")
+                elsif p_name.include?("ARM")
                   loan_type = "ARM"
-                elsif @title.include?("Floating")
+                elsif p_name.include?("Floating")
                   loan_type = "Floating"
-                elsif @title.include?("Variable")
+                elsif p_name.include?("Variable")
                   loan_type = "Variable"
                 else
                   loan_type = "Fixed"
                 end
 
                 # conforming
-                if @title.downcase.include?("conforming")
+                if p_name.downcase.include?("conforming")
                   conforming = true
                 end
 
-                if @title.downcase.include?("freddie mac")
+                if p_name.downcase.include?("freddie mac")
                   freddie_mac = true
                 end
 
                 # fannie_mae
                 fannie_mae = false
-                if @title.downcase.include?("fannie mae") 
+                if p_name.downcase.include?("fannie mae") 
                   fannie_mae = true
                 end
 
                 # High Balance
-                if @title.include?("High Balance")
+                if p_name.include?("High Balance")
                   loan_size = "High-Balance"
                 else
                   loan_size = "Conforming"
                 end
 
                 # loan_purpose
-                if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                if p_name.downcase.include?('refinance') || p_name.downcase.include?('refi')
                   loan_purpose = "Refinance"
                 else
                   loan_purpose = "Purchase"
                 end
 
                 # lp and du
-                if @title.downcase.include?('du ')
+                if p_name.downcase.include?('du ')
                   du = true
                 end
-                if @title.downcase.include?('lp ')
+                if p_name.downcase.include?('lp ')
                   lp = true
                 end
 
@@ -1246,7 +1247,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
               begin
                 #title
                 @title = sheet_data.cell(r,cc)
-
+                p_name = @title + " " + sheet
                 #term
                 if @title.include?("10yr") || @title.include?("10 Yr")
                   term = 10
@@ -1261,13 +1262,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
 
                 # rate type
-                if @title.include?("Fixed")
+                if p_name.include?("Fixed")
                   loan_type = "Fixed"
-                elsif @title.include?("ARM")
+                elsif p_name.include?("ARM")
                   loan_type = "ARM"
-                elsif @title.include?("Floating")
+                elsif p_name.include?("Floating")
                   loan_type = "Floating"
-                elsif @title.include?("Variable")
+                elsif p_name.include?("Variable")
                   loan_type = "Variable"
                 else
                   loan_type = "Fixed"
@@ -1283,39 +1284,39 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
                 # freddie_mac
                 freddie_mac = false
-                if @title.include?("Freddie Mac")
+                if p_name.include?("Freddie Mac")
                   freddie_mac = true
                 end
 
                 # fannie_mae
                 fannie_mae = false
-                if @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Ready")
+                if p_name.include?("Fannie Mae") || p_name.include?("Freddie Mac Home Ready")
                   fannie_mae = true
                 end
                 # freddie_mac_product
-                if @title.downcase.include?("home possible")
+                if p_name.downcase.include?("home possible")
                   freddie_mac_product = "Home Possible"
                 end
 
                 # loan_purpose
-                if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                if p_name.downcase.include?('refinance') || p_name.downcase.include?('refi')
                   loan_purpose = "Refinance"
                 else
                   loan_purpose = "Purchase"
                 end
 
                 # loan_size
-                if @title.downcase.include?('high balance')
+                if p_name.downcase.include?('high balance')
                   loan_size = "High Balance"
                 else
                   loan_size = "Conforming"
                 end
 
                 # lp and du
-                if @title.downcase.include?('du ')
+                if p_name.downcase.include?('du ')
                   du = true
                 end
-                if @title.downcase.include?('lp ')
+                if p_name.downcase.include?('lp ')
                   lp = true
                 end
 
@@ -2248,26 +2249,27 @@ class ObNewRezWholesale5806Controller < ApplicationController
               cc = 2 + max_column*6 # (2 / 8 / 14)
               begin
                 @title = sheet_data.cell(r,cc)
+                p_name = @title + " " + sheet
                 program_heading = @title.split
                 term =  program_heading[3]
                 loan_type = program_heading[5]
-                if @title.downcase.include?("jumbo")
+                if p_name.downcase.include?("jumbo")
                   loan_size = "Jumbo"
                 else
                   loan_size = "Conforming"
                 end
                 # loan_purpose
-                if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                if p_name.downcase.include?('refinance') || p_name.downcase.include?('refi')
                   loan_purpose = "Refinance"
                 else
                   loan_purpose = "Purchase"
                 end
 
                 # lp and du
-                if @title.downcase.include?('du ')
+                if p_name.downcase.include?('du ')
                   du = true
                 end
-                if @title.downcase.include?('lp ')
+                if p_name.downcase.include?('lp ')
                   lp = true
                 end
 
@@ -2808,6 +2810,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
               cc = 6 + max_column*6 # (6 / 12 / 18)
               begin
                 @title = sheet_data.cell(r,cc)
+                p_name = @title + " " + sheet
                 # term
                 if @title.include?("10yr") || @title.include?("10 Yr")
                   term = 10
@@ -2828,13 +2831,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
 
                 # rate type
-                if @title.downcase.include?("fixed")
+                if p_name.downcase.include?("fixed")
                   loan_type = "Fixed"
-                elsif @title.downcase.include?("arm")
+                elsif p_name.downcase.include?("arm")
                   loan_type = "ARM"
-                elsif @title.include?("Floating")
+                elsif p_name.include?("Floating")
                   loan_type = "Floating"
-                elsif @title.include?("Variable")
+                elsif p_name.include?("Variable")
                   loan_type = "Variable"
                 else
                   loan_type = "Fixed"
@@ -2851,24 +2854,24 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
 
                 # Loan Size
-                if @title.downcase.include?("jumbo")
+                if p_name.downcase.include?("jumbo")
                   loan_size = "Jumbo"
                 else
                   loan_size = "Conforming"
                 end
 
                 # loan_purpose
-                if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                if p_name.downcase.include?('refinance') || p_name.downcase.include?('refi')
                   loan_purpose = "Refinance"
                 else
                   loan_purpose = "Purchase"
                 end
 
                 # lp and du
-                if @title.downcase.include?('du ')
+                if p_name.downcase.include?('du ')
                   du = true
                 end
-                if @title.downcase.include?('lp ')
+                if p_name.downcase.include?('lp ')
                   lp = true
                 end
 
@@ -3361,6 +3364,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
               begin
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
+                  p_name = @title + " " + sheet
                   program_heading = @title.split
                   # term
                   term = nil
@@ -3378,13 +3382,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
 
                   # rate type
-                  if @title.downcase.include?("fixed")
+                  if p_name.downcase.include?("fixed")
                     loan_type = "Fixed"
-                  elsif @title.downcase.include?("arm")
+                  elsif p_name.downcase.include?("arm")
                     loan_type = "ARM"
-                  elsif @title.include?("Floating")
+                  elsif p_name.include?("Floating")
                     loan_type = "Floating"
-                  elsif @title.include?("Variable")
+                  elsif p_name.include?("Variable")
                     loan_type = "Variable"
                   else
                     loan_type = "Fixed"
@@ -3402,18 +3406,18 @@ class ObNewRezWholesale5806Controller < ApplicationController
 
                   # freddie_mac
                   freddie_mac = false
-                  if @title.include?("Freddie Mac")
+                  if p_name.include?("Freddie Mac")
                     freddie_mac = true
                   end
 
                   # fannie_mae
                   fannie_mae = false
-                  if @title.include?("Fannie Mae") || @title.include?("Freddie Mac Home Ready")
+                  if p_name.include?("Fannie Mae") || p_name.include?("Freddie Mac Home Ready")
                     fannie_mae = true
                   end
 
                   # High Balance
-                  if @title.downcase.include?("jumbo")
+                  if p_name.downcase.include?("jumbo")
                     loan_size = "Jumbo"
                   else
                     loan_size = "Conforming"
@@ -3421,16 +3425,16 @@ class ObNewRezWholesale5806Controller < ApplicationController
 
                   # Purchase & Refinance
                   # loan_purpose
-                  if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                  if p_name.downcase.include?('refinance') || p_name.downcase.include?('refi')
                     loan_purpose = "Refinance"
                   else
                     loan_purpose = "Purchase"
                   end
                   # lp and du
-                  if @program.program_name.downcase.include?('du ')
+                  if p_name.downcase.include?('du ')
                     du = true
                   end
-                  if @program.program_name.downcase.include?('lp ')
+                  if p_name.downcase.include?('lp ')
                     lp = true
                   end
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
@@ -4187,6 +4191,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
               begin
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
+                  p_name = @title + " " + sheet
                   program_heading = @title.split
                   # term
                     term = nil
@@ -4204,13 +4209,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     end
 
                     # rate type
-                    if @title.include?("Fixed")
+                    if p_name.include?("Fixed")
                       loan_type = "Fixed"
-                    elsif @title.include?("ARM")
+                    elsif p_name.include?("ARM")
                       loan_type = "ARM"
-                    elsif @title.include?("Floating")
+                    elsif p_name.include?("Floating")
                       loan_type = "Floating"
-                    elsif @title.include?("Variable")
+                    elsif p_name.include?("Variable")
                       loan_type = "Variable"
                     else
                       loan_type = "Fixed"
@@ -4228,24 +4233,24 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     end
 
                     loan_size = nil
-                    if @title.include?("Jumbo")
+                    if p_name.include?("Jumbo")
                       loan_size = "Jumbo"
                     else
                       loan_size = "Conforming"
                     end
 
                     # loan_purpose
-                    if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                    if p_name.downcase.include?('refinance') || p_name.downcase.include?('refi')
                       loan_purpose = "Refinance"
                     else
                       loan_purpose = "Purchase"
                     end
 
                     # lp and du
-                    if @title.downcase.include?('du ')
+                    if p_name.downcase.include?('du ')
                       du = true
                     end
-                    if @title.downcase.include?('lp ')
+                    if p_name.downcase.include?('lp ')
                       lp = true
                     end
 
@@ -4801,11 +4806,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
               cc = 6 + max_column*6 # (6 / 12 / 18)
               begin
                 @title = sheet_data.cell(r,cc)
+                p_name = @title + " " + sheet
                 if @title.present?
                   program_heading = @title.split
                   # term
                   term = nil
-                  program_heading = @title.split
                   if @title.include?("10yr") || @title.include?("10 Yr")
                     term = 10
                   elsif @title.include?("15yr") || @title.include?("15 Yr")
@@ -4823,20 +4828,20 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     term = 1015
                   end
                   # rate type
-                  if @title.include?("Fixed")
+                  if p_name.include?("Fixed")
                     loan_type = "Fixed"
-                  elsif @title.include?("ARM")
+                  elsif p_name.include?("ARM")
                     loan_type = "ARM"
-                  elsif @title.include?("Floating")
+                  elsif p_name.include?("Floating")
                     loan_type = "Floating"
-                  elsif @title.include?("Variable")
+                  elsif p_name.include?("Variable")
                     loan_type = "Variable"
                   else
                     loan_type = "Fixed"
                   end
 
                   # Loan Size
-                  if @title.downcase.include?("jumbo")
+                  if p_name.downcase.include?("jumbo")
                     loan_size = "Jumbo"
                   else
                     loan_size = "Conforming"
@@ -4850,16 +4855,16 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     arm_advanced = @title.downcase.split("arm").last.tr("A-Za-z- ","")
                   end
                   # loan_purpose
-                  if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                  if p_name.downcase.include?('refinance') || p_name.downcase.include?('refi')
                     loan_purpose = "Refinance"
                   else
                     loan_purpose = "Purchase"
                   end
                   # lp and du
-                  if @program.program_name.downcase.include?('du ')
+                  if p_name.downcase.include?('du ')
                     du = true
                   end
-                  if @program.program_name.downcase.include?('lp ')
+                  if p_name.downcase.include?('lp ')
                     lp = true
                   end
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
@@ -5068,7 +5073,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
               begin
                 # title
                 @title = sheet_data.cell(r,cc)
-
+                p_name = @title + " " + sheet
                 # term
                 term = nil
                 program_heading = @title.split
@@ -5087,13 +5092,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   term = 2030
                 end
                 # interest type
-                if @title.include?("Fixed")
+                if p_name.include?("Fixed")
                   loan_type = "Fixed"
-                elsif @title.include?("ARM")
+                elsif p_name.include?("ARM")
                   loan_type = "ARM"
-                elsif @title.include?("Floating")
+                elsif p_name.include?("Floating")
                   loan_type = "Floating"
-                elsif @title.include?("Variable")
+                elsif p_name.include?("Variable")
                   loan_type = "Variable"
                 else
                   loan_type = "Fixed"
@@ -5109,7 +5114,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   arm_advanced = @title.downcase.split("arm").last.tr('A-Za-z- ','')
                 end
                 # conforming
-                if @title.downcase.include?("conforming")
+                if p_name.downcase.include?("conforming")
                   conforming = true
                   loan_size = "Conforming"
                 else
@@ -5117,26 +5122,26 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
 
                 # freddie_mac
-                if @title.downcase.include?("freddie mac")
+                if p_name.downcase.include?("freddie mac")
                   freddie_mac = true
                 end
 
                 # fannie_mae
-                if @title.downcase.include?("fannie mae")
+                if p_name.downcase.include?("fannie mae")
                   fannie_mae = true
                 end
                 # loan_purpose
-                if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                if p_name.downcase.include?('refinance') || p_name.downcase.include?('refi')
                   loan_purpose = "Refinance"
                 else
                   loan_purpose = "Purchase"
                 end
 
                 # lp and du
-                if @title.downcase.include?('du ')
+                if p_name.downcase.include?('du ')
                   du = true
                 end
-                if @title.downcase.include?('lp ')
+                if p_name.downcase.include?('lp ')
                   lp = true
                 end
 
@@ -5380,6 +5385,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
               begin
                 # title
                 @title = sheet_data.cell(r,cc)
+                p_name = @title + " " + sheet
                 if @title.present?
                   # term
                   term = nil
@@ -5397,13 +5403,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
 
 
                   # rate type
-                  if @title.include?("Fixed")
+                  if p_name.include?("Fixed")
                     loan_type = "Fixed"
-                  elsif @title.include?("ARM")
+                  elsif p_name.include?("ARM")
                     loan_type = "ARM"
-                  elsif @title.include?("Floating")
+                  elsif p_name.include?("Floating")
                     loan_type = "Floating"
-                  elsif @title.include?("Variable")
+                  elsif p_name.include?("Variable")
                     loan_type = "Variable"
                   else
                     loan_type = "Fixed"
@@ -5419,16 +5425,16 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     loan_size = "Conforming"
                   end
                   # loan_purpose
-                  if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                  if p_name.downcase.include?('refinance') || p_name.downcase.include?('refi')
                     loan_purpose = "Refinance"
                   else
                     loan_purpose = "Purchase"
                   end
                   # lp and du
-                  if @program.program_name.downcase.include?('du ')
+                  if p_name.downcase.include?('du ')
                     du = true
                   end
-                  if @program.program_name.downcase.include?('lp ')
+                  if p_name.downcase.include?('lp ')
                     lp = true
                   end
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
@@ -5588,7 +5594,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
               begin
                 # title
                 @title = sheet_data.cell(r,cc)
-
+                p_name = @title + " " + sheet
                 # term
                 term = nil
                 if @title.include?("10yr") || @title.include?("10 Yr")
@@ -5604,13 +5610,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
 
                 # rate type
-                if @title.include?("Fixed")
+                if p_name.include?("Fixed")
                   loan_type = "Fixed"
-                elsif @title.include?("ARM")
+                elsif p_name.include?("ARM")
                   loan_type = "ARM"
-                elsif @title.include?("Floating")
+                elsif p_name.include?("Floating")
                   loan_type = "Floating"
-                elsif @title.include?("Variable")
+                elsif p_name.include?("Variable")
                   loan_type = "Variable"
                 else
                   loan_type = "Fixed"
@@ -5627,7 +5633,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
 
                 # conforming
-                if @title.downcase.include?("conforming") 
+                if p_name.downcase.include?("conforming") 
                   conforming = true
                   loan_size = "Conforming"
                 else
@@ -5636,28 +5642,28 @@ class ObNewRezWholesale5806Controller < ApplicationController
 
                 # freddie_mac
                 freddie_mac = false
-                if @title.include?("Freddie Mac")
+                if p_name.include?("Freddie Mac")
                   freddie_mac = true
                 end
 
                 # fannie_mae
                 fannie_mae = false
-                if @title.include?("Fannie Mae") 
+                if p_name.include?("Fannie Mae") 
                   fannie_mae = true
                 end
 
                 # loan_purpose
-                if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                if p_name.downcase.include?('refinance') || p_name.downcase.include?('refi')
                   loan_purpose = "Refinance"
                 else
                   loan_purpose = "Purchase"
                 end
 
                 # lp and du
-                if @title.downcase.include?('du ')
+                if p_name.downcase.include?('du ')
                   du = true
                 end
-                if @title.downcase.include?('lp ')
+                if p_name.downcase.include?('lp ')
                   lp = true
                 end
 
@@ -6018,6 +6024,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
               cc = 3 + max_column*6 # (3 / 9 / 15)
               begin
                 @title = sheet_data.cell(r,cc)
+                p_name = @title + " " + sheet
                 term = nil
                 if @title.include?("10yr") || @title.include?("10 Yr")
                   term = @title.scan(/\d+/)[0]
@@ -6031,13 +6038,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   term = @title.scan(/\d+/)[0]
                 end
 
-                if @title.include?("Fixed")
+                if p_name.include?("Fixed")
                   loan_type = "Fixed"
-                elsif @title.include?("ARM")
+                elsif p_name.include?("ARM")
                   loan_type = "ARM"
-                elsif @title.include?("Floating")
+                elsif p_name.include?("Floating")
                   loan_type = "Floating"
-                elsif @title.include?("Variable")
+                elsif p_name.include?("Variable")
                   loan_type = "Variable"
                 else
                   loan_type = "Fixed"
@@ -6049,17 +6056,17 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
 
                 freddie_mac = false
-                if @title.downcase.include?("freddie mac")
+                if p_name.downcase.include?("freddie mac")
                   freddie_mac = true
                 end
 
                 conforming = false
-                if @title.downcase.include?("conforming") 
+                if p_name.downcase.include?("conforming") 
                   conforming = true
                 end
 
                 fannie_mae = false
-                if @title.downcase.include?("fannie mae")
+                if p_name.downcase.include?("fannie mae")
                   fannie_mae = true
                 end
                 # Arm Advanced
@@ -6067,35 +6074,35 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   arm_advanced = @title.split("ARM").last.tr('A-Za-z ()', '')
                 end
                 # High Balance
-                if @title.include?("High Balance")
+                if p_name.include?("High Balance")
                   loan_size = "High-Balance"
                 else
                   loan_size = "Conforming"
                 end
 
                 # Fha, va, usda
-                if @title.downcase.include?("fha")
+                if p_name.downcase.include?("fha")
                   fha = true
                 end
-                if @title.downcase.include?("va")
+                if p_name.downcase.include?("va")
                   va = true
                 end
-                if @title.downcase.include?("usda")
+                if p_name.downcase.include?("usda")
                   usda = true
                 end
 
                 # loan_purpose
-                if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                if p_name.downcase.include?('refinance') || p_name.downcase.include?('refi')
                   loan_purpose = "Refinance"
                 else
                   loan_purpose = "Purchase"
                 end
 
                 # lp and du
-                if @title.downcase.include?('du ')
+                if p_name.downcase.include?('du ')
                   du = true
                 end
-                if @title.downcase.include?('lp ')
+                if p_name.downcase.include?('lp ')
                   lp = true
                 end
 
@@ -6452,7 +6459,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
               cc = 3 + max_column*6 # (3 / 9 / 15) 3/8/13
               begin
                 @title = sheet_data.cell(r,cc)
-
+                p_name = @title + " " + sheet
                 # term
                 term = nil
                 program_heading = @title.split
@@ -6469,13 +6476,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
 
                 # rate type
-                if @title.include?("Fixed")
+                if p_name.include?("Fixed")
                   loan_type = "Fixed"
-                elsif @title.include?("ARM")
+                elsif p_name.include?("ARM")
                   loan_type = "ARM"
-                elsif @title.include?("Floating")
+                elsif p_name.include?("Floating")
                   loan_type = "Floating"
-                elsif @title.include?("Variable")
+                elsif p_name.include?("Variable")
                   loan_type = "Variable"
                 else
                   loan_type = "Fixed"
@@ -6486,12 +6493,12 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   arm_basic = @title.scan(/\d+/)[0].to_i
                 end
 
-                if @title.downcase.include?("homeready")
+                if p_name.downcase.include?("homeready")
                   fannie_mae_product = "HomeReady"
                 end
 
                 # loan_purpose
-                if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                if p_name.downcase.include?('refinance') || p_name.downcase.include?('refi')
                   loan_purpose = "Refinance"
                 else
                   loan_purpose = "Purchase"
@@ -6500,10 +6507,10 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 loan_size = "Conforming"
 
                 # lp and du
-                if @title.downcase.include?('du ')
+                if p_name.downcase.include?('du ')
                   du = true
                 end
-                if @title.downcase.include?('lp ')
+                if p_name.downcase.include?('lp ')
                   lp = true
                 end
 
@@ -6864,6 +6871,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
               cc = 3 + max_column*6 
               begin
                 @title = sheet_data.cell(r,cc)
+                p_name = @title + " " + sheet
                  # term
                 term = nil
                 if @title.include?("10yr") || @title.include?("10 Yr")
@@ -6879,13 +6887,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
 
                 # rate type
-                if @title.include?("Fixed")
+                if p_name.include?("Fixed")
                   loan_type = "Fixed"
-                elsif @title.include?("ARM")
+                elsif p_name.include?("ARM")
                   loan_type = "ARM"
-                elsif @title.include?("Floating")
+                elsif p_name.include?("Floating")
                   loan_type = "Floating"
-                elsif @title.include?("Variable")
+                elsif p_name.include?("Variable")
                   loan_type = "Variable"
                 else
                   loan_type = "Fixed"
@@ -6900,37 +6908,37 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   arm_advanced = @title.split("ARM").last.tr('A-Z- () ','')
                 end
 
-                if @title.include?("Fannie Mae")
+                if p_name.include?("Fannie Mae")
                   fannie_mae = true
                 end
 
                 fannie_mae_home_ready = false
-                if @title.include?("Fannie Mae HomeReady")
+                if p_name.include?("Fannie Mae HomeReady")
                   fannie_mae_home_ready = true
                 end
                 # Loan Size
-                if @title.downcase.include?("high balance") || @title.downcase.include?("hb")
+                if p_name.downcase.include?("high balance") || p_name.downcase.include?("hb")
                   loan_size = "High-Balance"
                 else
                   loan_size = "Conforming"
                 end
                 # Fannie_mae_product
-                if @title.downcase.include?("homeready")
+                if p_name.downcase.include?("homeready")
                   fannie_mae_product = 'HomeReady'
                 end
 
                 # loan_purpose
-                if @title.downcase.include?('refinance') || @title.downcase.include?('refi')
+                if p_name.downcase.include?('refinance') || p_name.downcase.include?('refi')
                   loan_purpose = "Refinance"
                 else
                   loan_purpose = "Purchase"
                 end
 
                 # lp and du
-                if @title.downcase.include?('du ')
+                if p_name.downcase.include?('du ')
                   du = true
                 end
-                if @title.downcase.include?('lp ')
+                if p_name.downcase.include?('lp ')
                   lp = true
                 end
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)

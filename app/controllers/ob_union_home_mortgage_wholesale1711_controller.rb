@@ -47,7 +47,8 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
                   @block_hash = {}
                   key = ''
@@ -261,7 +262,8 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
                   @block_hash = {}
                   key = ''
@@ -319,7 +321,8 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
                   @block_hash = {}
                   key = ''
@@ -383,7 +386,8 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
                   @block_hash = {}
                   key = ''
@@ -511,7 +515,8 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
                   @block_hash = {}
                   key = ''
@@ -723,7 +728,8 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
                   @block_hash = {}
                   key = ''
@@ -939,7 +945,8 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
                   @block_hash = {}
                   key = ''
@@ -1140,7 +1147,8 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
                   @block_hash = {}
                   key = ''
@@ -1328,7 +1336,8 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
                   @block_hash = {}
                   key = ''
@@ -1502,7 +1511,8 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
                   @block_hash = {}
                   key = ''
@@ -1634,7 +1644,8 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @programs_ids << @program.id
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
                   @block_hash = {}
                   key = ''

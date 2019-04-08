@@ -4129,13 +4129,13 @@ class ObCmgWholesalesController < ApplicationController
       arm_basic = @program.program_name.split("ARM").first.split("/").first
     end
       # loan type
-    if @program.program_name.include?("Fixed")
+    if @program.program_name.downcase.include?("fixed") || sheet.downcase.include?("fixed")
       loan_type = "Fixed"
-    elsif @program.program_name.include?("ARM")
+    elsif @program.program_name.downcase.include?("arm") || sheet.downcase.include?("arm") 
       loan_type = "ARM"
-    elsif @program.program_name.include?("Floating")
+    elsif @program.program_name.downcase.include?("floating") || sheet.downcase.include?("floating") 
       loan_type = "Floating"
-    elsif @program.program_name.include?("Variable")
+    elsif @program.program_name.downcase.include?("variable") || sheet.downcase.include?("variable")
       loan_type = "Variable"
     else
       loan_type = "Fixed"
@@ -4144,33 +4144,30 @@ class ObCmgWholesalesController < ApplicationController
     bank_name = @sheet_obj.bank.name
 
     # streamline
-    if @program.program_name.downcase.include?("fha")
+    if @program.program_name.downcase.include?("fha") || sheet.downcase.include?("fha")
       fha = true
     end
-    if @program.program_name.downcase.include?("va")
+    if @program.program_name.downcase.include?("va") || sheet.downcase.include?("va")
       va = true
     end
-    if @program.program_name.downcase.include?("usda")
+    if @program.program_name.downcase.include?("usda") || sheet.downcase.include?("usda")
       usda = true
     end
-    if @program.program_name.downcase.include?("streamline")
+    if @program.program_name.downcase.include?("streamline") || sheet.downcase.include?("streamline")
       streamline = true
     end
     # High-Balance
     high_balance = false
     jumbo = false
-    if @program.program_name.downcase.include?("high bal") || @program.program_name.downcase.include?("high balance")
+    if @program.program_name.downcase.include?("high bal") || @program.program_name.downcase.include?("high balance") || sheet.downcase.include?("high balance") || sheet.downcase.include?("high bal")
       high_balance = true
-      loan_size = "High-Balance"
-    else
-      loan_size = "Conforming"
     end
      # Fannie mae Product
-    if @program.program_name.include?("HomeReady")
+    if @program.program_name.downcase.include?("homeready") || sheet.downcase.include?("homeready")
       fannie_mae_product = "HomeReady"
     end
     # Freddie mac product
-    if @program.program_name.include?("Home Possible")
+    if @program.program_name.downcase.include?("home possible") || sheet.downcase.include?("home possible")
       freddie_mac_product = "Home Possible"
     end
     # Program Property
@@ -4179,31 +4176,30 @@ class ObCmgWholesalesController < ApplicationController
       program_category = program_category.squish
     end
        # Loan Limit Type
-    if @program.program_name.include?("Non-Conforming")
+    if @program.program_name.downcase.include?("non-conforming") || @program.program_name.downcase.include?("non conforming") || sheet.downcase.include?("non-conforming") || sheet.downcase.include?("non conforming")
       loan_size = "Non-Conforming"
-    end
-    if @program.program_name.include?("Conforming")
+    elsif @program.program_name.downcase.include?("conforming") || sheet.downcase.include?("conforming")
       loan_size = "Conforming"
-    end
-    if @program.program_name.include?("Jumbo")
+    elsif @program.program_name.downcase.include?("jumbo") || sheet.downcase.include?("jumbo")
       loan_size = "Jumbo"
       jumbo = true
-    end
-    if @program.program_name.include?("High-Balance")
+    elsif @program.program_name.downcase.include?("high-Balance") || @program.program_name.downcase.include?("high bal") || sheet.downcase.include?("high-Balance") || sheet.downcase.include?("high bal")
       loan_size = "High-Balance"
       high_balance = true
+    else
+      loan_size = "Conforming"
     end
     # loan_purpose
-    if @program.program_name.downcase.include?('refinance') || @program.program_name.downcase.include?('refi')
+    if @program.program_name.downcase.include?('refinance') || @program.program_name.downcase.include?('refi') || sheet.downcase.include?('refinance') || sheet.downcase.include?('refi')
       loan_purpose = "Refinance"
     else
       loan_purpose = "Purchase"
     end
     # lp and du
-    if @program.program_name.downcase.include?('du ')
+    if @program.program_name.downcase.include?('du ') || sheet.downcase.include?('du ')
       du = true
     end
-    if @program.program_name.downcase.include?('lp ')
+    if @program.program_name.downcase.include?('lp ') || sheet.downcase.include?('lp ')
       lp = true
     end
     @program.update(term: term,loan_type: loan_type,program_category: program_category, streamline: streamline,fha: fha, va: va, usda: usda, arm_basic: arm_basic, loan_category: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product, loan_size: loan_size, bank_name: bank_name,loan_purpose: loan_purpose, du: du, lp: lp)

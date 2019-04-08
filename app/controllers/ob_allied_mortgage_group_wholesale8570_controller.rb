@@ -39,7 +39,8 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != 3.125
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + @sheet_name
+                  @program.update_fields p_name
                   @term = program_property @title
                   @program.update(loan_category: @sheet_name, term: @term )
                   @programs_ids << @program.id
@@ -248,7 +249,8 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != 3.5 && @title != 3.125 && @title != "Loan Amount"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + @sheet_name
+                  @program.update_fields p_name
                   @term = program_property @title
                   @program.update(loan_category: @sheet_name, term: @term )
                   @programs_ids << @program.id
@@ -442,7 +444,8 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
               begin
                 @title = sheet_data.cell(r,cc)
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                @program.update_fields @title
+                p_name = @title + @sheet_name
+                  @program.update_fields p_name
                 @term = program_property @title
                 @program.update(loan_category: @sheet_name, term: @term )
                 @programs_ids << @program.id

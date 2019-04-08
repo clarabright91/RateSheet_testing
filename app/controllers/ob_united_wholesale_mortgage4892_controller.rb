@@ -31,7 +31,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
         column_count = 3
         num1 = 2
         num2 = 4
-        make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2
+        make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2, sheet
       end
       # adjustments
       if (sheet == "Conv Adjustments")
@@ -80,6 +80,18 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                     @cash_out["RefinanceOption/FICO/LTV"]["Cash Out"][secondary_key][ltv_key] = {}
                     @cash_out["RefinanceOption/FICO/LTV"]["Cash Out"][secondary_key][ltv_key] = value
                   end
+                  # @adj_hash
+                  if r == 23 && cc == 1
+                    @adjustment_hash["LoanPurpose/LoanSize/RefinanceOption"] = {}
+                    @adjustment_hash["LoanPurpose/LoanSize/RefinanceOption"]["Purchase"] = {}
+                    @adjustment_hash["LoanPurpose/LoanSize/RefinanceOption"]["Purchase"]["High Balance"] = {}
+                    @adjustment_hash["LoanPurpose/LoanSize/RefinanceOption"]["Purchase"]["High Balance"]["Rate and Term"] = {}
+                  end
+                  if r == 23 && cc >= 9 && cc <= 17
+                    ltv_key = get_value @ltv_data[cc-1]
+                    @adjustment_hash["LoanPurpose/LoanSize/RefinanceOption"]["Purchase"]["High Balance"]["Rate and Term"][ltv_key] = {}
+                    @adjustment_hash["LoanPurpose/LoanSize/RefinanceOption"]["Purchase"]["High Balance"]["Rate and Term"][ltv_key] = value
+                  end
                 end
               rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
@@ -122,7 +134,8 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && @title != "GOVERNMENT PRICE ADJUSTMENTS"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id
 
@@ -157,7 +170,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
             end
           end
         end
-        make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2
+        make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2, sheet
         # Adjustments
         (78..93).each do |r|
           row = sheet_data.row(r)
@@ -282,7 +295,8 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id
                 end
@@ -327,7 +341,8 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id
                 end
@@ -373,7 +388,8 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id
                 end
@@ -418,7 +434,8 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id
                 end
@@ -590,7 +607,8 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id
                 end
@@ -635,7 +653,8 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id
                 end
@@ -682,7 +701,8 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id
                 end
@@ -863,7 +883,8 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id
                 end
@@ -1052,7 +1073,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
   end
 
   # create programs
-  def make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2
+  def make_program start_range, end_range, sheet_data, row_count, column_count, num1, num2, sheet
     (start_range..end_range).each do |r|
       row = sheet_data.row(r)
       if ((row.compact.count > 1) && (row.compact.count <= 4)) && (!row.compact.include?("GOVERNMENT PRICE ADJUSTMENTS"))
@@ -1064,7 +1085,8 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
             @title = sheet_data.cell(r,cc)
             if @title.present?
               @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-              @program.update_fields @title
+              p_name = @title + " " + sheet
+                  @program.update_fields p_name
               program_property @title
               @programs_ids << @program.id
               # Base rate

@@ -40,7 +40,8 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 if @title.present? && @title != "Rate"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @sheet_name = @program.sub_sheet.name
-                  @program.update_fields @title
+                  p_name = @title + " " + @sheet_name
+                  @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id
                 end
@@ -288,7 +289,8 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 if @title.present? && @title != "Rate"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @sheet_name = @program.sub_sheet.name
-                  @program.update_fields @title
+                  p_name = @title + " " + @sheet_name
+                  @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id
                 end
@@ -465,6 +467,8 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @jumbo_hash = {}
+        primary_key = ''
+        ltv_key = ''
         #Non-Confirming: Sigma Programs
         (1101..1179).each do |r|
           row = sheet_data.row(r)
@@ -478,7 +482,8 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 if @title.present? && @title != "ARM INFORMATION"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @sheet_name = @program.sub_sheet.name
-                  @program.update_fields @title
+                  p_name = @title + " " + @sheet_name
+                  @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id
                 end
@@ -528,10 +533,10 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 if value == "PROGRAM SPECIFIC PRICE ADJUSTMENTS"
                   @jumbo_hash["State/LTV"] = {}
                   @jumbo_hash["LoanAmount/FICO/LTV"] = {}
-                  @jumbo_hash["LoanAmount/FICO/LTV"]["0-1,000,000"] = {}
-                  @jumbo_hash["LoanAmount/FICO/LTV"]["1,000,000-1,500,000"] = {}
-                  @jumbo_hash["LoanAmount/FICO/LTV"]["1,500,000-2,000,000"] = {}
-                  @jumbo_hash["LoanAmount/FICO/LTV"]["2,000,000-2,500,000"] = {}
+                  @jumbo_hash["LoanAmount/FICO/LTV"]["0-1000000"] = {}
+                  @jumbo_hash["LoanAmount/FICO/LTV"]["1000000-1500000"] = {}
+                  @jumbo_hash["LoanAmount/FICO/LTV"]["1500000-2000000"] = {}
+                  @jumbo_hash["LoanAmount/FICO/LTV"]["2000000-2500000"] = {}
                 end
                 if r == 1169 && cc == 14
                   @jumbo_hash["LockDay/LTV"] = {}
@@ -596,33 +601,33 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
                 if r >= 1185 && r <= 1189 && cc == 2
                   primary_key = get_value value
-                  @jumbo_hash["LoanAmount/FICO/LTV"]["0-1,000,000"][primary_key] = {}
-                  @jumbo_hash["LoanAmount/FICO/LTV"]["1,000,000-1,500,000"][primary_key] = {}
+                  @jumbo_hash["LoanAmount/FICO/LTV"]["0-1000000"][primary_key] = {}
+                  @jumbo_hash["LoanAmount/FICO/LTV"]["1000000-1500000"][primary_key] = {}
                 end
                 if r >= 1185 && r <= 1189 && cc >= 3 && cc <= 7
                   ltv_key = get_value @price_data[cc-2]
-                  @jumbo_hash["LoanAmount/FICO/LTV"]["0-1,000,000"][primary_key][ltv_key] = {}
-                  @jumbo_hash["LoanAmount/FICO/LTV"]["0-1,000,000"][primary_key][ltv_key] = value
+                  @jumbo_hash["LoanAmount/FICO/LTV"]["0-1000000"][primary_key][ltv_key] = {}
+                  @jumbo_hash["LoanAmount/FICO/LTV"]["0-1000000"][primary_key][ltv_key] = value
                 end
                 if r >= 1185 && r <= 1189 && cc >= 8 && cc <= 12
                   ltv_key = get_value @price_data[cc-2]
-                  @jumbo_hash["LoanAmount/FICO/LTV"]["1,000,000-1,500,000"][primary_key][ltv_key] = {}
-                  @jumbo_hash["LoanAmount/FICO/LTV"]["1,000,000-1,500,000"][primary_key][ltv_key] = value
+                  @jumbo_hash["LoanAmount/FICO/LTV"]["1000000-1500000"][primary_key][ltv_key] = {}
+                  @jumbo_hash["LoanAmount/FICO/LTV"]["1000000-1500000"][primary_key][ltv_key] = value
                 end
                 if r >= 1195 && r <= 1198 && cc == 2
                   primary_key = get_value value
-                  @jumbo_hash["LoanAmount/FICO/LTV"]["1,500,000-2,000,000"][primary_key] = {}
-                  @jumbo_hash["LoanAmount/FICO/LTV"]["2,000,000-2,500,000"][primary_key] = {}
+                  @jumbo_hash["LoanAmount/FICO/LTV"]["1500000-2000000"][primary_key] = {}
+                  @jumbo_hash["LoanAmount/FICO/LTV"]["2000000-2500000"][primary_key] = {}
                 end
                 if r >= 1195 && r <= 1198 && cc >= 3 && cc <= 7
                   ltv_key = get_value @price_data[cc-2]
-                  @jumbo_hash["LoanAmount/FICO/LTV"]["1,500,000-2,000,000"][primary_key][ltv_key] = {}
-                  @jumbo_hash["LoanAmount/FICO/LTV"]["1,500,000-2,000,000"][primary_key][ltv_key] = value
+                  @jumbo_hash["LoanAmount/FICO/LTV"]["1500000-2000000"][primary_key][ltv_key] = {}
+                  @jumbo_hash["LoanAmount/FICO/LTV"]["1500000-2000000"][primary_key][ltv_key] = value
                 end
                 if r >= 1195 && r <= 1198 && cc >= 8 && cc <= 12
                   ltv_key = get_value @price_data[cc-2]
-                  @jumbo_hash["LoanAmount/FICO/LTV"]["2,000,000-2,500,000"][primary_key][ltv_key] = {}
-                  @jumbo_hash["LoanAmount/FICO/LTV"]["2,000,000-2,500,000"][primary_key][ltv_key] = value
+                  @jumbo_hash["LoanAmount/FICO/LTV"]["2000000-2500000"][primary_key][ltv_key] = {}
+                  @jumbo_hash["LoanAmount/FICO/LTV"]["2000000-2500000"][primary_key][ltv_key] = value
                 end
               end
             rescue Exception => e
@@ -645,6 +650,10 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @price_hash = {}
+        primary_key = ''
+        ltv_key = ''
+        cltv_key = ''
+        first_key = ''
         (1386..1547).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count >= 1) && (row.compact.count <= 4))
@@ -657,7 +666,8 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 if @title.present? && @title != "Rate"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @sheet_name = @program.sub_sheet.name
-                  @program.update_fields @title
+                  p_name = @title + " " + @sheet_name
+                  @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id
                 end
@@ -774,10 +784,10 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 if r == 1611 && cc == 2
                   @price_hash["LoanSize/LoanAmount"] = {}
                   @price_hash["LoanSize/LoanAmount"]["Non-Conforming"] = {}
-                  @price_hash["LoanSize/LoanAmount"]["Non-Conforming"]["1,000,000-Inf"] = {}
+                  @price_hash["LoanSize/LoanAmount"]["Non-Conforming"]["1000000-Inf"] = {}
                   cc = cc + 3
                   new_val = sheet_data.cell(r,cc)
-                  @price_hash["LoanSize/LoanAmount"]["Non-Conforming"]["1,000,000-Inf"] = new_val
+                  @price_hash["LoanSize/LoanAmount"]["Non-Conforming"]["1000000-Inf"] = new_val
                 end
                 if r >= 1612 && r <= 1614 && cc == 2
                   ltv_key = get_value value
@@ -806,7 +816,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
       if (sheet == "RATESHEET")
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
-        @price_hash = {}
+        @gov_hash = {}
         #GOVERNMENT PROGRAMS /programs
         (2180..2278).each do |r|
           row = sheet_data.row(r)
@@ -820,7 +830,8 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 if @title.present? && @title != "Rate" && @title != "PROGRAM SPECIFIC PRICE ADJUSTMENTS"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @sheet_name = @program.sub_sheet.name
-                  @program.update_fields @title
+                  p_name = @title + " " + @sheet_name
+                  @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id
                 end
@@ -936,8 +947,8 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
             end
           end
         end
-        adjustment = [@price_hash]
-        make_adjust(adjustment,@gov_hash)
+        adjustment = [@gov_hash]
+        make_adjust(adjustment,@sheet_name)
         create_program_association_with_adjustment(@sheet_name)
       end
     end
@@ -971,7 +982,8 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 if @title.present? && (cc <= 8) && @title.class == String && @title != "N/A"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @sheet_name = @program.sub_sheet.name
-                  @program.update_fields @title
+                  p_name = @title + " " + @sheet_name
+                  @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -1017,7 +1029,9 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @spec_adjustment5 = {}
-        @spec_adjustment6 = {}
+        # @spec_adjustment6 = {}
+        primary_key = ''
+        ltv_key = ''
         (2624..2675).each do |r|
           row = sheet_data.row(r)
           if ((row.compact.count >= 1) && (row.compact.count <= 7))
@@ -1030,7 +1044,8 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 if @title.present? && (cc <= 8) && @title.class == String && @title != "N/A"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @sheet_name = @program.sub_sheet.name
-                  @program.update_fields @title
+                  p_name = @title + " " + @sheet_name
+                  @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -1078,7 +1093,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 first_column = 11
                 last_column = 13
                 ltv_row = 2625
-                ltv_adjustment 2624, 2738, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
+                ltv_adjustment 2624, 2738, sheet_data, first_row, end_row,@sheet_name,first_column, last_column, ltv_row, primary_key
               end
 
               if value == "PROGRAM SPECIFIC PRICE ADJUSTMENTS "
@@ -1088,16 +1103,16 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 first_column = 13
                 last_column = 20
                 ltv_row = 2636
-                ltv_adjustment 2624, 2738, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
+                ltv_adjustment 2624, 2738, sheet_data, first_row, end_row,@sheet_name,first_column, last_column, ltv_row, primary_key
               end
 
               if value == "FULL DOCUMENTATION / ASSET UTILIZATION"
-                primary_key = "LoanType/Term/LTV/FICO"
+                primary_key = "FICO/LTV"
                 @spec_adjustment5[primary_key] = {}
               end
 
               if r >= 2732 && r <= 2738 && cc == 2
-                ltv_key = get_value value
+                ltv_key = value
                 @spec_adjustment5[primary_key][ltv_key] = {}
               end
 
@@ -1106,27 +1121,17 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 @spec_adjustment5[primary_key][ltv_key][c_val] = value
               end
 
-              if value == "BANK STATEMENT DOCUMENTION / EXPRESS DOCUMENTION"
-                primary_key = "LoanType/Term/LTV/FICO"
-                @spec_adjustment6[primary_key] = {}
-              end
-
-              if r >= 2732 && r <= 2738 && cc == 2
-                ltv_key = get_value value
-                @spec_adjustment6[primary_key][ltv_key] = {}
-              end
-
-              if r >= 2732 && r <= 2738 && cc >= 12 && cc <= 20
-                c_val = get_value @ltv_data[cc-2]
-                @spec_adjustment6[primary_key][ltv_key][c_val] = value
-              end
+              # if value == "BANK STATEMENT DOCUMENTION / EXPRESS DOCUMENTION"
+              #   primary_key = "LoanType/Term/LTV/FICO"
+              #   @spec_adjustment6[primary_key] = {}
+              # end
             rescue Exception => e
               error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
               error_log.save
             end
           end
         end
-        adjustment = [@spec_adjustment5, @spec_adjustment6]
+        adjustment = [@spec_adjustment5]
         make_adjust(adjustment,@sheet_name)
         create_program_association_with_adjustment(@sheet_name)
       end
@@ -1140,6 +1145,9 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @day_adjustment = {}
+        @adj_hash = {}
+        primary_key = ''
+        ltv_key = ''
         # NON-QM: R.E.A.L PRIME ADVANTAGE Programs done
         (2791..2803).each do |r|
           row = sheet_data.row(r)
@@ -1155,7 +1163,8 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                   # progreach_pair { |name, val|  }am_property @program
                   @programs_ids << @program.id
                   @sheet_name = @program.sub_sheet.name
-                  @program.update_fields @title
+                  p_name = @title + " " + @sheet_name
+                  @program.update_fields p_name
                   program_property @title
                   @program.adjustments.destroy_all
                   @block_hash = {}
@@ -1196,48 +1205,118 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
           (0..sheet_data.last_column).each do |cc|
             begin
               value = sheet_data.cell(r,cc)
-              if value == "ARM INFORMATION"
-                primary_key = "LoanType/Term/LTV/FICO"
-                first_row = 2799
-                end_row = 2802
-                first_column = 18
-                last_column = 20
-                ltv_row = 2798
-                ltv_adjustment 2791, 2885, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
-              end
+              if value.present?
+                if value == "PROGRAM SPECIFIC RATE ADJUSTMENTS"
+                  @adj_hash["Dti/LTV"] = {}
+                  @adj_hash["Dti/LTV"]["43.01-50.00"] = {}
+                  @adj_hash["Dti/LTV"]["50.00-Inf"] = {}
+                  @adj_hash["LoanPurpose/RefinanceOption/LTV"] = {}
+                  @adj_hash["LoanPurpose/RefinanceOption/LTV"]["Refinance"] = {}
+                  @adj_hash["LoanPurpose/RefinanceOption/LTV"]["Refinance"]["Cash Out"] = {}
+                  @adj_hash["LTV"] = {}
+                  @adj_hash["PropertyType/LTV"] = {}
+                  @adj_hash["PropertyType/LTV"]["2nd Home"] = {}
+                  @adj_hash["PropertyType/LTV"]["Condo"] = {}
+                  @adj_hash["PropertyType/LTV"]["2-4 Unit"] = {}
+                end
+                if r == 2858 && cc == 16
+                  @adj_hash["Dti/LTV"]["36.01-43.00"] = {}
+                  @adj_hash["Dti/LTV"]["36.01-43.00"]["85.01-90.00"] = {}
+                  cc = cc + 4
+                  new_val = sheet_data.cell(r,cc)
+                  @adj_hash["Dti/LTV"]["36.01-43.00"]["85.01-90.00"] = new_val
+                end
+                if r >= 2859 && r <= 2861 && cc == 16
+                  ltv_key = value.downcase.split('ltv').last.tr('A-Za-z()% ','')
+                  @adj_hash["Dti/LTV"]["43.01-50.00"][ltv_key] = {}
+                  cc = cc + 4
+                  new_val = sheet_data.cell(r,cc)
+                  @adj_hash["Dti/LTV"]["43.01-50.00"][ltv_key] = new_val
+                end
+                if r >= 2862 && r <= 2864 && cc == 16
+                  ltv_key = value.downcase.split('ltv').last.tr('A-Za-z()% ','')
+                  ltv_key = get_value ltv_key
+                  @adj_hash["Dti/LTV"]["50.00-Inf"][ltv_key] = {}
+                  cc = cc + 4
+                  new_val = sheet_data.cell(r,cc)
+                  @adj_hash["Dti/LTV"]["50.00-Inf"][ltv_key] = new_val
+                end
+                if r >= 2865 && r <= 2868 && cc == 16
+                  ltv_key = value.downcase.split('ltv').last.tr('A-Za-z()% ','')
+                  ltv_key = get_value ltv_key
+                  @adj_hash["LoanPurpose/RefinanceOption/LTV"]["Refinance"]["Cash Out"][ltv_key] = {}
+                  cc = cc + 4
+                  new_val = sheet_data.cell(r,cc)
+                  @adj_hash["LoanPurpose/RefinanceOption/LTV"]["Refinance"]["Cash Out"][ltv_key] = new_val
+                end
+                if r >= 2869 && r <= 2871 && cc == 16
+                  ltv_key = value.downcase.split('ltv').last.tr('A-Za-z()% ','')
+                  ltv_key = get_value ltv_key
+                  @adj_hash["LTV"][ltv_key] = {}
+                  cc = cc + 4
+                  new_val = sheet_data.cell(r,cc)
+                  @adj_hash["LTV"][ltv_key] = new_val
+                end
+                if r >= 2872 && r <= 2873 && cc == 16
+                  ltv_key = value.downcase.split('ltv').last.tr('A-Za-z()% ','')
+                  ltv_key = get_value ltv_key
+                  @adj_hash["PropertyType/LTV"]["2nd Home"][ltv_key] = {}
+                  cc = cc + 4
+                  new_val = sheet_data.cell(r,cc)
+                  @adj_hash["PropertyType/LTV"]["2nd Home"][ltv_key] = new_val
+                end
+                if r >= 2874 && r <= 2875 && cc == 16
+                  ltv_key = value.downcase.split('ltv').last.tr('A-Za-z()% ','')
+                  ltv_key = get_value ltv_key
+                  @adj_hash["PropertyType/LTV"]["Condo"][ltv_key] = {}
+                  cc = cc + 4
+                  new_val = sheet_data.cell(r,cc)
+                  @adj_hash["PropertyType/LTV"]["Condo"][ltv_key] = new_val
+                end
+                if r >= 2878 && r <= 2879 && cc == 16
+                  ltv_key = value.downcase.split('ltv').last.tr('A-Za-z()% ','')
+                  ltv_key = get_value ltv_key
+                  @adj_hash["PropertyType/LTV"]["2-4 Unit"][ltv_key] = {}
+                  cc = cc + 4
+                  new_val = sheet_data.cell(r,cc)
+                  @adj_hash["PropertyType/LTV"]["2-4 Unit"][ltv_key] = new_val
+                end
+                if value == "ARM INFORMATION"
+                  primary_key = "LoanType/Term/LTV/FICO"
+                  first_row = 2799
+                  end_row = 2802
+                  first_column = 18
+                  last_column = 20
+                  ltv_row = 2798
+                  ltv_adjustment 2791, 2885, sheet_data, first_row, end_row,@sheet_name,first_column, last_column, ltv_row, primary_key
+                end
 
-              if value == "PROGRAM SPECIFIC RATE ADJUSTMENTS"
-                primary_key = "LoanType / RateLock"
-                @spec_adjustment7[primary_key] = {}
-                c_val = sheet_data.cell(r,cc+4)
-                @spec_adjustment7[primary_key][value] = c_val
-              end
+                if value == "FICO"
+                  primary_key = "LoanType/LTV/FICO"
+                  first_row = 2859
+                  end_row = 2865
+                  first_column = 2
+                  last_column = 12
+                  ltv_row = 2856
+                  ltv_adjustment 2791, 2885, sheet_data, first_row, end_row,@sheet_name,first_column, last_column, ltv_row, primary_key
+                end
 
-              if value == "FICO"
-                primary_key = "LoanType/LTV/FICO"
-                first_row = 2859
-                end_row = 2865
-                first_column = 2
-                last_column = 12
-                ltv_row = 2856
-                ltv_adjustment 2791, 2885, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
-              end
+                if value == "LOAN AMOUNT"
+                  primary_key = "LoanType/LoanAmount/FICO"
+                  first_row = 2867
+                  end_row = 2874
+                  first_column = 2
+                  last_column = 12
+                  ltv_row = 2856
+                  ltv_adjustment 2791, 2885, sheet_data, first_row, end_row,@sheet_name,first_column, last_column, ltv_row, primary_key
+                end
 
-              if value == "LOAN AMOUNT"
-                primary_key = "LoanType/LoanAmount/FICO"
-                first_row = 2867
-                end_row = 2874
-                first_column = 2
-                last_column = 12
-                ltv_row = 2856
-                ltv_adjustment 2791, 2885, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
-              end
-
-              if value == "45 Day Lock (Price Adjustment)"
-                primary_key = "RateType/LoanType/RateLock"
-                c_val = sheet_data.cell(2855,20)
-                @day_adjustment[primary_key] = {}
-                @day_adjustment[primary_key][value] = c_val
+                if value == "45 Day Lock (Price Adjustment)"
+                  primary_key = "LockDay"
+                  c_val = sheet_data.cell(2855,20)
+                  @day_adjustment[primary_key] = {}
+                  @day_adjustment[primary_key]["45"] = c_val
+                end
               end
             rescue Exception => e
               error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
@@ -1245,7 +1324,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
             end
           end
         end
-        adjustment = [@day_adjustment]
+        adjustment = [@day_adjustment,@adj_hash]
         make_adjust(adjustment,@sheet_name)
         create_program_association_with_adjustment(@sheet_name)
       end
@@ -1272,7 +1351,8 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 if @title.present? && (cc <= 12) && @title.class == String #&& @title != "N/A"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @sheet_name = @program.sub_sheet.name
-                  @program.update_fields @title
+                  p_name = @title + " " + @sheet_name
+                  @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -1385,7 +1465,8 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 if @title.present? && (cc <= 12) && @title.class == String #&& @title != "N/A"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @sheet_name = @program.sub_sheet.name
-                  @program.update_fields @title
+                  p_name = @title + " " + @sheet_name
+                  @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -1520,7 +1601,8 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 if @title.present? && (cc <= 8) && @title.class == String #&& @title != "N/A"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @sheet_name = @program.sub_sheet.name
-                  @program.update_fields @title
+                  p_name = @title + " " + @sheet_name
+                  @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -1641,7 +1723,8 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 if @title.present? && (cc <= 12) && @title.class == String #&& @title != "N/A"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @sheet_name = @program.sub_sheet.name
-                  @program.update_fields @title
+                  p_name = @title + " " + @sheet_name
+                  @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -1754,7 +1837,8 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 if @title.present? && (cc <= 15) && @title.class == String #&& @title != "N/A"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @sheet_name = @program.sub_sheet.name
-                  @program.update_fields @title
+                  p_name = @title + " " + @sheet_name
+                  @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all

@@ -48,7 +48,8 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @title.present? && @title != "Rate"
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_property @title
-                @program.update_fields @title
+                p_name = @title + sheet
+                    @program.update_fields p_name
                 @programs_ids << @program.id
                 @program.adjustments.destroy_all
                 @block_hash = {}
@@ -263,7 +264,8 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   if @title.present?
                     @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                     @term = program_property @title
-                    @program.update_fields @title
+                    p_name = @title + sheet
+                    @program.update_fields p_name
                     @programs_ids << @program.id
                   end
 
@@ -338,7 +340,8 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   if @title.present?
                     @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                     @term = program_property @title
-                    @program.update_fields @title
+                    p_name = @title + sheet
+                    @program.update_fields p_name
                     @programs_ids << @program.id
                   end
 
@@ -414,7 +417,8 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @title = sheet_data.cell(r,cc)
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @term = program_property @title
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                    @program.update_fields p_name
                   @program.update(arm_advanced: nil)
                   @programs_ids << @program.id
 
@@ -554,7 +558,8 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @term = program_property @title
-                @program.update_fields @title
+                p_name = @title + sheet
+                    @program.update_fields p_name
                 @programs_ids << @program.id
 
                 @program.adjustments.destroy_all
@@ -679,7 +684,8 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   if @title.present?
                     @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                     @term = program_property @title
-                    @program.update_fields @title
+                    p_name = @title + sheet
+                    @program.update_fields p_name
                     @programs_ids << @program.id
                   end
 
@@ -758,7 +764,8 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 if @title.present? && @title != "5/1 CMT ARM 1/1/5 VA"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @term = program_property @title
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                    @program.update_fields p_name
                   @programs_ids << @program.id
 
                   @program.adjustments.destroy_all
@@ -941,7 +948,8 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @title = sheet_data.cell(r,cc)
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @term = program_property @title
-                  @program.update_fields @title
+                  p_name = @title + sheet
+                    @program.update_fields p_name
                   @programs_ids << @program.id
 
                   @program.adjustments.destroy_all
@@ -1177,7 +1185,8 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @term = program_property @title
-                @program.update_fields @title
+                p_name = @title + sheet
+                    @program.update_fields p_name
                 @programs_ids << @program.id
               end
 
@@ -1468,7 +1477,8 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   if @title.present?
                     @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                     @term = program_property @title
-                    @program.update_fields @title
+                    p_name = @title + sheet
+                    @program.update_fields p_name
                     @programs_ids << @program.id
                   end
                   @program.adjustments.destroy_all
@@ -1756,7 +1766,8 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   if @title.present?
                     @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                     @term = program_property @title
-                    @program.update_fields @title
+                    p_name = @title + sheet
+                    @program.update_fields p_name
                     @programs_ids << @program.id
                   end
 
@@ -2039,7 +2050,8 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   if @title.present?
                     @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                     @term = program_property @title
-                    @program.update_fields @title
+                    p_name = @title + sheet
+                    @program.update_fields p_name
                     @programs_ids << @program.id
                   end
 
@@ -2279,7 +2291,8 @@ class ObNewfiWholesale7019Controller < ApplicationController
               if @title.present?
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @term = program_property @title
-                @program.update_fields @title
+                p_name = @title + sheet
+                    @program.update_fields p_name
                 @programs_ids << @program.id
                 @program.adjustments.destroy_all
                 @block_hash = {}
@@ -2484,7 +2497,8 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   if @title.present?
                     @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                     @term = program_property @title
-                    @program.update_fields @title
+                    p_name = @title + sheet
+                    @program.update_fields p_name
                     @programs_ids << @program.id
                   end
 

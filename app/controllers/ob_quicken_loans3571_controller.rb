@@ -38,7 +38,8 @@ class ObQuickenLoans3571Controller < ApplicationController
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.loan_category = sheet
                   @programs_ids << @program.id
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
 
                   if @title == "30 Year Home Possible/Home Ready"
@@ -390,7 +391,8 @@ class ObQuickenLoans3571Controller < ApplicationController
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.loan_category = sheet
                   @programs_ids << @program.id
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
   	              @block_hash = {}
   	              key = ''
@@ -893,7 +895,8 @@ class ObQuickenLoans3571Controller < ApplicationController
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.loan_category = @sheet_name
                   @programs_ids << @program.id
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
   	              @block_hash = {}
   	              key = ''
@@ -952,7 +955,8 @@ class ObQuickenLoans3571Controller < ApplicationController
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.loan_category = @sheet_name
                   @programs_ids << @program.id
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
   	              @block_hash = {}
   	              key = ''
@@ -1011,7 +1015,8 @@ class ObQuickenLoans3571Controller < ApplicationController
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.loan_category = @sheet_name
                   @programs_ids << @program.id
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
   	              @block_hash = {}
   	              key = ''
@@ -1075,7 +1080,8 @@ class ObQuickenLoans3571Controller < ApplicationController
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.loan_category = @sheet_name
                   @programs_ids << @program.id
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
   	              @block_hash = {}
   	              key = ''
@@ -1199,7 +1205,6 @@ class ObQuickenLoans3571Controller < ApplicationController
             end
         	end
         end
-        # debugger
         adjustment = [@adjustment_hash,@government_hash]
         make_adjust(adjustment,@sheet_name)
         create_program_association_with_adjustment(@sheet_name)
@@ -1230,7 +1235,8 @@ class ObQuickenLoans3571Controller < ApplicationController
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.loan_category = @sheet_name
                   @programs_ids << @program.id
-                  @program.update_fields @title
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property @title
   	              @block_hash = {}
   	              key = ''

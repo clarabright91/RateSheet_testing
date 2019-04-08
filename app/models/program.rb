@@ -60,7 +60,7 @@ class Program < ApplicationRecord
   end
 
   def get_non_conforming
-    non_conforming = ["Non-Conforming"]
+    non_conforming = ["Non-Conforming","non conforming"]
     # non_conforming += Acronym.new(non_conforming).to_a
     non_conforming += non_conforming.map(&:downcase)
     return non_conforming
@@ -119,7 +119,7 @@ class Program < ApplicationRecord
   end
 
   def fetch_loan_size_fields
-    loan_size = get_conforming + get_non_conforming + get_high_balance + get_jumbo + get_conf + get_non_conf_hb + get_super_conforming
+    loan_size = get_non_conforming + get_super_conforming + get_conforming + get_high_balance + get_jumbo + get_conf + get_non_conf_hb 
     return loan_size
   end
 
@@ -220,6 +220,7 @@ class Program < ApplicationRecord
     present_word = nil
     fetch_loan_size_fields.each{ |word|
       present_word = word if p_name.squish.downcase.include?(word.downcase)
+      break if present_word.present?
     }
     loan_size = get_high_balance.include?(present_word) ? "High-Balance" : get_jumbo.include?(present_word) ? "Jumbo" : get_super_conforming.include?(present_word) ? "Super Conforming" : get_non_conforming.include?(present_word) ? "Non-Conforming" : get_conforming.include?(present_word) ? "Conforming" : get_conf.include?(present_word) ? "Conforming and High-Balance" : get_non_conf_hb.include?(present_word) ? "Non-Conforming and Jumbo" : "Conforming"
     self.loan_size = loan_size

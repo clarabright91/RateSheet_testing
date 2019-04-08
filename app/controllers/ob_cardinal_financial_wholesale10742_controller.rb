@@ -81,7 +81,8 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                   @programs_ids << @program.id
                   @sheet_name = @program.sub_sheet.name
                   # Program Property
-                  @program.update_fields @title
+                  p_name = @title + @sheet_name
+                  @program.update_fields p_name
                   program_property @title
                   @program.adjustments.destroy_all
                   @block_hash = {}
@@ -425,7 +426,8 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                   @programs_ids << @program.id
                   @sheet_name = @program.sub_sheet.name
                   # Program Property
-                  @program.update_fields @title
+                  p_name = @title + @sheet_name
+                  @program.update_fields p_name
                   program_property @title
                   @program.adjustments.destroy_all
                   @block_hash = {}
@@ -771,7 +773,8 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                   @programs_ids << @program.id
                   @sheet_name = @program.sub_sheet.name
                   # Program Property
-                  @program.update_fields @title
+                  p_name = @title + @sheet_name
+                  @program.update_fields p_name
                   program_property @title
                   @program.adjustments.destroy_all
                   @block_hash = {}
@@ -935,7 +938,8 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                   @programs_ids << @program.id
                   @sheet_name = @program.sub_sheet.name
                   # Program Property
-                  @program.update_fields @title
+                  p_name = @title + @sheet_name
+                  @program.update_fields p_name
                   program_property @title
                   @program.adjustments.destroy_all
                 end
@@ -1113,7 +1117,8 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                 @programs_ids << @program.id
                 @sheet_name = @program.sub_sheet.name
                 # Program Property
-                @program.update_fields @title
+                p_name = @title + @sheet_name
+                @program.update_fields p_name
                 program_property @title
                 @program.adjustments.destroy_all
                 @block_hash = {}
