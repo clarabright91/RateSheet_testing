@@ -62,3 +62,7 @@ h4#sheet-title{
   .valid {
     display: none;
   }
+
+  .error {
+    color: red
+  }

@@ -17,6 +17,7 @@
 //= require datatables
 //= require popper
 //= require bootstrap
+//= require jquery.validate
 //= require select2
 //= require select2-full
 //= require_tree .
