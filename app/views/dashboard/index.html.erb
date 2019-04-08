@@ -501,22 +501,30 @@
   $('#du').click(function(){
     if($(this).prop("checked"))
       $('#fannie_mae').prop('checked', true);
-    else
-      $('#fannie_mae').prop('checked', false);
+    else{
+      if ($('#fannie_mae_product').val()=='') {
+        $('#fannie_mae').prop('checked', false);
+      }
+    }
   });
 
    $('#lp').click(function(){
     if($(this).prop("checked"))
       $('#freddie_mac').prop('checked', true);
-    else
-      $('#freddie_mac').prop('checked', false);
+    else{
+      if ($('#freddie_mac_product').val()=='') {
+        $('#freddie_mac').prop('checked', false);
+      }
+    }
   });
 
   $('#fannie_mae').click(function(){
     if($(this).prop("checked"))
       $('#du').prop('checked', false);
-    else
+    else{
       $('#du').prop('checked', false);
+      $('#fannie_mae_product').val('')
+    }
   });
 
   $('#freddie_mac').click(function(){
@@ -524,6 +532,7 @@
       $('#lp').prop('checked', false);
     else
       $('#lp').prop('checked', false);
+      $('#freddie_mac_product').val('')
   });
 
   // when streamline checked fha will be true and loan_purpose will be 'Refinance'
@@ -556,8 +565,11 @@
 
   //when select fannie_mae_product fannie_mae will be true
   $('#fannie_mae_product').change(function(){
-    if ($(this).val() == "")
-      $('#fannie_mae').prop('checked', false)
+    if ($(this).val() == ""){
+      if ($('#du').prop("checked") == false) {
+        $('#fannie_mae').prop('checked', false)
+      }
+    }
     else
       $('#fannie_mae').prop('checked', true)
   })
@@ -565,7 +577,9 @@
   //when select freddie_mac_product freddie_mac will be true
   $('#freddie_mac_product').change(function(){
     if ($(this).val() == "")
-      $('#freddie_mac').prop('checked', false)
+      if ($('#lp').prop("checked") == false) {
+        $('#freddie_mac').prop('checked', false)
+      }
     else
       $('#freddie_mac').prop('checked', true)
   })
