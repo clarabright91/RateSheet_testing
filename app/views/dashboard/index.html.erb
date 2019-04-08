@@ -469,31 +469,60 @@
   });
 
   $('#du').click(function(){
-    if($(this).prop("checked") == true){
-      $('#fannie_mae').attr('checked', true);
+    if($(this).prop("checked")){
+      $('#fannie_mae').prop('checked', true);
     }
     else{
-      $('#fannie_mae').attr('checked', false);
+      $('#fannie_mae').prop('checked', false);
     }
   });
 
    $('#lp').click(function(){
-    if($(this).prop("checked") == true){
-      $('#freddie_mac').attr('checked', true);
+    if($(this).prop("checked")){
+      $('#freddie_mac').prop('checked', true);
     }
     else{
-      $('#freddie_mac').attr('checked', false);
+      $('#freddie_mac').prop('checked', false);
     }
   });
 
+  $('#fannie_mae').click(function(){
+    if($(this).prop("checked")){
+      $('#du').prop('checked', false);
+    }else{
+      $('#du').prop('checked', false);
+    }
+  });
+
+  $('#freddie_mac').click(function(){
+    if($(this).prop("checked")){
+      $('#lp').prop('checked', false);
+    }else{
+      $('#lp').prop('checked', false);
+    }
+  });
+
+  $('#fha').click(function () {
+    if ($(this).prop("checked")) {
+      if ($('#streamline').prop("checked")) {
+        $("#loan_purpose").val('')
+      }
+      $('#streamline').prop('checked', false);
+    } else {
+      if ($('#streamline').prop("checked")) {
+        $("#loan_purpose").val('')
+      }
+      $('#streamline').prop('checked', false);
+    }
+  });
 
   $('#streamline').click(function () {
     if ($(this).prop("checked")) {
       $("#loan_purpose").val('Refinance')
-      $('#fha').attr('checked', true);
+      $('#fha').prop('checked', true);
     } else {
       $("#loan_purpose").val('')
-      $('#fha').attr('checked', false);
+      $('#fha').prop('checked', false);
     }
   });
 
@@ -505,14 +534,14 @@
   $('#fannie_mae_product').change(function(){
     var fannie_mae_product =  $(this).val();
     if (fannie_mae_product == "HomeReady") {
-      $('#fannie_mae').attr('checked', true)
+      $('#fannie_mae').prop('checked', true)
     }
   })
 
   $('#freddie_mac_product').change(function(){
     var freddie_mac_product =  $(this).val();
     if (freddie_mac_product == "Home Possible") {
-      $('#freddie_mac').attr('checked', true)
+      $('#freddie_mac').prop('checked', true)
     }
   })
 
@@ -529,7 +558,7 @@
 
   $("#search_form").validate({
     errorPlacement: function(error, element) {
-    var n = element.attr("name");
+      var n = element.attr("name");
       if (n == "loan_purpose"){
         error.insertAfter(element);
       }
@@ -582,7 +611,7 @@
         $('.error-loan-purpose').show()
       }
     }
-});
+  });
 
 
 
