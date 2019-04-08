@@ -118,7 +118,7 @@
                     </div>
                     <div class="col-md-4">
                       <div class="checkbox">
-                        <label> <%= check_box_tag 'du', 'du', params[:du].present? %> DU</label>
+                        <label> <%= check_box_tag 'du', 'du', params[:du].present? %> DU Fannie Mae</label>
                       </div>
                     </div>
                     <div class="col-md-4">
@@ -136,7 +136,7 @@
                     </div>
                     <div class="col-md-4">
                       <div class="checkbox">
-                        <label> <%= check_box_tag 'lp', 'lp', params[:lp].present? %> LP</label>
+                        <label> <%= check_box_tag 'lp', 'lp', params[:lp].present? %> LP Freddie Mac</label>
                       </div>
                     </div>
                     <div class="col-md-4">
@@ -577,10 +577,11 @@
 
   //when select freddie_mac_product freddie_mac will be true
   $('#freddie_mac_product').change(function(){
-    if ($(this).val() == "")
+    if ($(this).val() == ""){
       if ($('#lp').prop("checked") == false) {
         $('#freddie_mac').prop('checked', false)
       }
+    }
     else
       $('#freddie_mac').prop('checked', true)
   })
