@@ -98,7 +98,7 @@ class DashboardController < ApplicationController
   end
 
   def modified_condition
-    %w[fannie_mae_product freddie_mac_product bank_name program_name pro_category loan_category loan_purpose term].each do |key|
+    %w[fannie_mae_product freddie_mac_product bank_name program_name pro_category loan_category loan_purpose].each do |key|
       key_value = params[key.to_sym]
       if key_value.present?
         unless (key_value == "All")
@@ -107,18 +107,10 @@ class DashboardController < ApplicationController
               @filter_data[:program_category] = key_value
             end
           else
-            unless (key == "term")
-              @filter_data[key.to_sym] = key_value
-            end
+            @filter_data[key.to_sym] = key_value
           end
           if %w[fannie_mae_product freddie_mac_product].include?(key)
             instance_variable_set("@#{key}", key_value)
-          end
-          if %w[term].include?(key)
-            if (params[:loan_type] != "ARM")
-              instance_variable_set("@#{key}", key_value)
-              @program_term = key_value.to_i
-            end
           end
         else
           if %w[fannie_mae_product freddie_mac_product loan_purpose].include?(key)
@@ -159,6 +151,10 @@ class DashboardController < ApplicationController
         if params[:term].present?
           if (params[:term] == "All")
             @filter_not_nil[:term] = nil
+          else
+            @filter_data[:term] = params[:term].to_i
+            @term = params[:term]
+            @program_term = params[:term].to_i
           end
         end
         if params[:arm_basic].present?
@@ -201,6 +197,11 @@ class DashboardController < ApplicationController
             end
           end
         end
+        if params[:loan_type] !="ARM"
+          @filter_data[:term] = params[:term].to_i
+          @term = params[:term]
+          @program_term = params[:term].to_i
+        end
       end
     end
 
@@ -212,7 +213,6 @@ class DashboardController < ApplicationController
   end
 
   def find_base_rate
-    debugger
     @program_list = Program.where(@filter_data)
     @program_list = @program_list.where.not(@filter_not_nil)
     @program_list2 = []
