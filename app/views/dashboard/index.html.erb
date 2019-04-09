@@ -553,14 +553,16 @@
   });
 
   // when streamline checked fha will be true and loan_purpose will be 'Refinance'
+  var fha_checked = false
   $('#streamline').click(function () {
     if ($(this).prop("checked")){
+      fha_checked = $('#fha').prop("checked")
       $("#loan_purpose").val('Refinance')
       $('#fha').prop('checked', true);
       $('#loan_purpose-error').hide();
     } else {
+      $('#fha').prop('checked', fha_checked);
       $("#loan_purpose").val('')
-      $('#fha').prop('checked', false);
       $('.error-loan-purpose').hide();
     }
   });
