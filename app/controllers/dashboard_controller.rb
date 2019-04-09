@@ -61,7 +61,7 @@ class DashboardController < ApplicationController
   end
 
   def set_default
-    @term_list = (Program.pluck(:term).reject(&:blank?).uniq.map{|n| n if n.to_s.length < 3}.reject(&:blank?).push(5,10,15,20,25,30).uniq.sort).map{|y| [y.to_s + " yrs" , y]}
+    @term_list = (Program.pluck(:term).reject(&:blank?).uniq.map{|n| n if n.to_s.length < 3}.reject(&:blank?).push(5,10,15,20,25,30).uniq.sort).map{|y| [y.to_s + " yrs" , y]}.prepend(["All"])
     @arm_advanced_list = Program.pluck(:arm_advanced).push("3-2-5").uniq.compact.reject { |c| c.empty? }.map{|c| [c]}
     @base_rate = 0.0
     @filter_data = {}
@@ -156,23 +156,49 @@ class DashboardController < ApplicationController
       @loan_type = params[:loan_type]
       if params[:loan_type] == "All"
         @filter_not_nil[:loan_type] = nil
-      else
-        @filter_data[:loan_type] = params[:loan_type]
-        if params[:loan_type] =="ARM" && params[:arm_basic].present?
-          @arm_basic = params[:arm_basic]
-          unless (params[:arm_basic] == "All")
+        if params[:term].present?
+          if (params[:term] == "All")
+            @filter_not_nil[:term] = nil
+          end
+        end
+        if params[:arm_basic].present?
+          if (params[:arm_basic] == "All")
+            @filter_not_nil[:arm_basic] = nil
+          else
+            @arm_basic = params[:arm_basic]
             if params[:arm_basic].include?("/")
               @filter_data[:arm_basic] = params[:arm_basic].split("/").first
             end
-            if params[:arm_basic].include?("-")
-              @filter_data[:arm_basic] = params[:arm_basic].split("-").first
-            end
           end
         end
-        if params[:loan_type] =="ARM" && params[:arm_advanced].present?
-          @arm_advanced = params[:arm_advanced]
-          unless params[:arm_advanced] == "All"
+        if params[:arm_advanced].present?
+          if params[:arm_advanced] == "All"
+            @filter_not_nil[:arm_advanced] = nil
+          else
+            @arm_advanced = params[:arm_advanced]
             @filter_data[:arm_advanced] = params[:arm_advanced]
+          end
+        end
+      else
+        @filter_data[:loan_type] = params[:loan_type]
+        if params[:loan_type] =="ARM"
+          if params[:arm_basic].present?
+            if (params[:arm_basic] == "All")
+              @filter_not_nil[:arm_basic] = nil
+            else
+              @arm_basic = params[:arm_basic]
+              if params[:arm_basic].include?("/")
+                @filter_data[:arm_basic] = params[:arm_basic].split("/").first
+              end
+            end
+          end
+          if params[:arm_advanced].present?
+            if params[:arm_advanced] == "All"
+              @filter_not_nil[:arm_advanced] = nil
+            else
+              @arm_advanced = params[:arm_advanced]
+              @filter_data[:arm_advanced] = params[:arm_advanced]
+            end
           end
         end
       end
@@ -186,6 +212,7 @@ class DashboardController < ApplicationController
   end
 
   def find_base_rate
+    debugger
     @program_list = Program.where(@filter_data)
     @program_list = @program_list.where.not(@filter_not_nil)
     @program_list2 = []

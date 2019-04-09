@@ -68,7 +68,7 @@
                       <div class="form-group">
                         <label>Term</label>
                         <div class="input-group">
-                          <%= select_tag 'term', options_for_select(@term_list, (params[:term] rescue nil)), { prompt: 'Select Term', :class=> "form-control"} %>
+                          <%= select_tag 'term', options_for_select(@term_list, (params[:term] rescue nil)), { prompt: 'Select Term', :class=> "form-control" } %>
                         </div>
                       </div>
                     </div>
@@ -83,19 +83,19 @@
                     <div class="col-md-6 arm-basic">
                       <div class="form-group">
                         <label>ARM Benchmark</label>
-                        <%= select_tag 'arm_benchmark', options_for_select(Program::ARM_BENCHMARK_LIST.flatten.sort_by!{ |m| m.downcase }, (params[:arm_benchmark] rescue nil)), { prompt: 'Select ARM Benchmark', :class=> "form-control"} %>
+                        <%= select_tag 'arm_benchmark', options_for_select(Program::ARM_BENCHMARK_LIST.flatten.sort_by!{ |m| m.downcase }, (params[:arm_benchmark] rescue nil)), { prompt: 'Select ARM Benchmark', :class=> "form-control" } %>
                       </div>
                     </div>
                     <div class="col-md-6 arm-basic">
                       <div class="form-group">
                         <label>ARM Margin</label>
-                        <%= select_tag 'arm_margin', options_for_select(Program::ARM_MARGIN_LIST.flatten.sort_by!{ |m| m.downcase }, (params[:arm_margin] rescue nil)), { prompt: 'Select ARM Margin', :class=> "form-control"} %>
+                        <%= select_tag 'arm_margin', options_for_select(Program::ARM_MARGIN_LIST.flatten, (params[:arm_margin] rescue nil)), { prompt: 'Select ARM Margin', :class=> "form-control"} %>
                       </div>
                     </div>
                     <div class="col-md-6 arm-basic">
                       <div class="form-group">
                         <label>ARM Advanced</label>
-                        <%= select_tag 'arm_advanced', options_for_select( @arm_advanced_list.flatten.sort_by!{ |m| m.downcase }, (params[:arm_advanced] rescue nil)), { prompt: 'Select ARM Advanced', :class=> "form-control"} %>
+                        <%= select_tag 'arm_advanced', options_for_select( @arm_advanced_list.flatten.sort_by!{ |m| m.downcase }.prepend(["All"]), (params[:arm_advanced] rescue nil)), { prompt: 'Select ARM Advanced', :class=> "form-control"} %>
                       </div>
                     </div>
                   </div>
@@ -492,26 +492,56 @@
 
     $(".alert-error" ).fadeOut(3000);
      if ($("#loan_type").val() == "ARM") {
-      $(".arm-basic").show()
-      $(".term").hide()
+      $(".arm-basic").show();
+      $(".term").hide();
     }else{
-     $(".arm-basic").hide()
-     $(".term").show()
+     $(".arm-basic").hide();
+     $(".term").show();
+    }
+
+    if ($("#loan_type").val() == "All") {
+      $(".arm-basic").show();
+      $(".term").show();
     }
 
    $("#loan_type").on('click', function(e){
      if ($(this).val()=="ARM"){
+      debugger
       $(".term").hide()
       $(".arm-basic").show()
+      $('#arm_benchmark').val('LIBOR')
+      $('#arm_margin').val('0.00')
+      $('#arm_basic').val('10/1')
      }else{
-        $(".arm-basic").hide()
-        $(".term").show()
+      if ($(this).val()=="All"){
+        debugger
+        $(".arm-basic").show();
+        $(".term").show();
+        $('#arm_benchmark').val('')
+        $('#arm_margin').val('')
+        $('#arm_basic').val('')
+      }else{
+        debugger
+        $(".arm-basic").hide();
+        $(".term").show();
+      }
      }
    });
   });
 
-  if ($('#arm_benchmark').val()=='') {
+  if ($('#arm_benchmark').val()=='' && $("#loan_type").val() != "All" && $("#loan_type").val() != "ARM" ) {
+    debugger
     $('#arm_benchmark').val('LIBOR')
+  }
+
+  if ($('#arm_margin').val()=='' && $("#loan_type").val() != "All" && $("#loan_type").val() != "ARM" ) {
+    debugger
+    $('#arm_margin').val('0.00')
+  }
+
+  if ($('#arm_basic').val()=='' && $("#loan_type").val() != "All" && $("#loan_type").val() != "ARM" ) {
+    debugger
+    $('#arm_basic').val('10/1')
   }
 
   $('#du').click(function(){
@@ -554,15 +584,17 @@
 
   // when streamline checked fha will be true and loan_purpose will be 'Refinance'
   var fha_checked = false
+  var loan_purpose_value = $('#loan_purpose').val();
   $('#streamline').click(function () {
     if ($(this).prop("checked")){
       fha_checked = $('#fha').prop("checked")
+      loan_purpose_value = $('#loan_purpose').val();
       $("#loan_purpose").val('Refinance')
       $('#fha').prop('checked', true);
       $('#loan_purpose-error').hide();
     } else {
       $('#fha').prop('checked', fha_checked);
-      $("#loan_purpose").val('')
+      $("#loan_purpose").val(loan_purpose_value)
       $('.error-loan-purpose').hide();
     }
   });
