@@ -18,6 +18,14 @@ class ObCmgWholesalesController < ApplicationController
     end
   end
 
+  def agencyllpas
+    redirect_to error_page_ob_new_rez_wholesale5806_path
+  end
+
+  def aio
+    redirect_to error_page_ob_new_rez_wholesale5806_path
+  end
+
   def gov
     @programs_ids = []
     @xlsx.sheets.each do |sheet|

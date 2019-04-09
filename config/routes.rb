@@ -58,6 +58,7 @@ Rails.application.routes.draw do
       get :programs
       get :gov
       get :agency
+      get :agencyllpas
       get :durp
       get :oa
       get :jumbo_700
@@ -70,6 +71,7 @@ Rails.application.routes.draw do
       get :jumbo_6900_7900
       get :mi_llpas
       get :single_program
+      get :aio
     end
   end
   resources :ob_cardinal_financial_wholesale10742, only: [:index] do
