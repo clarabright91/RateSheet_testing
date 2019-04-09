@@ -143,6 +143,8 @@ class Program < ApplicationRecord
     set_usda                        if p_name.downcase.include?("usda")
     set_streamline(p_name)          if ["streamline","SL"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_full_doc                    if p_name.downcase.include?("full doc")
+    set_libor                       if p_name.downcase.include?("libor")
+    set_arm_margin(p_name)          if p_name.downcase.include?("margin")
     # set_loan_purpose(p_name)        if ["Purchase", "Refinance"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_conforming(p_name)          if ["Conforming","Conf","fcf"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_fannie_mae(p_name)          if ["Fannie Mae", "FNMA", "Du "].each{ |word| p_name.downcase.include?(word.downcase) }
@@ -205,6 +207,17 @@ class Program < ApplicationRecord
     self.streamline = present_word
     self.fha = present_word
     self.loan_purpose = "Refinance" if present_word
+  end
+
+  def set_libor
+    self.arm_benchmark = "LIBOR"
+  end
+
+  def set_arm_margin(prog_name)
+    present_word = nil
+    ["2.25","2.00"].each{ |word| 
+      self.arm_margin = word if prog_name.include?(word) 
+    }
   end
 
   def set_full_doc
