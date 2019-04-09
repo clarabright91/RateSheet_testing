@@ -46,18 +46,14 @@
                     <div class="col-md-6">
                       <div class="form-group">
                         <label>Loan Purpose</label>
-                        <div class="input-group">
                           <%= select_tag 'loan_purpose', options_for_select(Program::LOAN_PURPOSE.flatten.sort_by!{ |m| m.downcase }, (params[:loan_purpose] rescue nil)), { prompt: 'Select Loan Purpose', :class=> "form-control" }%>
-                        </div>
                         <span class="error-loan-purpose">Please Select Refinance</span>
                       </div>
                     </div>
                     <div class="col-md-6">
                       <div class="form-group">
                         <label>Loan Size</label>
-                        <div class="input-group">
                           <%= select_tag 'loan_size', options_for_select(Program::LOAN_SIZE.flatten.sort_by!{ |m| m.downcase }, (params[:loan_size] rescue nil)), { prompt: 'Select Loan Size', :class=> "form-control" }%>
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -65,7 +61,7 @@
                     <div class="col-md-6">
                       <div class="form-group">
                         <label>Loan Type</label>
-                        <%= select_tag 'loan_type', options_for_select(Program::LOAN_TYPE.flatten.sort_by!{ |m| m.downcase }, (params[:loan_type] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control" } %>
+                          <%= select_tag 'loan_type', options_for_select(Program::LOAN_TYPE.flatten.sort_by!{ |m| m.downcase }, (params[:loan_type] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control" } %>
                       </div>
                     </div>
                     <div class="col-md-6 term">
@@ -86,14 +82,20 @@
                     </div>
                     <div class="col-md-6 arm-basic">
                       <div class="form-group">
-                        <label>ARM Advance</label>
-                        <%= select_tag 'arm_advanced', options_for_select( @arm_advanced_list.flatten.sort_by!{ |m| m.downcase }, (params[:arm_advanced] rescue nil)), { prompt: 'Select ARM Advance', :class=> "form-control"} %>
+                        <label>ARM Benchmark</label>
+                        <%= select_tag 'arm_benchmark', options_for_select(Program::ARM_BENCHMARK_LIST.flatten.sort_by!{ |m| m.downcase }, (params[:arm_benchmark] rescue nil)), { prompt: 'Select ARM Benchmark', :class=> "form-control"} %>
                       </div>
                     </div>
                     <div class="col-md-6 arm-basic">
                       <div class="form-group">
-                        <label>ARM Benchmark</label>
-                        <%= select_tag 'arm_benchmark', options_for_select(Program::ARM_BENCHMARK_LIST.flatten.sort_by!{ |m| m.downcase }, (params[:arm_benchmark] rescue nil)), { prompt: 'Select ARM Benchmark', :class=> "form-control"} %>
+                        <label>ARM Margin</label>
+                        <%= select_tag 'arm_margin', options_for_select(Program::ARM_MARGIN_LIST.flatten.sort_by!{ |m| m.downcase }, (params[:arm_margin] rescue nil)), { prompt: 'Select ARM Margin', :class=> "form-control"} %>
+                      </div>
+                    </div>
+                    <div class="col-md-6 arm-basic">
+                      <div class="form-group">
+                        <label>ARM Advanced</label>
+                        <%= select_tag 'arm_advanced', options_for_select( @arm_advanced_list.flatten.sort_by!{ |m| m.downcase }, (params[:arm_advanced] rescue nil)), { prompt: 'Select ARM Advanced', :class=> "form-control"} %>
                       </div>
                     </div>
                   </div>
@@ -173,7 +175,7 @@
                     </div>
                     <div class="col-md-4">
                       <div class="checkbox">
-                        <label> <%= check_box_tag 'du', 'du', params[:du].present? %> DU Fannie Mae</label>
+                        <label> <%= check_box_tag 'du', 'du', params[:du].present? %> DU</label>
                       </div>
                     </div>
                     <div class="col-md-4">
@@ -190,7 +192,7 @@
                     </div>
                     <div class="col-md-4">
                       <div class="checkbox">
-                        <label> <%= check_box_tag 'lp', 'lp', params[:lp].present? %> LP Freddie Mac</label>
+                        <label> <%= check_box_tag 'lp', 'lp', params[:lp].present? %> LP</label>
                       </div>
                     </div>
                     <div class="col-md-4">
