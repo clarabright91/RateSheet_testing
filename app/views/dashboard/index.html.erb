@@ -539,9 +539,11 @@
     if ($(this).prop("checked")){
       $("#loan_purpose").val('Refinance')
       $('#fha').prop('checked', true);
+      $('#loan_purpose-error').hide();
     } else {
       $("#loan_purpose").val('')
       $('#fha').prop('checked', false);
+      $('.error-loan-purpose').hide();
     }
   });
 
@@ -589,7 +591,7 @@
   function checkLoanPurposeValue() {
    var flag = true
    if ($("#streamline").is(":checked")){
-       if ($("#loan_purpose").val() != "Refinance") {
+       if ($("#loan_purpose").val() != "Refinance" && $("#loan_purpose").val() != "") {
         flag = false
        }
     }
@@ -599,6 +601,7 @@
   // form validation
   $("#search_form").validate({
     errorPlacement: function(error, element) {
+      $('.error-loan-purpose').hide();
       if(checkLoanPurposeValue() == false){
         $('html, body').animate({
             scrollTop: $(".error-loan-purpose").offset().top
