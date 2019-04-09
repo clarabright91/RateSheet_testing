@@ -5,6 +5,7 @@ class Program < ApplicationRecord
   has_many :adjustments, through: :program_adjustments
   belongs_to :sub_sheet, optional: true
   before_save :add_bank_name
+  after_save :add_default_loan_size
 
   STATE = [["All"], ["AK"], ["AL"], ["AR"], ["AS"], ["AZ"], ["CA"], ["CO"], ["CT"], ["DC"], ["DE"], ["FL"], ["FM"], ["GA"], ["GU"], ["HI"], ["IA"], ["ID"], ["IL"], ["IN"], ["KS"], ["KY"], ["LA"], ["MA"], ["MD"], ["ME"], ["MH"], ["MI"], ["MN"], ["MO"], ["MP"], ["MS"], ["MT"], ["NC"], ["ND"], ["NE"], ["NH"], ["NJ"], ["NM"], ["NV"], ["NY"], ["OH"], ["OK"], ["OR"], ["PA"], ["PR"], ["PW"], ["RI"], ["SC"], ["SD"], ["TN"], ["TX"], ["UT"], ["VA"], ["VI"], ["VT"], ["WA"], ["WI"], ["WV"], ["WY"]]
 
@@ -143,8 +144,8 @@ class Program < ApplicationRecord
     set_usda                        if p_name.downcase.include?("usda")
     set_streamline(p_name)          if ["streamline","SL"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_full_doc                    if p_name.downcase.include?("full doc")
-    set_libor                       if p_name.downcase.include?("libor")
-    set_arm_margin(p_name)          if p_name.downcase.include?("margin")
+    # set_libor                       if p_name.downcase.include?("libor")
+    set_arm_margin(p_name)          if p_name.downcase.include?("arm")
     # set_loan_purpose(p_name)        if ["Purchase", "Refinance"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_conforming(p_name)          if ["Conforming","Conf","fcf"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_fannie_mae(p_name)          if ["Fannie Mae", "FNMA", "Du "].each{ |word| p_name.downcase.include?(word.downcase) }
@@ -163,6 +164,9 @@ class Program < ApplicationRecord
       end
       if present_word.nil?
         present_word = "Fixed"
+      end
+      if present_word == "ARM"
+        self.arm_benchmark = "LIBOR"
       end
     }
     self.loan_type = present_word
@@ -209,14 +213,18 @@ class Program < ApplicationRecord
     self.loan_purpose = "Refinance" if present_word
   end
 
-  def set_libor
-    self.arm_benchmark = "LIBOR"
-  end
+  # def set_libor
+  #   self.arm_benchmark = "LIBOR"
+  # end
 
   def set_arm_margin(prog_name)
-    present_word = nil
     ["2.25","2.00"].each{ |word| 
-      self.arm_margin = word if prog_name.include?(word) 
+      if prog_name.include?(word) 
+        self.arm_margin = word
+      else
+        self.arm_margin = 0
+      end
+      break if self.arm_margin.present?
     }
   end
 
@@ -285,5 +293,16 @@ class Program < ApplicationRecord
       present_word = "HomeReady" if p_name.downcase.include?(word.downcase)
     }
     self.fannie_mae_product = present_word
+  end
+
+  def add_default_loan_size
+    p_name = self.program_name
+    present_word = nil
+    fetch_loan_size_fields.each{ |word|
+      present_word = word if p_name.squish.downcase.include?(word.downcase)
+      break if present_word.present?
+    }
+    loan_size = get_high_balance.include?(present_word) ? "High-Balance" : get_jumbo.include?(present_word) ? "Jumbo" : get_super_conforming.include?(present_word) ? "Super Conforming" : get_non_conforming.include?(present_word) ? "Non-Conforming" : get_conforming.include?(present_word) ? "Conforming" : get_conf.include?(present_word) ? "Conforming and High-Balance" : get_non_conf_hb.include?(present_word) ? "Non-Conforming and Jumbo" : "Conforming"
+    self.update_column(:loan_size, loan_size)
   end
 end
