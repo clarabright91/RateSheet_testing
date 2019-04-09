@@ -16,7 +16,9 @@ class Program < ApplicationRecord
 
   LOAN_SIZE = [["All"], ["Conforming"], ["Non-Conforming"], ["Super Conforming"], ["Jumbo"], ["High-Balance"]]
 
-  ARN_BASIC = [["1/1 ARM"],["2/1 ARM"],["3/1 ARM"],["7/1 ARM"],["10/1 ARM"],["5-1"],["5/1"]]
+  ARM_BASIC = [["1/1 ARM"],["2/1 ARM"],["3/1 ARM"],["5/1 ARM"], ["7/1 ARM"],["10/1 ARM"]]
+
+  ARM_BENCHMARK_LIST = [["LIBOR"]]
 
   INTEREST_LIST =[["3.250"],["3.375"],["3.500"],["3.625"],["3.750"],["3.875"],["4.000"],["4.125"],["4.250"],["4.375"],["4.500"],["4.625"],["4.750"],["4.875"],["5.000"],["5.125"],["5.250"],["5.375"],["5.500"],["5.625"],["5.750"],["5.875"]]
 

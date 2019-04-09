@@ -43,7 +43,7 @@
                 <div class="input-grp"><h5>Loan Property</h5></div>
                 <div class="row panel-body">
                   <div class="row col-md-12">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                       <div class="form-group">
                         <label>Loan Purpose</label>
                         <div class="input-group">
@@ -52,7 +52,7 @@
                         <span class="error-loan-purpose">Please Select Refinance</span>
                       </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                       <div class="form-group">
                         <label>Loan Size</label>
                         <div class="input-group">
@@ -62,13 +62,13 @@
                     </div>
                   </div>
                   <div class="row col-md-12">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                       <div class="form-group">
                         <label>Loan Type</label>
                         <%= select_tag 'loan_type', options_for_select(Program::LOAN_TYPE.flatten.sort_by!{ |m| m.downcase }, (params[:loan_type] rescue nil)), { prompt: 'Select Loan Type', :class=> "form-control" } %>
                       </div>
                     </div>
-                    <div class="col-md-4 term">
+                    <div class="col-md-6 term">
                       <div class="form-group">
                         <label>Term</label>
                         <div class="input-group">
@@ -76,29 +76,35 @@
                         </div>
                       </div>
                     </div>
-                    <div class="col-md-4 arm-basic">
+                    <div class="col-md-6 arm-basic">
                       <div class="form-group">
                         <label>ARM Basic</label>
                         <div class="input-group">
-                          <%= select_tag 'arm_basic', options_for_select(Program::ARN_BASIC.flatten.sort_by!{ |m| m.downcase }, (params[:arm_basic].present? ? params[:arm_basic] : "10/1 ARM")), { prompt: 'Select ARM Basic', :class=> "form-control"} %>
+                          <%= select_tag 'arm_basic', options_for_select(Program::ARM_BASIC.flatten, (params[:arm_basic].present? ? params[:arm_basic] : "10/1 ARM")), { prompt: 'Select ARM Basic', :class=> "form-control"} %>
                         </div>
                       </div>
                     </div>
-                    <div class="col-md-4 arm-basic">
+                    <div class="col-md-6 arm-basic">
                       <div class="form-group">
                         <label>ARM Advance</label>
                         <%= select_tag 'arm_advanced', options_for_select( @arm_advanced_list.flatten.sort_by!{ |m| m.downcase }, (params[:arm_advanced] rescue nil)), { prompt: 'Select ARM Advance', :class=> "form-control"} %>
                       </div>
                     </div>
+                    <div class="col-md-6 arm-basic">
+                      <div class="form-group">
+                        <label>ARM Benchmark</label>
+                        <%= select_tag 'arm_benchmark', options_for_select(Program::ARM_BENCHMARK_LIST.flatten.sort_by!{ |m| m.downcase }, (params[:arm_benchmark] rescue nil)), { prompt: 'Select ARM Benchmark', :class=> "form-control"} %>
+                      </div>
+                    </div>
                   </div>
                   <div class="row col-md-12">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                       <div class="form-group">
                         <label>Interest Rate</label>
                         <%= select_tag 'interest', options_for_select(Program::INTEREST_LIST, @interest), :class=> "form-control" %>
                       </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                       <div class="form-group">
                         <label>Lock Period</label>
                         <div class="input-group">
@@ -501,6 +507,10 @@
      }
    });
   });
+
+  if ($('#arm_benchmark').val()=='') {
+    $('#arm_benchmark').val('LIBOR')
+  }
 
   $('#du').click(function(){
     if($(this).prop("checked"))
