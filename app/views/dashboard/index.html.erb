@@ -489,36 +489,60 @@
       });
     });
 
-
-    $(".alert-error" ).fadeOut(3000);
-     if ($("#loan_type").val() == "ARM") {
-      $(".arm-basic").show();
-      $(".term").hide();
-    }else{
-     $(".arm-basic").hide();
-     $(".term").show();
+    function setArmDefaultValues(){
+      $('#arm_benchmark').val('LIBOR')
+      $('#arm_margin').val('0.00')
+      $('#arm_basic').val('10/1')
     }
 
-    if ($("#loan_type").val() == "All") {
-      $(".arm-basic").show();
-      $(".term").show();
+    function setArmNullValues(){
+      $('#arm_benchmark').val('')
+      $('#term').val('')
+      $('#arm_margin').val('')
+      $('#arm_basic').val('')
     }
+
+    function setArmDefaultValuesOnLoan(){
+      if ($('#arm_benchmark').val()=='' && $("#loan_type").val() != "All" && $("#loan_type").val() != "ARM" ) {
+          $('#arm_benchmark').val('LIBOR')
+        }
+        if ($('#arm_margin').val()=='' && $("#loan_type").val() != "All" && $("#loan_type").val() != "ARM" ) {
+          $('#arm_margin').val('0.00')
+        }
+        if ($('#arm_basic').val()=='' && $("#loan_type").val() != "All" && $("#loan_type").val() != "ARM" ) {
+          $('#arm_basic').val('10/1')
+        }
+    }
+
+    function showTermAndArmSectionOnLoan(){
+      if ($("#loan_type").val() == "ARM") {
+        $(".arm-basic").show();
+        $(".term").hide();
+      }else{
+       $(".arm-basic").hide();
+       $(".term").show();
+      }
+
+      if ($("#loan_type").val() == "All") {
+        $(".arm-basic").show();
+        $(".term").show();
+      }
+    }
+
+    setArmDefaultValuesOnLoan();
+    showTermAndArmSectionOnLoan();
+
 
    $("#loan_type").on('click', function(e){
      if ($(this).val()=="ARM"){
       $(".term").hide()
       $(".arm-basic").show()
-      $('#arm_benchmark').val('LIBOR')
-      $('#arm_margin').val('0.00')
-      $('#arm_basic').val('10/1')
+      setArmDefaultValues();
      }else{
       if ($(this).val()=="All"){
         $(".arm-basic").show();
         $(".term").show();
-        $('#arm_benchmark').val('')
-        $('#term').val('')
-        $('#arm_margin').val('')
-        $('#arm_basic').val('')
+        setArmNullValues();
       }else{
         $(".arm-basic").hide();
         $(".term").show();
@@ -526,18 +550,6 @@
      }
    });
   });
-
-  if ($('#arm_benchmark').val()=='' && $("#loan_type").val() != "All" && $("#loan_type").val() != "ARM" ) {
-    $('#arm_benchmark').val('LIBOR')
-  }
-
-  if ($('#arm_margin').val()=='' && $("#loan_type").val() != "All" && $("#loan_type").val() != "ARM" ) {
-    $('#arm_margin').val('0.00')
-  }
-
-  if ($('#arm_basic').val()=='' && $("#loan_type").val() != "All" && $("#loan_type").val() != "ARM" ) {
-    $('#arm_basic').val('10/1')
-  }
 
   $('#du').click(function(){
     if($(this).prop("checked"))
