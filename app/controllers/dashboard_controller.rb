@@ -175,6 +175,22 @@ class DashboardController < ApplicationController
             @filter_data[:arm_advanced] = params[:arm_advanced]
           end
         end
+        if params[:arm_benchmark].present?
+          if params[:arm_benchmark] == "All"
+            @filter_not_nil[:arm_benchmark] = nil
+          else
+            @arm_benchmark = params[:arm_benchmark]
+            @filter_data[:arm_benchmark] = params[:arm_benchmark]
+          end
+        end
+        if params[:arm_margin].present?
+          if params[:arm_margin] == "All"
+            @filter_not_nil[:arm_margin] = nil
+          else
+            @arm_margin = params[:arm_margin].to_f
+            @filter_data[:arm_margin] = params[:arm_margin].to_f
+          end
+        end
       else
         @filter_data[:loan_type] = params[:loan_type]
         if params[:loan_type] =="ARM"
@@ -196,11 +212,33 @@ class DashboardController < ApplicationController
               @filter_data[:arm_advanced] = params[:arm_advanced]
             end
           end
+          if params[:arm_benchmark].present?
+            if params[:arm_benchmark] == "All"
+              @filter_not_nil[:arm_benchmark] = nil
+            else
+              @arm_benchmark = params[:arm_benchmark]
+              @filter_data[:arm_benchmark] = params[:arm_benchmark]
+            end
+          end
+          if params[:arm_margin].present?
+            if params[:arm_margin] == "All"
+              @filter_not_nil[:arm_margin] = nil
+            else
+              @arm_margin = params[:arm_margin].to_f
+              @filter_data[:arm_margin] = params[:arm_margin].to_f
+            end
+          end
         end
         if params[:loan_type] !="ARM"
-          @filter_data[:term] = params[:term].to_i
-          @term = params[:term]
-          @program_term = params[:term].to_i
+          if params[:term].present?
+            if (params[:term] == "All")
+              @filter_not_nil[:term] = nil
+            else
+              @filter_data[:term] = params[:term].to_i
+              @term = params[:term]
+              @program_term = params[:term].to_i
+            end
+          end
         end
       end
     end
