@@ -107,7 +107,11 @@ class DashboardController < ApplicationController
               @filter_data[:program_category] = key_value
             end
           else
-            @filter_data[key.to_sym] = key_value
+            if (key == "program_name")
+              @filter_data[key.to_sym] = key_value.remove("\r")
+            else
+              @filter_data[key.to_sym] = key_value
+            end
           end
           if %w[fannie_mae_product freddie_mac_product].include?(key)
             instance_variable_set("@#{key}", key_value)
