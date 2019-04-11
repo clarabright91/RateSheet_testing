@@ -373,13 +373,13 @@
             <td><%= program[:loan_category] %></td>
             <td><%= program[:program_category] %></td>
             <td><%= program[:program_name] %></td>
-            <td><%= (program[:base_rate].to_f).round(2) %></td>
-            <td><%= program[:adj_points] %></td>
+            <td><%= (program[:base_rate].to_f).round(3) %></td>
+            <td><%= program[:adj_points] unless program[:adj_points] == "Adjustment Not Present" %></td>
             <td>
               <%
                 if program[:adj_primary_key] == "Adjustment Not Present"
                   %>
-                    <%= program[:adj_primary_key] %>
+                    <%#= program[:adj_primary_key] %>
                   <%
                 else
                   program[:adj_primary_key].each_with_index do |key, index|
@@ -551,43 +551,84 @@
    });
   });
 
-  $('#du').click(function(){
-    if($(this).prop("checked"))
+  // $('#du').click(function(){
+  //   if($(this).prop("checked"))
+  //     $('#fannie_mae').prop('checked', true);
+  //   else{
+  //     if ($('#fannie_mae_product').val()=='') {
+  //       $('#fannie_mae').prop('checked', false);
+  //     }
+  //   }
+  // });
+
+  var fannie_mae = false
+  $('#du').click(function () {
+    if ($(this).prop("checked")){
+      fannie_mae = $('#fannie_mae').prop("checked")
       $('#fannie_mae').prop('checked', true);
-    else{
-      if ($('#fannie_mae_product').val()=='') {
-        $('#fannie_mae').prop('checked', false);
-      }
+    } else {
+      $('#fannie_mae').prop('checked', fannie_mae);
     }
   });
 
-   $('#lp').click(function(){
-    if($(this).prop("checked"))
+  $('#fannie_mae').click(function () {
+    if ($(this).prop("checked")){
+      if ($('#du').prop("checked"))
+      $('#du').prop('checked', false);
+    } else {
+      if ($('#du').prop("checked"))
+      $('#du').prop('checked', false);
+    }
+  });
+
+  var freddie_mac = false
+  $('#lp').click(function () {
+    if ($(this).prop("checked")){
+      freddie_mac = $('#freddie_mac').prop("checked")
       $('#freddie_mac').prop('checked', true);
-    else{
-      if ($('#freddie_mac_product').val()=='') {
-        $('#freddie_mac').prop('checked', false);
-      }
+    } else {
+      $('#freddie_mac').prop('checked', freddie_mac);
     }
   });
 
-  $('#fannie_mae').click(function(){
-    if($(this).prop("checked"))
-      $('#du').prop('checked', false);
-    else{
-      $('#du').prop('checked', false);
-      $('#fannie_mae_product').val('')
+  $('#freddie_mac').click(function () {
+    if ($(this).prop("checked")){
+      if ($('#lp').prop("checked"))
+      $('#lp').prop('checked', false);
+    } else {
+      if ($('#lp').prop("checked"))
+      $('#lp').prop('checked', false);
     }
   });
 
-  $('#freddie_mac').click(function(){
-    if($(this).prop("checked"))
-      $('#lp').prop('checked', false);
-    else{
-      $('#lp').prop('checked', false);
-      $('#freddie_mac_product').val('')
-    }
-  });
+
+  //  $('#lp').click(function(){
+  //   if($(this).prop("checked"))
+  //     $('#freddie_mac').prop('checked', true);
+  //   else{
+  //     if ($('#freddie_mac_product').val()=='') {
+  //       $('#freddie_mac').prop('checked', false);
+  //     }
+  //   }
+  // });
+
+  // $('#fannie_mae').click(function(){
+  //   if($(this).prop("checked"))
+  //     $('#du').prop('checked', false);
+  //   else{
+  //     $('#du').prop('checked', false);
+  //     $('#fannie_mae_product').val('')
+  //   }
+  // });
+
+  // $('#freddie_mac').click(function(){
+  //   if($(this).prop("checked"))
+  //     $('#lp').prop('checked', false);
+  //   else{
+  //     $('#lp').prop('checked', false);
+  //     $('#freddie_mac_product').val('')
+  //   }
+  // });
 
   // when streamline checked fha will be true and loan_purpose will be 'Refinance'
   var fha_checked = false

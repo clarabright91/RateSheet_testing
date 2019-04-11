@@ -19,7 +19,7 @@ class Program < ApplicationRecord
 
   ARM_BASIC = [["All"], ["1/1"],["2/1"],["3/1"],["5/1"], ["7/1"],["10/1"]]
 
-  ARM_BENCHMARK_LIST = [["All"], ["LIBOR"]]
+  ARM_BENCHMARK_LIST = [["LIBOR"]]
 
   ARM_MARGIN_LIST = [["All"], ["0.00"], ["2.20"], ["2.25"]]
 
@@ -27,9 +27,9 @@ class Program < ApplicationRecord
 
   LOCK_PERIOD_LIST =[["15 days","15"], ["30 days","30"], ["45 days","45"], ["60 days","60"], ["75 days","75"], ["90 days","90"]]
 
-  FANNIE_MAE_PRODUCT_LIST =[["All"], ["HomeReady"]]
+  FANNIE_MAE_PRODUCT_LIST =[["HomeReady"]]
 
-  FREDDIE_MAC_PRODUCT_LIST =[["All"], ["Home Possible"]]
+  FREDDIE_MAC_PRODUCT_LIST =[["Home Possible"]]
 
   CREDIT_SCORE_LIST = [["760 +", "760 +"], ["740-759", "740-759"], ["720-739", "720-739"], ["700-719", "700-719"], ["680-699", "680-699"], ["660-679", "660-679"], ["640-659", "640-659"], ["620-639", "620-639"]]
 
