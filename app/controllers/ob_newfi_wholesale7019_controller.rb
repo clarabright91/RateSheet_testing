@@ -249,7 +249,15 @@ class ObNewfiWholesale7019Controller < ApplicationController
       if (sheet == "SEQUOIA PORTFOLIO PLUS PRODUCTS")
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
-
+        @adjustment_hash = {}
+        @cashout = {}
+        @additional_hash = {}
+        @rate_hash = {}
+        @cashout_hash = {}
+        @other_adjustment = {}
+        @ltv_data = []
+        primary_key = ''
+        ltv_key = ''
         #program
         (51..92).each do |r|
           row = sheet_data.row(r)
@@ -259,23 +267,17 @@ class ObNewfiWholesale7019Controller < ApplicationController
             (0..max_column_section).each do |max_column|
               cc = 5*max_column + (3+max_column) # 3 / 9 / 15
               begin
-                begin
-                  @title = sheet_data.cell(r,cc)
-                  if @title.present?
-                    @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                    @term = program_property @title
-                    p_name = @title + sheet
-                    @program.update_fields p_name
-                    @programs_ids << @program.id
-                  end
-
-                  @program.adjustments.destroy_all
-                  @block_hash = {}
-                  key = ''
-                rescue Exception => e
-                  error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
-                  error_log.save
+                @title = sheet_data.cell(r,cc)
+                if @title.present?
+                  @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  @term = program_property @title
+                  p_name = @title + sheet
+                  @program.update_fields p_name
+                  @programs_ids << @program.id
                 end
+                @program.adjustments.destroy_all
+                @block_hash = {}
+                key = ''
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -308,13 +310,183 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @block_hash.shift
                 end
                 @program.update(base_rate: @block_hash,loan_category: sheet)
-              end
               rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
                 error_log.save
               end
             end
           end
+        end
+        # Adjustments
+        (100..172).each do |r|
+          row = sheet_data.row(r)
+          @ltv_data = sheet_data.row(104)
+          (0..19).each do |cc|
+            value = sheet_data.cell(r,cc)
+            if value.present?
+              if value == "Full Doc Pricing Adjustments"
+                @adjustment_hash["FICO/LTV"] = {}
+                @cashout["RefinanceOption/FICO/LTV"] = {}
+                @cashout["RefinanceOption/FICO/LTV"]["Cash Out"] = {}
+                @additional_hash["PropertyType/LTV"] = {}
+              end
+              if value == "Bank Statement Pricing Adjustments"
+                @rate_hash["FICO/LTV"] = {}
+                @cashout_hash["RefinanceOption/FICO/LTV"] = {}
+                @cashout_hash["RefinanceOption/FICO/LTV"]["Cash Out"] = {}
+                @other_adjustment["PropertyType/LTV"] = {}
+              end
+              if r >= 105 && r <= 110 && cc == 3
+                primary_key = get_value value
+                @adjustment_hash["FICO/LTV"][primary_key] = {}
+              end
+              if r >= 105 && r <= 110 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @adjustment_hash["FICO/LTV"][primary_key][ltv_key] = {}
+                @adjustment_hash["FICO/LTV"][primary_key][ltv_key] = value
+              end
+              if r >= 113 && r <= 118 && cc == 3
+                primary_key = get_value value
+                @cashout["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key] = {}
+              end
+              if r >= 113 && r <= 118 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @cashout["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key][ltv_key] = {}
+                @cashout["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key][ltv_key] = value
+              end
+              if r == 121 && cc == 3
+                @additional_hash["LoanAmount/LTV"] = {}
+                @additional_hash["LoanAmount/LTV"]["1500000"] = {}
+              end
+              if r == 121 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @additional_hash["LoanAmount/LTV"]["1500000"][ltv_key] = {}
+                @additional_hash["LoanAmount/LTV"]["1500000"][ltv_key] = value
+              end
+              if r == 122 && cc == 3
+                @additional_hash["LoanType/LTV"] = {}
+                @additional_hash["LoanType/LTV"]["ARM"] = {}
+                @additional_hash["LoanType/Term/LTV"] = {}
+                @additional_hash["LoanType/Term/LTV"]["Fixed"] = {}
+                @additional_hash["LoanType/Term/LTV"]["Fixed"]["30"] = {}
+              end
+              if r == 122 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @additional_hash["LoanType/LTV"]["ARM"][ltv_key] = {}
+                @additional_hash["LoanType/LTV"]["ARM"][ltv_key] = value
+                @additional_hash["LoanType/Term/LTV"]["Fixed"]["30"][ltv_key] = {}
+                @additional_hash["LoanType/Term/LTV"]["Fixed"]["30"][ltv_key] = value
+              end
+              if r >= 123 && r <= 126 && cc == 3
+                if value == "Investment"
+                  primary_key = "Investment Property"
+                else
+                  primary_key = value
+                end
+                @additional_hash["PropertyType/LTV"][primary_key] = {}
+              end
+              if r >= 123 && r <= 126 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @additional_hash["PropertyType/LTV"][primary_key][ltv_key] = {}
+                @additional_hash["PropertyType/LTV"][primary_key][ltv_key] = value
+              end
+              if r == 127 && cc == 3
+                @additional_hash["LoanType/Term"] = {}
+                @additional_hash["LoanType/Term"]["Fixed"] = {}
+                @additional_hash["LoanType/Term"]["Fixed"]["40"] = {}
+              end
+              if r == 127 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @additional_hash["LoanType/Term"]["Fixed"]["40"][ltv_key] = {}
+                @additional_hash["LoanType/Term"]["Fixed"]["40"][ltv_key] = value
+              end
+              if r == 128 && cc == 3
+                @additional_hash["FullDoc/LTV"] = {}
+                @additional_hash["FullDoc/LTV"][true] = {}
+              end
+              if r == 128 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @additional_hash["FullDoc/LTV"][true][ltv_key] = {}
+                @additional_hash["FullDoc/LTV"][true][ltv_key] = value
+              end
+              if r >= 136 && r <= 141 && cc == 3
+                primary_key = get_value value
+                @rate_hash["FICO/LTV"][primary_key] = {}
+              end
+              if r >= 136 && r <= 141 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @rate_hash["FICO/LTV"][primary_key][ltv_key] = {}
+                @rate_hash["FICO/LTV"][primary_key][ltv_key] = value
+              end
+              if r >= 144 && r <= 149 && cc == 3
+                primary_key = get_value value
+                @cashout_hash["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key] = {}
+              end
+              if r >= 144 && r <= 149 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @cashout_hash["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key][ltv_key] = {}
+                @cashout_hash["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key][ltv_key] = value
+              end
+              if r == 152 && cc == 3
+                @other_adjustment["LoanAmount/LTV"] = {}
+                @other_adjustment["LoanAmount/LTV"]["1500000"] = {}
+              end
+              if r == 152 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @other_adjustment["LoanAmount/LTV"]["1500000"][ltv_key] = {}
+                @other_adjustment["LoanAmount/LTV"]["1500000"][ltv_key] = value
+              end
+              if r == 153 && cc == 3
+                @other_adjustment["LoanType/LTV"] = {}
+                @other_adjustment["LoanType/LTV"]["ARM"] = {}
+                @other_adjustment["LoanType/Term/LTV"] = {}
+                @other_adjustment["LoanType/Term/LTV"]["Fixed"] = {}
+                @other_adjustment["LoanType/Term/LTV"]["Fixed"]["30"] = {}
+              end
+              if r == 153 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @other_adjustment["LoanType/LTV"]["ARM"][ltv_key] = {}
+                @other_adjustment["LoanType/LTV"]["ARM"][ltv_key] = value
+                @other_adjustment["LoanType/Term/LTV"]["Fixed"]["30"][ltv_key] = {}
+                @other_adjustment["LoanType/Term/LTV"]["Fixed"]["30"][ltv_key] = value
+              end
+              if r >= 154 && r <= 157 && cc == 3
+                if value == "Investment"
+                  primary_key = "Investment Property"
+                else
+                  primary_key = value
+                end
+                @other_adjustment["PropertyType/LTV"][primary_key] = {}
+              end
+              if r >= 154 && r <= 157 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @other_adjustment["PropertyType/LTV"][primary_key][ltv_key] = {}
+                @other_adjustment["PropertyType/LTV"][primary_key][ltv_key] = value
+              end
+              if r == 158 && cc == 3
+                @other_adjustment["LoanType/Term"] = {}
+                @other_adjustment["LoanType/Term"]["Fixed"] = {}
+                @other_adjustment["LoanType/Term"]["Fixed"]["40"] = {}
+              end
+              if r == 158 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @other_adjustment["LoanType/Term"]["Fixed"]["40"][ltv_key] = {}
+                @other_adjustment["LoanType/Term"]["Fixed"]["40"][ltv_key] = value
+              end
+              if r == 159 && cc == 3
+                @other_adjustment["FullDoc/LTV"] = {}
+                @other_adjustment["FullDoc/LTV"][true] = {}
+              end
+              if r == 159 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @other_adjustment["FullDoc/LTV"][true][ltv_key] = {}
+                @other_adjustment["FullDoc/LTV"][true][ltv_key] = value
+              end
+            end
+          end
+        end
+        adjustment = [@adjustment_hash,@cashout,@additional_hash,@rate_hash,@cashout_hash,@other_adjustment]
+        make_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_ob_newfi_wholesale7019_path(@sheet_obj)
@@ -325,7 +497,15 @@ class ObNewfiWholesale7019Controller < ApplicationController
       if (sheet == "SEQUOIA EXPANDED PRODUCTS")
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
-
+        @adjustment_hash = {}
+        @cashout = {}
+        @additional_hash = {}
+        @rate_hash = {}
+        @cashout_hash = {}
+        @other_adjustment = {}
+        @ltv_data = []
+        primary_key = ''
+        ltv_key = ''
         #program
         (51..92).each do |r|
           row = sheet_data.row(r)
@@ -387,6 +567,176 @@ class ObNewfiWholesale7019Controller < ApplicationController
             end
           end
         end
+        # Adjustments
+        (100..183).each do |r|
+          row = sheet_data.row(r)
+          @ltv_data = sheet_data.row(104)
+          (0..19).each do |cc|
+            value = sheet_data.cell(r,cc)
+            if value.present?
+              if value == "Full Doc Pricing Adjustments"
+                @adjustment_hash["FICO/LTV"] = {}
+                @cashout["RefinanceOption/FICO/LTV"] = {}
+                @cashout["RefinanceOption/FICO/LTV"]["Cash Out"] = {}
+                @additional_hash["PropertyType/LTV"] = {}
+              end
+              if value == "Bank Statement Pricing Adjustments"
+                @rate_hash["FICO/LTV"] = {}
+                @cashout_hash["RefinanceOption/FICO/LTV"] = {}
+                @cashout_hash["RefinanceOption/FICO/LTV"]["Cash Out"] = {}
+                @other_adjustment["PropertyType/LTV"] = {}
+              end
+              if r >= 105 && r <= 112 && cc == 3
+                primary_key = get_value value
+                @adjustment_hash["FICO/LTV"][primary_key] = {}
+              end
+              if r >= 105 && r <= 112 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @adjustment_hash["FICO/LTV"][primary_key][ltv_key] = {}
+                @adjustment_hash["FICO/LTV"][primary_key][ltv_key] = value
+              end
+              if r >= 115 && r <= 122 && cc == 3
+                primary_key = get_value value
+                @cashout["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key] = {}
+              end
+              if r >= 115 && r <= 122 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @cashout["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key][ltv_key] = {}
+                @cashout["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key][ltv_key] = value
+              end
+              if r == 125 && cc == 3
+                @additional_hash["LoanAmount/LTV"] = {}
+                @additional_hash["LoanAmount/LTV"]["1500000"] = {}
+              end
+              if r == 125 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @additional_hash["LoanAmount/LTV"]["1500000"][ltv_key] = {}
+                @additional_hash["LoanAmount/LTV"]["1500000"][ltv_key] = value
+              end
+              if r == 126 && cc == 3
+                @additional_hash["LoanType/LTV"] = {}
+                @additional_hash["LoanType/LTV"]["ARM"] = {}
+                @additional_hash["LoanType/Term/LTV"] = {}
+                @additional_hash["LoanType/Term/LTV"]["Fixed"] = {}
+                @additional_hash["LoanType/Term/LTV"]["Fixed"]["30"] = {}
+              end
+              if r == 126 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @additional_hash["LoanType/LTV"]["ARM"][ltv_key] = {}
+                @additional_hash["LoanType/LTV"]["ARM"][ltv_key] = value
+                @additional_hash["LoanType/Term/LTV"]["Fixed"]["30"][ltv_key] = {}
+                @additional_hash["LoanType/Term/LTV"]["Fixed"]["30"][ltv_key] = value
+              end
+              if r >= 127 && r <= 130 && cc == 3
+                if value == "Investment"
+                  primary_key = "Investment Property"
+                else
+                  primary_key = value
+                end
+                @additional_hash["PropertyType/LTV"][primary_key] = {}
+              end
+              if r >= 127 && r <= 130 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @additional_hash["PropertyType/LTV"][primary_key][ltv_key] = {}
+                @additional_hash["PropertyType/LTV"][primary_key][ltv_key] = value
+              end
+              if r == 131 && cc == 3
+                @additional_hash["LoanType/Term"] = {}
+                @additional_hash["LoanType/Term"]["Fixed"] = {}
+                @additional_hash["LoanType/Term"]["Fixed"]["40"] = {}
+              end
+              if r == 131 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @additional_hash["LoanType/Term"]["Fixed"]["40"][ltv_key] = {}
+                @additional_hash["LoanType/Term"]["Fixed"]["40"][ltv_key] = value
+              end
+              if r == 132 && cc == 3
+                @additional_hash["FullDoc/LTV"] = {}
+                @additional_hash["FullDoc/LTV"][true] = {}
+              end
+              if r == 132 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @additional_hash["FullDoc/LTV"][true][ltv_key] = {}
+                @additional_hash["FullDoc/LTV"][true][ltv_key] = value
+              end
+              if r >= 140 && r <= 147 && cc == 3
+                primary_key = get_value value
+                @rate_hash["FICO/LTV"][primary_key] = {}
+              end
+              if r >= 140 && r <= 147 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @rate_hash["FICO/LTV"][primary_key][ltv_key] = {}
+                @rate_hash["FICO/LTV"][primary_key][ltv_key] = value
+              end
+              if r >= 150 && r <= 157 && cc == 3
+                primary_key = get_value value
+                @cashout_hash["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key] = {}
+              end
+              if r >= 150 && r <= 157 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @cashout_hash["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key][ltv_key] = {}
+                @cashout_hash["RefinanceOption/FICO/LTV"]["Cash Out"][primary_key][ltv_key] = value
+              end
+              if r == 160 && cc == 3
+                @other_adjustment["LoanAmount/LTV"] = {}
+                @other_adjustment["LoanAmount/LTV"]["1500000"] = {}
+              end
+              if r == 160 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @other_adjustment["LoanAmount/LTV"]["1500000"][ltv_key] = {}
+                @other_adjustment["LoanAmount/LTV"]["1500000"][ltv_key] = value
+              end
+              if r == 161 && cc == 3
+                @other_adjustment["LoanType/LTV"] = {}
+                @other_adjustment["LoanType/LTV"]["ARM"] = {}
+                @other_adjustment["LoanType/Term/LTV"] = {}
+                @other_adjustment["LoanType/Term/LTV"]["Fixed"] = {}
+                @other_adjustment["LoanType/Term/LTV"]["Fixed"]["30"] = {}
+              end
+              if r == 161 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @other_adjustment["LoanType/LTV"]["ARM"][ltv_key] = {}
+                @other_adjustment["LoanType/LTV"]["ARM"][ltv_key] = value
+                @other_adjustment["LoanType/Term/LTV"]["Fixed"]["30"][ltv_key] = {}
+                @other_adjustment["LoanType/Term/LTV"]["Fixed"]["30"][ltv_key] = value
+              end
+              if r >= 162 && r <= 165 && cc == 3
+                if value == "Investment"
+                  primary_key = "Investment Property"
+                else
+                  primary_key = value
+                end
+                @other_adjustment["PropertyType/LTV"][primary_key] = {}
+              end
+              if r >= 162 && r <= 165 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @other_adjustment["PropertyType/LTV"][primary_key][ltv_key] = {}
+                @other_adjustment["PropertyType/LTV"][primary_key][ltv_key] = value
+              end
+              if r == 166 && cc == 3
+                @other_adjustment["LoanType/Term"] = {}
+                @other_adjustment["LoanType/Term"]["Fixed"] = {}
+                @other_adjustment["LoanType/Term"]["Fixed"]["40"] = {}
+              end
+              if r == 166 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @other_adjustment["LoanType/Term"]["Fixed"]["40"][ltv_key] = {}
+                @other_adjustment["LoanType/Term"]["Fixed"]["40"][ltv_key] = value
+              end
+              if r == 167 && cc == 3
+                @other_adjustment["FullDoc/LTV"] = {}
+                @other_adjustment["FullDoc/LTV"][true] = {}
+              end
+              if r == 167 && cc >= 5 && cc <= 19
+                ltv_key = get_value @ltv_data[cc-3]
+                @other_adjustment["FullDoc/LTV"][true][ltv_key] = {}
+                @other_adjustment["FullDoc/LTV"][true][ltv_key] = value
+              end
+            end
+          end
+        end
+        adjustment = [@adjustment_hash,@cashout,@additional_hash,@rate_hash,@cashout_hash,@other_adjustment]
+        make_adjust(adjustment,sheet)
       end
     end
     redirect_to programs_ob_newfi_wholesale7019_path(@sheet_obj)
