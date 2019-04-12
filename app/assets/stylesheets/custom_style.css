@@ -70,12 +70,9 @@ h4#sheet-title{
   color: red;
   display:none;
 }
+
 .reset{
-  margin-left: auto;
+  margin-bottom: 5px;
 }
-.reset a.nav-link {
-  color: red !important;
-}
-.navbar-nav {
-  width: 100%;
-}
+
+

@@ -1,7 +1,13 @@
 <div class="container">
   <!-- searching form -->
   <div class="">
-    <br/>
+    <div class="row">
+      <div class="col-md-10">
+      </div>
+      <div class="col-md-2 text-right reset">
+        <%= link_to 'Reset All', root_path, :class=>"btn btn-danger" %>
+      </div>
+    </div>
     <%= form_tag('/dashboard/index', method: :get, id: :search_form) do %>
       <div class="main-form panel">
         <div class="panel-heading">Program Inputs</div>
