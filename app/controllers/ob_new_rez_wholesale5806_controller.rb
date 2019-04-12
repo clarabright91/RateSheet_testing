@@ -6506,6 +6506,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   fannie_mae_product = "HomeReady"
                 end
 
+                # fannie_mae
+                if p_name.downcase.include?("fnma")
+                  fannie_mae = true
+                end
+
                 # loan_purpose
                 if p_name.downcase.include?('refinance') || p_name.downcase.include?('refi')
                   loan_purpose = "Refinance"
@@ -6525,7 +6530,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
 
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_ids << @program.id
-                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, fannie_mae_product: fannie_mae_product, loan_category: @sheet_name, loan_purpose: loan_purpose, du: du, lp: lp, loan_size: loan_size)
+                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, fannie_mae_product: fannie_mae_product, loan_category: @sheet_name, loan_purpose: loan_purpose, du: du, lp: lp, loan_size: loan_size,fannie_mae: fannie_mae)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
