@@ -193,6 +193,7 @@ class Program < ApplicationRecord
 
   def set_fha
     self.fha = true
+    return
   end
 
   def set_va
@@ -206,11 +207,13 @@ class Program < ApplicationRecord
   def set_streamline(prog_name)
     present_word = nil
     ["streamline","SL"].map { |word|
-      present_word = true if prog_name.downcase.include?(word.downcase)
+      if prog_name.downcase.include?(word.downcase)
+        present_word = true 
+        self.streamline = present_word
+        self.fha = present_word
+        self.loan_purpose = "Refinance" if present_word
+      end
     }
-    self.streamline = present_word
-    self.fha = present_word
-    self.loan_purpose = "Refinance" if present_word
   end
 
   # def set_libor

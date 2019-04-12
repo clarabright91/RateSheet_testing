@@ -37,6 +37,7 @@ class ObQuickenLoans3571Controller < ApplicationController
                 if @title.present? && @title != "=FALSE()"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.loan_category = sheet
+                  Adjustment.where(loan_category: @program.loan_category).destroy_all
                   @programs_ids << @program.id
                   p_name = @title + " " + sheet
                   @program.update_fields p_name
@@ -221,12 +222,12 @@ class ObQuickenLoans3571Controller < ApplicationController
                     @other_adjustment["PropertyType/FannieMae/FreddieMac/LTV"]["Investment Property"] = {}
                     @other_adjustment["PropertyType/FannieMae/FreddieMac/LTV"]["Investment Property"][true] = {}
                     @other_adjustment["PropertyType/FannieMae/FreddieMac/LTV"]["Investment Property"][true][true] = {}
-                    @other_adjustment["PropertyType/FannieMae/FreddieMac/LTV"]["Investment Property"][true][true]["ALL"] = {}
+                    @other_adjustment["PropertyType/FannieMae/FreddieMac/LTV"]["Investment Property"][true][true]["0-Inf"] = {}
                   end
                   if r == 55 && cc >= 15 && cc <= 21
                     ltv_key = get_value @property_data[cc-1]
-                    @other_adjustment["PropertyType/FannieMae/FreddieMac/LTV"]["Investment Property"][true][true]["ALL"][ltv_key] = {}
-                    @other_adjustment["PropertyType/FannieMae/FreddieMac/LTV"]["Investment Property"][true][true]["ALL"][ltv_key] = value
+                    @other_adjustment["PropertyType/FannieMae/FreddieMac/LTV"]["Investment Property"][true][true]["0-Inf"][ltv_key] = {}
+                    @other_adjustment["PropertyType/FannieMae/FreddieMac/LTV"]["Investment Property"][true][true]["0-Inf"][ltv_key] = value
                   end
                   if r == 58 && cc == 13
                     @other_adjustment["FannieMae/FreddieMac/Term/LTV"] = {}
@@ -390,6 +391,7 @@ class ObQuickenLoans3571Controller < ApplicationController
                 if @title.present? && @title != "=FALSE()"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.loan_category = sheet
+                  Adjustment.where(loan_category: @program.loan_category).destroy_all
                   @programs_ids << @program.id
                   p_name = @title + " " + sheet
                   @program.update_fields p_name
@@ -894,6 +896,7 @@ class ObQuickenLoans3571Controller < ApplicationController
                 if @title.present? && @title != "=FALSE()"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.loan_category = @sheet_name
+                  Adjustment.where(loan_category: @program.loan_category).destroy_all
                   @programs_ids << @program.id
                   p_name = @title + " " + sheet
                   @program.update_fields p_name
@@ -954,6 +957,7 @@ class ObQuickenLoans3571Controller < ApplicationController
                 if @title.present? && @title != "=FALSE()"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.loan_category = @sheet_name
+                  Adjustment.where(loan_category: @program.loan_category).destroy_all
                   @programs_ids << @program.id
                   p_name = @title + " " + sheet
                   @program.update_fields p_name
@@ -1014,6 +1018,7 @@ class ObQuickenLoans3571Controller < ApplicationController
                 if @title.present? && @title != "=FALSE()"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.loan_category = @sheet_name
+                  Adjustment.where(loan_category: @program.loan_category).destroy_all
                   @programs_ids << @program.id
                   p_name = @title + " " + sheet
                   @program.update_fields p_name
@@ -1079,6 +1084,7 @@ class ObQuickenLoans3571Controller < ApplicationController
                 if @title.present? && @title != "=FALSE()"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.loan_category = @sheet_name
+                  Adjustment.where(loan_category: @program.loan_category).destroy_all
                   @programs_ids << @program.id
                   p_name = @title + " " + sheet
                   @program.update_fields p_name
@@ -1234,6 +1240,7 @@ class ObQuickenLoans3571Controller < ApplicationController
                 if @title.present? && @title != "=FALSE()"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.loan_category = @sheet_name
+                  Adjustment.where(loan_category: @program.loan_category).destroy_all
                   @programs_ids << @program.id
                   p_name = @title + " " + sheet
                   @program.update_fields p_name
