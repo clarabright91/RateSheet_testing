@@ -652,14 +652,14 @@ class DashboardController < ApplicationController
                           if cltv_key.include?("Inf") || cltv_key.include?("Infinity")
                             (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| cltv_key_range << f }
                             cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @ltv).present?
+                            if (cltv_key_range & @cltv).present?
                               cltv_key2 = cltv_key
                               adj_key_hash[key_index] = cltv_key
                             end
                           else
                             (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").last.strip.to_f).step(0.01) { |f| cltv_key_range << f }
                             cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @ltv).present?
+                            if (cltv_key_range & @cltv).present?
                               cltv_key2 = cltv_key
                               adj_key_hash[key_index] = cltv_key
                             end
@@ -1034,14 +1034,14 @@ class DashboardController < ApplicationController
                           if cltv_key.include?("Inf") || cltv_key.include?("Infinity")
                             (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| cltv_key_range << f }
                             cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @ltv).present?
+                            if (cltv_key_range & @cltv).present?
                               cltv_key2 = cltv_key
                               adj_key_hash[key_index] = cltv_key
                             end
                           else
                             (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").last.strip.to_f).step(0.01) { |f| cltv_key_range << f }
                             cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @ltv).present?
+                            if (cltv_key_range & @cltv).present?
                               cltv_key2 = cltv_key
                               adj_key_hash[key_index] = cltv_key
                             end
@@ -1415,14 +1415,14 @@ class DashboardController < ApplicationController
                           if cltv_key.include?("Inf") || cltv_key.include?("Infinity")
                             (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| cltv_key_range << f }
                             cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @ltv).present?
+                            if (cltv_key_range & @cltv).present?
                               cltv_key2 = cltv_key
                               adj_key_hash[key_index] = cltv_key
                             end
                           else
                             (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").last.strip.to_f).step(0.01) { |f| cltv_key_range << f }
                             cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @ltv).present?
+                            if (cltv_key_range & @cltv).present?
                               cltv_key2 = cltv_key
                               adj_key_hash[key_index] = cltv_key
                             end
@@ -1794,14 +1794,14 @@ class DashboardController < ApplicationController
                           if cltv_key.include?("Inf") || cltv_key.include?("Infinity")
                             (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| cltv_key_range << f }
                             cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @ltv).present?
+                            if (cltv_key_range & @cltv).present?
                               cltv_key2 = cltv_key
                               adj_key_hash[key_index] = cltv_key
                             end
                           else
                             (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").last.strip.to_f).step(0.01) { |f| cltv_key_range << f }
                             cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @ltv).present?
+                            if (cltv_key_range & @cltv).present?
                               cltv_key2 = cltv_key
                               adj_key_hash[key_index] = cltv_key
                             end
@@ -2172,14 +2172,14 @@ class DashboardController < ApplicationController
                           if cltv_key.include?("Inf") || cltv_key.include?("Infinity")
                             (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| cltv_key_range << f }
                             cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @ltv).present?
+                            if (cltv_key_range & @cltv).present?
                               cltv_key2 = cltv_key
                               adj_key_hash[key_index] = cltv_key
                             end
                           else
                             (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").last.strip.to_f).step(0.01) { |f| cltv_key_range << f }
                             cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @ltv).present?
+                            if (cltv_key_range & @cltv).present?
                               cltv_key2 = cltv_key
                               adj_key_hash[key_index] = cltv_key
                             end
@@ -2552,14 +2552,14 @@ class DashboardController < ApplicationController
                           if cltv_key.include?("Inf") || cltv_key.include?("Infinity")
                             (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| cltv_key_range << f }
                             cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @ltv).present?
+                            if (cltv_key_range & @cltv).present?
                               cltv_key2 = cltv_key
                               adj_key_hash[key_index] = cltv_key
                             end
                           else
                             (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").last.strip.to_f).step(0.01) { |f| cltv_key_range << f }
                             cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @ltv).present?
+                            if (cltv_key_range & @cltv).present?
                               cltv_key2 = cltv_key
                               adj_key_hash[key_index] = cltv_key
                             end
@@ -2933,14 +2933,14 @@ class DashboardController < ApplicationController
                           if cltv_key.include?("Inf") || cltv_key.include?("Infinity")
                             (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| cltv_key_range << f }
                             cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @ltv).present?
+                            if (cltv_key_range & @cltv).present?
                               cltv_key2 = cltv_key
                               adj_key_hash[key_index] = cltv_key
                             end
                           else
                             (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").last.strip.to_f).step(0.01) { |f| cltv_key_range << f }
                             cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @ltv).present?
+                            if (cltv_key_range & @cltv).present?
                               cltv_key2 = cltv_key
                               adj_key_hash[key_index] = cltv_key
                             end
