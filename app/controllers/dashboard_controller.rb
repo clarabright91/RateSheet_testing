@@ -603,8 +603,11 @@ class DashboardController < ApplicationController
                         adj_key_hash[key_index] = "Cash Out"
                       end
                     else
-                      adj.data[first_key][@refinance_option]
-                      adj_key_hash[key_index] = @refinance_option
+                      if adj.data[first_key][@refinance_option].present?
+                        adj_key_hash[key_index] = @refinance_option
+                      else
+                        break
+                      end
                     end
                   rescue Exception
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Loan Category: #{adj.loan_category}"
@@ -983,8 +986,11 @@ class DashboardController < ApplicationController
                         adj_key_hash[key_index] = "Cash Out"
                       end
                     else
-                      adj.data[first_key][adj_key_hash[key_index-1]][@refinance_option]
-                      adj_key_hash[key_index] = @refinance_option
+                      if adj.data[first_key][adj_key_hash[key_index-1]][@refinance_option].present?
+                        adj_key_hash[key_index] = @refinance_option
+                      else
+                        break
+                      end
                     end
                   rescue Exception
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Loan Category: #{adj.loan_category}"
@@ -1362,8 +1368,11 @@ class DashboardController < ApplicationController
                         adj_key_hash[key_index] = "Cash Out"
                       end
                     else
-                      adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@refinance_option]
-                      adj_key_hash[key_index] = @refinance_option
+                      if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@refinance_option].present?
+                        adj_key_hash[key_index] = @refinance_option
+                      else
+                        break
+                      end
                     end
                   rescue Exception
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Loan Category: #{adj.loan_category}"
@@ -1738,8 +1747,11 @@ class DashboardController < ApplicationController
                         adj_key_hash[key_index] = "Cash Out"
                       end
                     else
-                      adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@refinance_option]
-                      adj_key_hash[key_index] = @refinance_option
+                      if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@refinance_option].present?
+                        adj_key_hash[key_index] = @refinance_option
+                      else
+                        break
+                      end
                     end
                   rescue Exception
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Loan Category: #{adj.loan_category}"
@@ -2114,8 +2126,11 @@ class DashboardController < ApplicationController
                         adj_key_hash[key_index] = "Cash Out"
                       end
                     else
-                      adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@refinance_option]
-                      adj_key_hash[key_index] = @refinance_option
+                      if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@refinance_option].present?
+                        adj_key_hash[key_index] = @refinance_option
+                      else
+                        break
+                      end
                     end
                   rescue Exception
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Loan Category: #{adj.loan_category}"
@@ -2490,8 +2505,11 @@ class DashboardController < ApplicationController
                         adj_key_hash[key_index] = "Cash Out"
                       end
                     else
-                      adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@refinance_option]
-                      adj_key_hash[key_index] = @refinance_option
+                      if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@refinance_option].present?
+                        adj_key_hash[key_index] = @refinance_option
+                      else
+                        break
+                      end
                     end
                   rescue Exception
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Loan Category: #{adj.loan_category}"
@@ -2866,8 +2884,11 @@ class DashboardController < ApplicationController
                         adj_key_hash[key_index] = "Cash Out"
                       end
                     else
-                      adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@refinance_option]
-                      adj_key_hash[key_index] = @refinance_option
+                      if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][@refinance_option].present?
+                        adj_key_hash[key_index] = @refinance_option
+                      else
+                        break
+                      end
                     end
                   rescue Exception
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Loan Category: #{adj.loan_category}"
