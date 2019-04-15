@@ -1304,6 +1304,11 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         title.split.each do |arm|
           if arm.tr('1-9A-Za-z(|.% ','') == "//"
             @arm_advanced = arm.tr('A-Za-z()|.% , ','')[0,5]
+            if @arm_advanced.include?('/')
+              @arm_advanced = @arm_advanced.tr('/','-')
+            else
+              @arm_advanced
+            end
           end
         end
       end

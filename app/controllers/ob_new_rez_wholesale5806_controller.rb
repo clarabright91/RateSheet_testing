@@ -1288,6 +1288,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 # Arm Advanced
                 if @title.downcase.include?("arm")
                   arm_advanced = @title.downcase.split("arm").last.tr('A-Za-z() ','')
+                  if arm_advanced.include?('/')
+                    arm_advanced = arm_advanced.tr('/','-')
+                  else
+                    arm_advanced
+                  end
                 end
                 # freddie_mac
                 freddie_mac = false
@@ -2858,6 +2863,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 # Arm Advanced
                 if @title.downcase.include?("arm")
                   arm_advanced = @title.downcase.split("arm").last.tr('A-Za-z ','')
+                  if arm_advanced.include?('/')
+                    arm_advanced = arm_advanced.tr('/','-')
+                  else
+                    arm_advanced
+                  end
                 end
 
                 # Loan Size
@@ -3409,6 +3419,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   # Arm Advanced
                   if @title.downcase.include?("arm")
                     arm_advanced = @title.downcase.split("arm").last.tr('A-Za-z- ','')
+                    if arm_advanced.include?('/')
+                      arm_advanced = arm_advanced.tr('/','-')
+                    else
+                      arm_advanced
+                    end
                   end
 
                   # freddie_mac
@@ -4236,7 +4251,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
 
                     arm_advanced = nil
                     if @title.include?("5/2/5")
-                      arm_advanced = "5/2/5"
+                      arm_advanced = "5-2-5"
                     end
 
                     loan_size = nil
@@ -4860,6 +4875,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   # Arm Advanced
                   if @title.downcase.include?("arm")
                     arm_advanced = @title.downcase.split("arm").last.tr("A-Za-z- ","")
+                    if arm_advanced.include?('/')
+                      arm_advanced = arm_advanced.tr('/','-')
+                    else
+                      arm_advanced
+                    end
                   end
                   # loan_purpose
                   if p_name.downcase.include?('refinance') || p_name.downcase.include?('refi')
@@ -5119,6 +5139,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 # Arm Advanced
                 if @title.downcase.include?("arm")
                   arm_advanced = @title.downcase.split("arm").last.tr('A-Za-z- ','')
+                  if arm_advanced.include?('/')
+                    arm_advanced = arm_advanced.tr('/','-')
+                  else
+                    arm_advanced
+                  end
                 end
                 # conforming
                 if p_name.downcase.include?("conforming")
@@ -5637,6 +5662,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 # Arm Advanced
                 if @title.downcase.include?("arm")
                   arm_advanced = @title.downcase.split("arm").last.tr('A-Za-z() ','')
+                  if arm_advanced.include?('/')
+                    arm_advanced = arm_advanced.tr('/','-')
+                  else
+                    arm_advanced
+                  end
                 end
 
                 # conforming
@@ -6081,6 +6111,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 # Arm Advanced
                 if @title.downcase.include?("arm")
                   arm_advanced = @title.split("ARM").last.tr('A-Za-z ()', '')
+                  if arm_advanced.include?('/')
+                    arm_advanced = arm_advanced.tr('/','-')
+                  else
+                    arm_advanced
+                  end
                 end
                 # High Balance
                 if p_name.include?("High Balance")
@@ -6920,6 +6955,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 # Arm Advanced
                 if @title.downcase.include?("arm") 
                   arm_advanced = @title.split("ARM").last.tr('A-Z- () ','')
+                  if arm_advanced.include?('/')
+                    arm_advanced = arm_advanced.tr('/','-')
+                  else
+                    arm_advanced
+                  end
                 end
 
                 if p_name.include?("Fannie Mae") || p_name.downcase.include?("fnma")
