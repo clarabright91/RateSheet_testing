@@ -271,12 +271,15 @@ class DashboardController < ApplicationController
     program_list = []
     programs.each do |program|
       if program.base_rate.present?
-        if(program.base_rate.keys.include?(@interest.to_f.to_s))
-          if(program.base_rate[@interest.to_f.to_s].keys.include?(@lock_period))
-              program_list << program
-          end
-        elsif (program.base_rate.keys.include?(@interest.to_s))
-          if(program.base_rate[@interest.to_s].keys.include?(@lock_period))
+        base_rate_keys = program.base_rate.keys.map{ |k| ActionController::Base.helpers.number_with_precision(k, :precision => 3)}
+
+        interest_rate = ActionController::Base.helpers.number_with_precision(@interest.to_f.to_s, :precision => 3)
+
+        key_list = program.base_rate.keys
+
+        if(base_rate_keys.include?(interest_rate))
+          rate_index = base_rate_keys.index(interest_rate)
+          if(program.base_rate[key_list[rate_index]].keys.include?(@lock_period))
               program_list << program
           end
         end
@@ -412,15 +415,23 @@ class DashboardController < ApplicationController
       hash_obj[:program_category] = pro.program_category.present? ? pro.program_category : ""
       hash_obj[:program_name] = pro.program_name.present? ? pro.program_name : ""
 
-      if (pro.base_rate.present? || pro.base_rate[@interest.to_f.to_s].present? || pro.base_rate[@interest.to_s].present?)
-        if (pro.base_rate[@interest.to_f.to_s][@lock_period].present?)
-          hash_obj[:base_rate] = pro.base_rate[@interest.to_f.to_s][@lock_period]
-        elsif (pro.base_rate[@interest.to_s][@lock_period].present?)
-          hash_obj[:base_rate] = pro.base_rate[@interest.to_s][@lock_period]
-        else
-          hash_obj[:base_rate] = 0.0
+      if pro.base_rate.present?
+        base_rate_keys = pro.base_rate.keys.map{ |k| ActionController::Base.helpers.number_with_precision(k, :precision => 3)}
+
+        interest_rate = ActionController::Base.helpers.number_with_precision(@interest.to_f.to_s, :precision => 3)
+
+        key_list = pro.base_rate.keys
+
+        if(base_rate_keys.include?(interest_rate))
+          rate_index = base_rate_keys.index(interest_rate)
+          if(pro.base_rate[key_list[rate_index]].keys.include?(@lock_period))
+            hash_obj[:base_rate] = pro.base_rate[key_list[rate_index]][@lock_period]
+          else
+            hash_obj[:base_rate] = 0.0
+          end
         end
       end
+
       program_adjustments = pro.adjustments
       if program_adjustments.present?
         program_adjustments.each do |adj|
