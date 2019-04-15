@@ -501,15 +501,17 @@
 
     function setArmDefaultValues(){
       $('#arm_benchmark').val('LIBOR')
-      $('#arm_margin').val('0.00')
-      $('#arm_basic').val('10/1')
+      $('#arm_margin').val('All')
+      $('#arm_advanced').val('All')
+      $('#arm_basic').val('5/1')
     }
 
     function setArmNullValues(){
-      $('#arm_benchmark').val('')
       $('#term').val('')
-      $('#arm_margin').val('')
-      $('#arm_basic').val('')
+      $('#arm_benchmark').val('LIBOR')
+      $('#arm_margin').val('All')
+      $('#arm_advanced').val('All')
+      $('#arm_basic').val('5/1')
     }
 
     function setArmDefaultValuesOnLoan(){
@@ -517,10 +519,10 @@
           $('#arm_benchmark').val('LIBOR')
         }
         if ($('#arm_margin').val()=='' && $("#loan_type").val() != "All" && $("#loan_type").val() != "ARM" ) {
-          $('#arm_margin').val('0.00')
+          $('#arm_margin').val('All')
         }
         if ($('#arm_basic').val()=='' && $("#loan_type").val() != "All" && $("#loan_type").val() != "ARM" ) {
-          $('#arm_basic').val('10/1')
+          $('#arm_basic').val('5/1')
         }
     }
 
