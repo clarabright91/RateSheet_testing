@@ -76,6 +76,7 @@ class DashboardController < ApplicationController
     @cltv = []
     @fannie_mae_product = "HomeReady"
     @freddie_mac_product = "Home Possible"
+    @flag_loan_type = false
   end
 
   def modified_ltv_cltv_credit_score
@@ -142,6 +143,67 @@ class DashboardController < ApplicationController
     end
   end
 
+  def set_term
+    if params[:term].present?
+      if (params[:term] == "All")
+        @filter_not_nil[:term] = nil
+      else
+        @filter_data[:term] = params[:term].to_i
+        @term = params[:term]
+        @program_term = params[:term].to_i
+      end
+    end
+  end
+
+  def set_arm_basic
+    if params[:arm_basic].present?
+      if (params[:arm_basic] == "All")
+        @filter_not_nil[:arm_basic] = nil
+      else
+        @arm_basic = params[:arm_basic]
+        if params[:arm_basic].include?("/")
+          @filter_data[:arm_basic] = params[:arm_basic].split("/").first
+        end
+      end
+    end
+  end
+
+  def set_arm_advanced
+    if params[:arm_advanced].present?
+      if params[:arm_advanced] == "All"
+        @filter_not_nil[:arm_advanced] = nil
+      else
+        @arm_advanced = params[:arm_advanced]
+        @filter_data[:arm_advanced] = params[:arm_advanced]
+      end
+    end
+  end
+
+  def set_arm_benchmark
+    if params[:arm_benchmark].present?
+      if params[:arm_benchmark] == "All"
+        @filter_not_nil[:arm_benchmark] = nil
+      else
+        @arm_benchmark = params[:arm_benchmark]
+        @filter_data[:arm_benchmark] = params[:arm_benchmark]
+      end
+    end
+  end
+
+  def set_arm_margin
+    if params[:arm_margin].present?
+      if params[:arm_margin] == "All"
+        @filter_not_nil[:arm_margin] = nil
+      else
+        @arm_margin = params[:arm_margin].to_f
+        @filter_data[:arm_margin] = params[:arm_margin].to_f
+      end
+    end
+  end
+
+  def set_flag_loan_type(flag)
+    @flag_loan_type = flag
+  end
   def set_variable
     modified_ltv_cltv_credit_score
     modified_condition
@@ -152,97 +214,23 @@ class DashboardController < ApplicationController
       @loan_type = params[:loan_type]
       if params[:loan_type] == "All"
         @filter_not_nil[:loan_type] = nil
-        if params[:term].present?
-          if (params[:term] == "All")
-            @filter_not_nil[:term] = nil
-          else
-            @filter_data[:term] = params[:term].to_i
-            @term = params[:term]
-            @program_term = params[:term].to_i
-          end
-        end
-        if params[:arm_basic].present?
-          if (params[:arm_basic] == "All")
-            @filter_not_nil[:arm_basic] = nil
-          else
-            @arm_basic = params[:arm_basic]
-            if params[:arm_basic].include?("/")
-              @filter_data[:arm_basic] = params[:arm_basic].split("/").first
-            end
-          end
-        end
-        if params[:arm_advanced].present?
-          if params[:arm_advanced] == "All"
-            @filter_not_nil[:arm_advanced] = nil
-          else
-            @arm_advanced = params[:arm_advanced]
-            @filter_data[:arm_advanced] = params[:arm_advanced]
-          end
-        end
-        if params[:arm_benchmark].present?
-          if params[:arm_benchmark] == "All"
-            @filter_not_nil[:arm_benchmark] = nil
-          else
-            @arm_benchmark = params[:arm_benchmark]
-            @filter_data[:arm_benchmark] = params[:arm_benchmark]
-          end
-        end
-        if params[:arm_margin].present?
-          if params[:arm_margin] == "All"
-            @filter_not_nil[:arm_margin] = nil
-          else
-            @arm_margin = params[:arm_margin].to_f
-            @filter_data[:arm_margin] = params[:arm_margin].to_f
-          end
-        end
+        set_flag_loan_type(true)
+        set_term
+        set_arm_basic
+        set_arm_advanced
+        set_arm_benchmark
+        set_arm_margin
       else
         @filter_data[:loan_type] = params[:loan_type]
         if params[:loan_type] =="ARM"
-          if params[:arm_basic].present?
-            if (params[:arm_basic] == "All")
-              @filter_not_nil[:arm_basic] = nil
-            else
-              @arm_basic = params[:arm_basic]
-              if params[:arm_basic].include?("/")
-                @filter_data[:arm_basic] = params[:arm_basic].split("/").first
-              end
-            end
-          end
-          if params[:arm_advanced].present?
-            if params[:arm_advanced] == "All"
-              @filter_not_nil[:arm_advanced] = nil
-            else
-              @arm_advanced = params[:arm_advanced]
-              @filter_data[:arm_advanced] = params[:arm_advanced]
-            end
-          end
-          if params[:arm_benchmark].present?
-            if params[:arm_benchmark] == "All"
-              @filter_not_nil[:arm_benchmark] = nil
-            else
-              @arm_benchmark = params[:arm_benchmark]
-              @filter_data[:arm_benchmark] = params[:arm_benchmark]
-            end
-          end
-          if params[:arm_margin].present?
-            if params[:arm_margin] == "All"
-              @filter_not_nil[:arm_margin] = nil
-            else
-              @arm_margin = params[:arm_margin].to_f
-              @filter_data[:arm_margin] = params[:arm_margin].to_f
-            end
-          end
+          set_flag_loan_type(false)
+          set_arm_basic
+          set_arm_advanced
+          set_arm_benchmark
+          set_arm_margin
         end
         if params[:loan_type] !="ARM"
-          if params[:term].present?
-            if (params[:term] == "All")
-              @filter_not_nil[:term] = nil
-            else
-              @filter_data[:term] = params[:term].to_i
-              @term = params[:term]
-              @program_term = params[:term].to_i
-            end
-          end
+          set_term
         end
       end
     end
@@ -254,33 +242,116 @@ class DashboardController < ApplicationController
     end
   end
 
-  def find_base_rate
-    @program_list = Program.where(@filter_data)
+  def find_programs_on_term_based(programs, find_term)
+    program_list = []
+    programs.each do |program|
+       pro_term = program.term
+      if (pro_term.to_s.length <=2 )
+        if (pro_term == find_term)
+          program_list << program
+        end
+      else
+        first = pro_term/100
+        last = pro_term%100
+        term_arr = []
+        if first < last
+          term_arr = (first..last).to_a
+        else
+          term_arr = (last..first).to_a
+        end
+        if term_arr.include?(find_term)
+          program_list << program
+        end
+      end
+    end
+    return program_list
+  end
+
+  def calculate_base_rate_of_selected_programs(programs)
+    program_list = []
+    programs.each do |program|
+      if program.base_rate.present?
+        if(program.base_rate.keys.include?(@interest.to_f.to_s))
+          if(program.base_rate[@interest.to_f.to_s].keys.include?(@lock_period))
+              program_list << program
+          end
+        elsif (program.base_rate.keys.include?(@interest.to_s))
+          if(program.base_rate[@interest.to_s].keys.include?(@lock_period))
+              program_list << program
+          end
+        end
+      end
+    end
+    return program_list
+  end
+
+  def search_programs_with_loan_type_all
+    term_programs = []
+    arm_programs = []
+    if (@filter_not_nil.keys.include?(:term && (:arm_basic || :arm_advanced || :arm_margin || :arm_benchmark)))
+        term_programs = Program.where.not(loan_type: "ARM")
+        arm_programs1 = Program.where(loan_type: "ARM")
+        arm_basic_programs  = []
+        arm_advanced_programs = []
+        arm_margin_programs = []
+        arm_benchmark_programs  = []
+        if (@filter_not_nil.keys.include?(:arm_basic))
+          arm_basic_programs = arm_programs1.where.not(arm_basic: nil)
+        end
+        if (@filter_not_nil.keys.include?(:arm_advanced))
+          arm_advanced_programs = arm_programs1.where.not(arm_advanced: nil)
+        end
+        if (@filter_not_nil.keys.include?(:arm_margin))
+          arm_margin_programs = arm_programs1.where.not(arm_margin: nil)
+        end
+        if (@filter_not_nil.keys.include?(:arm_benchmark))
+          arm_benchmark_programs = arm_programs1.where.not(arm_benchmark: nil)
+        end
+      arm_programs = (arm_basic_programs + arm_advanced_programs + arm_margin_programs + arm_benchmark_programs).uniq
+    else
+      if (@filter_not_nil.keys.include?(:term))
+        term_programs = Program.where.not(loan_type: "ARM")
+      else
+        if (@filter_not_nil.keys.include?(:arm_basic || :arm_advanced || :arm_margin || :arm_benchmark))
+          arm_programs = Program.where(loan_type: "ARM")
+        else
+          term_programs = Program.where.not(loan_type: "ARM")
+          arm_programs = Program.where(loan_type: "ARM")
+        end
+      end
+    end
+
+    if (@filter_data.keys.include?(:term && (:arm_basic || :arm_advanced || :arm_margin || :arm_benchmark)))
+        term_programs1 = Program.where(@filter_data.except(:arm_basic, :arm_advanced, :arm_benchmark, :arm_margin, :term))
+        term_programs = find_programs_on_term_based(term_programs1, @filter_data[:term])
+        arm_programs = Program.where(@filter_data.except(:term))
+    else
+      if (@filter_data.keys.include?(:term))
+        term_programs1 = Program.where(@filter_data.except(:arm_basic, :arm_advanced, :arm_benchmark, :arm_margin, :term))
+        term_programs = find_programs_on_term_based(term_programs1, @filter_data[:term])
+      else
+        if (@filter_data.keys.include?(:arm_basic || :arm_advanced || :arm_margin || :arm_benchmark))
+          arm_programs = Program.where(@filter_data.except(:term))
+        end
+      end
+    end
+    total_searched_program = calculate_base_rate_of_selected_programs((term_programs + arm_programs).uniq)
+    
+    @result= []
+    if total_searched_program.present?
+      find_points_of_the_loan total_searched_program
+    end
+
+  end
+
+  def search_programs_with_selected_loan_type
+    @program_list = Program.where(@filter_data.except(:term))
     @program_list = @program_list.where.not(@filter_not_nil)
     @program_list2 = []
     if @program_list.present?
       if @program_term.present?
         @program_list = @program_list.where.not(term:nil)
-        @program_list.each do |program|
-           pro_term = program.term
-          if (pro_term.to_s.length <=2 )
-            if (pro_term == @program_term)
-              @program_list2 << program
-            end
-          else
-            first = pro_term/100
-            last = pro_term%100
-            term_arr = []
-            if first < last
-              term_arr = (first..last).to_a
-            else
-              term_arr = (last..first).to_a
-            end
-            if term_arr.include?(@program_term)
-              @program_list2 << program
-            end
-          end
-        end
+        @program_list2 = find_programs_on_term_based(@program_list, @program_term)
       else
         @program_list2 = @program_list
       end
@@ -306,24 +377,20 @@ class DashboardController < ApplicationController
 
       @programs =[]
       if @program_list3.present?
-        @program_list3.each do |program|
-          if program.base_rate.present?
-            if(program.base_rate.keys.include?(@interest.to_f.to_s))
-              if(program.base_rate[@interest.to_f.to_s].keys.include?(@lock_period))
-                  @programs << program
-              end
-            elsif (program.base_rate.keys.include?(@interest.to_s))
-              if(program.base_rate[@interest.to_s].keys.include?(@lock_period))
-                  @programs << program
-              end
-            end
-          end
-        end
+        @programs = calculate_base_rate_of_selected_programs(@program_list3)
       end
       @result= []
       if @programs.present?
         find_points_of_the_loan @programs
       end
+    end
+  end
+
+  def find_base_rate
+    if (@flag_loan_type)
+      search_programs_with_loan_type_all
+    else
+      search_programs_with_selected_loan_type
     end
   end
 
