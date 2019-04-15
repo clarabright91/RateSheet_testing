@@ -6537,6 +6537,16 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   arm_basic = @title.scan(/\d+/)[0].to_i
                 end
 
+                # Arm Advanced
+                if @title.downcase.include?("arm") 
+                  arm_advanced = @title.split("ARM").last.tr('A-Z- () ','')
+                  if arm_advanced.include?('/')
+                    arm_advanced = arm_advanced.tr('/','-')
+                  else
+                    arm_advanced
+                  end
+                end
+
                 if p_name.downcase.include?("homeready")
                   fannie_mae_product = "HomeReady"
                 end
@@ -6565,7 +6575,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
 
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_ids << @program.id
-                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, fannie_mae_product: fannie_mae_product, loan_category: @sheet_name, loan_purpose: loan_purpose, du: du, lp: lp, loan_size: loan_size,fannie_mae: fannie_mae)
+                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic,arm_advanced: arm_advanced, fannie_mae_product: fannie_mae_product, loan_category: @sheet_name, loan_purpose: loan_purpose, du: du, lp: lp, loan_size: loan_size,fannie_mae: fannie_mae)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
