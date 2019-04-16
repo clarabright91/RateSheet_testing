@@ -347,7 +347,27 @@ class DashboardController < ApplicationController
       term_programs = Program.where(id: term_ids).where(@filter_data.except(:arm_basic, :arm_advanced, :arm_benchmark, :arm_margin, :term))
     end
     
-    total_searched_program = calculate_base_rate_of_selected_programs((term_programs + arm_programs).uniq)
+    total_searched_program1 = calculate_base_rate_of_selected_programs((term_programs + arm_programs).uniq)
+      total_searched_program = []
+
+      if total_searched_program1.present?
+        if params[:loan_size].present?
+          if params[:loan_size] == "All"
+            total_searched_program = total_searched_program1
+          else
+            @loan_size = params[:loan_size]
+            total_searched_program1 = total_searched_program1.map{ |pro| pro if pro.loan_size!=nil}.compact
+            total_searched_program1.each do |pro|
+              if(pro.loan_size.split("and").map{ |l| l.strip }.include?(params[:loan_size]))
+                total_searched_program << pro
+              end
+            end
+          end
+        else
+          total_searched_program = total_searched_program1
+        end
+      end
+
     @result= []
     if total_searched_program.present?
       find_points_of_the_loan total_searched_program
