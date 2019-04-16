@@ -5472,7 +5472,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
                   # High Balance
                   if p_name.downcase.include?("high balance extra")
-                    loan_size = "High Balance Extra"
+                    loan_size = "High-Balance Extra"
                   else
                     loan_size = "Conforming"
                   end
