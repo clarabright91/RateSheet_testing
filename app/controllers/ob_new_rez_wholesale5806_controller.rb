@@ -1,23 +1,12 @@
 class ObNewRezWholesale5806Controller < ApplicationController
-  method_names = [:assign_libor, :government, :programs, :freddie_fixed_rate, :conforming_fixed_rate, :home_possible, :conforming_arms, :lp_open_acces_arms, :lp_open_access_105, :lp_open_access, :du_refi_plus_arms, :du_refi_plus_fixed_rate_105, :du_refi_plus_fixed_rate, :dream_big, :high_balance_extra, :freddie_arms, :jumbo_series_d,:jumbo_series_f, :jumbo_series_h, :jumbo_series_i, :jumbo_series_jqm, :homeready, :homeready_hb]
+  method_names = [:government, :programs, :freddie_fixed_rate, :conforming_fixed_rate, :home_possible, :conforming_arms, :lp_open_acces_arms, :lp_open_access_105, :lp_open_access, :du_refi_plus_arms, :du_refi_plus_fixed_rate_105, :du_refi_plus_fixed_rate, :dream_big, :high_balance_extra, :freddie_arms, :jumbo_series_d,:jumbo_series_f, :jumbo_series_h, :jumbo_series_i, :jumbo_series_jqm, :homeready, :homeready_hb]
   before_action :read_sheet, only: method_names + [:index]
   before_action :get_sheet, only: method_names
-  before_action :get_program, only: [:single_program, :program_property, :assign_libor]
-  after_action :assign_libor
   # before_action :check_sheet_empty , only: method_names
+  before_action :get_program, only: [:single_program, :program_property]
 
   require 'roo'
   require 'roo-xls'
-
-
-  def assign_libor
-    if @program.present?
-      p_name = @program.program_name
-      if p_name.downcase.include?('arm')
-        @program.update(arm_benchmark: "LIBOR", arm_margin: 0)
-      end
-    end
-  end
 
   def index
     # HardWorker.perform_async(1)
@@ -126,6 +115,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     loan_type = "Fixed"
                   elsif p_name.include?("ARM")
                     loan_type = "ARM"
+                    arm_benchmark = "LIBOR"
+                    arm_margin = 0
                   elsif p_name.include?("Floating")
                     loan_type = "Floating"
                   elsif p_name.include?("Variable")
@@ -186,7 +177,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   if p_name.downcase.include?('lp ')
                     lp = true
                   end
-                  @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fha: fha, va: va, usda: usda, fannie_mae: fannie_mae, loan_size: loan_size, loan_category: @sheet_name, arm_basic: arm_basic, arm_advanced: arm_advanced, loan_purpose: loan_purpose, du: du, lp: lp)
+                  @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fha: fha, va: va, usda: usda, fannie_mae: fannie_mae, loan_size: loan_size, loan_category: @sheet_name, arm_basic: arm_basic, arm_advanced: arm_advanced, loan_purpose: loan_purpose, du: du, lp: lp, arm_benchmark: arm_benchmark, arm_margin: arm_margin)
                   @block_hash = {}
                   key = ''
                   (1..23).each do |max_row|
@@ -409,6 +400,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   loan_type = "Fixed"
                 elsif p_name.include?("ARM")
                   loan_type = "ARM"
+                  arm_benchmark = "LIBOR"
+                  arm_margin = 0
                 elsif p_name.include?("Floating")
                   loan_type = "Floating"
                 elsif p_name.include?("Variable")
@@ -452,7 +445,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
 
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @program_ids << @program.id
-                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, loan_category: @sheet_name, fannie_mae: fannie_mae,loan_size: loan_size, loan_purpose: loan_purpose, du: du, lp: lp)
+                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, loan_category: @sheet_name, fannie_mae: fannie_mae,loan_size: loan_size, loan_purpose: loan_purpose, du: du, lp: lp,arm_benchmark: arm_benchmark, arm_margin: arm_margin)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -859,6 +852,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   loan_type = "Fixed"
                 elsif p_name.include?("ARM")
                   loan_type = "ARM"
+                  arm_benchmark = "LIBOR"
+                  arm_margin = 0
                 elsif p_name.include?("Floating")
                   loan_type = "Floating"
                 elsif p_name.include?("Variable")
@@ -907,7 +902,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_ids << @program.id
 
-                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae,loan_size: loan_size, loan_category: @sheet_name, loan_purpose: loan_purpose, du: du, lp: lp)
+                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae,loan_size: loan_size, loan_category: @sheet_name, loan_purpose: loan_purpose, du: du, lp: lp, arm_benchmark: arm_benchmark, arm_margin: arm_margin)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -1284,6 +1279,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   loan_type = "Fixed"
                 elsif p_name.include?("ARM")
                   loan_type = "ARM"
+                  arm_benchmark = "LIBOR"
+                  arm_margin = 0
                 elsif p_name.include?("Floating")
                   loan_type = "Floating"
                 elsif p_name.include?("Variable")
@@ -1346,7 +1343,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @program_ids << @program.id
                 @program.adjustments.destroy_all
-                @program.update(term: term,loan_type: loan_type,freddie_mac: freddie_mac, fannie_mae: fannie_mae, loan_category: @sheet_name,arm_basic: arm_basic, freddie_mac_product: freddie_mac_product, arm_advanced: arm_advanced, loan_purpose: loan_purpose, du: du, lp: lp,loan_size: loan_size)
+                @program.update(term: term,loan_type: loan_type,freddie_mac: freddie_mac, fannie_mae: fannie_mae, loan_category: @sheet_name,arm_basic: arm_basic, freddie_mac_product: freddie_mac_product, arm_advanced: arm_advanced, loan_purpose: loan_purpose, du: du, lp: lp,loan_size: loan_size, arm_benchmark: arm_benchmark, arm_margin: arm_margin)
                 @block_hash = {}
                 key = ''
                 (0..50).each do |max_row|
@@ -2858,6 +2855,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   loan_type = "Fixed"
                 elsif p_name.downcase.include?("arm")
                   loan_type = "ARM"
+                  arm_benchmark = "LIBOR"
+                  arm_margin = 0
                 elsif p_name.include?("Floating")
                   loan_type = "Floating"
                 elsif p_name.include?("Variable")
@@ -2904,7 +2903,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
 
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                @program.update(term: term,loan_type: loan_type,arm_basic: arm_basic, loan_category: @sheet_name,arm_advanced: arm_advanced, loan_size: loan_size, loan_purpose: loan_purpose, du: du, lp: lp)
+                @program.update(term: term,loan_type: loan_type,arm_basic: arm_basic, loan_category: @sheet_name,arm_advanced: arm_advanced, loan_size: loan_size, loan_purpose: loan_purpose, du: du, lp: lp, arm_benchmark: arm_benchmark, arm_margin: arm_margin)
                 @block_hash = {}
                 key = ''
                 (0..50).each do |max_row|
@@ -3414,6 +3413,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     loan_type = "Fixed"
                   elsif p_name.downcase.include?("arm")
                     loan_type = "ARM"
+                    arm_benchmark = "LIBOR"
+                    arm_margin = 0
                   elsif p_name.include?("Floating")
                     loan_type = "Floating"
                   elsif p_name.include?("Variable")
@@ -3472,7 +3473,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program_ids << @program.id
-                  @program.update(term: term,loan_type: loan_type,loan_purpose: loan_purpose ,arm_basic: arm_basic, loan_category: @sheet_name,arm_advanced: arm_advanced,loan_size: loan_size, du: du, lp: lp)
+                  @program.update(term: term,loan_type: loan_type,loan_purpose: loan_purpose ,arm_basic: arm_basic, loan_category: @sheet_name,arm_advanced: arm_advanced,loan_size: loan_size, du: du, lp: lp, arm_benchmark: arm_benchmark, arm_margin: arm_margin)
                   @program.adjustments.destroy_all
 
                   @block_hash = {}
@@ -4246,6 +4247,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                       loan_type = "Fixed"
                     elsif p_name.include?("ARM")
                       loan_type = "ARM"
+                      arm_benchmark = "LIBOR"
+                      arm_margin = 0
                     elsif p_name.include?("Floating")
                       loan_type = "Floating"
                     elsif p_name.include?("Variable")
@@ -4289,7 +4292,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
 
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program_ids << @program.id
-                  @program.update(term: term,loan_type: loan_type ,arm_basic: arm_basic, loan_category: @sheet_name, loan_size: loan_size, arm_advanced: arm_advanced, loan_purpose: loan_purpose, du: du, lp: lp)
+                  @program.update(term: term,loan_type: loan_type ,arm_basic: arm_basic, loan_category: @sheet_name, loan_size: loan_size, arm_advanced: arm_advanced, loan_purpose: loan_purpose, du: du, lp: lp, arm_benchmark: arm_benchmark, arm_margin: arm_margin)
                   @program.adjustments.destroy_all
                   @block_hash = {}
                   key = ''
@@ -4865,6 +4868,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     loan_type = "Fixed"
                   elsif p_name.include?("ARM")
                     loan_type = "ARM"
+                    arm_benchmark = "LIBOR"
+                    arm_margin = 0
                   elsif p_name.include?("Floating")
                     loan_type = "Floating"
                   elsif p_name.include?("Variable")
@@ -4907,7 +4912,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program_ids << @program.id
-                  @program.update(term: term,loan_type: loan_type,arm_basic: arm_basic, loan_category: @sheet_name,loan_size: loan_size,arm_advanced: arm_advanced, loan_purpose: loan_purpose, du: du, lp: lp)
+                  @program.update(term: term,loan_type: loan_type,arm_basic: arm_basic, loan_category: @sheet_name,loan_size: loan_size,arm_advanced: arm_advanced, loan_purpose: loan_purpose, du: du, lp: lp, arm_benchmark: arm_benchmark, arm_margin: arm_margin)
                   @program.adjustments.destroy_all
                   @block_hash = {}
                   key = ''
@@ -5134,6 +5139,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   loan_type = "Fixed"
                 elsif p_name.include?("ARM")
                   loan_type = "ARM"
+                  arm_benchmark = "LIBOR"
+                  arm_margin = 0
                 elsif p_name.include?("Floating")
                   loan_type = "Floating"
                 elsif p_name.include?("Variable")
@@ -5190,7 +5197,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
 
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @program_ids << @program.id
-                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, loan_category: @sheet_name,arm_advanced: arm_advanced, loan_purpose: loan_purpose, du: du, lp: lp, loan_size: loan_size)
+                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, loan_category: @sheet_name,arm_advanced: arm_advanced, loan_purpose: loan_purpose, du: du, lp: lp, loan_size: loan_size, arm_benchmark: arm_benchmark, arm_margin: arm_margin)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -5450,6 +5457,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     loan_type = "Fixed"
                   elsif p_name.include?("ARM")
                     loan_type = "ARM"
+                    arm_benchmark = "LIBOR"
+                    arm_margin = 0
                   elsif p_name.include?("Floating")
                     loan_type = "Floating"
                   elsif p_name.include?("Variable")
@@ -5463,7 +5472,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
                   # High Balance
                   if p_name.downcase.include?("high balance extra")
-                    loan_size = "High-Balance Extra"
+                    loan_size = "High Balance Extra"
                   else
                     loan_size = "Conforming"
                   end
@@ -5482,7 +5491,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program_ids << @program.id
-                  @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, loan_category: @sheet_name, loan_size: loan_size, loan_purpose: loan_purpose, du: du, lp: lp)
+                  @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, loan_category: @sheet_name, loan_size: loan_size, loan_purpose: loan_purpose, du: du, lp: lp, arm_benchmark: arm_benchmark, arm_margin: arm_margin)
                   @program.adjustments.destroy_all
                   @block_hash = {}
                   key = ''
@@ -5657,6 +5666,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   loan_type = "Fixed"
                 elsif p_name.include?("ARM")
                   loan_type = "ARM"
+                  arm_benchmark = "LIBOR"
+                  arm_margin = 0
                 elsif p_name.include?("Floating")
                   loan_type = "Floating"
                 elsif p_name.include?("Variable")
@@ -5719,7 +5730,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
 
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 @program_ids << @program.id
-                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, loan_category: @sheet_name, arm_advanced: arm_advanced,loan_size: loan_size, loan_purpose: loan_purpose, du: du, lp: lp)
+                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fannie_mae: fannie_mae, arm_basic: arm_basic, loan_category: @sheet_name, arm_advanced: arm_advanced,loan_size: loan_size, loan_purpose: loan_purpose, du: du, lp: lp, arm_benchmark: arm_benchmark, arm_margin: arm_margin)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -6092,6 +6103,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   loan_type = "Fixed"
                 elsif p_name.include?("ARM")
                   loan_type = "ARM"
+                  arm_benchmark = "LIBOR"
+                  arm_margin = 0
                 elsif p_name.include?("Floating")
                   loan_type = "Floating"
                 elsif p_name.include?("Variable")
@@ -6189,7 +6202,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 if @block_hash.values.first.keys.first.nil?
                   @block_hash.values.first.shift
                 end
-                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fha: fha, va: va, usda: usda, fannie_mae: fannie_mae, loan_size: loan_size, loan_category: @sheet_name, arm_basic: arm_basic, arm_advanced: arm_advanced ,base_rate: @block_hash, loan_purpose: loan_purpose, du: du, lp: lp)
+                @program.update(term: term,loan_type: loan_type,conforming: conforming,freddie_mac: freddie_mac, fha: fha, va: va, usda: usda, fannie_mae: fannie_mae, loan_size: loan_size, loan_category: @sheet_name, arm_basic: arm_basic, arm_advanced: arm_advanced ,base_rate: @block_hash, loan_purpose: loan_purpose, du: du, lp: lp, arm_benchmark: arm_benchmark, arm_margin: arm_margin)
 
                 # @program.update(base_rate: @block_hash,loan_category: @sheet_name)
               rescue Exception => e
@@ -6535,6 +6548,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   loan_type = "Fixed"
                 elsif p_name.include?("ARM")
                   loan_type = "ARM"
+                  arm_benchmark = "LIBOR"
+                  arm_margin = 0
                 elsif p_name.include?("Floating")
                   loan_type = "Floating"
                 elsif p_name.include?("Variable")
@@ -6586,7 +6601,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
 
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_ids << @program.id
-                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic,arm_advanced: arm_advanced, fannie_mae_product: fannie_mae_product, loan_category: @sheet_name, loan_purpose: loan_purpose, du: du, lp: lp, loan_size: loan_size,fannie_mae: fannie_mae)
+                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic,arm_advanced: arm_advanced, fannie_mae_product: fannie_mae_product, loan_category: @sheet_name, loan_purpose: loan_purpose, du: du, lp: lp, loan_size: loan_size,fannie_mae: fannie_mae, arm_benchmark: arm_benchmark, arm_margin: arm_margin)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -6961,6 +6976,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   loan_type = "Fixed"
                 elsif p_name.include?("ARM")
                   loan_type = "ARM"
+                  arm_benchmark = "LIBOR"
+                  arm_margin = 0
                 elsif p_name.include?("Floating")
                   loan_type = "Floating"
                 elsif p_name.include?("Variable")
@@ -7018,7 +7035,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 end
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 program_ids << @program.id
-                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, arm_advanced: arm_advanced, fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, loan_category: @sheet_name,loan_size: loan_size, fannie_mae_product: fannie_mae_product, loan_purpose: loan_purpose, du: du, lp: lp)
+                @program.update(term: term,loan_type: loan_type, arm_basic: arm_basic, arm_advanced: arm_advanced, fannie_mae: fannie_mae, fannie_mae_home_ready: fannie_mae_home_ready, loan_category: @sheet_name,loan_size: loan_size, fannie_mae_product: fannie_mae_product, loan_purpose: loan_purpose, du: du, lp: lp, arm_benchmark: arm_benchmark, arm_margin: arm_margin)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
