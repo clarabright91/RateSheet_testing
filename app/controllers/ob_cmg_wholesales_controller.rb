@@ -4141,6 +4141,8 @@ class ObCmgWholesalesController < ApplicationController
       loan_type = "Fixed"
     elsif @program.program_name.downcase.include?("arm") || sheet.downcase.include?("arm") 
       loan_type = "ARM"
+      arm_benchmark = "LIBOR"
+      arm_margin = 0
     elsif @program.program_name.downcase.include?("floating") || sheet.downcase.include?("floating") 
       loan_type = "Floating"
     elsif @program.program_name.downcase.include?("variable") || sheet.downcase.include?("variable")
@@ -4210,7 +4212,7 @@ class ObCmgWholesalesController < ApplicationController
     if @program.program_name.downcase.include?('lp ') || sheet.downcase.include?('lp ')
       lp = true
     end
-    @program.update(term: term,loan_type: loan_type,program_category: program_category, streamline: streamline,fha: fha, va: va, usda: usda, arm_basic: arm_basic, loan_category: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product, loan_size: loan_size, bank_name: bank_name,loan_purpose: loan_purpose, du: du, lp: lp)
+    @program.update(term: term,loan_type: loan_type,program_category: program_category, streamline: streamline,fha: fha, va: va, usda: usda, arm_basic: arm_basic, loan_category: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product, loan_size: loan_size, bank_name: bank_name,loan_purpose: loan_purpose, du: du, lp: lp, arm_benchmark: arm_benchmark, arm_margin: arm_margin)
   end
 
   def make_adjust(block_hash, sheet)
