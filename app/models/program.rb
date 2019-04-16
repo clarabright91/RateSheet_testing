@@ -15,7 +15,7 @@ class Program < ApplicationRecord
 
   LOAN_PURPOSE = [["All"], ["Purchase"], ["Refinance"]]
 
-  LOAN_SIZE = [["All"], ["Conforming"], ["Non-Conforming"], ["Super Conforming"], ["Jumbo"], ["High-Balance"]]
+  LOAN_SIZE = [["All"], ["Conforming"], ["Non-Conforming"], ["Super Conforming"], ["Jumbo"], ["High-Balance"], ["High Balance Extra"]]
 
   ARM_BASIC = [["All"], ["1/1"],["2/1"],["3/1"],["5/1"], ["7/1"],["10/1"]]
 
@@ -37,7 +37,7 @@ class Program < ApplicationRecord
 
   CLTV_VALUES = [["97 +"], ["95.01 - 97.00"], ["90.01 - 95.00"], ["85.01 - 90.00"], ["80.01 - 85.00"], ["75.01 - 80.00"], ["70.01 - 75.00"], ["65.01 - 70.00"], ["60.01 - 65.00"], ["0.00 - 60.00"]]
 
-  PROGRAM_CATEGORY_LIST =[["Non-Qm 7900"], ["QM 6900"]]
+  PROGRAM_CATEGORY_LIST =[["7900"], ["6900"]]
 
   PROPERTY_TYPE_VALUES = [["Manufactured Home"],["2nd Home"],["3-4 Unit"],["Non-Owner Occupied"],["Condo"],["2-Unit"], ["2-4 Unit"],["Investment Property"], ["Gov'n Non Owner"], ["NOO"]]
 

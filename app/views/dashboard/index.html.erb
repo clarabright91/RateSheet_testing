@@ -5,7 +5,7 @@
       <div class="col-md-10">
       </div>
       <div class="col-md-2 text-right reset">
-        <%= link_to 'Reset All', root_path, :class=>"btn btn-danger" %>
+      <button id="reset_all_btn" class="btn btn-danger" >Reset All</button>
       </div>
     </div>
     <%= form_tag('/dashboard/index', method: :get, id: :search_form) do %>
@@ -563,16 +563,6 @@
    });
   });
 
-  // $('#du').click(function(){
-  //   if($(this).prop("checked"))
-  //     $('#fannie_mae').prop('checked', true);
-  //   else{
-  //     if ($('#fannie_mae_product').val()=='') {
-  //       $('#fannie_mae').prop('checked', false);
-  //     }
-  //   }
-  // });
-
   var fannie_mae = false
   $('#du').click(function () {
     if ($(this).prop("checked")){
@@ -612,35 +602,6 @@
       $('#lp').prop('checked', false);
     }
   });
-
-
-  //  $('#lp').click(function(){
-  //   if($(this).prop("checked"))
-  //     $('#freddie_mac').prop('checked', true);
-  //   else{
-  //     if ($('#freddie_mac_product').val()=='') {
-  //       $('#freddie_mac').prop('checked', false);
-  //     }
-  //   }
-  // });
-
-  // $('#fannie_mae').click(function(){
-  //   if($(this).prop("checked"))
-  //     $('#du').prop('checked', false);
-  //   else{
-  //     $('#du').prop('checked', false);
-  //     $('#fannie_mae_product').val('')
-  //   }
-  // });
-
-  // $('#freddie_mac').click(function(){
-  //   if($(this).prop("checked"))
-  //     $('#lp').prop('checked', false);
-  //   else{
-  //     $('#lp').prop('checked', false);
-  //     $('#freddie_mac_product').val('')
-  //   }
-  // });
 
   // when streamline checked fha will be true and loan_purpose will be 'Refinance'
   var fha_checked = false
@@ -773,6 +734,58 @@
     }
   });
 
+  $(document).ready(function(){
+      $('#reset_all_btn').click(function(event){
+        if ($(this).val()=="ARM"){
+          $(".term").hide()
+          $(".arm-basic").show()
+          setArmDefaultValues();
+         }else{
+          if ($(this).val()=="All"){
+            $(".arm-basic").show();
+            $(".term").show();
+            setArmNullValues();
+          }else{
+            $(".arm-basic").hide();
+            $(".term").show();
+          }
+         }
+        $('input:checkbox').removeAttr('checked');
+        $('#loan_type').val('')
+        $('#term').val('')
+        $('#arm_benchmark').val('LIBOR')
+        $('#arm_margin').val('All')
+        $('#arm_advanced').val('All')
+        $('#arm_basic').val('5/1')
+        $(".arm-basic").hide();
+        $(".term").show();
+        $('#bank_name').val('')
+        $('#term').val('')
+        $('#interest').val('4.375')
+        $('#lock_period').val('30')
+        $('#loan_category').val('')
+        $('#loan_category').val('')
+        $('#program_name').val('')
+        $('#loan_purpose').val('')
+        $('#loan_size').val('')
+        $('#fannie_mae_product').val('')
+        $('#freddie_mac_product').val('')
+        $('#credit_score').val('760 +')
+        $('#ltv').val('97 +')
+        $('#cltv').val('97 +')
+        $('#state').val('All')
+        $('#loan_amount').val('50000')
+        $('#program_category').val('7900')
+        $('#property_type').val('2-4 Unit')
+        $('#financing_type').val('Subordinate Financing')
+        $('#refinance_option').val('Cash Out')
+        $('#misc_adjuster').val('CA Escrow Waiver (Full or Taxes Only)')
+        $('#payment_type').val('Interest Only')
+        $('#dti').val('25.6%')
+        $('#coverage').val('30.5%')
+        $('#margin').val('2.0')
+      });
+  });
 
 
 </script>
