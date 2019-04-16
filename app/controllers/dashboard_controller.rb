@@ -291,7 +291,7 @@ class DashboardController < ApplicationController
   def search_programs_with_loan_type_all
     term_programs = []
     arm_programs = []
-    if (@filter_not_nil.keys.include?(:term && (:arm_basic || :arm_advanced || :arm_margin || :arm_benchmark)))
+    if (@filter_not_nil.keys & [:arm_basic, :arm_advanced, :arm_margin, :arm_benchmark, :term]).any?
         term_programs = Program.where.not(loan_type: "ARM")
         arm_programs1 = Program.where(loan_type: "ARM")
         arm_basic_programs  = []
@@ -324,22 +324,30 @@ class DashboardController < ApplicationController
       end
     end
 
-    if (@filter_data.keys.include?(:term && (:arm_basic || :arm_advanced || :arm_margin || :arm_benchmark)))
+    if (@filter_data.keys & [:term] & [:arm_basic, :arm_advanced, :arm_margin, :arm_benchmark, :term]).any?
         term_programs1 = Program.where(@filter_data.except(:arm_basic, :arm_advanced, :arm_benchmark, :arm_margin, :term))
         term_programs = find_programs_on_term_based(term_programs1, @filter_data[:term])
         arm_programs = Program.where(@filter_data.except(:term))
     else
-      if (@filter_data.keys.include?(:term))
+      if (@filter_data.keys & [:term]).any?
         term_programs1 = Program.where(@filter_data.except(:arm_basic, :arm_advanced, :arm_benchmark, :arm_margin, :term))
         term_programs = find_programs_on_term_based(term_programs1, @filter_data[:term])
       else
-        if (@filter_data.keys.include?(:arm_basic || :arm_advanced || :arm_margin || :arm_benchmark))
+        if (@filter_data.keys & [:arm_basic, :arm_advanced, :arm_margin, :arm_benchmark]).any?
           arm_programs = Program.where(@filter_data.except(:term))
         end
       end
     end
-    total_searched_program = calculate_base_rate_of_selected_programs((term_programs + arm_programs).uniq)
+    if arm_programs.present?
+      arm_ids = arm_programs.pluck(:id)
+      arm_programs = Program.where(id: arm_ids).where(@filter_data.except(:term))
+    end
+    if term_programs.present?
+      term_ids = term_programs.pluck(:id)
+      term_programs = Program.where(id: term_ids).where(@filter_data.except(:arm_basic, :arm_advanced, :arm_benchmark, :arm_margin, :term))
+    end
     
+    total_searched_program = calculate_base_rate_of_selected_programs((term_programs + arm_programs).uniq)
     @result= []
     if total_searched_program.present?
       find_points_of_the_loan total_searched_program

@@ -516,7 +516,7 @@
 
     function setArmDefaultValuesOnLoan(){
       if ($('#arm_benchmark').val()=='' && $("#loan_type").val() != "All" && $("#loan_type").val() != "ARM" ) {
-          $('#arm_benchmark').val('LIBOR')
+          $('#arm_benchmark').val('')
         }
         if ($('#arm_margin').val()=='' && $("#loan_type").val() != "All" && $("#loan_type").val() != "ARM" ) {
           $('#arm_margin').val('All')
