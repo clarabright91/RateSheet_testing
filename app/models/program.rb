@@ -15,7 +15,7 @@ class Program < ApplicationRecord
 
   LOAN_PURPOSE = [["All"], ["Purchase"], ["Refinance"]]
 
-  LOAN_SIZE = [["All"], ["Conforming"], ["Non-Conforming"], ["Super Conforming"], ["Jumbo"], ["High-Balance"], ["High Balance Extra"]]
+  LOAN_SIZE = [["All"], ["Conforming"], ["Non-Conforming"], ["Super Conforming"], ["Jumbo"], ["High-Balance"], ["High-Balance Extra"]]
 
   ARM_BASIC = [["All"], ["1/1"],["2/1"],["3/1"],["5/1"], ["7/1"],["10/1"]]
 
