@@ -97,6 +97,12 @@ class Program < ApplicationRecord
     return conf
   end
 
+  def get_high_balance_extra
+    high_balance_extra = ["High Balance Extra"]
+    high_balance_extra += high_balance_extra.map(&:downcase)
+    return high_balance_extra
+  end
+
   def get_high_balance
     high_balance = ["High-Balance", "HIGH BAL", "High Balance", "HB"]
     # high_balance += Acronym.new(high_balance).to_a
@@ -124,7 +130,7 @@ class Program < ApplicationRecord
   end
 
   def fetch_loan_size_fields
-    loan_size = get_non_conforming + get_super_conforming + get_conforming + get_high_balance + get_jumbo + get_conf + get_non_conf_hb 
+    loan_size = get_non_conforming + get_super_conforming + get_conforming + get_high_balance_extra + get_high_balance + get_jumbo + get_conf + get_non_conf_hb 
     return loan_size
   end
 
@@ -305,7 +311,7 @@ class Program < ApplicationRecord
       present_word = word if p_name.squish.downcase.include?(word.downcase)
       break if present_word.present?
     }
-    loan_size = get_high_balance.include?(present_word) ? "High-Balance" : get_jumbo.include?(present_word) ? "Jumbo" : get_super_conforming.include?(present_word) ? "Super Conforming" : get_non_conforming.include?(present_word) ? "Non-Conforming" : get_conforming.include?(present_word) ? "Conforming" : get_conf.include?(present_word) ? "Conforming and High-Balance" : get_non_conf_hb.include?(present_word) ? "Non-Conforming and Jumbo" : "Conforming"
+    loan_size = get_high_balance_extra.include?(present_word) ? "High Balance Extra" : get_high_balance.include?(present_word) ? "High-Balance" : get_jumbo.include?(present_word) ? "Jumbo" : get_super_conforming.include?(present_word) ? "Super Conforming" : get_non_conforming.include?(present_word) ? "Non-Conforming" : get_conforming.include?(present_word) ? "Conforming" : get_conf.include?(present_word) ? "Conforming and High-Balance" : get_non_conf_hb.include?(present_word) ? "Non-Conforming and Jumbo" : "Conforming"
     self.update_column(:loan_size, loan_size)
   end
 end
