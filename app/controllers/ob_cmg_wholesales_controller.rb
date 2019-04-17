@@ -4043,14 +4043,19 @@ class ObCmgWholesalesController < ApplicationController
     if value1.present?
       if value1.include?("<=") || value1.include?("<")
         value1 = "0-"+value1.split("<=").last.tr('A-Za-z%$><=, ','')
+        value1 = value1.tr('–','-')
       elsif value1.include?(">")
         value1 = value1.split(">").last.tr('A-Za-z%$><=, ', '')+"-Inf"
+        value1 = value1.tr('–','-')
       elsif value1.include?("+")
         value1.split("+")[0] + "-Inf"
+        value1 = value1.tr('–','-')
       elsif value1.include?("%")
         value1.gsub("%", "")
+        value1 = value1.tr('–','-')
       else
         value1 = value1.tr('A-Za-z&$, ','')
+        value1 = value1.tr('–','-')
       end
     end
   end
