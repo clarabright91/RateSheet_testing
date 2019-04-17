@@ -1252,9 +1252,12 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
         value1 = "0-"+value1.split("<=").last.tr('A-Za-z%$><=≤ ','')
       elsif value1.include?(">") || value1.include?("+")
         value1 = value1.split(">").last.tr('A-Za-z+ ','')+"-Inf"
+        value1 = value1.tr('–', '-')
       elsif value1.include?("≥")
-        value1 = value1.split("≥").last.tr('A-Za-z ','')+"-Inf"
+        value1 = value1.split("≥").last.tr('A-Za-z– ','')+"-Inf"
+        value1 = value1.tr('–', '-')
       else
+        value1 = value1.tr('–','-')
         value1 = value1.tr(' ','')
       end
     end

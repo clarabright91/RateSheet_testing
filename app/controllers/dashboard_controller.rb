@@ -82,19 +82,36 @@ class DashboardController < ApplicationController
   def modified_ltv_cltv_credit_score
     %w[ltv cltv credit_score].each do |key|
       array_data = []
-      key_value = params[key.to_sym]
-      if key_value.present?
-        if key_value.include?("-")
-          key_range = (key_value.split("-").first.to_f..key_value.split("-").last.to_f)
-          key_range.step(0.01) { |f| array_data << f }
-          instance_variable_set("@#{key}", array_data.uniq)
-        elsif key_value.include?("+")
-          score = key.eql?('credit_score') ? 100 : 60
-          key_range = (key_value.to_f..(key_value.to_f+score))
-          key_range.step(0.01) { |f| array_data << f }
+      if key == "ltv" || key == "cltv"
+        key_value = params[key.to_sym]
+        if key_value.present?
+          if key_value.include?("-")
+            key_range = (key_value.split("-").first.to_f..key_value.split("-").last.to_f)
+            key_range.step(0.01) { |f| array_data << f }
+            instance_variable_set("@#{key}", array_data.uniq)
+          end
+        end
+      end
+      if key == "credit_score"
+        key_value = params[key.to_sym]
+        if key_value.present?
+          array_data = (key_value.split("-").first.to_i..key_value.split("-").last.to_i)
           instance_variable_set("@#{key}", array_data.uniq)
         end
       end
+      # key_value = params[key.to_sym]
+      # if key_value.present?
+      #   if key_value.include?("-")
+      #     key_range = (key_value.split("-").first.to_f..key_value.split("-").last.to_f)
+      #     key_range.step(0.01) { |f| array_data << f }
+      #     instance_variable_set("@#{key}", array_data.uniq)
+      #   elsif key_value.include?("+")
+      #     score = key.eql?('credit_score') ? 100 : 60
+      #     key_range = (key_value.to_f..(key_value.to_f+score))
+      #     key_range.step(0.01) { |f| array_data << f }
+      #     instance_variable_set("@#{key}", array_data.uniq)
+      #   end
+      # end
     end
   end
 
@@ -297,6 +314,88 @@ class DashboardController < ApplicationController
       end
     end
     return loan_amount_key2
+  end
+
+  def ltv_key_of_adjustment(ltv_keys)
+    ltv_key2 = ''
+    ltv_keys.each do |ltv_key|
+      if (ltv_key.include?("Any") || ltv_key.include?("All"))
+        ltv_key2 = ltv_key
+      end
+      if ltv_key.include?("-")
+        ltv_key_range =[]
+        if ltv_key.include?("Inf") || ltv_key.include?("Infinity")
+          first_range = ltv_key.split("-").first.strip.to_f
+          if params[:ltv].include?("+")
+            full_range = params[:ltv].split("+").first.strip.to_f
+            if (full_range <= first_range)
+              ltv_key2 = ltv_key
+            end
+          else
+            if first_range <= @ltv.last
+              ltv_key2 = ltv_key
+            end
+          end
+        else
+          first_range = ltv_key.split("-").first.strip.to_f
+          last_range =  ltv_key.split("-").last.strip.to_f
+          if params[:ltv].include?("+")
+            full_range = params[:ltv].split("+").first.strip.to_f
+            if (full_range >= first_range && full_range < last_range )
+              ltv_key2 = ltv_key
+            end
+          else
+            (first_range..last_range).step(0.01) { |f| ltv_key_range << f }
+            ltv_key_range = ltv_key_range.uniq
+            if (ltv_key_range & @ltv).present?
+              ltv_key2 = ltv_key
+            end
+          end
+        end
+      end
+    end
+    return ltv_key2
+  end
+
+  def cltv_key_of_adjustment(cltv_keys)
+    cltv_key2 = ''
+    cltv_keys.each do |cltv_key|
+      if (cltv_key.include?("Any") || cltv_key.include?("All"))
+        cltv_key2 = cltv_key
+      end
+      if cltv_key.include?("-")
+        cltv_key_range =[]
+        if cltv_key.include?("Inf") || cltv_key.include?("Infinity")
+          first_range = cltv_key.split("-").first.strip.to_f
+          if params[:cltv].include?("+")
+            full_range = params[:cltv].split("+").first.strip.to_f
+            if (full_range <= first_range)
+              cltv_key2 = cltv_key
+            end
+          else
+            if first_range <= @ltv.last
+              cltv_key2 = cltv_key
+            end
+          end
+        else
+          first_range = cltv_key.split("-").first.strip.to_f
+          last_range =  cltv_key.split("-").last.strip.to_f
+          if params[:cltv].include?("+")
+            full_range = params[:cltv].split("+").first.strip.to_f
+            if (full_range >= first_range && full_range < last_range )
+              cltv_key2 = cltv_key
+            end
+          else
+            (first_range..last_range).step(0.01) { |f| cltv_key_range << f }
+            cltv_key_range = cltv_key_range.uniq
+            if (cltv_key_range & @ltv).present?
+              cltv_key2 = cltv_key
+            end
+          end
+        end
+      end
+    end
+    return cltv_key2
   end
 
   def find_programs_on_term_based(programs, find_term)
@@ -662,31 +761,34 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key].present?
                       ltv_key2 = ''
-                      adj.data[first_key].keys.each do |ltv_key|
-                        if (ltv_key.include?("Any") || ltv_key.include?("All"))
-                          ltv_key2 = ltv_key
-                          adj_key_hash[key_index] = ltv_key
-                        end
-                        if ltv_key.include?("-")
-                          ltv_key_range =[]
-                          if ltv_key.include?("Inf") || ltv_key.include?("Infinity")
-                            (ltv_key.split("-").first.strip.to_f..ltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| ltv_key_range << f }
-                            ltv_key_range = ltv_key_range.uniq
-                            if (ltv_key_range & @ltv).present?
-                              ltv_key2 = ltv_key
-                              adj_key_hash[key_index] = ltv_key
-                            end
-                          else
-                            (ltv_key.split("-").first.strip.to_f..ltv_key.split("-").last.strip.to_f).step(0.01) { |f| ltv_key_range << f }
-                            ltv_key_range = ltv_key_range.uniq
-                            if (ltv_key_range & @ltv).present?
-                              ltv_key2 = ltv_key
-                              adj_key_hash[key_index] = ltv_key
-                            end
-                          end
-                        end
-                      end
-                      unless ltv_key2.present?
+                      ltv_key2 = ltv_key_of_adjustment(adj.data[first_key].keys)
+                      # adj.data[first_key].keys.each do |ltv_key|
+                      #   if (ltv_key.include?("Any") || ltv_key.include?("All"))
+                      #     ltv_key2 = ltv_key
+                      #     adj_key_hash[key_index] = ltv_key
+                      #   end
+                      #   if ltv_key.include?("-")
+                      #     ltv_key_range =[]
+                      #     if ltv_key.include?("Inf") || ltv_key.include?("Infinity")
+                      #       (ltv_key.split("-").first.strip.to_f..ltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| ltv_key_range << f }
+                      #       ltv_key_range = ltv_key_range.uniq
+                      #       if (ltv_key_range & @ltv).present?
+                      #         ltv_key2 = ltv_key
+                      #         adj_key_hash[key_index] = ltv_key
+                      #       end
+                      #     else
+                      #       (ltv_key.split("-").first.strip.to_f..ltv_key.split("-").last.strip.to_f).step(0.01) { |f| ltv_key_range << f }
+                      #       ltv_key_range = ltv_key_range.uniq
+                      #       if (ltv_key_range & @ltv).present?
+                      #         ltv_key2 = ltv_key
+                      #         adj_key_hash[key_index] = ltv_key
+                      #       end
+                      #     end
+                      #   end
+                      # end
+                      if ltv_key2.present?
+                        adj_key_hash[key_index] = ltv_key2
+                      else
                         break
                       end
                     else
@@ -787,31 +889,11 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key].present?
                       ltv_key2 = ''
-                      adj.data[first_key].keys.each do |cltv_key|
-                        if (cltv_key.include?("Any") || cltv_key.include?("All"))
-                          cltv_key2 = cltv_key
-                          adj_key_hash[key_index] = cltv_key
-                        end
-                        if cltv_key.include?("-")
-                          cltv_key_range =[]
-                          if cltv_key.include?("Inf") || cltv_key.include?("Infinity")
-                            (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| cltv_key_range << f }
-                            cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @cltv).present?
-                              cltv_key2 = cltv_key
-                              adj_key_hash[key_index] = cltv_key
-                            end
-                          else
-                            (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").last.strip.to_f).step(0.01) { |f| cltv_key_range << f }
-                            cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @cltv).present?
-                              cltv_key2 = cltv_key
-                              adj_key_hash[key_index] = cltv_key
-                            end
-                          end
-                        end
-                      end
-                      unless cltv_key2.present?
+                      cltv_key2 = cltv_key_of_adjustment(adj.data[first_key].keys)
+
+                      if cltv_key2.present?
+                        adj_key_hash[key_index] = cltv_key2
+                      else
                         break
                       end
                     else
@@ -1027,31 +1109,11 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-1]].present?
                       ltv_key2 = ''
-                      adj.data[first_key][adj_key_hash[key_index-1]].keys.each do |ltv_key|
-                        if (ltv_key.include?("Any") || ltv_key.include?("All"))
-                          ltv_key2 = ltv_key
-                          adj_key_hash[key_index] = ltv_key
-                        end
-                        if ltv_key.include?("-")
-                          ltv_key_range =[]
-                          if ltv_key.include?("Inf") || ltv_key.include?("Infinity")
-                            (ltv_key.split("-").first.strip.to_f..ltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| ltv_key_range << f }
-                            ltv_key_range = ltv_key_range.uniq
-                            if (ltv_key_range & @ltv).present?
-                              ltv_key2 = ltv_key
-                              adj_key_hash[key_index] = ltv_key
-                            end
-                          else
-                            (ltv_key.split("-").first.strip.to_f..ltv_key.split("-").last.strip.to_f).step(0.01) { |f| ltv_key_range << f }
-                            ltv_key_range = ltv_key_range.uniq
-                            if (ltv_key_range & @ltv).present?
-                              ltv_key2 = ltv_key
-                              adj_key_hash[key_index] = ltv_key
-                            end
-                          end
-                        end
-                      end
-                      unless ltv_key2.present?
+                      ltv_key2 = ltv_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-1]].keys)
+
+                      if ltv_key2.present?
+                        adj_key_hash[key_index] = ltv_key2
+                      else
                         break
                       end
                     else
@@ -1151,31 +1213,11 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-1]].present?
                       cltv_key2 = ''
-                      adj.data[first_key][adj_key_hash[key_index-1]].keys.each do |cltv_key|
-                        if (cltv_key.include?("Any") || cltv_key.include?("All"))
-                          cltv_key2 = cltv_key
-                          adj_key_hash[key_index] = cltv_key
-                        end
-                        if cltv_key.include?("-")
-                          cltv_key_range =[]
-                          if cltv_key.include?("Inf") || cltv_key.include?("Infinity")
-                            (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| cltv_key_range << f }
-                            cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @cltv).present?
-                              cltv_key2 = cltv_key
-                              adj_key_hash[key_index] = cltv_key
-                            end
-                          else
-                            (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").last.strip.to_f).step(0.01) { |f| cltv_key_range << f }
-                            cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @cltv).present?
-                              cltv_key2 = cltv_key
-                              adj_key_hash[key_index] = cltv_key
-                            end
-                          end
-                        end
-                      end
-                      unless cltv_key2.present?
+                      cltv_key2 = cltv_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-1]].keys)
+
+                      if cltv_key2.present?
+                        adj_key_hash[key_index] = cltv_key2
+                      else
                         break
                       end
                     else
@@ -1391,31 +1433,11 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       ltv_key2 = ''
-                      adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |ltv_key|
-                        if (ltv_key.include?("Any") || ltv_key.include?("All"))
-                          ltv_key2 = ltv_key
-                          adj_key_hash[key_index] = ltv_key
-                        end
-                        if ltv_key.include?("-")
-                          ltv_key_range =[]
-                          if ltv_key.include?("Inf") || ltv_key.include?("Infinity")
-                            (ltv_key.split("-").first.strip.to_f..ltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| ltv_key_range << f }
-                            ltv_key_range = ltv_key_range.uniq
-                            if (ltv_key_range & @ltv).present?
-                              ltv_key2 = ltv_key
-                              adj_key_hash[key_index] = ltv_key
-                            end
-                          else
-                            (ltv_key.split("-").first.strip.to_f..ltv_key.split("-").last.strip.to_f).step(0.01) { |f| ltv_key_range << f }
-                            ltv_key_range = ltv_key_range.uniq
-                            if (ltv_key_range & @ltv).present?
-                              ltv_key2 = ltv_key
-                              adj_key_hash[key_index] = ltv_key
-                            end
-                          end
-                        end
-                      end
-                      unless ltv_key2.present?
+                      ltv_key2 = ltv_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+
+                      if ltv_key2.present?
+                        adj_key_hash[key_index] = ltv_key2
+                      else
                         break
                       end
                     else
@@ -1514,31 +1536,11 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       cltv_key2 = ''
-                      adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |cltv_key|
-                        if (cltv_key.include?("Any") || cltv_key.include?("All"))
-                          cltv_key2 = cltv_key
-                          adj_key_hash[key_index] = cltv_key
-                        end
-                        if cltv_key.include?("-")
-                          cltv_key_range =[]
-                          if cltv_key.include?("Inf") || cltv_key.include?("Infinity")
-                            (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| cltv_key_range << f }
-                            cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @cltv).present?
-                              cltv_key2 = cltv_key
-                              adj_key_hash[key_index] = cltv_key
-                            end
-                          else
-                            (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").last.strip.to_f).step(0.01) { |f| cltv_key_range << f }
-                            cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @cltv).present?
-                              cltv_key2 = cltv_key
-                              adj_key_hash[key_index] = cltv_key
-                            end
-                          end
-                        end
-                      end
-                      unless cltv_key2.present?
+                      cltv_key2 = cltv_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+
+                      if cltv_key2.present?
+                        adj_key_hash[key_index] = cltv_key2
+                      else
                         break
                       end
                     else
@@ -1753,31 +1755,11 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       ltv_key2 = ''
-                      adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |ltv_key|
-                        if (ltv_key.include?("Any") || ltv_key.include?("All"))
-                          ltv_key2 = ltv_key
-                          adj_key_hash[key_index] = ltv_key
-                        end
-                        if ltv_key.include?("-")
-                          ltv_key_range =[]
-                          if ltv_key.include?("Inf") || ltv_key.include?("Infinity")
-                            (ltv_key.split("-").first.strip.to_f..ltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| ltv_key_range << f }
-                            ltv_key_range = ltv_key_range.uniq
-                            if (ltv_key_range & @ltv).present?
-                              ltv_key2 = ltv_key
-                              adj_key_hash[key_index] = ltv_key
-                            end
-                          else
-                            (ltv_key.split("-").first.strip.to_f..ltv_key.split("-").last.strip.to_f).step(0.01) { |f| ltv_key_range << f }
-                            ltv_key_range = ltv_key_range.uniq
-                            if (ltv_key_range & @ltv).present?
-                              ltv_key2 = ltv_key
-                              adj_key_hash[key_index] = ltv_key
-                            end
-                          end
-                        end
-                      end
-                      unless ltv_key2.present?
+                      ltv_key2 = ltv_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+
+                      if ltv_key2.present?
+                        adj_key_hash[key_index] = ltv_key2
+                      else
                         break
                       end
                     else
@@ -1876,31 +1858,11 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       cltv_key2 = ''
-                      adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |cltv_key|
-                        if (cltv_key.include?("Any") || cltv_key.include?("All"))
-                          cltv_key2 = cltv_key
-                          adj_key_hash[key_index] = cltv_key
-                        end
-                        if cltv_key.include?("-")
-                          cltv_key_range =[]
-                          if cltv_key.include?("Inf") || cltv_key.include?("Infinity")
-                            (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| cltv_key_range << f }
-                            cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @cltv).present?
-                              cltv_key2 = cltv_key
-                              adj_key_hash[key_index] = cltv_key
-                            end
-                          else
-                            (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").last.strip.to_f).step(0.01) { |f| cltv_key_range << f }
-                            cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @cltv).present?
-                              cltv_key2 = cltv_key
-                              adj_key_hash[key_index] = cltv_key
-                            end
-                          end
-                        end
-                      end
-                      unless cltv_key2.present?
+                      cltv_key2 = cltv_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+
+                      if cltv_key2.present?
+                        adj_key_hash[key_index] = cltv_key2
+                      else
                         break
                       end
                     else
@@ -2115,31 +2077,11 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       ltv_key2 = ''
-                      adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |ltv_key|
-                        if (ltv_key.include?("Any") || ltv_key.include?("All"))
-                          ltv_key2 = ltv_key
-                          adj_key_hash[key_index] = ltv_key
-                        end
-                        if ltv_key.include?("-")
-                          ltv_key_range =[]
-                          if ltv_key.include?("Inf") || ltv_key.include?("Infinity")
-                            (ltv_key.split("-").first.strip.to_f..ltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| ltv_key_range << f }
-                            ltv_key_range = ltv_key_range.uniq
-                            if (ltv_key_range & @ltv).present?
-                              ltv_key2 = ltv_key
-                              adj_key_hash[key_index] = ltv_key
-                            end
-                          else
-                            (ltv_key.split("-").first.strip.to_f..ltv_key.split("-").last.strip.to_f).step(0.01) { |f| ltv_key_range << f }
-                            ltv_key_range = ltv_key_range.uniq
-                            if (ltv_key_range & @ltv).present?
-                              ltv_key2 = ltv_key
-                              adj_key_hash[key_index] = ltv_key
-                            end
-                          end
-                        end
-                      end
-                      unless ltv_key2.present?
+                      ltv_key2 = ltv_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+
+                      if ltv_key2.present?
+                        adj_key_hash[key_index] = ltv_key2
+                      else
                         break
                       end
                     else
@@ -2237,31 +2179,11 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       cltv_key2 = ''
-                      adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |cltv_key|
-                        if (cltv_key.include?("Any") || cltv_key.include?("All"))
-                          cltv_key2 = cltv_key
-                          adj_key_hash[key_index] = cltv_key
-                        end
-                        if cltv_key.include?("-")
-                          cltv_key_range =[]
-                          if cltv_key.include?("Inf") || cltv_key.include?("Infinity")
-                            (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| cltv_key_range << f }
-                            cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @cltv).present?
-                              cltv_key2 = cltv_key
-                              adj_key_hash[key_index] = cltv_key
-                            end
-                          else
-                            (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").last.strip.to_f).step(0.01) { |f| cltv_key_range << f }
-                            cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @cltv).present?
-                              cltv_key2 = cltv_key
-                              adj_key_hash[key_index] = cltv_key
-                            end
-                          end
-                        end
-                      end
-                      unless cltv_key2.present?
+                      cltv_key2 = cltv_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+
+                      if cltv_key2.present?
+                        adj_key_hash[key_index] = cltv_key2
+                      else
                         break
                       end
                     else
@@ -2477,31 +2399,11 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       ltv_key2 = ''
-                      adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |ltv_key|
-                        if (ltv_key.include?("Any") || ltv_key.include?("All"))
-                          ltv_key2 = ltv_key
-                          adj_key_hash[key_index] = ltv_key
-                        end
-                        if ltv_key.include?("-")
-                          ltv_key_range =[]
-                          if ltv_key.include?("Inf") || ltv_key.include?("Infinity")
-                            (ltv_key.split("-").first.strip.to_f..ltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| ltv_key_range << f }
-                            ltv_key_range = ltv_key_range.uniq
-                            if (ltv_key_range & @ltv).present?
-                              ltv_key2 = ltv_key
-                              adj_key_hash[key_index] = ltv_key
-                            end
-                          else
-                            (ltv_key.split("-").first.strip.to_f..ltv_key.split("-").last.strip.to_f).step(0.01) { |f| ltv_key_range << f }
-                            ltv_key_range = ltv_key_range.uniq
-                            if (ltv_key_range & @ltv).present?
-                              ltv_key2 = ltv_key
-                              adj_key_hash[key_index] = ltv_key
-                            end
-                          end
-                        end
-                      end
-                      unless ltv_key2.present?
+                      ltv_key2 = ltv_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+
+                      if ltv_key2.present?
+                        adj_key_hash[key_index] = ltv_key2
+                      else
                         break
                       end
                     else
@@ -2600,31 +2502,11 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       cltv_key2 = ''
-                      adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |cltv_key|
-                        if (cltv_key.include?("Any") || cltv_key.include?("All"))
-                          cltv_key2 = cltv_key
-                          adj_key_hash[key_index] = cltv_key
-                        end
-                        if cltv_key.include?("-")
-                          cltv_key_range =[]
-                          if cltv_key.include?("Inf") || cltv_key.include?("Infinity")
-                            (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| cltv_key_range << f }
-                            cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @cltv).present?
-                              cltv_key2 = cltv_key
-                              adj_key_hash[key_index] = cltv_key
-                            end
-                          else
-                            (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").last.strip.to_f).step(0.01) { |f| cltv_key_range << f }
-                            cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @cltv).present?
-                              cltv_key2 = cltv_key
-                              adj_key_hash[key_index] = cltv_key
-                            end
-                          end
-                        end
-                      end
-                      unless cltv_key2.present?
+                      cltv_key2 = cltv_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+
+                      if cltv_key2.present?
+                        adj_key_hash[key_index] = cltv_key2
+                      else
                         break
                       end
                     else
@@ -2839,31 +2721,11 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       ltv_key2 = ''
-                      adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |ltv_key|
-                        if (ltv_key.include?("Any") || ltv_key.include?("All"))
-                          ltv_key2 = ltv_key
-                          adj_key_hash[key_index] = ltv_key
-                        end
-                        if ltv_key.include?("-")
-                          ltv_key_range =[]
-                          if ltv_key.include?("Inf") || ltv_key.include?("Infinity")
-                            (ltv_key.split("-").first.strip.to_f..ltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| ltv_key_range << f }
-                            ltv_key_range = ltv_key_range.uniq
-                            if (ltv_key_range & @ltv).present?
-                              ltv_key2 = ltv_key
-                              adj_key_hash[key_index] = ltv_key
-                            end
-                          else
-                            (ltv_key.split("-").first.strip.to_f..ltv_key.split("-").last.strip.to_f).step(0.01) { |f| ltv_key_range << f }
-                            ltv_key_range = ltv_key_range.uniq
-                            if (ltv_key_range & @ltv).present?
-                              ltv_key2 = ltv_key
-                              adj_key_hash[key_index] = ltv_key
-                            end
-                          end
-                        end
-                      end
-                      unless ltv_key2.present?
+                      ltv_key2 = ltv_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+
+                      if ltv_key2.present?
+                        adj_key_hash[key_index] = ltv_key2
+                      else
                         break
                       end
                     else
@@ -2964,31 +2826,11 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       cltv_key2 = ''
-                      adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |cltv_key|
-                        if (cltv_key.include?("Any") || cltv_key.include?("All"))
-                          cltv_key2 = cltv_key
-                          adj_key_hash[key_index] = cltv_key
-                        end
-                        if cltv_key.include?("-")
-                          cltv_key_range =[]
-                          if cltv_key.include?("Inf") || cltv_key.include?("Infinity")
-                            (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| cltv_key_range << f }
-                            cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @cltv).present?
-                              cltv_key2 = cltv_key
-                              adj_key_hash[key_index] = cltv_key
-                            end
-                          else
-                            (cltv_key.split("-").first.strip.to_f..cltv_key.split("-").last.strip.to_f).step(0.01) { |f| cltv_key_range << f }
-                            cltv_key_range = cltv_key_range.uniq
-                            if (cltv_key_range & @cltv).present?
-                              cltv_key2 = cltv_key
-                              adj_key_hash[key_index] = cltv_key
-                            end
-                          end
-                        end
-                      end
-                      unless cltv_key2.present?
+                      cltv_key2 = cltv_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+
+                      if cltv_key2.present?
+                        adj_key_hash[key_index] = cltv_key2
+                      else
                         break
                       end
                     else

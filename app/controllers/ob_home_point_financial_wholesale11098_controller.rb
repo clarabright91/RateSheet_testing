@@ -1581,13 +1581,18 @@ class ObHomePointFinancialWholesale11098Controller < ApplicationController
     if value1.present?
       if value1.include?("FICO <")
         value1 = "0"+value1.split("FICO").last
+        value1 = value1.tr('–','-')
       elsif value1.include?("<")
         value1 = "0"+value1
+        value1 = value1.tr('–','-')
       elsif value1.include?("FICO")
         value1 = value1.split("FICO ").last.first(9)
+        value1 = value1.tr('–','-')
       elsif value1 == "Investment Property"
         value1 = "Property/Type"
+        value1 = value1.tr('–','-')
       else
+        value1 = value1.tr('–','-')
         value1
       end
     end
