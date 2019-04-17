@@ -130,25 +130,25 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                 if value.present?
                   if value == "Fannie Mae Loan Level Price Adjustments"
                     @adjustment_hash["FannieMae/Term/FICO/LTV"] = {}
-                    @adjustment_hash["FannieMae/Term/FICO/LTV"][true] = {}
-                    @adjustment_hash["FannieMae/Term/FICO/LTV"][true]["15-Inf"] = {}
+                    @adjustment_hash["FannieMae/Term/FICO/LTV"]["true"] = {}
+                    @adjustment_hash["FannieMae/Term/FICO/LTV"]["true"]["15-Inf"] = {}
                   end
                   # if value == "Lender Paid Mortgage Insurance"
                   #   @lpmi_hash["LPMI/Term/FICO/LTV"] = {}
-                  #   @lpmi_hash["LPMI/Term/FICO/LTV"][true] = {}
-                  #   @lpmi_hash["LPMI/Term/FICO/LTV"][true]["20-Inf"] = {}
+                  #   @lpmi_hash["LPMI/Term/FICO/LTV"]["true"] = {}
+                  #   @lpmi_hash["LPMI/Term/FICO/LTV"]["true"]["20-Inf"] = {}
                   # end
                   if value == "All Eligible Mortgages  Cash-Out Refinance  LLPAs"
                     @cashout_adjustment["FannieMae/RefinanceOption/FICO/LTV"] = {}
-                    @cashout_adjustment["FannieMae/RefinanceOption/FICO/LTV"][true] = {}
-                    @cashout_adjustment["FannieMae/RefinanceOption/FICO/LTV"][true]["Cash Out"] = {}
+                    @cashout_adjustment["FannieMae/RefinanceOption/FICO/LTV"]["true"] = {}
+                    @cashout_adjustment["FannieMae/RefinanceOption/FICO/LTV"]["true"]["Cash Out"] = {}
                   end
                   if value == "All Eligible Mortgages Product Feature  LLPAs"
                     @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"] = {}
-                    @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"][true] = {}
-                    @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"][true]["High-Balance"] = {}
-                    @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"][true]["High-Balance"]["Rate and Term"] = {}
-                    @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"][true]["High-Balance"]["Cash Out"] = {}
+                    @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"]["true"] = {}
+                    @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"]["true"]["High-Balance"] = {}
+                    @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"]["true"]["High-Balance"]["Rate and Term"] = {}
+                    @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"]["true"]["High-Balance"]["Cash Out"] = {}
                   end
                   if value == "Mortgages with Subordinate Financing4"
                     @subordinate_hash["FinancingType/LTV/CLTV/FICO"] = {}
@@ -158,90 +158,90 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                   # All Eligible Mortgages - LLPAs for Terms > 15 Years
                   if r >= 357 && r <= 365 && cc == 9
                     ltv_key = get_value value
-                    @adjustment_hash["FannieMae/Term/FICO/LTV"][true]["15-Inf"][ltv_key] = {}
+                    @adjustment_hash["FannieMae/Term/FICO/LTV"]["true"]["15-Inf"][ltv_key] = {}
                   end
                   if r >= 357 && r <= 365 && cc >= 18 && cc <= 44
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @adjustment_hash["FannieMae/Term/FICO/LTV"][true]["15-Inf"][ltv_key][ltv_data] = {}
-                    @adjustment_hash["FannieMae/Term/FICO/LTV"][true]["15-Inf"][ltv_key][ltv_data] = value
+                    @adjustment_hash["FannieMae/Term/FICO/LTV"]["true"]["15-Inf"][ltv_key][ltv_data] = {}
+                    @adjustment_hash["FannieMae/Term/FICO/LTV"]["true"]["15-Inf"][ltv_key][ltv_data] = value
                   end
 
                   # All Eligible Mortgages  Cash-Out Refinance  LLPAs
                   if r >= 367 && r <= 373 && cc == 9
                     ltv_key = get_value value
-                    @cashout_adjustment["FannieMae/RefinanceOption/FICO/LTV"][true]["Cash Out"][ltv_key] = {}
+                    @cashout_adjustment["FannieMae/RefinanceOption/FICO/LTV"]["true"]["Cash Out"][ltv_key] = {}
                   end
                   if r >= 367 && r <= 373 && cc >= 18 && cc <= 44
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @cashout_adjustment["FannieMae/RefinanceOption/FICO/LTV"][true]["Cash Out"][ltv_key][ltv_data] = {}
-                    @cashout_adjustment["FannieMae/RefinanceOption/FICO/LTV"][true]["Cash Out"][ltv_key][ltv_data] = value
+                    @cashout_adjustment["FannieMae/RefinanceOption/FICO/LTV"]["true"]["Cash Out"][ltv_key][ltv_data] = {}
+                    @cashout_adjustment["FannieMae/RefinanceOption/FICO/LTV"]["true"]["Cash Out"][ltv_key][ltv_data] = value
                   end
 
                   # All Eligible Mortgages Product Feature  LLPAs
                   if r == 375 && cc == 9
                     @product_hash["FannieMae/LoanType/LTV"] = {}
-                    @product_hash["FannieMae/LoanType/LTV"][true] = {}
-                    @product_hash["FannieMae/LoanType/LTV"][true]["ARM"] = {}
+                    @product_hash["FannieMae/LoanType/LTV"]["true"] = {}
+                    @product_hash["FannieMae/LoanType/LTV"]["true"]["ARM"] = {}
                   end
                   if r == 375 && cc >= 18 && cc <= 44
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @product_hash["FannieMae/LoanType/LTV"][true]["ARM"][ltv_data] = {}
-                    @product_hash["FannieMae/LoanType/LTV"][true]["ARM"][ltv_data] = value
+                    @product_hash["FannieMae/LoanType/LTV"]["true"]["ARM"][ltv_data] = {}
+                    @product_hash["FannieMae/LoanType/LTV"]["true"]["ARM"][ltv_data] = value
                   end
                   if r == 376 && cc == 9
                     @product_hash["FannieMae/PropertyType/LTV"] = {}
-                    @product_hash["FannieMae/PropertyType/LTV"][true] = {}
-                    @product_hash["FannieMae/PropertyType/LTV"][true]["Manufactured Home"] = {}
+                    @product_hash["FannieMae/PropertyType/LTV"]["true"] = {}
+                    @product_hash["FannieMae/PropertyType/LTV"]["true"]["Manufactured Home"] = {}
                   end
                   if r == 376 && cc >= 18 && cc <= 44
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @product_hash["FannieMae/PropertyType/LTV"][true]["Manufactured Home"][ltv_data] = {}
-                    @product_hash["FannieMae/PropertyType/LTV"][true]["Manufactured Home"][ltv_data] = value
+                    @product_hash["FannieMae/PropertyType/LTV"]["true"]["Manufactured Home"][ltv_data] = {}
+                    @product_hash["FannieMae/PropertyType/LTV"]["true"]["Manufactured Home"][ltv_data] = value
                   end
                   if r == 377 && cc == 9
-                    @product_hash["FannieMae/PropertyType/LTV"][true]["Investment Property"] = {}
+                    @product_hash["FannieMae/PropertyType/LTV"]["true"]["Investment Property"] = {}
                   end
                   if r == 377 && cc >= 18 && cc <= 44
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @product_hash["FannieMae/PropertyType/LTV"][true]["Investment Property"][ltv_data] = {}
-                    @product_hash["FannieMae/PropertyType/LTV"][true]["Investment Property"][ltv_data] = value
+                    @product_hash["FannieMae/PropertyType/LTV"]["true"]["Investment Property"][ltv_data] = {}
+                    @product_hash["FannieMae/PropertyType/LTV"]["true"]["Investment Property"][ltv_data] = value
                   end
                   if r == 378 && cc >= 18 && cc <= 44
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"][true]["High-Balance"]["Rate and Term"][ltv_data] = {}
-                    @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"][true]["High-Balance"]["Rate and Term"][ltv_data] = value
+                    @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"]["true"]["High-Balance"]["Rate and Term"][ltv_data] = {}
+                    @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"]["true"]["High-Balance"]["Rate and Term"][ltv_data] = value
                   end
                   if r == 379 && cc >= 18 && cc <= 44
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"][true]["High-Balance"]["Cash Out"][ltv_data] = {}
-                    @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"][true]["High-Balance"]["Cash Out"][ltv_data] = value
+                    @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"]["true"]["High-Balance"]["Cash Out"][ltv_data] = {}
+                    @product_hash["FannieMae/LoanSize/RefinanceOption/LTV"]["true"]["High-Balance"]["Cash Out"][ltv_data] = value
                   end
                   if r == 380 && cc == 9
                     @product_hash["FannieMae/LoanSize/LoanType/LTV"] = {}
-                    @product_hash["FannieMae/LoanSize/LoanType/LTV"][true] = {}
-                    @product_hash["FannieMae/LoanSize/LoanType/LTV"][true]["High-Balance"] = {}
-                    @product_hash["FannieMae/LoanSize/LoanType/LTV"][true]["High-Balance"]["ARM"] = {}
+                    @product_hash["FannieMae/LoanSize/LoanType/LTV"]["true"] = {}
+                    @product_hash["FannieMae/LoanSize/LoanType/LTV"]["true"]["High-Balance"] = {}
+                    @product_hash["FannieMae/LoanSize/LoanType/LTV"]["true"]["High-Balance"]["ARM"] = {}
                   end
                   if r == 380 && cc >= 18 && cc <= 44
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @product_hash["FannieMae/LoanSize/LoanType/LTV"][true]["High-Balance"]["ARM"][ltv_data] = {}
-                    @product_hash["FannieMae/LoanSize/LoanType/LTV"][true]["High-Balance"]["ARM"][ltv_data] = value
+                    @product_hash["FannieMae/LoanSize/LoanType/LTV"]["true"]["High-Balance"]["ARM"][ltv_data] = {}
+                    @product_hash["FannieMae/LoanSize/LoanType/LTV"]["true"]["High-Balance"]["ARM"][ltv_data] = value
                   end
                   if r == 381 && cc == 9
-                    @product_hash["FannieMae/PropertyType/LTV"][true]["2-4 Unit"] = {}
+                    @product_hash["FannieMae/PropertyType/LTV"]["true"]["2-4 Unit"] = {}
                   end
                   if r == 381 && cc >= 18 && cc <= 44
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @product_hash["FannieMae/PropertyType/LTV"][true]["2-4 Unit"][ltv_data] = {}
-                    @product_hash["FannieMae/PropertyType/LTV"][true]["2-4 Unit"][ltv_data] = value
+                    @product_hash["FannieMae/PropertyType/LTV"]["true"]["2-4 Unit"][ltv_data] = {}
+                    @product_hash["FannieMae/PropertyType/LTV"]["true"]["2-4 Unit"][ltv_data] = value
                   end
                   if r == 382 && cc == 9
-                    @product_hash["FannieMae/PropertyType/LTV"][true]["Condo"] = {}
+                    @product_hash["FannieMae/PropertyType/LTV"]["true"]["Condo"] = {}
                   end
                   if r == 382 && cc >= 18 && cc <= 44
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @product_hash["FannieMae/PropertyType/LTV"][true]["Condo"][ltv_data] = {}
-                    @product_hash["FannieMae/PropertyType/LTV"][true]["Condo"][ltv_data] = value
+                    @product_hash["FannieMae/PropertyType/LTV"]["true"]["Condo"][ltv_data] = {}
+                    @product_hash["FannieMae/PropertyType/LTV"]["true"]["Condo"][ltv_data] = value
                   end
 
                   # subordinate adjustment
@@ -329,59 +329,59 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                   # Lender Paid Mortgage Insurance
                   if r == 424 && cc == 7
                     @lpmi_hash["LPMI/Term/FICO"] = {}
-                    @lpmi_hash["LPMI/Term/FICO"][true] = {}
-                    @lpmi_hash["LPMI/Term/FICO"][true]["0-25"] = {}
+                    @lpmi_hash["LPMI/Term/FICO"]["true"] = {}
+                    @lpmi_hash["LPMI/Term/FICO"]["true"]["0-25"] = {}
                   end
                   if r == 424 && cc >= 15 && cc <= 33
                     lpmi_key = get_value @lpmi_data[cc-2]
-                    @lpmi_hash["LPMI/Term/FICO"][true]["0-25"][lpmi_key] = {}
-                    @lpmi_hash["LPMI/Term/FICO"][true]["0-25"][lpmi_key] = value
+                    @lpmi_hash["LPMI/Term/FICO"]["true"]["0-25"][lpmi_key] = {}
+                    @lpmi_hash["LPMI/Term/FICO"]["true"]["0-25"][lpmi_key] = value
                   end
                   if r == 425 && cc == 7
                     @lpmi_hash["LPMI/RefinanceOption/FICO"] = {}
-                    @lpmi_hash["LPMI/RefinanceOption/FICO"][true] = {}
-                    @lpmi_hash["LPMI/RefinanceOption/FICO"][true]["Cash Out"] = {}
+                    @lpmi_hash["LPMI/RefinanceOption/FICO"]["true"] = {}
+                    @lpmi_hash["LPMI/RefinanceOption/FICO"]["true"]["Cash Out"] = {}
                   end
                   if r == 425 && cc >= 15 && cc <= 33
                     lpmi_key = get_value @lpmi_data[cc-2]
-                    @lpmi_hash["LPMI/RefinanceOption/FICO"][true]["Cash Out"][lpmi_key] = {}
-                    @lpmi_hash["LPMI/RefinanceOption/FICO"][true]["Cash Out"][lpmi_key] = value
+                    @lpmi_hash["LPMI/RefinanceOption/FICO"]["true"]["Cash Out"][lpmi_key] = {}
+                    @lpmi_hash["LPMI/RefinanceOption/FICO"]["true"]["Cash Out"][lpmi_key] = value
                   end
                   if r == 426 && cc == 7
                     @lpmi_hash["LPMI/PropertyType/FICO"] = {}
-                    @lpmi_hash["LPMI/PropertyType/FICO"][true] = {}
-                    @lpmi_hash["LPMI/PropertyType/FICO"][true]["Investment Property"] = {}
+                    @lpmi_hash["LPMI/PropertyType/FICO"]["true"] = {}
+                    @lpmi_hash["LPMI/PropertyType/FICO"]["true"]["Investment Property"] = {}
                   end
                   if r == 426 && cc >= 15 && cc <= 33
                     lpmi_key = get_value @lpmi_data[cc-2]
-                    @lpmi_hash["LPMI/PropertyType/FICO"][true]["Investment Property"][lpmi_key] = {}
-                    @lpmi_hash["LPMI/PropertyType/FICO"][true]["Investment Property"][lpmi_key] = value
+                    @lpmi_hash["LPMI/PropertyType/FICO"]["true"]["Investment Property"][lpmi_key] = {}
+                    @lpmi_hash["LPMI/PropertyType/FICO"]["true"]["Investment Property"][lpmi_key] = value
                   end
                   if r == 427 && cc == 7
                     @lpmi_hash["LPMI/LoanAmount/FICO"] = {}
-                    @lpmi_hash["LPMI/LoanAmount/FICO"][true] = {}
-                    @lpmi_hash["LPMI/LoanAmount/FICO"][true]["484350-Inf"] = {}
+                    @lpmi_hash["LPMI/LoanAmount/FICO"]["true"] = {}
+                    @lpmi_hash["LPMI/LoanAmount/FICO"]["true"]["484350-Inf"] = {}
                   end
                   if r == 427 && cc >= 15 && cc <= 33
                     lpmi_key = get_value @lpmi_data[cc-2]
-                    @lpmi_hash["LPMI/LoanAmount/FICO"][true]["484350-Inf"][lpmi_key] = {}
-                    @lpmi_hash["LPMI/LoanAmount/FICO"][true]["484350-Inf"][lpmi_key] = value
+                    @lpmi_hash["LPMI/LoanAmount/FICO"]["true"]["484350-Inf"][lpmi_key] = {}
+                    @lpmi_hash["LPMI/LoanAmount/FICO"]["true"]["484350-Inf"][lpmi_key] = value
                   end
                   if r == 428 && cc == 7
-                    @lpmi_hash["LPMI/RefinanceOption/LTV"][true]["Rate and Term"] = {}
+                    @lpmi_hash["LPMI/RefinanceOption/LTV"]["true"]["Rate and Term"] = {}
                   end
                   if r == 428 && cc >= 15 && cc <= 33
                     lpmi_key = get_value @lpmi_data[cc-2]
-                    @lpmi_hash["LPMI/RefinanceOption/LTV"][true]["Rate and Term"][lpmi_key] = {}
-                    @lpmi_hash["LPMI/RefinanceOption/LTV"][true]["Rate and Term"][lpmi_key] = value
+                    @lpmi_hash["LPMI/RefinanceOption/LTV"]["true"]["Rate and Term"][lpmi_key] = {}
+                    @lpmi_hash["LPMI/RefinanceOption/LTV"]["true"]["Rate and Term"][lpmi_key] = value
                   end
                   if r == 429 && cc == 7
-                    @lpmi_hash["LPMI/PropertyType/LTV"][true]["2nd Home"] = {}
+                    @lpmi_hash["LPMI/PropertyType/LTV"]["true"]["2nd Home"] = {}
                   end
                   if r == 429 && cc >= 15 && cc <= 33
                     lpmi_key = get_value @lpmi_data[cc-2]
-                    @lpmi_hash["LPMI/PropertyType/LTV"][true]["2nd Home"][lpmi_key] = {}
-                    @lpmi_hash["LPMI/PropertyType/LTV"][true]["2nd Home"][lpmi_key] = value
+                    @lpmi_hash["LPMI/PropertyType/LTV"]["true"]["2nd Home"][lpmi_key] = {}
+                    @lpmi_hash["LPMI/PropertyType/LTV"]["true"]["2nd Home"][lpmi_key] = value
                   end
                 end
               rescue Exception => e
@@ -478,19 +478,19 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                 if value.present?
                   if value == "Freddie Mac Loan Level Price Adjustments"
                     @freddie_adjustment_hash["FreddieMac/Term/FICO/LTV"] = {}
-                    @freddie_adjustment_hash["FreddieMac/Term/FICO/LTV"][true] = {}
-                    @freddie_adjustment_hash["FreddieMac/Term/FICO/LTV"][true]["15-Inf"] = {}
+                    @freddie_adjustment_hash["FreddieMac/Term/FICO/LTV"]["true"] = {}
+                    @freddie_adjustment_hash["FreddieMac/Term/FICO/LTV"]["true"]["15-Inf"] = {}
                   end
                   if value == "All Eligible Mortgages - Relief Refinance Mortgages - LLPAs for Terms > 15 Years"
                     @freddie_adjustment_hash["FreddieMac/LoanPurpose/Term/FICO/LTV"] = {}
-                    @freddie_adjustment_hash["FreddieMac/LoanPurpose/Term/FICO/LTV"][true] = {}
-                    @freddie_adjustment_hash["FreddieMac/LoanPurpose/Term/FICO/LTV"][true]["Refinance"] = {}
-                    @freddie_adjustment_hash["FreddieMac/LoanPurpose/Term/FICO/LTV"][true]["Refinance"]["15-Inf"] = {}
+                    @freddie_adjustment_hash["FreddieMac/LoanPurpose/Term/FICO/LTV"]["true"] = {}
+                    @freddie_adjustment_hash["FreddieMac/LoanPurpose/Term/FICO/LTV"]["true"]["Refinance"] = {}
+                    @freddie_adjustment_hash["FreddieMac/LoanPurpose/Term/FICO/LTV"]["true"]["Refinance"]["15-Inf"] = {}
                   end
                   if value == "All Eligible Mortgages  Cash-Out Refinance  LLPAs"
                     @cashout_hash["FreddieMac/RefinanceOption/FICO/LTV"] = {}
-                    @cashout_hash["FreddieMac/RefinanceOption/FICO/LTV"][true] = {}
-                    @cashout_hash["FreddieMac/RefinanceOption/FICO/LTV"][true]["Cash Out"] = {}
+                    @cashout_hash["FreddieMac/RefinanceOption/FICO/LTV"]["true"] = {}
+                    @cashout_hash["FreddieMac/RefinanceOption/FICO/LTV"]["true"]["Cash Out"] = {}
                   end
                   if value == "Mortgages with Subordinate Financing5 - Other Than Relief Refinance Mortgages"
                     @sub_hash["FinancingType/FreddieMacProduct/LTV/CLTV/FICO"] = {}
@@ -505,141 +505,141 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                   # All Eligible Mortgages - Other Than Relief Refinance Mortgages - LLPAs for Terms > 15 Years
                   if r >= 744 && r <= 750 && cc == 10
                     ltv_key = get_value value
-                    @freddie_adjustment_hash["FreddieMac/Term/FICO/LTV"][true]["15-Inf"][ltv_key] = {}
+                    @freddie_adjustment_hash["FreddieMac/Term/FICO/LTV"]["true"]["15-Inf"][ltv_key] = {}
                   end
                   if r >= 744 && r <= 750 && cc >= 21 && cc <= 42
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @freddie_adjustment_hash["FreddieMac/Term/FICO/LTV"][true]["15-Inf"][ltv_key][ltv_data] = {}
-                    @freddie_adjustment_hash["FreddieMac/Term/FICO/LTV"][true]["15-Inf"][ltv_key][ltv_data] = value
+                    @freddie_adjustment_hash["FreddieMac/Term/FICO/LTV"]["true"]["15-Inf"][ltv_key][ltv_data] = {}
+                    @freddie_adjustment_hash["FreddieMac/Term/FICO/LTV"]["true"]["15-Inf"][ltv_key][ltv_data] = value
                   end
 
                   # All Eligible Mortgages - Relief Refinance Mortgages - LLPAs for Terms > 15 Years
                   if r >= 752 && r <= 760 && cc == 10
                     ltv_key = get_value value
-                    @freddie_adjustment_hash["FreddieMac/LoanPurpose/Term/FICO/LTV"][true]["Refinance"]["15-Inf"][ltv_key] = {}
+                    @freddie_adjustment_hash["FreddieMac/LoanPurpose/Term/FICO/LTV"]["true"]["Refinance"]["15-Inf"][ltv_key] = {}
                   end
                   if r >= 752 && r <= 760 && cc >= 21 && cc <= 42
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @freddie_adjustment_hash["FreddieMac/LoanPurpose/Term/FICO/LTV"][true]["Refinance"]["15-Inf"][ltv_key][ltv_data] = {}
-                    @freddie_adjustment_hash["FreddieMac/LoanPurpose/Term/FICO/LTV"][true]["Refinance"]["15-Inf"][ltv_key][ltv_data] = value
+                    @freddie_adjustment_hash["FreddieMac/LoanPurpose/Term/FICO/LTV"]["true"]["Refinance"]["15-Inf"][ltv_key][ltv_data] = {}
+                    @freddie_adjustment_hash["FreddieMac/LoanPurpose/Term/FICO/LTV"]["true"]["Refinance"]["15-Inf"][ltv_key][ltv_data] = value
                   end
 
                   # All Eligible Mortgages  Cash-Out Refinance  LLPAs
                   if r >= 762 && r <= 768 && cc == 10
                     ltv_key = get_value value
-                    @cashout_hash["FreddieMac/RefinanceOption/FICO/LTV"][true]["Cash Out"][ltv_key] = {}
+                    @cashout_hash["FreddieMac/RefinanceOption/FICO/LTV"]["true"]["Cash Out"][ltv_key] = {}
                   end
                   if r >= 762 && r <= 768 && cc >= 21 && cc <= 42
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @cashout_hash["FreddieMac/RefinanceOption/FICO/LTV"][true]["Cash Out"][ltv_key][ltv_data] = {}
-                    @cashout_hash["FreddieMac/RefinanceOption/FICO/LTV"][true]["Cash Out"][ltv_key][ltv_data] = value
+                    @cashout_hash["FreddieMac/RefinanceOption/FICO/LTV"]["true"]["Cash Out"][ltv_key][ltv_data] = {}
+                    @cashout_hash["FreddieMac/RefinanceOption/FICO/LTV"]["true"]["Cash Out"][ltv_key][ltv_data] = value
                   end
 
                   # # All Eligible Mortgages Product Feature  LLPAs
                   if r == 770 && cc == 10
                     @property_hash["FreddieMac/LoanType/LTV"] = {}
-                    @property_hash["FreddieMac/LoanType/LTV"][true] = {}
-                    @property_hash["FreddieMac/LoanType/LTV"][true]["ARM"] = {}
+                    @property_hash["FreddieMac/LoanType/LTV"]["true"] = {}
+                    @property_hash["FreddieMac/LoanType/LTV"]["true"]["ARM"] = {}
                   end
                   if r == 770 && cc >= 21 && cc <= 42
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @property_hash["FreddieMac/LoanType/LTV"][true]["ARM"][ltv_data] = {}
-                    @property_hash["FreddieMac/LoanType/LTV"][true]["ARM"][ltv_data] = value
+                    @property_hash["FreddieMac/LoanType/LTV"]["true"]["ARM"][ltv_data] = {}
+                    @property_hash["FreddieMac/LoanType/LTV"]["true"]["ARM"][ltv_data] = value
                   end
                   if r == 771 && cc == 10
                     @property_hash["FreddieMac/PropertyType/LTV"] = {}
-                    @property_hash["FreddieMac/PropertyType/LTV"][true] = {}
-                    @property_hash["FreddieMac/PropertyType/LTV"][true]["Manufactured Home"] = {}
+                    @property_hash["FreddieMac/PropertyType/LTV"]["true"] = {}
+                    @property_hash["FreddieMac/PropertyType/LTV"]["true"]["Manufactured Home"] = {}
                   end
                   if r == 771 && cc >= 21 && cc <= 42
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @property_hash["FreddieMac/PropertyType/LTV"][true]["Manufactured Home"][ltv_data] = {}
-                    @property_hash["FreddieMac/PropertyType/LTV"][true]["Manufactured Home"][ltv_data] = value
+                    @property_hash["FreddieMac/PropertyType/LTV"]["true"]["Manufactured Home"][ltv_data] = {}
+                    @property_hash["FreddieMac/PropertyType/LTV"]["true"]["Manufactured Home"][ltv_data] = value
                   end
                   if r == 772 && cc == 10
-                    @property_hash["FreddieMac/PropertyType/LTV"][true]["Condo"] = {}
+                    @property_hash["FreddieMac/PropertyType/LTV"]["true"]["Condo"] = {}
                   end
                   if r == 772 && cc >= 21 && cc <= 42
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @property_hash["FreddieMac/PropertyType/LTV"][true]["Condo"][ltv_data] = {}
-                    @property_hash["FreddieMac/PropertyType/LTV"][true]["Condo"][ltv_data] = value
+                    @property_hash["FreddieMac/PropertyType/LTV"]["true"]["Condo"][ltv_data] = {}
+                    @property_hash["FreddieMac/PropertyType/LTV"]["true"]["Condo"][ltv_data] = value
                   end
                   if r == 773 && cc == 10
-                    @property_hash["FreddieMac/PropertyType/LTV"][true]["Investment Property"] = {}
+                    @property_hash["FreddieMac/PropertyType/LTV"]["true"]["Investment Property"] = {}
                   end
                   if r == 773 && cc >= 21 && cc <= 42
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @property_hash["FreddieMac/PropertyType/LTV"][true]["Investment Property"][ltv_data] = {}
-                    @property_hash["FreddieMac/PropertyType/LTV"][true]["Investment Property"][ltv_data] = value
+                    @property_hash["FreddieMac/PropertyType/LTV"]["true"]["Investment Property"][ltv_data] = {}
+                    @property_hash["FreddieMac/PropertyType/LTV"]["true"]["Investment Property"][ltv_data] = value
                   end
                   if r == 774 && cc == 10
-                    @property_hash["FreddieMac/PropertyType/LTV"][true]["2nd Home"] = {}
+                    @property_hash["FreddieMac/PropertyType/LTV"]["true"]["2nd Home"] = {}
                   end
                   if r == 774 && cc >= 21 && cc <= 42
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @property_hash["FreddieMac/PropertyType/LTV"][true]["2nd Home"][ltv_data] = {}
-                    @property_hash["FreddieMac/PropertyType/LTV"][true]["2nd Home"][ltv_data] = value
+                    @property_hash["FreddieMac/PropertyType/LTV"]["true"]["2nd Home"][ltv_data] = {}
+                    @property_hash["FreddieMac/PropertyType/LTV"]["true"]["2nd Home"][ltv_data] = value
                   end
                   if r == 775 && cc == 10
-                    @property_hash["FreddieMac/PropertyType/LTV"][true]["2 Unit"] = {}
+                    @property_hash["FreddieMac/PropertyType/LTV"]["true"]["2 Unit"] = {}
                   end
                   if r == 775 && cc >= 21 && cc <= 42
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @property_hash["FreddieMac/PropertyType/LTV"][true]["2 Unit"][ltv_data] = {}
-                    @property_hash["FreddieMac/PropertyType/LTV"][true]["2 Unit"][ltv_data] = value
+                    @property_hash["FreddieMac/PropertyType/LTV"]["true"]["2 Unit"][ltv_data] = {}
+                    @property_hash["FreddieMac/PropertyType/LTV"]["true"]["2 Unit"][ltv_data] = value
                   end
                   if r == 776 && cc == 10
-                    @property_hash["FreddieMac/PropertyType/LTV"][true]["3-4 Unit"] = {}
+                    @property_hash["FreddieMac/PropertyType/LTV"]["true"]["3-4 Unit"] = {}
                   end
                   if r == 776 && cc >= 21 && cc <= 42
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @property_hash["FreddieMac/PropertyType/LTV"][true]["3-4 Unit"][ltv_data] = {}
-                    @property_hash["FreddieMac/PropertyType/LTV"][true]["3-4 Unit"][ltv_data] = value
+                    @property_hash["FreddieMac/PropertyType/LTV"]["true"]["3-4 Unit"][ltv_data] = {}
+                    @property_hash["FreddieMac/PropertyType/LTV"]["true"]["3-4 Unit"][ltv_data] = value
                   end
                   if r == 777 && cc == 10
                     @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"] = {}
-                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true] = {}
-                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true]["Purchase"] = {}
-                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true]["Purchase"]["Fixed"] = {}
-                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true]["Purchase"]["Fixed"]["Conforming"] = {}
-                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true]["Purchase"]["Fixed"]["Conforming"]["Rate and Term"] = {}
+                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"]["true"] = {}
+                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"]["true"]["Purchase"] = {}
+                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"]["true"]["Purchase"]["Fixed"] = {}
+                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"]["true"]["Purchase"]["Fixed"]["Conforming"] = {}
+                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"]["true"]["Purchase"]["Fixed"]["Conforming"]["Rate and Term"] = {}
                   end
                   if r == 777 && cc >= 21 && cc <= 42
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true]["Purchase"]["Fixed"]["Conforming"]["Rate and Term"][ltv_data] = {}
-                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true]["Purchase"]["Fixed"]["Conforming"]["Rate and Term"][ltv_data] = value
+                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"]["true"]["Purchase"]["Fixed"]["Conforming"]["Rate and Term"][ltv_data] = {}
+                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"]["true"]["Purchase"]["Fixed"]["Conforming"]["Rate and Term"][ltv_data] = value
                   end
                   if r == 778 && cc == 10
                     @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"] = {}
-                    @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"][true] = {}
-                    @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"][true]["Fixed"] = {}
-                    @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"][true]["Fixed"]["Conforming"] = {}
-                    @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"][true]["Fixed"]["Conforming"]["Cash Out"] = {}
+                    @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"]["true"] = {}
+                    @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"]["true"]["Fixed"] = {}
+                    @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"]["true"]["Fixed"]["Conforming"] = {}
+                    @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"]["true"]["Fixed"]["Conforming"]["Cash Out"] = {}
                   end
                   if r == 778 && cc >= 21 && cc <= 42
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"][true]["Fixed"]["Conforming"]["Cash Out"][ltv_data] = {}
-                    @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"][true]["Fixed"]["Conforming"]["Cash Out"][ltv_data] = value
+                    @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"]["true"]["Fixed"]["Conforming"]["Cash Out"][ltv_data] = {}
+                    @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"]["true"]["Fixed"]["Conforming"]["Cash Out"][ltv_data] = value
                   end
                   if r == 779 && cc == 10
-                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true]["Purchase"]["ARM"] = {}
-                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true]["Purchase"]["ARM"]["Conforming"] = {}
-                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true]["Purchase"]["ARM"]["Conforming"]["Rate and Term"] = {}
+                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"]["true"]["Purchase"]["ARM"] = {}
+                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"]["true"]["Purchase"]["ARM"]["Conforming"] = {}
+                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"]["true"]["Purchase"]["ARM"]["Conforming"]["Rate and Term"] = {}
                   end
                   if r == 779 && cc >= 21 && cc <= 42
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true]["Purchase"]["ARM"]["Conforming"]["Rate and Term"][ltv_data] = {}
-                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"][true]["Purchase"]["ARM"]["Conforming"]["Rate and Term"][ltv_data] = value
+                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"]["true"]["Purchase"]["ARM"]["Conforming"]["Rate and Term"][ltv_data] = {}
+                    @property_hash["FreddieMac/LoanPurpose/LoanType/LoanSize/RefinanceOption/LTV"]["true"]["Purchase"]["ARM"]["Conforming"]["Rate and Term"][ltv_data] = value
                   end
                   if r == 780 && cc == 10
-                    @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"][true]["ARM"] = {}
-                    @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"][true]["ARM"]["Conforming"] = {}
-                    @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"][true]["ARM"]["Conforming"]["Cash Out"] = {}
+                    @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"]["true"]["ARM"] = {}
+                    @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"]["true"]["ARM"]["Conforming"] = {}
+                    @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"]["true"]["ARM"]["Conforming"]["Cash Out"] = {}
                   end
                   if r == 780 && cc >= 21 && cc <= 42
                     ltv_data =  get_value @ltv_data[cc-2]
-                    @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"][true]["ARM"]["Conforming"]["Cash Out"][ltv_data] = {}
-                    @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"][true]["ARM"]["Conforming"]["Cash Out"][ltv_data] = value
+                    @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"]["true"]["ARM"]["Conforming"]["Cash Out"][ltv_data] = {}
+                    @property_hash["FreddieMac/LoanType/LoanSize/RefinanceOption/LTV"]["true"]["ARM"]["Conforming"]["Cash Out"][ltv_data] = value
                   end
                   # # subordinate adjustment
                   if r == 786 && cc == 7
@@ -822,11 +822,11 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                 if value.present?
                   if value == "FHA, VA, and USDA Loan Level Price Adjustments"
                     @relief_cashout_adjustment["FHA/FICO"] = {}
-                    @relief_cashout_adjustment["FHA/FICO"][true] = {}
+                    @relief_cashout_adjustment["FHA/FICO"]["true"] = {}
                     @relief_cashout_adjustment["USDA/FICO"] = {}
-                    @relief_cashout_adjustment["USDA/FICO"][true] = {}
+                    @relief_cashout_adjustment["USDA/FICO"]["true"] = {}
                     @relief_cashout_adjustment["VA/FICO"] = {}
-                    @relief_cashout_adjustment["VA/FICO"][true] = {}
+                    @relief_cashout_adjustment["VA/FICO"]["true"] = {}
                   end
                   # FHA, VA, and USDA Loan Level Price Adjustments
                   if r >= 1036 && r <= 1045 && cc == 8
@@ -835,26 +835,26 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                     else
                       primary_key = get_value value
                     end
-                    @relief_cashout_adjustment["FHA/FICO"][true][primary_key] = {}
-                    @relief_cashout_adjustment["USDA/FICO"][true][primary_key] = {}
-                    @relief_cashout_adjustment["VA/FICO"][true][primary_key] = {}
+                    @relief_cashout_adjustment["FHA/FICO"]["true"][primary_key] = {}
+                    @relief_cashout_adjustment["USDA/FICO"]["true"][primary_key] = {}
+                    @relief_cashout_adjustment["VA/FICO"]["true"][primary_key] = {}
                     cc1 = cc + 13
                     cc2 = cc + 19
                     cc = cc + 7
                     new_val = sheet_data.cell(r,cc)
                     new_val1 = sheet_data.cell(r,cc1)
                     new_val2 = sheet_data.cell(r,cc2)
-                    @relief_cashout_adjustment["FHA/FICO"][true][primary_key] = new_val
-                    @relief_cashout_adjustment["USDA/FICO"][true][primary_key] = new_val1
-                    @relief_cashout_adjustment["VA/FICO"][true][primary_key] = new_val2
+                    @relief_cashout_adjustment["FHA/FICO"]["true"][primary_key] = new_val
+                    @relief_cashout_adjustment["USDA/FICO"]["true"][primary_key] = new_val1
+                    @relief_cashout_adjustment["VA/FICO"]["true"][primary_key] = new_val2
                   end
                   if r == 1048 && cc == 8
                     @relief_cashout_adjustment["VA/PropertyType"] = {}
-                    @relief_cashout_adjustment["VA/PropertyType"][true] = {}
-                    @relief_cashout_adjustment["VA/PropertyType"][true]["Non-Owner Occupied"] = {}
+                    @relief_cashout_adjustment["VA/PropertyType"]["true"] = {}
+                    @relief_cashout_adjustment["VA/PropertyType"]["true"]["Non-Owner Occupied"] = {}
                     cc = cc + 7
                     new_val = sheet_data.cell(r,cc)
-                    @relief_cashout_adjustment["VA/PropertyType"][true]["Non-Owner Occupied"] = new_val
+                    @relief_cashout_adjustment["VA/PropertyType"]["true"]["Non-Owner Occupied"] = new_val
                   end
                   if r == 1049 && cc == 8
                     @relief_cashout_adjustment["PropertyType"] = {}
@@ -877,19 +877,19 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                   end
                   if r == 1052 && cc == 8
                     @relief_cashout_adjustment["VA/RefinanceOption/LTV"] = {}
-                    @relief_cashout_adjustment["VA/RefinanceOption/LTV"][true] = {}
-                    @relief_cashout_adjustment["VA/RefinanceOption/LTV"][true]["Cash Out"] = {}
-                    @relief_cashout_adjustment["VA/RefinanceOption/LTV"][true]["Cash Out"]["95-Inf"] = {}
+                    @relief_cashout_adjustment["VA/RefinanceOption/LTV"]["true"] = {}
+                    @relief_cashout_adjustment["VA/RefinanceOption/LTV"]["true"]["Cash Out"] = {}
+                    @relief_cashout_adjustment["VA/RefinanceOption/LTV"]["true"]["Cash Out"]["95-Inf"] = {}
                     cc = cc + 7
                     new_val = sheet_data.cell(r,cc)
-                    @relief_cashout_adjustment["VA/RefinanceOption/LTV"][true]["Cash Out"]["95-Inf"] = new_val
+                    @relief_cashout_adjustment["VA/RefinanceOption/LTV"]["true"]["Cash Out"]["95-Inf"] = new_val
                   end
                   if r == 1053 && cc == 8
                     @relief_cashout_adjustment["FHA"] = {}
-                    @relief_cashout_adjustment["FHA"][true] = {}
+                    @relief_cashout_adjustment["FHA"]["true"] = {}
                     cc = cc + 7
                     new_val = sheet_data.cell(r,cc)
-                    @relief_cashout_adjustment["FHA"][true] = new_val
+                    @relief_cashout_adjustment["FHA"]["true"] = new_val
                   end
                   if r == 1054 && cc == 8
                     @relief_cashout_adjustment["LockDay"] = {}

@@ -193,18 +193,18 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
                 if r == 384 && cc == 15
                   @adj_hash["LPMI/RefinanceOption/FICO"] = {}
-                  @adj_hash["LPMI/RefinanceOption/FICO"][true] = {}
-                  @adj_hash["LPMI/RefinanceOption/FICO"][true]["Cash Out"] = {}
-                  @adj_hash["LPMI/RefinanceOption/FICO"][true]["Cash Out"]["680-719"] = {}
+                  @adj_hash["LPMI/RefinanceOption/FICO"]["true"] = {}
+                  @adj_hash["LPMI/RefinanceOption/FICO"]["true"]["Cash Out"] = {}
+                  @adj_hash["LPMI/RefinanceOption/FICO"]["true"]["Cash Out"]["680-719"] = {}
                   cc = cc + 5
                   new_val = sheet_data.cell(r,cc)
-                  @adj_hash["LPMI/RefinanceOption/FICO"][true]["Cash Out"]["680-719"] = new_val
+                  @adj_hash["LPMI/RefinanceOption/FICO"]["true"]["Cash Out"]["680-719"] = new_val
                 end
                 if r == 385 && cc == 15
-                  @adj_hash["LPMI/RefinanceOption/FICO"][true]["Cash Out"]["660-679"] = {}
+                  @adj_hash["LPMI/RefinanceOption/FICO"]["true"]["Cash Out"]["660-679"] = {}
                   cc = cc + 5
                   new_val = sheet_data.cell(r,cc)
-                  @adj_hash["LPMI/RefinanceOption/FICO"][true]["Cash Out"]["660-679"] = new_val
+                  @adj_hash["LPMI/RefinanceOption/FICO"]["true"]["Cash Out"]["660-679"] = new_val
                 end
                 if r == 386 && cc == 15
                   @adj_hash["LoanSize/LoanType/LTV"] = {}
@@ -240,20 +240,20 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
                 if r == 397 && cc == 15
                   @adj_hash["FNMA/FannieMaeProduct/FICO/LTV"] = {}
-                  @adj_hash["FNMA/FannieMaeProduct/FICO/LTV"][true] = {}
-                  @adj_hash["FNMA/FannieMaeProduct/FICO/LTV"][true]["HomeReady"] = {}
-                  @adj_hash["FNMA/FannieMaeProduct/FICO/LTV"][true]["HomeReady"]["680-Inf"] = {}
-                  @adj_hash["FNMA/FannieMaeProduct/FICO/LTV"][true]["HomeReady"]["680-Inf"]["80-Inf"] = {}
+                  @adj_hash["FNMA/FannieMaeProduct/FICO/LTV"]["true"] = {}
+                  @adj_hash["FNMA/FannieMaeProduct/FICO/LTV"]["true"]["HomeReady"] = {}
+                  @adj_hash["FNMA/FannieMaeProduct/FICO/LTV"]["true"]["HomeReady"]["680-Inf"] = {}
+                  @adj_hash["FNMA/FannieMaeProduct/FICO/LTV"]["true"]["HomeReady"]["680-Inf"]["80-Inf"] = {}
                   cc = cc + 5
                   new_val = sheet_data.cell(r,cc)
-                  @adj_hash["FNMA/FannieMaeProduct/FICO/LTV"][true]["HomeReady"]["680-Inf"]["80-Inf"] = new_val
+                  @adj_hash["FNMA/FannieMaeProduct/FICO/LTV"]["true"]["HomeReady"]["680-Inf"]["80-Inf"] = new_val
                 end
                 if r == 398 && cc == 15
-                  @adj_hash["FNMA/FannieMaeProduct/FICO/LTV"][true]["HomeReady"]["0-680"] = {}
-                  @adj_hash["FNMA/FannieMaeProduct/FICO/LTV"][true]["HomeReady"]["0-680"]["0-80"] = {}
+                  @adj_hash["FNMA/FannieMaeProduct/FICO/LTV"]["true"]["HomeReady"]["0-680"] = {}
+                  @adj_hash["FNMA/FannieMaeProduct/FICO/LTV"]["true"]["HomeReady"]["0-680"]["0-80"] = {}
                   cc = cc + 5
                   new_val = sheet_data.cell(r,cc)
-                  @adj_hash["FNMA/FannieMaeProduct/FICO/LTV"][true]["HomeReady"]["0-680"]["0-80"] = new_val
+                  @adj_hash["FNMA/FannieMaeProduct/FICO/LTV"]["true"]["HomeReady"]["0-680"]["0-80"] = new_val
                 end
               end
             rescue Exception => e
@@ -883,24 +883,24 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 end
                 if r == 2256 && cc == 14
                   @gov_hash["FHA"] = {}
-                  @gov_hash["FHA"][true] = {}
+                  @gov_hash["FHA"]["true"] = {}
                   cc = cc + 6
                   new_val = sheet_data.cell(r,cc)
-                  @gov_hash["FHA"][true] = new_val
+                  @gov_hash["FHA"]["true"] = new_val
                 end
                 if r == 2257 && cc == 14
                   @gov_hash["VA"] = {}
-                  @gov_hash["VA"][true] = {}
+                  @gov_hash["VA"]["true"] = {}
                   cc = cc + 6
                   new_val = sheet_data.cell(r,cc)
-                  @gov_hash["VA"][true] = new_val
+                  @gov_hash["VA"]["true"] = new_val
                 end
                 if r == 2258 && cc == 14
                   @gov_hash["USDA"] = {}
-                  @gov_hash["USDA"][true] = {}
+                  @gov_hash["USDA"]["true"] = {}
                   cc = cc + 6
                   new_val = sheet_data.cell(r,cc)
-                  @gov_hash["USDA"][true] = new_val
+                  @gov_hash["USDA"]["true"] = new_val
                 end
                 if r == 2260 && cc == 14
                   @gov_hash["LoanType/Term"] = {}
@@ -2081,8 +2081,8 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
     def lpmi_adjustment range1, range2, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row, primary_key
       @adjustment_hash = {}
       @adjustment_hash[primary_key] = {}
-      @adjustment_hash[primary_key][true] = {}
-      @adjustment_hash[primary_key][true]["Conforming"] = {}
+      @adjustment_hash[primary_key]["true"] = {}
+      @adjustment_hash[primary_key]["true"]["Conforming"] = {}
       ltv_key = ''
       cltv_key = ''
       (range1..range2).each do |r|
@@ -2095,12 +2095,12 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
               if value.present?
                 if r >= first_row && r <= end_row && cc == first_column
                   ltv_key = get_value value
-                  @adjustment_hash[primary_key][true]["Conforming"][ltv_key] = {}
+                  @adjustment_hash[primary_key]["true"]["Conforming"][ltv_key] = {}
                 end
                 if r >= first_row && r <= end_row && cc > first_column && cc <= last_column
                   cltv_key = get_value @ltv_data[cc-2]
-                  @adjustment_hash[primary_key][true]["Conforming"][ltv_key][cltv_key] = {}
-                  @adjustment_hash[primary_key][true]["Conforming"][ltv_key][cltv_key] = value
+                  @adjustment_hash[primary_key]["true"]["Conforming"][ltv_key][cltv_key] = {}
+                  @adjustment_hash[primary_key]["true"]["Conforming"][ltv_key][cltv_key] = value
                 end
               end
             rescue Exception => e
