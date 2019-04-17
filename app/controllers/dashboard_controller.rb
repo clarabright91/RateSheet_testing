@@ -114,7 +114,7 @@ class DashboardController < ApplicationController
               @filter_data[key.to_sym] = key_value
             end
           end
-          if %w[fannie_mae_product freddie_mac_product].include?(key)
+          if %w[fannie_mae_product freddie_mac_product pro_category loan_category loan_purpose].include?(key)
             instance_variable_set("@#{key}", key_value)
           end
         else
@@ -138,7 +138,6 @@ class DashboardController < ApplicationController
   def modified_variables
     %w[state property_type financing_type refinance_option refinance_option misc_adjuster premium_type interest lock_period loan_amount program_category payment_type].each do |key|
       key_value = params[key.to_sym]
-      key_value = key_value.to_i if key_value.present? && key.eql?('loan_amount')
       instance_variable_set("@#{key}", key_value) if key_value.present?
     end
   end
@@ -209,7 +208,6 @@ class DashboardController < ApplicationController
     modified_condition
     modified_true_condition
     modified_variables
-
     if params[:loan_type].present?
       @loan_type = params[:loan_type]
       if params[:loan_type] == "All"
@@ -240,6 +238,65 @@ class DashboardController < ApplicationController
         @filter_not_nil[:loan_size] = nil
       end
     end
+  end
+
+  def loan_amount_key_of_adjustment(loan_amount_keys)
+    loan_amount_key2 = ''
+    if @loan_amount.include?("-")
+      first_range = @loan_amount.split("-").first.strip.to_i
+      last_range = @loan_amount.split("-").last.strip.to_i
+      if loan_amount_keys.present?
+        loan_amount_keys.each do |loan_amount_key|
+          if loan_amount_key.include?("$")
+            loan_amount_key = loan_amount_key.tr('$', '').strip
+          end
+          if loan_amount_key.include?(",")
+            loan_amount_key = loan_amount_key.tr(',', '').strip
+          end
+          if (loan_amount_key.include?("Inf") || loan_amount_key.include?("Infinity"))
+            loan_amount_value = loan_amount_key.split("-").first.strip.to_i
+            if (loan_amount_value.between?(first_range, last_range))
+                loan_amount_key2 = loan_amount_key
+            end
+          else
+            if loan_amount_key.include?("-")
+                first_value_range = loan_amount_key.split("-").first.strip.to_i
+                last_value_range = loan_amount_key.split("-").last.strip.to_i
+                if (first_value_range.between?(first_range, last_range) || last_value_range.between?(first_range, last_range))
+                  loan_amount_key2 = loan_amount_key
+                end
+            end
+          end
+        end
+      end
+    else
+      full_range = @loan_amount.split("+").first.strip.to_i
+      if loan_amount_keys.present?
+        loan_amount_keys.each do |loan_amount_key|
+          if loan_amount_key.include?("$")
+            loan_amount_key = loan_amount_key.tr('$', '').strip
+          end
+          if loan_amount_key.include?(",")
+            loan_amount_key = loan_amount_key.tr(',', '').strip
+          end
+          if (loan_amount_key.include?("Inf") || loan_amount_key.include?("Infinity"))
+            loan_amount_value = loan_amount_key.split("-").first.strip.to_i
+            if (full_range <= loan_amount_value)
+                loan_amount_key2 = loan_amount_key
+            end
+          else
+            if loan_amount_key.include?("-")
+                last_value_range = loan_amount_key.split("-").last.strip.to_i
+
+                if (last_value_range >= full_range)
+                  loan_amount_key2 = loan_amount_key
+                end
+            end
+          end
+        end
+      end
+    end
+    return loan_amount_key2
   end
 
   def find_programs_on_term_based(programs, find_term)
@@ -541,28 +598,10 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key].present?
                       loan_amount_key2 = ''
-                      adj.data[first_key].keys.each do |loan_amount_key|
-                        if loan_amount_key.include?("$")
-                          loan_amount_key = loan_amount_key.tr('$', '').strip
-                        end
-                        if loan_amount_key.include?("$")
-                          loan_amount_key = loan_amount_key.tr(',', '').strip
-                        end
-                        if (loan_amount_key.include?("Inf") || loan_amount_key.include?("Infinity"))
-                          if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i)
-                            loan_amount_key2 = loan_amount_key
-                            adj_key_hash[key_index] = loan_amount_key
-                          end
-                        else
-                          if loan_amount_key.include?("-")
-                            if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i && @loan_amount.to_i <= loan_amount_key.split("-").second.strip.to_i)
-                              loan_amount_key2 = loan_amount_key
-                              adj_key_hash[key_index] = loan_amount_key
-                            end
-                          end
-                        end
-                      end
-                      unless loan_amount_key2.present?
+                      loan_amount_key2 = loan_amount_key_of_adjustment(adj.data[first_key].keys)
+                      if loan_amount_key2.present?
+                        adj_key_hash[key_index] = loan_amount_key2
+                      else
                         break
                       end
                     else
@@ -924,28 +963,10 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-1]].present?
                       loan_amount_key2 = ''
-                      adj.data[first_key][adj_key_hash[key_index-1]].keys.each do |loan_amount_key|
-                        if loan_amount_key.include?("$")
-                          loan_amount_key = loan_amount_key.tr('$', '').strip
-                        end
-                        if loan_amount_key.include?("$")
-                          loan_amount_key = loan_amount_key.tr(',', '').strip
-                        end
-                        if (loan_amount_key.include?("Inf") || loan_amount_key.include?("Infinity"))
-                          if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i)
-                            loan_amount_key2 = loan_amount_key
-                            adj_key_hash[key_index] = loan_amount_key
-                          end
-                        else
-                          if loan_amount_key.include?("-")
-                            if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i && @loan_amount.to_i <= loan_amount_key.split("-").second.strip.to_i)
-                              loan_amount_key2 = loan_amount_key
-                              adj_key_hash[key_index] = loan_amount_key
-                            end
-                          end
-                        end
-                      end
-                      unless loan_amount_key2.present?
+                      loan_amount_key2 = loan_amount_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-1]].keys)
+                      if loan_amount_key2.present?
+                        adj_key_hash[key_index] = loan_amount_key2
+                      else
                         break
                       end
                     else
@@ -1306,28 +1327,10 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       loan_amount_key2 = ''
-                      adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |loan_amount_key|
-                        if loan_amount_key.include?("$")
-                          loan_amount_key = loan_amount_key.tr('$', '').strip
-                        end
-                        if loan_amount_key.include?("$")
-                          loan_amount_key = loan_amount_key.tr(',', '').strip
-                        end
-                        if (loan_amount_key.include?("Inf") || loan_amount_key.include?("Infinity"))
-                          if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i)
-                            loan_amount_key2 = loan_amount_key
-                            adj_key_hash[key_index] = loan_amount_key
-                          end
-                        else
-                          if loan_amount_key.include?("-")
-                            if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i && @loan_amount.to_i <= loan_amount_key.split("-").second.strip.to_i)
-                              loan_amount_key2 = loan_amount_key
-                              adj_key_hash[key_index] = loan_amount_key
-                            end
-                          end
-                        end
-                      end
-                      unless loan_amount_key2.present?
+                      loan_amount_key2 = loan_amount_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+                      if loan_amount_key2.present?
+                        adj_key_hash[key_index] = loan_amount_key2
+                      else
                         break
                       end
                     else
@@ -1685,28 +1688,11 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       loan_amount_key2 = ''
-                      adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |loan_amount_key|
-                        if loan_amount_key.include?("$")
-                          loan_amount_key = loan_amount_key.tr('$', '').strip
-                        end
-                        if loan_amount_key.include?("$")
-                          loan_amount_key = loan_amount_key.tr(',', '').strip
-                        end
-                        if (loan_amount_key.include?("Inf") || loan_amount_key.include?("Infinity"))
-                          if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i)
-                            loan_amount_key2 = loan_amount_key
-                            adj_key_hash[key_index] = loan_amount_key
-                          end
-                        else
-                          if loan_amount_key.include?("-")
-                            if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i && @loan_amount.to_i <= loan_amount_key.split("-").second.strip.to_i)
-                              loan_amount_key2 = loan_amount_key
-                              adj_key_hash[key_index] = loan_amount_key
-                            end
-                          end
-                        end
-                      end
-                      unless loan_amount_key2.present?
+                      loan_amount_key2 = loan_amount_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+
+                      if loan_amount_key2.present?
+                        adj_key_hash[key_index] = loan_amount_key2
+                      else
                         break
                       end
                     else
@@ -2064,28 +2050,11 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       loan_amount_key2 = ''
-                      adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |loan_amount_key|
-                        if loan_amount_key.include?("$")
-                          loan_amount_key = loan_amount_key.tr('$', '').strip
-                        end
-                        if loan_amount_key.include?("$")
-                          loan_amount_key = loan_amount_key.tr(',', '').strip
-                        end
-                        if (loan_amount_key.include?("Inf") || loan_amount_key.include?("Infinity"))
-                          if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i)
-                            loan_amount_key2 = loan_amount_key
-                            adj_key_hash[key_index] = loan_amount_key
-                          end
-                        else
-                          if loan_amount_key.include?("-")
-                            if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i && @loan_amount.to_i <= loan_amount_key.split("-").second.strip.to_i)
-                              loan_amount_key2 = loan_amount_key
-                              adj_key_hash[key_index] = loan_amount_key
-                            end
-                          end
-                        end
-                      end
-                      unless loan_amount_key2.present?
+                      loan_amount_key2 = loan_amount_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+
+                      if loan_amount_key2.present?
+                        adj_key_hash[key_index] = loan_amount_key2
+                      else
                         break
                       end
                     else
@@ -2443,28 +2412,11 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       loan_amount_key2 = ''
-                      adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |loan_amount_key|
-                        if loan_amount_key.include?("$")
-                          loan_amount_key = loan_amount_key.tr('$', '').strip
-                        end
-                        if loan_amount_key.include?("$")
-                          loan_amount_key = loan_amount_key.tr(',', '').strip
-                        end
-                        if (loan_amount_key.include?("Inf") || loan_amount_key.include?("Infinity"))
-                          if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i)
-                            loan_amount_key2 = loan_amount_key
-                            adj_key_hash[key_index] = loan_amount_key
-                          end
-                        else
-                          if loan_amount_key.include?("-")
-                            if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i && @loan_amount.to_i <= loan_amount_key.split("-").second.strip.to_i)
-                              loan_amount_key2 = loan_amount_key
-                              adj_key_hash[key_index] = loan_amount_key
-                            end
-                          end
-                        end
-                      end
-                      unless loan_amount_key2.present?
+                      loan_amount_key2 = loan_amount_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+
+                      if loan_amount_key2.present?
+                        adj_key_hash[key_index] = loan_amount_key2
+                      else
                         break
                       end
                     else
@@ -2822,28 +2774,11 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       loan_amount_key2 = ''
-                      adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |loan_amount_key|
-                        if loan_amount_key.include?("$")
-                          loan_amount_key = loan_amount_key.tr('$', '').strip
-                        end
-                        if loan_amount_key.include?("$")
-                          loan_amount_key = loan_amount_key.tr(',', '').strip
-                        end
-                        if (loan_amount_key.include?("Inf") || loan_amount_key.include?("Infinity"))
-                          if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i)
-                            loan_amount_key2 = loan_amount_key
-                            adj_key_hash[key_index] = loan_amount_key
-                          end
-                        else
-                          if loan_amount_key.include?("-")
-                            if (loan_amount_key.split("-").first.strip.to_i <= @loan_amount.to_i && @loan_amount.to_i <= loan_amount_key.split("-").second.strip.to_i)
-                              loan_amount_key2 = loan_amount_key
-                              adj_key_hash[key_index] = loan_amount_key
-                            end
-                          end
-                        end
-                      end
-                      unless loan_amount_key2.present?
+                      loan_amount_key2 = loan_amount_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+
+                      if loan_amount_key2.present?
+                        adj_key_hash[key_index] = loan_amount_key2
+                      else
                         break
                       end
                     else
@@ -3262,5 +3197,4 @@ class DashboardController < ApplicationController
     end
   end
 
-  # render :index
 end

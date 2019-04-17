@@ -102,6 +102,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@cash_out]
         make_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     redirect_to programs_ob_united_wholesale_mortgage4892_path(@sheet_obj)
