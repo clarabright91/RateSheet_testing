@@ -462,11 +462,11 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                   end
                   if r == 39 && cc == 13
                     @fico_hash["VA/FICO"] = {}
-                    @fico_hash["VA/FICO"][true] = {}
-                    @fico_hash["VA/FICO"][true]["600-619"] = {}
+                    @fico_hash["VA/FICO"]["true"] = {}
+                    @fico_hash["VA/FICO"]["true"]["600-619"] = {}
                     cc = cc + 1
                     new_value = sheet_data.cell(r,cc)
-                    @fico_hash["VA/FICO"][true]["600-619"] = new_value*100
+                    @fico_hash["VA/FICO"]["true"]["600-619"] = new_value*100
                   end
                   if r >= 41 && r <= 42 && cc == 11
                     new_value = sheet_data.cell(r,cc+1)

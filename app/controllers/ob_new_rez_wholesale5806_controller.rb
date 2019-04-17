@@ -545,11 +545,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
                           second_key = "LPMI/PropertyType/LTV"
                           final_key  = "LPMI/Term/FICO/LTV"
                           @block_hash[@title][first_key] = {}
-                          @block_hash[@title][first_key][true] = {}
+                          @block_hash[@title][first_key]["true"] = {}
                           @block_hash[@title][second_key] = {}
-                          @block_hash[@title][second_key][true] = {}
+                          @block_hash[@title][second_key]["true"] = {}
                           @block_hash[@title][final_key] = {}
-                          @block_hash[@title][final_key][true] = {}
+                          @block_hash[@title][final_key]["true"] = {}
                         end
                       elsif rrr.eql?(155) && index == 3
                         # for Number Of Units
@@ -599,19 +599,19 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         if index == 5 && value
                           if ["Rate & Term Refi", "Cash Out"].include?(value)
                             f1_key = "Rate & Term"
-                            @block_hash[@title][first_key][true][f1_key] = {}
+                            @block_hash[@title][first_key]["true"][f1_key] = {}
                           elsif ["Manufactured Home", "2nd Home", "3-4 Unit", "Non Owner Occupied"].include?(value)
                             f2_key = value
-                            @block_hash[@title][second_key][true][f2_key] = {}
+                            @block_hash[@title][second_key]["true"][f2_key] = {}
                           else
-                            @block_hash[@title][final_key][true]["0 - 20"] = {} if value.eql?("≤ 20 Yr Term")
-                            @block_hash[@title][final_key][true]["20 - Infinity"] = {} if value.eql?("> 20 Yr Term")
+                            @block_hash[@title][final_key]["true"]["0 - 20"] = {} if value.eql?("≤ 20 Yr Term")
+                            @block_hash[@title][final_key]["true"]["20 - Infinity"] = {} if value.eql?("> 20 Yr Term")
                             key = "0 - 20" if value.eql?("≤ 20 Yr Term")
                             key = "20 - Infinity" if value.eql?("> 20 Yr Term")
                           end
                         elsif index == 6 && rrr < 154 && value
                           another_key = value.eql?("≤ 85") ? set_range(value) : value
-                          @block_hash[@title][final_key][true][key][another_key] = {} if another_key
+                          @block_hash[@title][final_key]["true"][key][another_key] = {} if another_key
                         end
                       end
 
@@ -703,13 +703,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         hash_key = set_range(hash_key).nil? ? get_value(hash_key) : set_range(hash_key)
                         if (138..143).to_a.include?(rrr)
                           if [138, 143].include?(rrr)
-                            @block_hash[@title][first_key][true][f1_key][hash_key] = value
+                            @block_hash[@title][first_key]["true"][f1_key][hash_key] = value
                           elsif [139, 140, 141, 142].include?(rrr)
-                            @block_hash[@title][second_key][true][f2_key][hash_key] = value
+                            @block_hash[@title][second_key]["true"][f2_key][hash_key] = value
                           end
                         else
                           if rrr > 144
-                            @block_hash[@title][final_key][true][key][another_key][hash_key] = value
+                            @block_hash[@title][final_key]["true"][key][another_key][hash_key] = value
                           end
                         end
                       end
@@ -1004,11 +1004,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
                           second_key = "LPMI/PropertyType/LTV"
                           final_key  = "LPMI/Term/FICO/LTV"
                           @block_hash[@title][first_key] = {}
-                          @block_hash[@title][first_key][true] = {}
+                          @block_hash[@title][first_key]["true"] = {}
                           @block_hash[@title][second_key] = {}
-                          @block_hash[@title][second_key][true] = {}
+                          @block_hash[@title][second_key]["true"] = {}
                           @block_hash[@title][final_key] = {}
-                          @block_hash[@title][final_key][true] = {}
+                          @block_hash[@title][final_key]["true"] = {}
                         end
                       elsif rrr.eql?(156) && index == 3
                         # for Subordinate Financing
@@ -1047,19 +1047,19 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         if index == 5 && value
                           if ["Rate & Term Refi", "Cash Out"].include?(value)
                             f1_key = "Rate & Term Refi".eql?(value) ? "Rate & Term" : "Cash Out"
-                            @block_hash[@title][first_key][true][f1_key] = {}
+                            @block_hash[@title][first_key]["true"][f1_key] = {}
                           elsif ["Manufactured Home", "2nd Home", "3-4 Unit", "Non Owner Occupied"].include?(value)
                             f2_key = value
-                            @block_hash[@title][second_key][true][f2_key] = {}
+                            @block_hash[@title][second_key]["true"][f2_key] = {}
                           else
-                            @block_hash[@title][final_key][true]["0 - 20"] = {} if value.eql?("≤ 20 Yr Term")
-                            @block_hash[@title][final_key][true]["20 - Infinity"] = {} if value.eql?("> 20 Yr Term")
+                            @block_hash[@title][final_key]["true"]["0 - 20"] = {} if value.eql?("≤ 20 Yr Term")
+                            @block_hash[@title][final_key]["true"]["20 - Infinity"] = {} if value.eql?("> 20 Yr Term")
                             key = "0 - 20" if value.eql?("≤ 20 Yr Term")
                             key = "20 - Infinity" if value.eql?("> 20 Yr Term")
                           end
                         elsif index == 6 && rrr < 154 && value
                           another_key = value.eql?("≤ 85") ? set_range(value) : value
-                          @block_hash[@title][final_key][true][key][another_key] = {} if another_key
+                          @block_hash[@title][final_key]["true"][key][another_key] = {} if another_key
                         end
                       end
 
@@ -1141,13 +1141,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         hash_key = set_range(hash_key).nil? ? get_value(hash_key) : set_range(hash_key)
                         if (138..143).to_a.include?(rrr)
                           if [138, 143].include?(rrr)
-                            @block_hash[@title][first_key][true][f1_key][hash_key] = value
+                            @block_hash[@title][first_key]["true"][f1_key][hash_key] = value
                           elsif [139, 140, 141, 142].include?(rrr)
-                            @block_hash[@title][second_key][true][f2_key][hash_key] = value
+                            @block_hash[@title][second_key]["true"][f2_key][hash_key] = value
                           end
                         else
                           if rrr > 144
-                            @block_hash[@title][final_key][true][key][another_key][hash_key] = value
+                            @block_hash[@title][final_key]["true"][key][another_key][hash_key] = value
                           end
                         end
                       end
@@ -1429,11 +1429,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         second_key = "LPMI/PropertyType/LTV"
                         final_key  = "LPMI/Term/FICO/LTV"
                         @block_hash[@title][first_key] = {}
-                        @block_hash[@title][first_key][true] = {}
+                        @block_hash[@title][first_key]["true"] = {}
                         @block_hash[@title][second_key] = {}
-                        @block_hash[@title][second_key][true] = {}
+                        @block_hash[@title][second_key]["true"] = {}
                         @block_hash[@title][final_key] = {}
-                        @block_hash[@title][final_key][true] = {}
+                        @block_hash[@title][final_key]["true"] = {}
                       end
                     elsif rrr.eql?(107) && index == 3
                       # for VLIP LPMI Adjustments
@@ -1482,37 +1482,37 @@ class ObNewRezWholesale5806Controller < ApplicationController
                       if index == 5 && value
                         if ["Rate & Term Refi", "Cash Out"].include?(value)
                           f1_key = "Rate & Term Refi".eql?(value) ? "Rate & Term" : "Cash Out"
-                          @block_hash[@title][first_key][true][f1_key] = {}
+                          @block_hash[@title][first_key]["true"][f1_key] = {}
                         elsif ["Manufactured Home", "2nd Home", "3-4 Unit", "Non Owner Occupied"].include?(value)
                           f2_key = value
-                          @block_hash[@title][second_key][true][f2_key] = {}
+                          @block_hash[@title][second_key]["true"][f2_key] = {}
                         else
-                          @block_hash[@title][final_key][true]["0 - 20"] = {} if value.eql?("≤ 20 Yr Term")
-                          @block_hash[@title][final_key][true]["20 - Infinity"] = {} if value.eql?("> 20 Yr Term")
+                          @block_hash[@title][final_key]["true"]["0 - 20"] = {} if value.eql?("≤ 20 Yr Term")
+                          @block_hash[@title][final_key]["true"]["20 - Infinity"] = {} if value.eql?("> 20 Yr Term")
                           key = "0 - 20" if value.eql?("≤ 20 Yr Term")
                           key = "20 - Infinity" if value.eql?("> 20 Yr Term")
                         end
                       elsif index == 6 && rrr < 106 && value
                         another_key = value.eql?("≤ 85") ? set_range(value) : value
-                        @block_hash[@title][final_key][true][key][another_key] = {} if another_key
+                        @block_hash[@title][final_key]["true"][key][another_key] = {} if another_key
                       end
                     elsif (107..112).to_a.include?(rrr) && index < 7 && value
                       if(rrr == 107) && (ccc == 4)
                         # for VLIP LPMI Adjustments
                           @title = "LPMI/PropertyType/FICO"
                           key = sheet_data.cell(rrr,ccc)
-                          @block_hash[@title][true] = {}
-                          @block_hash[@title][true][key] = {}
+                          @block_hash[@title]["true"] = {}
+                          @block_hash[@title]["true"][key] = {}
                       elsif (rrr == 109) && (ccc == 4)
                         @title = "LPMI/Term/FICO/LTV"
                         first_key  = sheet_data.cell(rrr,ccc)
                         second_key = sheet_data.cell(rrr,ccc + 1)
                         second_key.to_i
-                        @block_hash[@title][true] = {}
-                        @block_hash[@title][true][second_key.to_i.to_s] = {}
+                        @block_hash[@title]["true"] = {}
+                        @block_hash[@title]["true"][second_key.to_i.to_s] = {}
                       elsif (rrr > 108) && (ccc == 6)
                         key = get_value(value)
-                        @block_hash[@title][true][second_key.to_i.to_s][key] = {} if second_key && key
+                        @block_hash[@title]["true"][second_key.to_i.to_s][key] = {} if second_key && key
                       end
                     end
 
@@ -1573,13 +1573,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
                       hash_key = set_range(hash_key).nil? ? get_value(hash_key) : set_range(hash_key)
                       if (93..95).to_a.include?(rrr)
                         if rrr.eql?(93)
-                          @block_hash[@title][first_key][true][f1_key][hash_key] = value
+                          @block_hash[@title][first_key]["true"][f1_key][hash_key] = value
                         elsif [94, 95].include?(rrr)
-                          @block_hash[@title][second_key][true][f2_key][hash_key] = value
+                          @block_hash[@title][second_key]["true"][f2_key][hash_key] = value
                         end
                       else
                         if rrr > 96
-                          @block_hash[@title][final_key][true][key][another_key][hash_key] = value
+                          @block_hash[@title][final_key]["true"][key][another_key][hash_key] = value
                         end
                       end
                     end
@@ -1591,9 +1591,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                       hash_key = get_value(hash_key)
                       if(rrr == 107)
                         # for VLIP LPMI Adjustments
-                        @block_hash[@title][true][key][hash_key] = value if value && hash_key
+                        @block_hash[@title]["true"][key][hash_key] = value if value && hash_key
                       elsif (109..112).to_a.include?(rrr)
-                         @block_hash[@title][true][second_key.to_i.to_s][hash_key] = value if value && hash_key
+                         @block_hash[@title]["true"][second_key.to_i.to_s][hash_key] = value if value && hash_key
                       end
                     elsif (115..118).to_a.include?(rrr) && ccc > 9 && ccc < 12 && value
                       # for Subordinate Financing
@@ -5837,11 +5837,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         second_key = "LPMI/PropertyType/LTV"
                         final_key  = "LPMI/FICO/LTV"
                         @block_hash[@title][first_key] = {}
-                        @block_hash[@title][first_key][true] = {}
+                        @block_hash[@title][first_key]["true"] = {}
                         @block_hash[@title][second_key] = {}
-                        @block_hash[@title][second_key][true] = {}
+                        @block_hash[@title][second_key]["true"] = {}
                         @block_hash[@title][final_key] = {}
-                        @block_hash[@title][final_key][true] = {}
+                        @block_hash[@title][final_key]["true"] = {}
                       end
                     elsif rrr.eql?(81) && index == 7
                       # for Number Of Units
@@ -5886,14 +5886,14 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         key = sheet_data.cell(rrr,ccc - 2)
                         if ["Rate & Term Refi", "Cash Out"].include?(key)
                           key = key.eql?("Rate & Term Refi") ? "Rate & Term" : "Cash Out"
-                          @block_hash[@title][first_key][true][key] = {}
+                          @block_hash[@title][first_key]["true"][key] = {}
                         else
-                          @block_hash[@title][second_key][true][key] = {}
+                          @block_hash[@title][second_key]["true"][key] = {}
                         end
                       elsif(76..79).to_a.include?(rrr) && index == 7 && value
                         key = sheet_data.cell(rrr,ccc - 2)
                         key = key.eql?("<= 85") ? set_range(key) : get_value(key)
-                        @block_hash[@title][final_key][true][key] = {}
+                        @block_hash[@title][final_key]["true"][key] = {}
                       else
                         @block_hash[@title][key] = {}
                       end
@@ -5962,13 +5962,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         if (69..74).to_a.include?(rrr)
                           if(69..74).to_a.include?(rrr) && index >= 7 && value
                             if [69,74].include?(rrr)
-                              @block_hash[@title][first_key][true][key][hash_key] = value
+                              @block_hash[@title][first_key]["true"][key][hash_key] = value
                             else
-                              @block_hash[@title][second_key][true][key][hash_key] = value
+                              @block_hash[@title][second_key]["true"][key][hash_key] = value
                             end
                           end
                         elsif(76..79).to_a.include?(rrr) && index >= 7 && value
-                          @block_hash[@title][final_key][true][key][hash_key] = value
+                          @block_hash[@title][final_key]["true"][key][hash_key] = value
                         end
                       elsif [82,83].include?(rrr) && [9,10,11].include?(index)
                         # for Number Of Units
@@ -6279,11 +6279,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         second_key = "LPMI/PropertyType/LTV"
                         final_key  = "LPMI/FICO/LTV"
                         @block_hash[@title][first_key] = {}
-                        @block_hash[@title][first_key][true] = {}
+                        @block_hash[@title][first_key]["true"] = {}
                         @block_hash[@title][second_key] = {}
-                        @block_hash[@title][second_key][true] = {}
+                        @block_hash[@title][second_key]["true"] = {}
                         @block_hash[@title][final_key] = {}
-                        @block_hash[@title][final_key][true] = {}
+                        @block_hash[@title][final_key]["true"] = {}
                       end
                     elsif rrr.eql?(81) && index == 13
                       # for Loan Size Adjustments
@@ -6323,14 +6323,14 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         key = sheet_data.cell(rrr,ccc - 2)
                         if "Rate & Term Refi".eql?(key)
                           key = "Rate & Term"
-                          @block_hash[@title][first_key][true][key] = {}
+                          @block_hash[@title][first_key]["true"][key] = {}
                         else
-                          @block_hash[@title][second_key][true][key] = {}
+                          @block_hash[@title][second_key]["true"][key] = {}
                         end
                       elsif(75..78).to_a.include?(rrr) && index == 7 && value
                         key = sheet_data.cell(rrr,ccc - 2)
                         key = key.eql?("<= 85") ? set_range(key) : get_value(key)
-                        @block_hash[@title][final_key][true][key] = {}
+                        @block_hash[@title][final_key]["true"][key] = {}
                       end
                     else
                       if (81..84).to_a.include?(rrr) && ccc < 12
@@ -6412,13 +6412,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         if (68..72).to_a.include?(rrr)
                           if(68..72).to_a.include?(rrr) && index >= 7 && value
                             if rrr.eql?(68)
-                              @block_hash[@title][first_key][true][key][hash_key] = value
+                              @block_hash[@title][first_key]["true"][key][hash_key] = value
                             else
-                              @block_hash[@title][second_key][true][key][hash_key] = value
+                              @block_hash[@title][second_key]["true"][key][hash_key] = value
                             end
                           end
                         elsif(75..78).to_a.include?(rrr) && index >= 7 && value
-                          @block_hash[@title][final_key][true][key][hash_key] = value
+                          @block_hash[@title][final_key]["true"][key][hash_key] = value
                         end
                       elsif (81..88).to_a.include?(rrr) && ccc > 15 && value
                         #for Loan Size Adjustments
@@ -6696,11 +6696,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         second_key = "LPMI/PropertyType/LTV"
                         final_key  = "LPMI/Term/FICO/LTV"
                         @block_hash[@title][first_key] = {}
-                        @block_hash[@title][first_key][true] = {}
+                        @block_hash[@title][first_key]["true"] = {}
                         @block_hash[@title][second_key] = {}
-                        @block_hash[@title][second_key][true] = {}
+                        @block_hash[@title][second_key]["true"] = {}
                         @block_hash[@title][final_key] = {}
-                        @block_hash[@title][final_key][true] = {}
+                        @block_hash[@title][final_key]["true"] = {}
                       end
                     elsif rrr.eql?(113) && index == 3
                       # for Subordinate Financing
@@ -6743,19 +6743,19 @@ class ObNewRezWholesale5806Controller < ApplicationController
                       if index == 5 && value
                         if ["Rate & Term Refi", "Cash Out"].include?(value)
                           f1_key = "Rate & Term"
-                          @block_hash[@title][first_key][true][f1_key] = {}
+                          @block_hash[@title][first_key]["true"][f1_key] = {}
                         elsif ["Manufactured Home", "2nd Home", "3-4 Unit", "Non Owner Occupied"].include?(value)
                           f2_key = value
-                          @block_hash[@title][second_key][true][f2_key] = {}
+                          @block_hash[@title][second_key]["true"][f2_key] = {}
                         else
-                          @block_hash[@title][final_key][true]["0 - 20"] = {} if value.eql?("≤ 20 Yr Term")
-                          @block_hash[@title][final_key][true]["20 - Infinity"] = {} if value.eql?("> 20 Yr Term")
+                          @block_hash[@title][final_key]["true"]["0 - 20"] = {} if value.eql?("≤ 20 Yr Term")
+                          @block_hash[@title][final_key]["true"]["20 - Infinity"] = {} if value.eql?("> 20 Yr Term")
                           key = "0 - 20" if value.eql?("≤ 20 Yr Term")
                           key = "20 - Infinity" if value.eql?("> 20 Yr Term")
                         end
                       elsif index == 6 && rrr < 154 && value
                         another_key = value.eql?("≤ 85") ? set_range(value) : value
-                        @block_hash[@title][final_key][true][key][another_key] = {} if another_key
+                        @block_hash[@title][final_key]["true"][key][another_key] = {} if another_key
                       end
                     end
 
@@ -6838,13 +6838,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
                       hash_key = set_range(hash_key).nil? ? get_value(hash_key) : set_range(hash_key)
                       if (98..100).to_a.include?(rrr)
                         if [98].include?(rrr)
-                          @block_hash[@title][first_key][true][f1_key][hash_key] = value
+                          @block_hash[@title][first_key]["true"][f1_key][hash_key] = value
                         else
-                          @block_hash[@title][second_key][true][f2_key][hash_key] = value
+                          @block_hash[@title][second_key]["true"][f2_key][hash_key] = value
                         end
                       else
                         if rrr > 101
-                          @block_hash[@title][final_key][true][key][another_key][hash_key] = value
+                          @block_hash[@title][final_key]["true"][key][another_key][hash_key] = value
                         end
                       end
                     end
@@ -7134,11 +7134,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
                           second_key = "LPMI/PropertyType/LTV"
                           final_key  = "LPMI/Term/FICO/LTV"
                           @block_hash[@title][first_key] = {}
-                          @block_hash[@title][first_key][true] = {}
+                          @block_hash[@title][first_key]["true"] = {}
                           @block_hash[@title][second_key] = {}
-                          @block_hash[@title][second_key][true] = {}
+                          @block_hash[@title][second_key]["true"] = {}
                           @block_hash[@title][final_key] = {}
-                          @block_hash[@title][final_key][true] = {}
+                          @block_hash[@title][final_key]["true"] = {}
                         end
                       elsif rrr.eql?(112) && index == 3
                         # for Subordinate Financing
@@ -7176,19 +7176,19 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         if index == 5 && value
                           if ["Rate & Term Refi", "Cash Out"].include?(value)
                             f1_key = "Rate & Term"
-                            @block_hash[@title][first_key][true][f1_key] = {}
+                            @block_hash[@title][first_key]["true"][f1_key] = {}
                           elsif ["Manufactured Home", "2nd Home", "3-4 Unit", "Non Owner Occupied"].include?(value)
                             f2_key = value
-                            @block_hash[@title][second_key][true][f2_key] = {}
+                            @block_hash[@title][second_key]["true"][f2_key] = {}
                           else
-                            @block_hash[@title][final_key][true]["0 - 20"] = {} if value.eql?("≤ 20 Yr Term")
-                            @block_hash[@title][final_key][true]["20 - Infinity"] = {} if value.eql?("> 20 Yr Term")
+                            @block_hash[@title][final_key]["true"]["0 - 20"] = {} if value.eql?("≤ 20 Yr Term")
+                            @block_hash[@title][final_key]["true"]["20 - Infinity"] = {} if value.eql?("> 20 Yr Term")
                             key = "0 - 20" if value.eql?("≤ 20 Yr Term")
                             key = "20 - Infinity" if value.eql?("> 20 Yr Term")
                           end
                         elsif index == 6 && rrr < 110 && value
                           another_key = value.eql?("≤ 85") ? set_range(value) : value
-                          @block_hash[@title][final_key][true][key][another_key] = {} if another_key
+                          @block_hash[@title][final_key]["true"][key][another_key] = {} if another_key
                         end
                       end
 
@@ -7264,13 +7264,13 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         hash_key = set_range(hash_key).nil? ? get_value(hash_key) : set_range(hash_key)
                         if (97..99).to_a.include?(rrr)
                           if rrr.eql?(97)
-                            @block_hash[@title][first_key][true][f1_key][hash_key] = value
+                            @block_hash[@title][first_key]["true"][f1_key][hash_key] = value
                           elsif [98, 99].include?(rrr)
-                            @block_hash[@title][second_key][true][f2_key][hash_key] = value
+                            @block_hash[@title][second_key]["true"][f2_key][hash_key] = value
                           end
                         else
                           if rrr > 100
-                            @block_hash[@title][final_key][true][key][another_key][hash_key] = value
+                            @block_hash[@title][final_key]["true"][key][another_key][hash_key] = value
                           end
                         end
                       end

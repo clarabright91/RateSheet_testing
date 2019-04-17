@@ -402,12 +402,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
               end
               if r == 128 && cc == 3
                 @additional_hash["FullDoc/LTV"] = {}
-                @additional_hash["FullDoc/LTV"][true] = {}
+                @additional_hash["FullDoc/LTV"]["true"] = {}
               end
               if r == 128 && cc >= 5 && cc <= 19
                 ltv_key = get_value @ltv_data[cc-3]
-                @additional_hash["FullDoc/LTV"][true][ltv_key] = {}
-                @additional_hash["FullDoc/LTV"][true][ltv_key] = value
+                @additional_hash["FullDoc/LTV"]["true"][ltv_key] = {}
+                @additional_hash["FullDoc/LTV"]["true"][ltv_key] = value
               end
               if r >= 136 && r <= 141 && cc == 3
                 primary_key = get_value value
@@ -475,12 +475,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
               end
               if r == 159 && cc == 3
                 @other_adjustment["FullDoc/LTV"] = {}
-                @other_adjustment["FullDoc/LTV"][true] = {}
+                @other_adjustment["FullDoc/LTV"]["true"] = {}
               end
               if r == 159 && cc >= 5 && cc <= 19
                 ltv_key = get_value @ltv_data[cc-3]
-                @other_adjustment["FullDoc/LTV"][true][ltv_key] = {}
-                @other_adjustment["FullDoc/LTV"][true][ltv_key] = value
+                @other_adjustment["FullDoc/LTV"]["true"][ltv_key] = {}
+                @other_adjustment["FullDoc/LTV"]["true"][ltv_key] = value
               end
             end
           end
@@ -652,12 +652,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
               end
               if r == 132 && cc == 3
                 @additional_hash["FullDoc/LTV"] = {}
-                @additional_hash["FullDoc/LTV"][true] = {}
+                @additional_hash["FullDoc/LTV"]["true"] = {}
               end
               if r == 132 && cc >= 5 && cc <= 19
                 ltv_key = get_value @ltv_data[cc-3]
-                @additional_hash["FullDoc/LTV"][true][ltv_key] = {}
-                @additional_hash["FullDoc/LTV"][true][ltv_key] = value
+                @additional_hash["FullDoc/LTV"]["true"][ltv_key] = {}
+                @additional_hash["FullDoc/LTV"]["true"][ltv_key] = value
               end
               if r >= 140 && r <= 147 && cc == 3
                 primary_key = get_value value
@@ -725,12 +725,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
               end
               if r == 167 && cc == 3
                 @other_adjustment["FullDoc/LTV"] = {}
-                @other_adjustment["FullDoc/LTV"][true] = {}
+                @other_adjustment["FullDoc/LTV"]["true"] = {}
               end
               if r == 167 && cc >= 5 && cc <= 19
                 ltv_key = get_value @ltv_data[cc-3]
-                @other_adjustment["FullDoc/LTV"][true][ltv_key] = {}
-                @other_adjustment["FullDoc/LTV"][true][ltv_key] = value
+                @other_adjustment["FullDoc/LTV"]["true"][ltv_key] = {}
+                @other_adjustment["FullDoc/LTV"]["true"][ltv_key] = value
               end
             end
           end
@@ -1596,11 +1596,11 @@ class ObNewfiWholesale7019Controller < ApplicationController
               end
               if value == "LPMI Single Premium Rate Card"
                 @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["20-Inf"] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["0-20"] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"]["true"] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"]["true"]["Fixed"] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"]["true"]["Fixed"]["Rate and Term"] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"]["true"]["Fixed"]["Rate and Term"]["20-Inf"] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"]["true"]["Fixed"]["Rate and Term"]["0-20"] = {}
               end
               # Cash Out Refinance
               if r >= 154 && r <= 160 && cc == 4
@@ -1619,12 +1619,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 else
                   primary_key = value.sub('to','-').tr('% ','')
                 end
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["20-Inf"][primary_key] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"]["true"]["Fixed"]["Rate and Term"]["20-Inf"][primary_key] = {}
               end
               if r >= 167 && r <= 170 && cc >= 5 && cc <= 11
                 ltv_key = get_value @lpmi_data[cc-1]
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["20-Inf"][primary_key][ltv_key] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["20-Inf"][primary_key][ltv_key] = value
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"]["true"]["Fixed"]["Rate and Term"]["20-Inf"][primary_key][ltv_key] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"]["true"]["Fixed"]["Rate and Term"]["20-Inf"][primary_key][ltv_key] = value
               end
               if r >= 173 && r <= 176 && cc == 2
                 if value.include?("below")
@@ -1632,25 +1632,25 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 else
                   primary_key = value.sub('to','-').tr('% ','')
                 end
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["0-20"][primary_key] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"]["true"]["Fixed"]["Rate and Term"]["0-20"][primary_key] = {}
               end
               if r >= 173 && r <= 176 && cc >= 5 && cc <= 11
                 ltv_key = get_value @lpmi_data[cc-1]
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["0-20"][primary_key][ltv_key] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["0-20"][primary_key][ltv_key] = value
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"]["true"]["Fixed"]["Rate and Term"]["0-20"][primary_key][ltv_key] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"]["true"]["Fixed"]["Rate and Term"]["0-20"][primary_key][ltv_key] = value
               end
               if r == 178 && cc == 2
                 @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"]["2nd Home"] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"]["2nd Home"]["Rate and Term"] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"]["true"] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"]["true"]["Fixed"] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"]["true"]["Fixed"]["2nd Home"] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"]["true"]["Fixed"]["2nd Home"]["Rate and Term"] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"]["true"]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"] = {}
               end
               if r == 178 && cc >= 5 && cc <= 11
                 ltv_key = get_value @lpmi_data[cc-1]
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"][ltv_key] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"][ltv_key] = value
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"]["true"]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"][ltv_key] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"]["true"]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"][ltv_key] = value
               end
               # Other Adjustments
               if r == 141 && cc == 14
@@ -1896,11 +1896,11 @@ class ObNewfiWholesale7019Controller < ApplicationController
               # LPMI Single Premium Rate Card
               if value == "LPMI Single Premium Rate Card"
                 @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["20-Inf"] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["0-20"] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"]["true"] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"]["true"]["Fixed"] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"]["true"]["Fixed"]["Rate and Term"] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"]["true"]["Fixed"]["Rate and Term"]["20-Inf"] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"]["true"]["Fixed"]["Rate and Term"]["0-20"] = {}
               end
               # Cash Out Refinance
               if r >= 154 && r <= 160 && cc == 4
@@ -1919,12 +1919,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 else
                   primary_key = value.sub('to','-').tr('% ','')
                 end
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["20-Inf"][primary_key] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"]["true"]["Fixed"]["Rate and Term"]["20-Inf"][primary_key] = {}
               end
               if r >= 173 && r <= 176 && cc >= 5 && cc <= 11
                 ltv_key = get_value @lpmi_data[cc-1]
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["20-Inf"][primary_key][ltv_key] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["20-Inf"][primary_key][ltv_key] = value
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"]["true"]["Fixed"]["Rate and Term"]["20-Inf"][primary_key][ltv_key] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"]["true"]["Fixed"]["Rate and Term"]["20-Inf"][primary_key][ltv_key] = value
               end
               if r >= 179 && r <= 182 && cc == 2
                 if value.include?("below")
@@ -1932,25 +1932,25 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 else
                   primary_key = value.sub('to','-').tr('% ','')
                 end
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["0-20"][primary_key] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"]["true"]["Fixed"]["Rate and Term"]["0-20"][primary_key] = {}
               end
               if r >= 179 && r <= 182 && cc >= 5 && cc <= 11
                 ltv_key = get_value @lpmi_data[cc-1]
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["0-20"][primary_key][ltv_key] = {}
-                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"][true]["Fixed"]["Rate and Term"]["0-20"][primary_key][ltv_key] = value
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"]["true"]["Fixed"]["Rate and Term"]["0-20"][primary_key][ltv_key] = {}
+                @lpmi_hash["LPMI/LoanType/RefinanceOption/Term/LTV/FICO"]["true"]["Fixed"]["Rate and Term"]["0-20"][primary_key][ltv_key] = value
               end
               if r == 184 && cc == 2
                 @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"]["2nd Home"] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"]["2nd Home"]["Rate and Term"] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"]["true"] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"]["true"]["Fixed"] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"]["true"]["Fixed"]["2nd Home"] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"]["true"]["Fixed"]["2nd Home"]["Rate and Term"] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"]["true"]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"] = {}
               end
               if r == 184 && cc >= 5 && cc <= 11
                 ltv_key = get_value @lpmi_data[cc-1]
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"][ltv_key] = {}
-                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"][true]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"][ltv_key] = value
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"]["true"]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"][ltv_key] = {}
+                @lpmi_hash["LPMI/LoanType/PropertyType/RefinanceOption/Term/FICO"]["true"]["Fixed"]["2nd Home"]["Rate and Term"]["0-20"][ltv_key] = value
               end
               # Other Adjustments
               if r == 141 && cc == 14

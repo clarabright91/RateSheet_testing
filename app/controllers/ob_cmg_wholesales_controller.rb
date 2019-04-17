@@ -195,7 +195,7 @@ class ObCmgWholesalesController < ApplicationController
                     @misc_hash["MiscAdjuster/LockDay"]["Miscellaneous"]["60"] = {}
                     @misc_hash["MiscAdjuster/VA/RefinanceOption"] = {}
                     @misc_hash["MiscAdjuster/VA/RefinanceOption"]["Miscellaneous"] = {}
-                    @misc_hash["MiscAdjuster/VA/RefinanceOption"]["Miscellaneous"][true] = {}
+                    @misc_hash["MiscAdjuster/VA/RefinanceOption"]["Miscellaneous"]["true"] = {}
                   end
                   if r == 70 && cc == 10
                     ccc = cc + 6
@@ -205,11 +205,11 @@ class ObCmgWholesalesController < ApplicationController
                   if r == 71 && cc == 10
                     @misc_hash["MiscAdjuster/FHA/Streamline"] = {}
                     @misc_hash["MiscAdjuster/FHA/Streamline"]["Miscellaneous"] = {}
-                    @misc_hash["MiscAdjuster/FHA/Streamline"]["Miscellaneous"][true] = {}
-                    @misc_hash["MiscAdjuster/FHA/Streamline"]["Miscellaneous"][true][true] = {}
+                    @misc_hash["MiscAdjuster/FHA/Streamline"]["Miscellaneous"]["true"] = {}
+                    @misc_hash["MiscAdjuster/FHA/Streamline"]["Miscellaneous"]["true"]["true"] = {}
                     ccc = cc + 6
                     c_val = sheet_data.cell(r,ccc)
-                    @misc_hash["MiscAdjuster/FHA/Streamline"]["Miscellaneous"][true][true] = c_val
+                    @misc_hash["MiscAdjuster/FHA/Streamline"]["Miscellaneous"]["true"]["true"] = c_val
                   end
                   if r >= 72 && r <= 74 && cc == 10
                     if value.include?("Non-IRRRL")
@@ -217,19 +217,19 @@ class ObCmgWholesalesController < ApplicationController
                     else
                       secondary_key = get_value value
                     end
-                    @misc_hash["MiscAdjuster/VA/RefinanceOption"]["Miscellaneous"][true][secondary_key] = {}
+                    @misc_hash["MiscAdjuster/VA/RefinanceOption"]["Miscellaneous"]["true"][secondary_key] = {}
                     ccc = cc + 6
                     c_val = sheet_data.cell(r,ccc)
-                    @misc_hash["MiscAdjuster/VA/RefinanceOption"]["Miscellaneous"][true][secondary_key] = c_val
+                    @misc_hash["MiscAdjuster/VA/RefinanceOption"]["Miscellaneous"]["true"][secondary_key] = c_val
                   end
                   if r == 75 && cc == 10
                     @misc_hash["MiscAdjuster/RefinanceOption/VA/FICO"] = {}
                     @misc_hash["MiscAdjuster/RefinanceOption/VA/FICO"]["Miscellaneous"] = {}
                     @misc_hash["MiscAdjuster/RefinanceOption/VA/FICO"]["Miscellaneous"]["Cash Out"] = {}
-                    @misc_hash["MiscAdjuster/RefinanceOption/VA/FICO"]["Miscellaneous"]["Cash Out"][true] = {}
+                    @misc_hash["MiscAdjuster/RefinanceOption/VA/FICO"]["Miscellaneous"]["Cash Out"]["true"] = {}
                     ccc = cc + 6
                     c_val = sheet_data.cell(r,ccc)
-                    @misc_hash["MiscAdjuster/RefinanceOption/VA/FICO"]["Miscellaneous"]["Cash Out"][true] = c_val
+                    @misc_hash["MiscAdjuster/RefinanceOption/VA/FICO"]["Miscellaneous"]["Cash Out"]["true"] = c_val
                   end
                   if r == 76 && cc == 10
                     @misc_hash["MiscAdjuster/LoanType"] = {}
@@ -432,8 +432,8 @@ class ObCmgWholesalesController < ApplicationController
                   primary_key1 = "LPMI/PropertyType/FICO"
                   @property_hash[primary_key] = {}
                   @property_hash[primary_key1] = {}
-                  @property_hash[primary_key][true] = {}
-                  @property_hash[primary_key1][true] = {}
+                  @property_hash[primary_key]["true"] = {}
+                  @property_hash[primary_key1]["true"] = {}
                 end
                 # AGENCY FIXED AND ARM ADJUSTMENTS
                 if r == 11 && cc == 1
@@ -754,21 +754,21 @@ class ObCmgWholesalesController < ApplicationController
                   else
                     secondary_key = get_value value
                   end
-                  @property_hash[primary_key][true][secondary_key] = {}
+                  @property_hash[primary_key]["true"][secondary_key] = {}
                 end
                 if r >= 88 && r <= 89 && cc >= 7 && cc <= 14
                   lpmi_key = get_value @lpmi_data[cc-1]
-                  @property_hash[primary_key][true][secondary_key][lpmi_key] = {}
-                  @property_hash[primary_key][true][secondary_key][lpmi_key] = value
+                  @property_hash[primary_key]["true"][secondary_key][lpmi_key] = {}
+                  @property_hash[primary_key]["true"][secondary_key][lpmi_key] = value
                 end
                 if r >= 90 && r <= 93 && cc == 3
                   secondary_key = get_value value
-                  @property_hash[primary_key1][true][secondary_key] = {}
+                  @property_hash[primary_key1]["true"][secondary_key] = {}
                 end
                 if r >= 90 && r <= 93 && cc >= 7 && cc <= 14
                   lpmi_key = get_value @lpmi_data[cc-1]
-                  @property_hash[primary_key1][true][secondary_key][lpmi_key] = {}
-                  @property_hash[primary_key1][true][secondary_key][lpmi_key] = value
+                  @property_hash[primary_key1]["true"][secondary_key][lpmi_key] = {}
+                  @property_hash[primary_key1]["true"][secondary_key][lpmi_key] = value
                 end
               end
             rescue Exception => e
@@ -954,8 +954,8 @@ class ObCmgWholesalesController < ApplicationController
                     primary_key = "PropertyType/LTV"
                     @adjustment_hash[primary_key] = {}
                     @adjustment_hash["FannieMae/Term/FICO/LTV"] = {}
-                    @adjustment_hash["FannieMae/Term/FICO/LTV"][true] = {}
-                    @adjustment_hash["FannieMae/Term/FICO/LTV"][true]["15-Inf"] = {}
+                    @adjustment_hash["FannieMae/Term/FICO/LTV"]["true"] = {}
+                    @adjustment_hash["FannieMae/Term/FICO/LTV"]["true"]["15-Inf"] = {}
                   elsif value == "SUBORDINATE FINANCING"
                     primary_key = "FinancingType/LTV/CLTV/FICO"
                     @subordinate_hash[primary_key] = {}
@@ -963,7 +963,7 @@ class ObCmgWholesalesController < ApplicationController
                   elsif value == "DU REFI PLUS ADJUSTMENT CAP (MAX ADJ) *"
                     primary_key = "FannieMae/PropertyType/Term/LTV"
                     @adjustment_cap[primary_key] = {}
-                    @adjustment_cap[primary_key][true] = {}
+                    @adjustment_cap[primary_key]["true"] = {}
                   end
                   if r >= 58 && r <= 59 && cc == 1
                     if value.downcase.include?('units')
@@ -999,12 +999,12 @@ class ObCmgWholesalesController < ApplicationController
                     elsif value.include?("(N/A for 15 Year Term or less)")
                       secondary_key = value.split("(N/A for 15 Year Term or less)").first.tr('A-Z ','')
                     end
-                    @adjustment_hash["FannieMae/Term/FICO/LTV"][true]["15-Inf"][secondary_key] = {}
+                    @adjustment_hash["FannieMae/Term/FICO/LTV"]["true"]["15-Inf"][secondary_key] = {}
                   end
                   if r >= 61 && r <= 68 && cc >= 8 && cc <= 16
                     ltv_key = get_value @fnma_data[cc-1]
-                    @adjustment_hash["FannieMae/Term/FICO/LTV"][true]["15-Inf"][secondary_key][ltv_key] = {}
-                    @adjustment_hash["FannieMae/Term/FICO/LTV"][true]["15-Inf"][secondary_key][ltv_key] = value
+                    @adjustment_hash["FannieMae/Term/FICO/LTV"]["true"]["15-Inf"][secondary_key][ltv_key] = {}
+                    @adjustment_hash["FannieMae/Term/FICO/LTV"]["true"]["15-Inf"][secondary_key][ltv_key] = value
                   end
                   if r == 69 && cc == 1
                     @adjustment_hash["PropertyType/LTV"]["Manufactured Home"] = {}
@@ -1058,7 +1058,7 @@ class ObCmgWholesalesController < ApplicationController
                     else
                       secondary_key = value
                     end
-                    @adjustment_cap[primary_key][true][secondary_key] = {}
+                    @adjustment_cap[primary_key]["true"][secondary_key] = {}
                   end
                   if r >= 81 && r <= 82 && cc == 4
                     if value.downcase.include?("all")
@@ -1066,21 +1066,21 @@ class ObCmgWholesalesController < ApplicationController
                     else
                       cltv_key = get_value value
                     end
-                    @adjustment_cap[primary_key][true][secondary_key][cltv_key] = {}
+                    @adjustment_cap[primary_key]["true"][secondary_key][cltv_key] = {}
                   end
                   if r >= 81 && r <= 82 && cc >= 5 && cc <= 7
                     cap_key = get_value @cap_data[cc-1]
-                    @adjustment_cap[primary_key][true][secondary_key][cltv_key][cap_key] = {}
-                    @adjustment_cap[primary_key][true][secondary_key][cltv_key][cap_key] = value
+                    @adjustment_cap[primary_key]["true"][secondary_key][cltv_key][cap_key] = {}
+                    @adjustment_cap[primary_key]["true"][secondary_key][cltv_key][cap_key] = value
                   end
                   if r == 83 && cc == 4
                     cltv_key = get_value value
-                    @adjustment_cap[primary_key][true][secondary_key][cltv_key] = {}
+                    @adjustment_cap[primary_key]["true"][secondary_key][cltv_key] = {}
                   end
                   if r == 83 && cc >= 5 && cc <= 7
                     cap_key = get_value @cap_data[cc-1]
-                    @adjustment_cap[primary_key][true][secondary_key][cltv_key][cap_key] = {}
-                    @adjustment_cap[primary_key][true][secondary_key][cltv_key][cap_key] = value
+                    @adjustment_cap[primary_key]["true"][secondary_key][cltv_key][cap_key] = {}
+                    @adjustment_cap[primary_key]["true"][secondary_key][cltv_key][cap_key] = value
                   end
                 end
               rescue Exception => e
@@ -1244,10 +1244,10 @@ class ObCmgWholesalesController < ApplicationController
                   if value == "FHLMC LP OPEN ACCESS ADJUSTMENTS"
                     primary_key = "FreddieMac/PropertyType/LTV"
                     @adjustment_hash[primary_key] = {}
-                    @adjustment_hash[primary_key][true] = {}
+                    @adjustment_hash[primary_key]["true"] = {}
                     @adjustment_hash["FreddieMac/Term/FICO/LTV"] = {}
-                    @adjustment_hash["FreddieMac/Term/FICO/LTV"][true] = {}
-                    @adjustment_hash["FreddieMac/Term/FICO/LTV"][true]["15-Inf"] = {}
+                    @adjustment_hash["FreddieMac/Term/FICO/LTV"]["true"] = {}
+                    @adjustment_hash["FreddieMac/Term/FICO/LTV"]["true"]["15-Inf"] = {}
                   elsif value == "SUBORDINATE FINANCING"
                     primary_key = "FinancingType/LTV/CLTV/FICO"
                     @subordinate_hash[primary_key] = {}
@@ -1255,7 +1255,7 @@ class ObCmgWholesalesController < ApplicationController
                   elsif value == "OPEN ACCESS ADJUSTMENT CAP (MAX ADJ) *"
                     primary_key = "FannieMae/PropertyType/Term/LTV"
                     @adjustment_cap[primary_key] = {}
-                    @adjustment_cap[primary_key][true] = {}
+                    @adjustment_cap[primary_key]["true"] = {}
                   end
                   if r >= 57 && r <= 60 && cc == 1
                     if value.downcase.include?('units') || value.downcase.include?('homes')
@@ -1263,23 +1263,23 @@ class ObCmgWholesalesController < ApplicationController
                     else
                       secondary_key = get_value value
                     end
-                    @adjustment_hash[primary_key][true][secondary_key] = {}
+                    @adjustment_hash[primary_key]["true"][secondary_key] = {}
                   end
                   if r >= 57 && r <= 60 && cc >= 8 && cc <= 16
                     fnma_key = get_value @fnma_data[cc-1]
-                    @adjustment_hash[primary_key][true][secondary_key][fnma_key] = {}
-                    @adjustment_hash[primary_key][true][secondary_key][fnma_key] = value
+                    @adjustment_hash[primary_key]["true"][secondary_key][fnma_key] = {}
+                    @adjustment_hash[primary_key]["true"][secondary_key][fnma_key] = value
                   end
                   if r == 61 && cc == 1
                     @adjustment_hash["FreddieMac/PropertyType/Term/LTV"] = {}
-                    @adjustment_hash["FreddieMac/PropertyType/Term/LTV"][true] = {}
-                    @adjustment_hash["FreddieMac/PropertyType/Term/LTV"][true]["Condo"] = {}
-                    @adjustment_hash["FreddieMac/PropertyType/Term/LTV"][true]["Condo"]["15-Inf"] = {}
+                    @adjustment_hash["FreddieMac/PropertyType/Term/LTV"]["true"] = {}
+                    @adjustment_hash["FreddieMac/PropertyType/Term/LTV"]["true"]["Condo"] = {}
+                    @adjustment_hash["FreddieMac/PropertyType/Term/LTV"]["true"]["Condo"]["15-Inf"] = {}
                   end
                   if r == 61 && cc >= 8 && cc <= 16
                     fnma_key = get_value @fnma_data[cc-1]
-                    @adjustment_hash["FreddieMac/PropertyType/Term/LTV"][true]["Condo"]["15-Inf"][fnma_key] = {}
-                    @adjustment_hash["FreddieMac/PropertyType/Term/LTV"][true]["Condo"]["15-Inf"][fnma_key] = value
+                    @adjustment_hash["FreddieMac/PropertyType/Term/LTV"]["true"]["Condo"]["15-Inf"][fnma_key] = {}
+                    @adjustment_hash["FreddieMac/PropertyType/Term/LTV"]["true"]["Condo"]["15-Inf"][fnma_key] = value
                   end
                   if r == 62 && cc == 1
                     @adjustment_hash["PropertyType/State"] = {}
@@ -1299,12 +1299,12 @@ class ObCmgWholesalesController < ApplicationController
                     elsif value.include?("(N/A for 15 Year Term or less)")
                       secondary_key = value.split("(N/A for 15 Year Term or less)").first.tr('A-Z ','')
                     end
-                    @adjustment_hash["FreddieMac/Term/FICO/LTV"][true]["15-Inf"][secondary_key] = {}
+                    @adjustment_hash["FreddieMac/Term/FICO/LTV"]["true"]["15-Inf"][secondary_key] = {}
                   end
                   if r >= 63 && r <= 69 && cc >= 8 && cc <= 16
                     fnma_key = get_value @fnma_data[cc-1]
-                    @adjustment_hash["FreddieMac/Term/FICO/LTV"][true]["15-Inf"][secondary_key][fnma_key] = {}
-                    @adjustment_hash["FreddieMac/Term/FICO/LTV"][true]["15-Inf"][secondary_key][fnma_key] = value
+                    @adjustment_hash["FreddieMac/Term/FICO/LTV"]["true"]["15-Inf"][secondary_key][fnma_key] = {}
+                    @adjustment_hash["FreddieMac/Term/FICO/LTV"]["true"]["15-Inf"][secondary_key][fnma_key] = value
                   end
                   if r == 70 && cc == 1
                     @adjustment_hash["LoanSize/LTV"] = {}
@@ -1347,7 +1347,7 @@ class ObCmgWholesalesController < ApplicationController
                     else
                       secondary_key = value
                     end
-                    @adjustment_cap[primary_key][true][secondary_key] = {}
+                    @adjustment_cap[primary_key]["true"][secondary_key] = {}
                   end
                   if r >= 83 && r <= 84 && cc == 4
                     if value.downcase.include?('all')
@@ -1355,21 +1355,21 @@ class ObCmgWholesalesController < ApplicationController
                     else
                       cltv_key = get_value value
                     end
-                    @adjustment_cap[primary_key][true][secondary_key][cltv_key] = {}
+                    @adjustment_cap[primary_key]["true"][secondary_key][cltv_key] = {}
                   end
                   if r >= 83 && r <= 84 && cc >= 5 && cc <= 7
                     cap_key = get_value @cap_data[cc-1]
-                    @adjustment_cap[primary_key][true][secondary_key][cltv_key][cap_key] = {}
-                    @adjustment_cap[primary_key][true][secondary_key][cltv_key][cap_key] = value
+                    @adjustment_cap[primary_key]["true"][secondary_key][cltv_key][cap_key] = {}
+                    @adjustment_cap[primary_key]["true"][secondary_key][cltv_key][cap_key] = value
                   end
                   if r == 85 && cc == 4
                     cltv_key = get_value value
-                    @adjustment_cap[primary_key][true][secondary_key][cltv_key] = {}
+                    @adjustment_cap[primary_key]["true"][secondary_key][cltv_key] = {}
                   end
                   if r == 85 && cc >= 5 && cc <= 7
                     cap_key = get_value @cap_data[cc-1]
-                    @adjustment_cap[primary_key][true][secondary_key][cltv_key][cap_key] = {}
-                    @adjustment_cap[primary_key][true][secondary_key][cltv_key][cap_key] = value
+                    @adjustment_cap[primary_key]["true"][secondary_key][cltv_key][cap_key] = {}
+                    @adjustment_cap[primary_key]["true"][secondary_key][cltv_key][cap_key] = value
                   end
                 end
               rescue Exception => e
@@ -1473,31 +1473,31 @@ class ObCmgWholesalesController < ApplicationController
                   if value.present?
                     if value == 'LENDER PAID MI'
                       @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"] = {}
-                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"][true] = {}
-                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"][true]["Fixed"] = {}
-                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["25"] = {}
-                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["30"] = {}
-                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["10"] = {}
-                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["15"] = {}
-                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["20"] = {}
+                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"]["true"] = {}
+                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"] = {}
+                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["25"] = {}
+                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["30"] = {}
+                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["10"] = {}
+                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["15"] = {}
+                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["20"] = {}
                       @adjustment_hash["LPMI/LoanType/LTV/FICO"] = {}
-                      @adjustment_hash["LPMI/LoanType/LTV/FICO"][true] = {}
-                      @adjustment_hash["LPMI/LoanType/LTV/FICO"][true]["ARM"] = {}
+                      @adjustment_hash["LPMI/LoanType/LTV/FICO"]["true"] = {}
+                      @adjustment_hash["LPMI/LoanType/LTV/FICO"]["true"]["ARM"] = {}
                       @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"] = {}
-                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true] = {}
-                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"] = {}
-                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"] = {}
-                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["30"] = {}
+                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"] = {}
+                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"] = {}
+                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"] = {}
+                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["30"] = {}
                       @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"] = {}
-                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true] = {}
-                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"] = {}
-                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"] = {}
-                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["30"] = {}
+                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"] = {}
+                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"] = {}
+                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"] = {}
+                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["30"] = {}
 
-                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["15"] = {}
-                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["15"] = {}
-                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["20"] = {}
-                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["20"] = {}
+                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["15"] = {}
+                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["15"] = {}
+                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["20"] = {}
+                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["20"] = {}
                     end
                     if value == "LPMI (in addition to adjustments above)"
                       @subordinate_hash["RefinanceOption/FICO"] = {}
@@ -1505,58 +1505,58 @@ class ObCmgWholesalesController < ApplicationController
                     end
                     if value == 'ENTERPRISE PAID MI'
                       @standard_hash["EPMI/LoanType/Term/LTV/FICO"] = {}
-                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"][true] = {}
-                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"][true]["Fixed"] = {}
-                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["25"] = {}
-                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["30"] = {}
-                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["10"] = {}
-                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["15"] = {}
-                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["20"] = {}
+                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"]["true"] = {}
+                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"] = {}
+                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["25"] = {}
+                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["30"] = {}
+                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["10"] = {}
+                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["15"] = {}
+                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["20"] = {}
 
                       @standard_hash["EPMI/LoanType/LTV/FICO"] = {}
-                      @standard_hash["EPMI/LoanType/LTV/FICO"][true] = {}
-                      @standard_hash["EPMI/LoanType/LTV/FICO"][true]["ARM"] = {}
+                      @standard_hash["EPMI/LoanType/LTV/FICO"]["true"] = {}
+                      @standard_hash["EPMI/LoanType/LTV/FICO"]["true"]["ARM"] = {}
 
                       @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"] = {}
-                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true] = {}
-                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"] = {}
-                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"] = {}
-                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["30"] = {}
+                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"] = {}
+                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"] = {}
+                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"] = {}
+                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["30"] = {}
 
                       @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"] = {}
-                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true] = {}
-                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"] = {}
-                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"] = {}
-                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["30"] = {}
+                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"] = {}
+                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"] = {}
+                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"] = {}
+                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["30"] = {}
 
-                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["15"] = {}
-                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["15"] = {}
-                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["20"] = {}
-                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["20"] = {}
+                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["15"] = {}
+                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["15"] = {}
+                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["20"] = {}
+                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["20"] = {}
 
                       @home_hash["EPMI/FannieMaeProduct/LoanType/LTV/FICO"] = {}
-                      @home_hash["EPMI/FannieMaeProduct/LoanType/LTV/FICO"][true] = {}
-                      @home_hash["EPMI/FannieMaeProduct/LoanType/LTV/FICO"][true]["HomeReady"] = {}
-                      @home_hash["EPMI/FannieMaeProduct/LoanType/LTV/FICO"][true]["HomeReady"]["ARM"] = {}
+                      @home_hash["EPMI/FannieMaeProduct/LoanType/LTV/FICO"]["true"] = {}
+                      @home_hash["EPMI/FannieMaeProduct/LoanType/LTV/FICO"]["true"]["HomeReady"] = {}
+                      @home_hash["EPMI/FannieMaeProduct/LoanType/LTV/FICO"]["true"]["HomeReady"]["ARM"] = {}
 
                       @home_hash["EPMI/FreddieMacProduct/LoanType/LTV/FICO"] = {}
-                      @home_hash["EPMI/FreddieMacProduct/LoanType/LTV/FICO"][true] = {}
-                      @home_hash["EPMI/FreddieMacProduct/LoanType/LTV/FICO"][true]["HomePossible"] = {}
-                      @home_hash["EPMI/FreddieMacProduct/LoanType/LTV/FICO"][true]["HomePossible"]["ARM"] = {}
+                      @home_hash["EPMI/FreddieMacProduct/LoanType/LTV/FICO"]["true"] = {}
+                      @home_hash["EPMI/FreddieMacProduct/LoanType/LTV/FICO"]["true"]["HomePossible"] = {}
+                      @home_hash["EPMI/FreddieMacProduct/LoanType/LTV/FICO"]["true"]["HomePossible"]["ARM"] = {}
                     end
                     if value == "EPMI (in addition to adjustments above)"
                       @property_hash["EPMI/RefinanceOption/FICO"] = {}
-                      @property_hash["EPMI/RefinanceOption/FICO"][true] = {}
-                      @property_hash["EPMI/RefinanceOption/FICO"][true] = {}
+                      @property_hash["EPMI/RefinanceOption/FICO"]["true"] = {}
+                      @property_hash["EPMI/RefinanceOption/FICO"]["true"] = {}
 
                       @property_hash["EPMI/PropertyType/FICO"] = {}
-                      @property_hash["EPMI/PropertyType/FICO"][true] = {}
+                      @property_hash["EPMI/PropertyType/FICO"]["true"] = {}
                     end
                     if r >= 12 && r <= 15 && cc == 5
                       secondary_key = get_value value
-                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["25"][secondary_key] = {}
-                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["30"][secondary_key] = {}
-                      @adjustment_hash["LPMI/LoanType/LTV/FICO"][true]["ARM"][secondary_key] = {}
+                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["25"][secondary_key] = {}
+                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["30"][secondary_key] = {}
+                      @adjustment_hash["LPMI/LoanType/LTV/FICO"]["true"]["ARM"][secondary_key] = {}
                     end
                     if r >= 12 && r <= 15 && cc >= 7 && cc <= 14
                       if @sub_data[cc-1].include?("+")
@@ -1564,17 +1564,17 @@ class ObCmgWholesalesController < ApplicationController
                       else
                         ltv_key = get_value @sub_data[cc-1]
                       end
-                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["25"][secondary_key][ltv_key] = {}
-                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["30"][secondary_key][ltv_key] = {}
-                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["25"][secondary_key][ltv_key] = value
-                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["30"][secondary_key][ltv_key] = value
-                      @adjustment_hash["LPMI/LoanType/LTV/FICO"][true]["ARM"][secondary_key][ltv_key] = value
+                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["25"][secondary_key][ltv_key] = {}
+                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["30"][secondary_key][ltv_key] = {}
+                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["25"][secondary_key][ltv_key] = value
+                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["30"][secondary_key][ltv_key] = value
+                      @adjustment_hash["LPMI/LoanType/LTV/FICO"]["true"]["ARM"][secondary_key][ltv_key] = value
                     end
                     if r >= 16 && r <= 19 && cc == 5
                       secondary_key = get_value value
-                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["10"][secondary_key] = {}
-                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["15"][secondary_key] = {}
-                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["20"][secondary_key] = {}
+                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["10"][secondary_key] = {}
+                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["15"][secondary_key] = {}
+                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["20"][secondary_key] = {}
                     end
                     if r >= 16 && r <= 19 && cc >= 7 && cc <= 14
                       if @sub_data[cc-1].include?("+")
@@ -1582,18 +1582,18 @@ class ObCmgWholesalesController < ApplicationController
                       else
                         ltv_key = get_value @sub_data[cc-1]
                       end
-                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["10"][secondary_key][ltv_key] = {}
-                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["15"][secondary_key][ltv_key] = {}
-                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["20"][secondary_key][ltv_key] = {}
-                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["10"][secondary_key][ltv_key] = value
-                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["15"][secondary_key][ltv_key] = value
-                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["20"][secondary_key][ltv_key] = value
+                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["10"][secondary_key][ltv_key] = {}
+                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["15"][secondary_key][ltv_key] = {}
+                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["20"][secondary_key][ltv_key] = {}
+                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["10"][secondary_key][ltv_key] = value
+                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["15"][secondary_key][ltv_key] = value
+                      @adjustment_hash["LPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["20"][secondary_key][ltv_key] = value
                     end
                     # HomeReady and HomePossible
                     if r >= 20 && r <= 23 && cc == 5
                       secondary_key = get_value value
-                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["30"][secondary_key] = {}
-                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["30"][secondary_key] = {}
+                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["30"][secondary_key] = {}
+                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["30"][secondary_key] = {}
                     end
                     if r >= 20 && r <= 23 && cc >= 7 && cc <= 14
                       if @sub_data[cc-1].include?("+")
@@ -1601,17 +1601,17 @@ class ObCmgWholesalesController < ApplicationController
                       else
                         ltv_key = get_value @sub_data[cc-1]
                       end
-                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["30"][secondary_key][ltv_key] = {}
-                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["30"][secondary_key][ltv_key] = value
-                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["30"][secondary_key][ltv_key] = {}
-                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["30"][secondary_key][ltv_key] = value
+                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["30"][secondary_key][ltv_key] = {}
+                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["30"][secondary_key][ltv_key] = value
+                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["30"][secondary_key][ltv_key] = {}
+                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["30"][secondary_key][ltv_key] = value
                     end
                     if r >= 24 && r <= 27 && cc == 5
                       secondary_key = get_value value
-                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["15"][secondary_key] = {}
-                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["20"][secondary_key] = {}
-                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["15"][secondary_key] = {}
-                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["20"][secondary_key] = {}
+                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["15"][secondary_key] = {}
+                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["20"][secondary_key] = {}
+                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["15"][secondary_key] = {}
+                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["20"][secondary_key] = {}
                     end
                     if r >= 24 && r <= 27 && cc >= 7 && cc <= 14
                       if @sub_data[cc-1].include?("+")
@@ -1619,15 +1619,15 @@ class ObCmgWholesalesController < ApplicationController
                       else
                         ltv_key = get_value @sub_data[cc-1]
                       end
-                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["15"][secondary_key][ltv_key] = {}
-                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["20"][secondary_key][ltv_key] = {}
-                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["15"][secondary_key][ltv_key] = value
-                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["20"][secondary_key][ltv_key] = value
+                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["15"][secondary_key][ltv_key] = {}
+                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["20"][secondary_key][ltv_key] = {}
+                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["15"][secondary_key][ltv_key] = value
+                      @adjustment_cap["LPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["20"][secondary_key][ltv_key] = value
 
-                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["15"][secondary_key][ltv_key] = {}
-                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["20"][secondary_key][ltv_key] = {}
-                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["15"][secondary_key][ltv_key] = value
-                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["20"][secondary_key][ltv_key] = value
+                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["15"][secondary_key][ltv_key] = {}
+                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["20"][secondary_key][ltv_key] = {}
+                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["15"][secondary_key][ltv_key] = value
+                      @adjustment_cap["LPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["20"][secondary_key][ltv_key] = value
                     end
                     # LPMI (in addition to adjustments above)
                     if r >= 29 && r <= 30 && cc == 3
@@ -1669,9 +1669,9 @@ class ObCmgWholesalesController < ApplicationController
                     # ENTERPRISE PAID MI
                     if r >= 38 && r <= 41 && cc == 5
                       secondary_key = get_value value
-                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["25"][secondary_key] = {}
-                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["30"][secondary_key] = {}
-                      @standard_hash["EPMI/LoanType/LTV/FICO"][true]["ARM"][secondary_key] = {}
+                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["25"][secondary_key] = {}
+                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["30"][secondary_key] = {}
+                      @standard_hash["EPMI/LoanType/LTV/FICO"]["true"]["ARM"][secondary_key] = {}
                     end
                     if r >= 38 && r <= 41 && cc >= 7 && cc <= 14
                       if @sub_data[cc-1].include?("+")
@@ -1679,17 +1679,17 @@ class ObCmgWholesalesController < ApplicationController
                       else
                         ltv_key = get_value @sub_data[cc-1]
                       end
-                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["25"][secondary_key][ltv_key] = {}
-                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["30"][secondary_key][ltv_key] = {}
-                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["25"][secondary_key][ltv_key] = value
-                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["30"][secondary_key][ltv_key] = value
-                      @standard_hash["EPMI/LoanType/LTV/FICO"][true]["ARM"][secondary_key][ltv_key] = value
+                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["25"][secondary_key][ltv_key] = {}
+                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["30"][secondary_key][ltv_key] = {}
+                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["25"][secondary_key][ltv_key] = value
+                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["30"][secondary_key][ltv_key] = value
+                      @standard_hash["EPMI/LoanType/LTV/FICO"]["true"]["ARM"][secondary_key][ltv_key] = value
                     end
                     if r >= 42 && r <= 45 && cc == 5
                       secondary_key = get_value value
-                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["10"][secondary_key] = {}
-                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["15"][secondary_key] = {}
-                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["20"][secondary_key] = {}
+                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["10"][secondary_key] = {}
+                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["15"][secondary_key] = {}
+                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["20"][secondary_key] = {}
                     end
                     if r >= 42 && r <= 45 && cc >= 7 && cc <= 14
                       if @sub_data[cc-1].include?("+")
@@ -1697,21 +1697,21 @@ class ObCmgWholesalesController < ApplicationController
                       else
                         ltv_key = get_value @sub_data[cc-1]
                       end
-                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["10"][secondary_key][ltv_key] = {}
-                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["15"][secondary_key][ltv_key] = {}
-                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["20"][secondary_key][ltv_key] = {}
-                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["10"][secondary_key][ltv_key] = value
-                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["15"][secondary_key][ltv_key] = value
-                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"][true]["Fixed"]["20"][secondary_key][ltv_key] = value
+                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["10"][secondary_key][ltv_key] = {}
+                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["15"][secondary_key][ltv_key] = {}
+                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["20"][secondary_key][ltv_key] = {}
+                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["10"][secondary_key][ltv_key] = value
+                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["15"][secondary_key][ltv_key] = value
+                      @standard_hash["EPMI/LoanType/Term/LTV/FICO"]["true"]["Fixed"]["20"][secondary_key][ltv_key] = value
                     end
                     # HomeReady and HomePossible
                     if r >= 46 && r <= 49 && cc == 5
                       secondary_key = get_value value
-                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["30"][secondary_key] = {}
-                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["30"][secondary_key] = {}
+                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["30"][secondary_key] = {}
+                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["30"][secondary_key] = {}
 
-                      @home_hash["EPMI/FannieMaeProduct/LoanType/LTV/FICO"][true]["HomeReady"]["ARM"][secondary_key] = {}
-                      @home_hash["EPMI/FreddieMacProduct/LoanType/LTV/FICO"][true]["HomePossible"]["ARM"][secondary_key] = {}
+                      @home_hash["EPMI/FannieMaeProduct/LoanType/LTV/FICO"]["true"]["HomeReady"]["ARM"][secondary_key] = {}
+                      @home_hash["EPMI/FreddieMacProduct/LoanType/LTV/FICO"]["true"]["HomePossible"]["ARM"][secondary_key] = {}
                     end
                     if r >= 46 && r <= 49 && cc >= 7 && cc <= 14
                       if @sub_data[cc-1].include?("+")
@@ -1719,22 +1719,22 @@ class ObCmgWholesalesController < ApplicationController
                       else
                         ltv_key = get_value @sub_data[cc-1]
                       end
-                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["30"][secondary_key][ltv_key] = {}
-                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["30"][secondary_key][ltv_key] = value
-                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["30"][secondary_key][ltv_key] = {}
-                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["30"][secondary_key][ltv_key] = value
+                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["30"][secondary_key][ltv_key] = {}
+                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["30"][secondary_key][ltv_key] = value
+                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["30"][secondary_key][ltv_key] = {}
+                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["30"][secondary_key][ltv_key] = value
 
-                      @home_hash["EPMI/FannieMaeProduct/LoanType/LTV/FICO"][true]["HomeReady"]["ARM"][secondary_key][ltv_key] = {}
-                      @home_hash["EPMI/FreddieMacProduct/LoanType/LTV/FICO"][true]["HomePossible"]["ARM"][secondary_key][ltv_key] = {}
-                      @home_hash["EPMI/FannieMaeProduct/LoanType/LTV/FICO"][true]["HomeReady"]["ARM"][secondary_key][ltv_key] = value
-                      @home_hash["EPMI/FreddieMacProduct/LoanType/LTV/FICO"][true]["HomePossible"]["ARM"][secondary_key][ltv_key] = value
+                      @home_hash["EPMI/FannieMaeProduct/LoanType/LTV/FICO"]["true"]["HomeReady"]["ARM"][secondary_key][ltv_key] = {}
+                      @home_hash["EPMI/FreddieMacProduct/LoanType/LTV/FICO"]["true"]["HomePossible"]["ARM"][secondary_key][ltv_key] = {}
+                      @home_hash["EPMI/FannieMaeProduct/LoanType/LTV/FICO"]["true"]["HomeReady"]["ARM"][secondary_key][ltv_key] = value
+                      @home_hash["EPMI/FreddieMacProduct/LoanType/LTV/FICO"]["true"]["HomePossible"]["ARM"][secondary_key][ltv_key] = value
                     end
                     if r >= 50 && r <= 53 && cc == 5
                       secondary_key = get_value value
-                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["15"][secondary_key] = {}
-                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["20"][secondary_key] = {}
-                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["15"][secondary_key] = {}
-                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["20"][secondary_key] = {}
+                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["15"][secondary_key] = {}
+                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["20"][secondary_key] = {}
+                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["15"][secondary_key] = {}
+                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["20"][secondary_key] = {}
                     end
                     if r >= 50 && r <= 53 && cc >= 7 && cc <= 14
                       if @sub_data[cc-1].include?("+")
@@ -1742,19 +1742,19 @@ class ObCmgWholesalesController < ApplicationController
                       else
                         ltv_key = get_value @sub_data[cc-1]
                       end
-                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["15"][secondary_key][ltv_key] = {}
-                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["20"][secondary_key][ltv_key] = {}
-                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["15"][secondary_key][ltv_key] = value
-                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"][true]["HomePossible"]["Fixed"]["20"][secondary_key][ltv_key] = value
+                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["15"][secondary_key][ltv_key] = {}
+                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["20"][secondary_key][ltv_key] = {}
+                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["15"][secondary_key][ltv_key] = value
+                      @home_hash["EPMI/FreddieMacProduct/LoanType/Term/LTV/FICO"]["true"]["HomePossible"]["Fixed"]["20"][secondary_key][ltv_key] = value
 
-                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["15"][secondary_key][ltv_key] = {}
-                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["20"][secondary_key][ltv_key] = {}
-                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["15"][secondary_key][ltv_key] = value
-                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"][true]["HomeReady"]["Fixed"]["20"][secondary_key][ltv_key] = value
+                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["15"][secondary_key][ltv_key] = {}
+                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["20"][secondary_key][ltv_key] = {}
+                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["15"][secondary_key][ltv_key] = value
+                      @home_hash["EPMI/FannieMaeProduct/LoanType/Term/LTV/FICO"]["true"]["HomeReady"]["Fixed"]["20"][secondary_key][ltv_key] = value
                     end
                     # EPMI (in addition to adjustments above)
                     if r == 55 && cc == 3
-                      @property_hash["EPMI/RefinanceOption/FICO"][true]["Rate and Term"] = {}
+                      @property_hash["EPMI/RefinanceOption/FICO"]["true"]["Rate and Term"] = {}
                     end
                     if r == 55 && cc >= 7 && cc <= 14
                       if @sub_data[cc-1].include?("+")
@@ -1762,11 +1762,11 @@ class ObCmgWholesalesController < ApplicationController
                       else
                         ltv_key = get_value @sub_data[cc-1]
                       end
-                      @property_hash["EPMI/RefinanceOption/FICO"][true]["Rate and Term"][ltv_key] = {}
-                      @property_hash["EPMI/RefinanceOption/FICO"][true]["Rate and Term"][ltv_key] = value
+                      @property_hash["EPMI/RefinanceOption/FICO"]["true"]["Rate and Term"][ltv_key] = {}
+                      @property_hash["EPMI/RefinanceOption/FICO"]["true"]["Rate and Term"][ltv_key] = value
                     end
                     if r == 56 && cc == 3
-                      @property_hash["EPMI/RefinanceOption/FICO"][true]["Cash Out"] = {}
+                      @property_hash["EPMI/RefinanceOption/FICO"]["true"]["Cash Out"] = {}
                     end
                     if r == 56 && cc >= 7 && cc <= 14
                       if @sub_data[cc-1].include?("+")
@@ -1774,12 +1774,12 @@ class ObCmgWholesalesController < ApplicationController
                       else
                         ltv_key = get_value @sub_data[cc-1]
                       end
-                      @property_hash["EPMI/RefinanceOption/FICO"][true]["Cash Out"][ltv_key] = {}
-                      @property_hash["EPMI/RefinanceOption/FICO"][true]["Cash Out"][ltv_key] = value
+                      @property_hash["EPMI/RefinanceOption/FICO"]["true"]["Cash Out"][ltv_key] = {}
+                      @property_hash["EPMI/RefinanceOption/FICO"]["true"]["Cash Out"][ltv_key] = value
                     end
                     if r >= 57 && r <= 58 && cc == 3
                       secondary_key = value
-                      @property_hash["EPMI/PropertyType/FICO"][true][secondary_key] = {}
+                      @property_hash["EPMI/PropertyType/FICO"]["true"][secondary_key] = {}
                     end
                     if r >= 57 && r <= 58 && cc >= 7 && cc <= 14
                       if @sub_data[cc-1].include?("+")
@@ -1787,8 +1787,8 @@ class ObCmgWholesalesController < ApplicationController
                       else
                         ltv_key = get_value @sub_data[cc-1]
                       end
-                      @property_hash["EPMI/PropertyType/FICO"][true][secondary_key][ltv_key] = {}
-                      @property_hash["EPMI/PropertyType/FICO"][true][secondary_key][ltv_key] = value
+                      @property_hash["EPMI/PropertyType/FICO"]["true"][secondary_key][ltv_key] = {}
+                      @property_hash["EPMI/PropertyType/FICO"]["true"][secondary_key][ltv_key] = value
                     end
                   end
                 rescue Exception => e
@@ -3369,7 +3369,7 @@ class ObCmgWholesalesController < ApplicationController
                 if value.present?
                   if value == "FLEX JUMBO 6400 SERIES ADJUSTMENTS"
                     @flex_hash["Jumbo/FICO/LTV"] = {}
-                    @flex_hash["Jumbo/FICO/LTV"][true] = {}
+                    @flex_hash["Jumbo/FICO/LTV"]["true"] = {}
                   end
                   if r >= 14 && r <= 19 && cc == 10
                     if value.include?("-")
@@ -3377,12 +3377,12 @@ class ObCmgWholesalesController < ApplicationController
                     else
                       secondary_key = get_value value
                     end
-                    @flex_hash["Jumbo/FICO/LTV"][true][secondary_key] = {}
+                    @flex_hash["Jumbo/FICO/LTV"]["true"][secondary_key] = {}
                   end
                   if r >= 14 && r <= 19 && cc >= 12 && cc <= 16
                     cltv_key = get_value @cltv_data[cc-1]
-                    @flex_hash["Jumbo/FICO/LTV"][true][secondary_key][cltv_key] = {}
-                    @flex_hash["Jumbo/FICO/LTV"][true][secondary_key][cltv_key] = value
+                    @flex_hash["Jumbo/FICO/LTV"]["true"][secondary_key][cltv_key] = {}
+                    @flex_hash["Jumbo/FICO/LTV"]["true"][secondary_key][cltv_key] = value
                   end
                 end
               rescue Exception => e

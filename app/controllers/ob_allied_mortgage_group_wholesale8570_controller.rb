@@ -92,78 +92,78 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 if value.present?
                   if value == "FHA & USDA Loan Level Adjustments"
                     @fha_adjustment["FHA/USDA/FICO"] = {}
-                    @fha_adjustment["FHA/USDA/FICO"][true] = {}
-                    @fha_adjustment["FHA/USDA/FICO"][true][true] = {}
+                    @fha_adjustment["FHA/USDA/FICO"]["true"] = {}
+                    @fha_adjustment["FHA/USDA/FICO"]["true"]["true"] = {}
                   end
                   if r >=41 && r <= 45 && cc == 17
                     first_key = get_value value
                     ccc = cc + 3
                     c_val = sheet_data.cell(r,ccc)
-                    @fha_adjustment["FHA/USDA/FICO"][true][true][first_key] = c_val
+                    @fha_adjustment["FHA/USDA/FICO"]["true"]["true"][first_key] = c_val
                   end
                   if r == 46 && cc == 17
                     @fha_adjustment["FHA/USDA/LoanPurpose"] = {}
-                    @fha_adjustment["FHA/USDA/LoanPurpose"][true] = {}
-                    @fha_adjustment["FHA/USDA/LoanPurpose"][true][true] = {}
-                    @fha_adjustment["FHA/USDA/LoanPurpose"][true][true]["Refinance"] = {}
+                    @fha_adjustment["FHA/USDA/LoanPurpose"]["true"] = {}
+                    @fha_adjustment["FHA/USDA/LoanPurpose"]["true"]["true"] = {}
+                    @fha_adjustment["FHA/USDA/LoanPurpose"]["true"]["true"]["Refinance"] = {}
                     cc = cc + 3
                     new_val = sheet_data.cell(r,cc)
-                    @fha_adjustment["FHA/USDA/LoanPurpose"][true][true]["Refinance"] = new_val
+                    @fha_adjustment["FHA/USDA/LoanPurpose"]["true"]["true"]["Refinance"] = new_val
                   end
                   if r == 47 && cc == 17
                     @fha_adjustment["FHA/USDA"] = {}
-                    @fha_adjustment["FHA/USDA"][true] = {}
-                    @fha_adjustment["FHA/USDA"][true][true] = {}
+                    @fha_adjustment["FHA/USDA"]["true"] = {}
+                    @fha_adjustment["FHA/USDA"]["true"]["true"] = {}
                     cc = cc + 3
                     new_val = sheet_data.cell(r,cc)
-                    @fha_adjustment["FHA/USDA"][true][true] = new_val
+                    @fha_adjustment["FHA/USDA"]["true"]["true"] = new_val
                   end
                   if r == 48 && cc == 17
                     @fha_adjustment["FHA/USDA/LoanSize/FICO"] = {}
-                    @fha_adjustment["FHA/USDA/LoanSize/FICO"][true] = {}
-                    @fha_adjustment["FHA/USDA/LoanSize/FICO"][true][true] = {}
-                    @fha_adjustment["FHA/USDA/LoanSize/FICO"][true][true]["High-Balance"] = {}
-                    @fha_adjustment["FHA/USDA/LoanSize/FICO"][true][true]["High-Balance"]["0-680"] = {}
+                    @fha_adjustment["FHA/USDA/LoanSize/FICO"]["true"] = {}
+                    @fha_adjustment["FHA/USDA/LoanSize/FICO"]["true"]["true"] = {}
+                    @fha_adjustment["FHA/USDA/LoanSize/FICO"]["true"]["true"]["High-Balance"] = {}
+                    @fha_adjustment["FHA/USDA/LoanSize/FICO"]["true"]["true"]["High-Balance"]["0-680"] = {}
                     cc = cc + 3
                     new_val = sheet_data.cell(r,cc)
-                    @fha_adjustment["FHA/USDA/LoanSize/FICO"][true][true]["High-Balance"]["0-680"] = new_val
+                    @fha_adjustment["FHA/USDA/LoanSize/FICO"]["true"]["true"]["High-Balance"]["0-680"] = new_val
                   end
                   if r == 49 && cc == 17
                     @fha_adjustment["FHA/StreamLine/CLTV"] = {}
-                    @fha_adjustment["FHA/StreamLine/CLTV"][true] = {}
-                    @fha_adjustment["FHA/StreamLine/CLTV"][true][true] = {}
-                    @fha_adjustment["FHA/StreamLine/CLTV"][true][true]["100-125"] = {}
+                    @fha_adjustment["FHA/StreamLine/CLTV"]["true"] = {}
+                    @fha_adjustment["FHA/StreamLine/CLTV"]["true"]["true"] = {}
+                    @fha_adjustment["FHA/StreamLine/CLTV"]["true"]["true"]["100-125"] = {}
                     cc = cc + 3
                     new_val = sheet_data.cell(r,cc)
-                    @fha_adjustment["FHA/StreamLine/CLTV"][true][true]["100-125"] = new_val
+                    @fha_adjustment["FHA/StreamLine/CLTV"]["true"]["true"]["100-125"] = new_val
                   end
                   if r == 50 && cc == 17
                     @fha_adjustment["FHA/USDA/PropertyType"] = {}
-                    @fha_adjustment["FHA/USDA/PropertyType"][true] = {}
-                    @fha_adjustment["FHA/USDA/PropertyType"][true][true] = {}
-                    @fha_adjustment["FHA/USDA/PropertyType"][true][true]["Gov'n Non Owner"] = {}
+                    @fha_adjustment["FHA/USDA/PropertyType"]["true"] = {}
+                    @fha_adjustment["FHA/USDA/PropertyType"]["true"]["true"] = {}
+                    @fha_adjustment["FHA/USDA/PropertyType"]["true"]["true"]["Gov'n Non Owner"] = {}
                     cc = cc + 3
                     new_val = sheet_data.cell(r,cc)
-                    @fha_adjustment["FHA/USDA/PropertyType"][true][true]["Gov'n Non Owner"] = new_val
+                    @fha_adjustment["FHA/USDA/PropertyType"]["true"]["true"]["Gov'n Non Owner"] = new_val
                   end
                   if r == 51 && cc == 17
                     @fha_adjustment["FHA/USDA/LoanAmount/FICO"] = {}
-                    @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true] = {}
-                    @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true] = {}
-                    @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true]["0-100000"] = {}
-                    @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true]["0-100000"]["0-640"] = {}
+                    @fha_adjustment["FHA/USDA/LoanAmount/FICO"]["true"] = {}
+                    @fha_adjustment["FHA/USDA/LoanAmount/FICO"]["true"]["true"] = {}
+                    @fha_adjustment["FHA/USDA/LoanAmount/FICO"]["true"]["true"]["0-100000"] = {}
+                    @fha_adjustment["FHA/USDA/LoanAmount/FICO"]["true"]["true"]["0-100000"]["0-640"] = {}
                     cc = cc + 3
                     new_val = sheet_data.cell(r,cc)
-                    @fha_adjustment["FHA/USDA/LoanAmount/FICO"][true][true]["0-100000"]["0-640"] = new_val
+                    @fha_adjustment["FHA/USDA/LoanAmount/FICO"]["true"]["true"]["0-100000"]["0-640"] = new_val
                   end
                   if r == 52 && cc == 17
                     @fha_adjustment["FHA/USDA/State"] = {}
-                    @fha_adjustment["FHA/USDA/State"][true] = {}
-                    @fha_adjustment["FHA/USDA/State"][true][true] = {}
-                    @fha_adjustment["FHA/USDA/State"][true][true]["NY"] = {}
+                    @fha_adjustment["FHA/USDA/State"]["true"] = {}
+                    @fha_adjustment["FHA/USDA/State"]["true"]["true"] = {}
+                    @fha_adjustment["FHA/USDA/State"]["true"]["true"]["NY"] = {}
                     cc = cc + 3
                     new_val = sheet_data.cell(r,cc)
-                    @fha_adjustment["FHA/USDA/State"][true][true]["NY"] = new_val
+                    @fha_adjustment["FHA/USDA/State"]["true"]["true"]["NY"] = new_val
                   end
                 end
               rescue Exception => e
@@ -299,13 +299,13 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                 if value.present?
                   if value == "VA Loan Level Adjustments"
                     @adjustment_hash["VA/FICO"] = {}
-                    @adjustment_hash["VA/FICO"][true] = {}
+                    @adjustment_hash["VA/FICO"]["true"] = {}
                     @adjustment_hash["VA/LoanPurpose/LTV"] = {}
-                    @adjustment_hash["VA/LoanPurpose/LTV"][true] = {}
-                    @adjustment_hash["VA/LoanPurpose/LTV"][true]["Refinance"] = {}
+                    @adjustment_hash["VA/LoanPurpose/LTV"]["true"] = {}
+                    @adjustment_hash["VA/LoanPurpose/LTV"]["true"]["Refinance"] = {}
                     @adjustment_hash["VA/RefinanceOption/LoanAmount"] = {}
-                    @adjustment_hash["VA/RefinanceOption/LoanAmount"][true] = {}
-                    @adjustment_hash["VA/RefinanceOption/LoanAmount"][true]["IRRRL"] = {}
+                    @adjustment_hash["VA/RefinanceOption/LoanAmount"]["true"] = {}
+                    @adjustment_hash["VA/RefinanceOption/LoanAmount"]["true"]["IRRRL"] = {}
                   end
                   if value == "Allied Wholesale Loan Amt Adj *"
                     @loan_amount["LoanAmount"] = {}
@@ -319,35 +319,35 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                     primary_key = get_value value
                     ccc = cc + 3
                     c_val = sheet_data.cell(r,ccc)
-                    @adjustment_hash["VA/FICO"][true][primary_key] = c_val
+                    @adjustment_hash["VA/FICO"]["true"][primary_key] = c_val
                   end
                   if r == 22 && cc == 17
                     @adjustment_hash["VA/LoanSize/FICO"] = {}
-                    @adjustment_hash["VA/LoanSize/FICO"][true] = {}
-                    @adjustment_hash["VA/LoanSize/FICO"][true]["High-Balance"] = {}
-                    @adjustment_hash["VA/LoanSize/FICO"][true]["High-Balance"]["0-680"] = {}
+                    @adjustment_hash["VA/LoanSize/FICO"]["true"] = {}
+                    @adjustment_hash["VA/LoanSize/FICO"]["true"]["High-Balance"] = {}
+                    @adjustment_hash["VA/LoanSize/FICO"]["true"]["High-Balance"]["0-680"] = {}
                     cc == cc + 3
                     new_val = sheet_data.cell(r,cc+3)
-                    @adjustment_hash["VA/LoanSize/FICO"][true]["High-Balance"]["0-680"] = new_val
+                    @adjustment_hash["VA/LoanSize/FICO"]["true"]["High-Balance"]["0-680"] = new_val
                   end
                   if r == 23 && cc == 20
                     primary_key = "90-95"
-                    @adjustment_hash["VA/LoanPurpose/LTV"][true]["Refinance"][primary_key] = {}
-                    @adjustment_hash["VA/LoanPurpose/LTV"][true]["Refinance"][primary_key] = value
+                    @adjustment_hash["VA/LoanPurpose/LTV"]["true"]["Refinance"][primary_key] = {}
+                    @adjustment_hash["VA/LoanPurpose/LTV"]["true"]["Refinance"][primary_key] = value
                   end
                   if r == 24 && cc == 20
                     primary_key = "95-Inf"
-                    @adjustment_hash["VA/LoanPurpose/LTV"][true]["Refinance"][primary_key] = {}
-                    @adjustment_hash["VA/LoanPurpose/LTV"][true]["Refinance"][primary_key] = value
+                    @adjustment_hash["VA/LoanPurpose/LTV"]["true"]["Refinance"][primary_key] = {}
+                    @adjustment_hash["VA/LoanPurpose/LTV"]["true"]["Refinance"][primary_key] = value
                   end
                   if r == 25 && cc == 17
                     @adjustment_hash["VA/RefinanceOption/LTV"] = {}
-                    @adjustment_hash["VA/RefinanceOption/LTV"][true] = {}
-                    @adjustment_hash["VA/RefinanceOption/LTV"][true]["IRRRL"] = {}
-                    @adjustment_hash["VA/RefinanceOption/LTV"][true]["IRRRL"]["105-Inf"] = {}
+                    @adjustment_hash["VA/RefinanceOption/LTV"]["true"] = {}
+                    @adjustment_hash["VA/RefinanceOption/LTV"]["true"]["IRRRL"] = {}
+                    @adjustment_hash["VA/RefinanceOption/LTV"]["true"]["IRRRL"]["105-Inf"] = {}
                     cc = cc + 3
                     new_val = sheet_data.cell(r,cc)
-                    @adjustment_hash["VA/RefinanceOption/LTV"][true]["IRRRL"]["105-Inf"] = new_val
+                    @adjustment_hash["VA/RefinanceOption/LTV"]["true"]["IRRRL"]["105-Inf"] = new_val
                   end
                   if r == 26 && cc == 17
                     @adjustment_hash["State"] = {}
@@ -358,26 +358,26 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   end
                   if r == 28 && cc == 17
                     @adjustment_hash["VA/LoanAmount/FICO"] = {}
-                    @adjustment_hash["VA/LoanAmount/FICO"][true] = {}
-                    @adjustment_hash["VA/LoanAmount/FICO"][true]["0-100000"] = {}
-                    @adjustment_hash["VA/LoanAmount/FICO"][true]["0-100000"]["0-640"] = {}
+                    @adjustment_hash["VA/LoanAmount/FICO"]["true"] = {}
+                    @adjustment_hash["VA/LoanAmount/FICO"]["true"]["0-100000"] = {}
+                    @adjustment_hash["VA/LoanAmount/FICO"]["true"]["0-100000"]["0-640"] = {}
                     cc = cc + 3
                     new_val = sheet_data.cell(r,cc + 3)
-                    @adjustment_hash["VA/LoanAmount/FICO"][true]["0-100000"]["0-640"] = new_val
+                    @adjustment_hash["VA/LoanAmount/FICO"]["true"]["0-100000"]["0-640"] = new_val
                   end
                   if r == 30 && cc == 17
                     primary_key = "0-75000"
-                    @adjustment_hash["VA/RefinanceOption/LoanAmount"][true]["IRRRL"][primary_key] = {}
+                    @adjustment_hash["VA/RefinanceOption/LoanAmount"]["true"]["IRRRL"][primary_key] = {}
                     cc = cc + 3
                     new_val = sheet_data.cell(r,cc)
-                    @adjustment_hash["VA/RefinanceOption/LoanAmount"][true]["IRRRL"][primary_key] = new_val
+                    @adjustment_hash["VA/RefinanceOption/LoanAmount"]["true"]["IRRRL"][primary_key] = new_val
                   end
                   if r == 31 && cc == 17
                     primary_key = "75000-99999"
-                    @adjustment_hash["VA/RefinanceOption/LoanAmount"][true]["IRRRL"][primary_key] = {}
+                    @adjustment_hash["VA/RefinanceOption/LoanAmount"]["true"]["IRRRL"][primary_key] = {}
                     cc = cc + 3
                     new_val = sheet_data.cell(r,cc)
-                    @adjustment_hash["VA/RefinanceOption/LoanAmount"][true]["IRRRL"][primary_key] = new_val
+                    @adjustment_hash["VA/RefinanceOption/LoanAmount"]["true"]["IRRRL"][primary_key] = new_val
                   end
                   if r >= 37 && r <= 45 && cc == 17
                     if value.include?("to")
@@ -583,11 +583,11 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   end
                   if r == 73 && cc == 13
                     @other_adjustment["FreddieMac/FICO"] = {}
-                    @other_adjustment["FreddieMac/FICO"][true] = {}
-                    @other_adjustment["FreddieMac/FICO"][true]["640-679"] = {}
+                    @other_adjustment["FreddieMac/FICO"]["true"] = {}
+                    @other_adjustment["FreddieMac/FICO"]["true"]["640-679"] = {}
                     cc = cc + 7
                     new_val = sheet_data.cell(r,cc)
-                    @other_adjustment["FreddieMac/FICO"][true]["640-679"] = new_val
+                    @other_adjustment["FreddieMac/FICO"]["true"]["640-679"] = new_val
                   end
                   if r == 74 && cc == 13
                     @other_adjustment["LoanSize/FICO"] = {}
