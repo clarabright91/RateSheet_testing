@@ -2350,8 +2350,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 if value.present?
                   if value == "FICO/LTV Adjustments - Loan Amount ≤ $1MM"
                     @adjustment_hash["LoanAmount/FICO/LTV"] = {}
-                    @adjustment_hash["LoanAmount/FICO/LTV"]["0-1,000,000"] = {}
-                    @adjustment_hash["LoanAmount/FICO/LTV"]["1,000,000-#{(Float::INFINITY).to_s.downcase}"] = {}
+                    @adjustment_hash["LoanAmount/FICO/LTV"]["0-1000000"] = {}
+                    @adjustment_hash["LoanAmount/FICO/LTV"]["1000000-#{(Float::INFINITY).to_s.downcase}"] = {}
                   end
                   if value == "Feature Adjustments"
                     @property_hash["PropertyType/LTV"] = {}
@@ -2366,7 +2366,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     else
                       primary_key = value
                     end
-                    @adjustment_hash["LoanAmount/FICO/LTV"]["0-1,000,000"][primary_key] = {}
+                    @adjustment_hash["LoanAmount/FICO/LTV"]["0-1000000"][primary_key] = {}
                   end
                   if r >= 45 && r <= 51 && cc >= 4 && cc <= 9
                     if @ltv_data[cc-1].include?("<")
@@ -2374,8 +2374,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     else
                       ltv_key = @ltv_data[cc-1]
                     end
-                    @adjustment_hash["LoanAmount/FICO/LTV"]["0-1,000,000"][primary_key][ltv_key] = {}
-                    @adjustment_hash["LoanAmount/FICO/LTV"]["0-1,000,000"][primary_key][ltv_key] = value
+                    @adjustment_hash["LoanAmount/FICO/LTV"]["0-1000000"][primary_key][ltv_key] = {}
+                    @adjustment_hash["LoanAmount/FICO/LTV"]["0-1000000"][primary_key][ltv_key] = value
                   end
                   # State Adjustments
                   if r >= 45 && r <= 61 && cc == 11
@@ -2406,7 +2406,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     else
                       primary_key = value
                     end
-                    @adjustment_hash["LoanAmount/FICO/LTV"]["1,000,000-#{(Float::INFINITY).to_s.downcase}"][primary_key] = {}
+                    @adjustment_hash["LoanAmount/FICO/LTV"]["1000000-#{(Float::INFINITY).to_s.downcase}"][primary_key] = {}
                   end
                   if r >= 55 && r <= 61 && cc >= 4 && cc <= 9
                     if @ltv_data[cc-1].include?("<")
@@ -2414,8 +2414,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     else
                       ltv_key = @ltv_data[cc-1]
                     end
-                    @adjustment_hash["LoanAmount/FICO/LTV"]["1,000,000-#{(Float::INFINITY).to_s.downcase}"][primary_key][ltv_key] = {}
-                    @adjustment_hash["LoanAmount/FICO/LTV"]["1,000,000-#{(Float::INFINITY).to_s.downcase}"][primary_key][ltv_key] = value
+                    @adjustment_hash["LoanAmount/FICO/LTV"]["1000000-#{(Float::INFINITY).to_s.downcase}"][primary_key][ltv_key] = {}
+                    @adjustment_hash["LoanAmount/FICO/LTV"]["1000000-#{(Float::INFINITY).to_s.downcase}"][primary_key][ltv_key] = value
                   end
                   # Max Price
                   if r == 64 && cc == 11
