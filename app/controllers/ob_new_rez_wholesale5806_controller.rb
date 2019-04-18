@@ -6705,8 +6705,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @property_hash["LPMI/RefinanceOption/FICO"][true] = {}
                     @property_hash["LPMI/RefinanceOption/FICO"][true]["Rate and Term"] = {}
                   end
-                  if r == 98 && cc >= 10 && cc <= 19
-                    ltv_key = get_value @ltv_data[cc-2]
+                  if r == 98 && cc >= 7 && cc <= 19
+                    ltv_key = get_value @ltv_data[cc+1]
                     @property_hash["LPMI/RefinanceOption/FICO"][true]["Rate and Term"][ltv_key] = {}
                     @property_hash["LPMI/RefinanceOption/FICO"][true]["Rate and Term"][ltv_key] = value
                   end
@@ -6714,8 +6714,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     primary_key = value
                     @property_hash["LPMI/PropertyType/FICO"][true][primary_key] = {}
                   end
-                  if r >= 99 && r <= 100 && cc >= 10 && cc <= 19
-                    ltv_key = get_value @ltv_data[cc-2]
+                  if r >= 99 && r <= 100 && cc >= 7 && cc <= 19
+                    ltv_key = get_value @ltv_data[cc+1]
                     @property_hash["LPMI/PropertyType/FICO"][true][primary_key][ltv_key] = {}
                     @property_hash["LPMI/PropertyType/FICO"][true][primary_key][ltv_key] = value
                   end
@@ -7054,8 +7054,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @property_hash["LPMI/RefinanceOption/FICO"][true] = {}
                     @property_hash["LPMI/RefinanceOption/FICO"][true]["Rate and Term"] = {}
                   end
-                  if r == 97 && cc >= 10 && cc <= 19
-                    ltv_key = get_value @ltv_data[cc-2]
+                  if r == 97 && cc >= 7 && cc <= 19
+                    ltv_key = get_value @ltv_data[cc+1]
                     @property_hash["LPMI/RefinanceOption/FICO"][true]["Rate and Term"][ltv_key] = {}
                     @property_hash["LPMI/RefinanceOption/FICO"][true]["Rate and Term"][ltv_key] = value
                   end
@@ -7063,8 +7063,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     primary_key = value
                     @property_hash["LPMI/PropertyType/FICO"][true][primary_key] = {}
                   end
-                  if r >= 98 && r <= 99 && cc >= 10 && cc <= 19
-                    ltv_key = get_value @ltv_data[cc-2]
+                  if r >= 98 && r <= 99 && cc >= 7 && cc <= 19
+                    ltv_key = get_value @ltv_data[cc+1]
                     @property_hash["LPMI/PropertyType/FICO"][true][primary_key][ltv_key] = {}
                     @property_hash["LPMI/PropertyType/FICO"][true][primary_key][ltv_key] = value
                   end
