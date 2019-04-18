@@ -1349,6 +1349,7 @@ class ObCardinalFinancialWholesale10742Controller < ApplicationController
                   program_filter2[key_name.underscore] = true
                 end
               end
+              include_in_input_values = true
             else
               if(Adjustment::INPUT_VALUES.include?(key_name))
                 include_in_input_values = true
