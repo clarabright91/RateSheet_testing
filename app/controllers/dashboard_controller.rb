@@ -267,7 +267,7 @@ class DashboardController < ApplicationController
             if loan_amount_key.include?("-")
                 first_value_range = loan_amount_key.split("-").first.strip.to_i
                 last_value_range = loan_amount_key.split("-").last.strip.to_i
-                if (first_value_range.between?(first_range, last_range) || last_value_range.between?(first_range, last_range))
+                if (first_value_range.between?(first_range, ((last_range-1))) || last_value_range.between?(first_range, ((last_range-1))))
                   loan_amount_key2 = loan_amount_key
                 end
             end
@@ -378,6 +378,32 @@ class DashboardController < ApplicationController
       end
     end
     return cltv_key2
+  end
+
+  def term_key_of_adjustment(term_keys)
+    term_key2 = ''
+    term_keys.each do |term_key|
+      if term_key.include?("-")
+        if term_key.include?("Inf") || term_key.include?("Infinite")
+          if (term_key.split("-").first.strip.to_i <= @term)
+            term_key2 = term_key
+          else
+            break
+          end
+        elsif term_key.include?("-")
+          if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
+            term_key2 = term_key
+          else
+            break
+          end
+        end
+      else
+        if (term_key.to_i == @term)
+          term_key2 = term_key
+        end
+      end
+    end
+    return term_key2
   end
 
   def fico_key_of_adjustment(fico_keys)
@@ -934,21 +960,12 @@ class DashboardController < ApplicationController
 
                 if key_name == "Term"
                   begin
-                    term_key = adj.data[first_key].keys.first
-                    if term_key.include?("Inf") || term_key.include?("Infinite")
-                      if (term_key.split("-").first.strip.to_i <= @term)
-                        adj.data[first_key][term_key]
-                        adj_key_hash[key_index] = term_key
-                      else
-                        break
-                      end
-                    elsif term_key.include?("-")
-                      if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
-                        adj.data[first_key][term_key]
-                        adj_key_hash[key_index] = term_key
-                      else
-                        break
-                      end
+                    term_key2 = ''
+                    term_key2 = term_key_of_adjustment(adj.data[first_key].keys)
+                    if term_key2.present?
+                      adj_key_hash[key_index] = term_key2
+                    else
+                      break
                     end
                   rescue Exception
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Loan Category: #{adj.loan_category}"
@@ -1236,21 +1253,12 @@ class DashboardController < ApplicationController
 
                 if key_name == "Term"
                   begin
-                    term_key = adj.data[first_key][adj_key_hash[key_index-1]].keys.first
-                    if term_key.include?("Inf") || term_key.include?("Infinite")
-                      if (term_key.split("-").first.strip.to_i <= @term)
-                        adj.data[first_key][adj_key_hash[key_index-1]][term_key]
-                        adj_key_hash[key_index] = term_key
-                      else
-                        break
-                      end
-                    elsif term_key.include?("-")
-                      if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
-                        adj.data[first_key][adj_key_hash[key_index-1]][term_key]
-                        adj_key_hash[key_index] = term_key
-                      else
-                        break
-                      end
+                    term_key2 = ''
+                    term_key2 = term_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-1]].keys)
+                    if term_key2.present?
+                      adj_key_hash[key_index] = term_key2
+                    else
+                      break
                     end
                   rescue Exception
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Loan Category: #{adj.loan_category}"
@@ -1536,21 +1544,12 @@ class DashboardController < ApplicationController
                 end
                 if key_name == "Term"
                   begin
-                    term_key = adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
-                    if term_key.include?("Inf") || term_key.include?("Infinite")
-                      if (term_key.split("-").first.strip.to_i <= @term)
-                        adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
-                        adj_key_hash[key_index] = term_key
-                      else
-                        break
-                      end
-                    elsif term_key.include?("-")
-                      if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
-                        adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
-                        adj_key_hash[key_index] = term_key
-                      else
-                        break
-                      end
+                    term_key2 = ''
+                    term_key2 = term_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+                    if term_key2.present?
+                      adj_key_hash[key_index] = term_key2
+                    else
+                      break
                     end
                   rescue Exception
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Loan Category: #{adj.loan_category}"
@@ -1836,21 +1835,12 @@ class DashboardController < ApplicationController
                 end
                 if key_name == "Term"
                   begin
-                    term_key = adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
-                    if term_key.include?("Inf") || term_key.include?("Infinite")
-                      if (term_key.split("-").first.strip.to_i <= @term)
-                        adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
-                        adj_key_hash[key_index] = term_key
-                      else
-                        break
-                      end
-                    elsif term_key.include?("-")
-                      if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
-                        adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
-                        adj_key_hash[key_index] = term_key
-                      else
-                        break
-                      end
+                    term_key2 = ''
+                    term_key2 = term_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+                    if term_key2.present?
+                      adj_key_hash[key_index] = term_key2
+                    else
+                      break
                     end
                   rescue Exception
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Loan Category: #{adj.loan_category}"
@@ -2136,21 +2126,12 @@ class DashboardController < ApplicationController
 
                 if key_name == "Term"
                   begin
-                    term_key = adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
-                    if term_key.include?("Inf") || term_key.include?("Infinite")
-                      if (term_key.split("-").first.strip.to_i <= @term)
-                        adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
-                        adj_key_hash[key_index] = term_key
-                      else
-                        break
-                      end
-                    elsif term_key.include?("-")
-                      if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
-                        adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
-                        adj_key_hash[key_index] = term_key
-                      else
-                        break
-                      end
+                    term_key2 = ''
+                    term_key2 = term_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+                    if term_key2.present?
+                      adj_key_hash[key_index] = term_key2
+                    else
+                      break
                     end
                   rescue Exception
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Loan Category: #{adj.loan_category}"
@@ -2436,21 +2417,12 @@ class DashboardController < ApplicationController
                 end
                 if key_name == "Term"
                   begin
-                    term_key = adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
-                    if term_key.include?("Inf") || term_key.include?("Infinite")
-                      if (term_key.split("-").first.strip.to_i <= @term)
-                        adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
-                        adj_key_hash[key_index] = term_key
-                      else
-                        break
-                      end
-                    elsif term_key.include?("-")
-                      if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
-                        adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
-                        adj_key_hash[key_index] = term_key
-                      else
-                        break
-                      end
+                    term_key2 = ''
+                    term_key2 = term_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+                    if term_key2.present?
+                      adj_key_hash[key_index] = term_key2
+                    else
+                      break
                     end
                   rescue Exception
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Loan Category: #{adj.loan_category}"
@@ -2739,21 +2711,12 @@ class DashboardController < ApplicationController
 
                 if key_name == "Term"
                   begin
-                    term_key = adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.first
-                    if term_key.include?("Inf") || term_key.include?("Infinite")
-                      if (term_key.split("-").first.strip.to_i <= @term)
-                        adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
-                        adj_key_hash[key_index] = term_key
-                      else
-                        break
-                      end
-                    elsif term_key.include?("-")
-                      if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
-                        adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]][term_key]
-                        adj_key_hash[key_index] = term_key
-                      else
-                        break
-                      end
+                    term_key2 = ''
+                    term_key2 = term_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+                    if term_key2.present?
+                      adj_key_hash[key_index] = term_key2
+                    else
+                      break
                     end
                   rescue Exception
                     puts "Adjustment Error: Adjustment Id: #{adj.id}, Adjustment Primary Key: #{first_key}, Key Name: #{key_name}, Loan Category: #{adj.loan_category}"

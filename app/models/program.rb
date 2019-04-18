@@ -45,7 +45,7 @@ class Program < ApplicationRecord
 
   REFINANCE_OPTION_VALUES = [["Cash Out"], ["Rate and Term"], ["IRRRL"]]
 
-  MISC_ADJUSTER_VALUES = [["CA Escrow Waiver (Full or Taxes Only)"], ["CA Escrow Waiver (Insurance Only)"], ["Miscellaneous"], ["Escrow Waiver Fee"], ["Escrow Waiver (LTVs >80%; CA only)"]]
+  MISC_ADJUSTER_VALUES = [["CA Escrow Waiver (Full or Taxes Only)"], ["CA Escrow Waiver (Insurance Only)"], ["Miscellaneous"], ["Escrow Waiver Fee"], ["Escrow Waiver (LTVs >80%; CA only)"], ["Escrow Waiver (N/A for: CA, CT, ME, MT, NY, RI, SD, UT, VT, WV)"]]
 
   PATMENT_TYPE_VALUES = [["Principal and Interest"], ["Interest Only"]]
 

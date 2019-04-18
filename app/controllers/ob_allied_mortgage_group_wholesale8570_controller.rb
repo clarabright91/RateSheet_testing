@@ -826,7 +826,6 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
     def create_program_association_with_adjustment(sheet)
       adjustment_list = Adjustment.where(loan_category: sheet)
       program_list = Program.where(loan_category: sheet)
-
       adjustment_list.each_with_index do |adj_ment, index|
         key_list = adj_ment.data.keys.first.split("/")
         program_filter1={}
@@ -842,6 +841,7 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   program_filter2[key_name.underscore] = true
                 end
               end
+              include_in_input_values = true
             else
               if(Adjustment::INPUT_VALUES.include?(key_name))
                 include_in_input_values = true
