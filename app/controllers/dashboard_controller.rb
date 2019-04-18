@@ -99,19 +99,6 @@ class DashboardController < ApplicationController
           instance_variable_set("@#{key}", array_data.uniq)
         end
       end
-      # key_value = params[key.to_sym]
-      # if key_value.present?
-      #   if key_value.include?("-")
-      #     key_range = (key_value.split("-").first.to_f..key_value.split("-").last.to_f)
-      #     key_range.step(0.01) { |f| array_data << f }
-      #     instance_variable_set("@#{key}", array_data.uniq)
-      #   elsif key_value.include?("+")
-      #     score = key.eql?('credit_score') ? 100 : 60
-      #     key_range = (key_value.to_f..(key_value.to_f+score))
-      #     key_range.step(0.01) { |f| array_data << f }
-      #     instance_variable_set("@#{key}", array_data.uniq)
-      #   end
-      # end
     end
   end
 
@@ -220,6 +207,7 @@ class DashboardController < ApplicationController
   def set_flag_loan_type(flag)
     @flag_loan_type = flag
   end
+
   def set_variable
     modified_ltv_cltv_credit_score
     modified_condition
@@ -327,10 +315,7 @@ class DashboardController < ApplicationController
         if ltv_key.include?("Inf") || ltv_key.include?("Infinity")
           first_range = ltv_key.split("-").first.strip.to_f
           if params[:ltv].include?("+")
-            full_range = params[:ltv].split("+").first.strip.to_f
-            if (full_range <= first_range)
               ltv_key2 = ltv_key
-            end
           else
             if first_range <= @ltv.last
               ltv_key2 = ltv_key
@@ -368,10 +353,7 @@ class DashboardController < ApplicationController
         if cltv_key.include?("Inf") || cltv_key.include?("Infinity")
           first_range = cltv_key.split("-").first.strip.to_f
           if params[:cltv].include?("+")
-            full_range = params[:cltv].split("+").first.strip.to_f
-            if (full_range <= first_range)
               cltv_key2 = cltv_key
-            end
           else
             if first_range <= @ltv.last
               cltv_key2 = cltv_key
@@ -396,6 +378,42 @@ class DashboardController < ApplicationController
       end
     end
     return cltv_key2
+  end
+
+  def fico_key_of_adjustment(fico_keys)
+    fico_key2 = ''
+    fico_keys.each do |fico_key|
+      if (fico_key.include?("Any") || fico_key.include?("All"))
+        fico_key2 = fico_key
+      end
+      if fico_key.include?("-")
+        fico_key_range =[]
+        if fico_key.include?("Inf") || fico_key.include?("Infinity")
+          first_range = fico_key.split("-").first.strip.to_i
+          if params[:credit_score].include?("+")
+              fico_key2 = fico_key
+          else
+            if first_range <= @credit_score.last
+              fico_key2 = fico_key
+            end
+          end
+        else
+          first_range = fico_key.split("-").first.strip.to_i
+          last_range =  fico_key.split("-").last.strip.to_i
+          if params[:credit_score].include?("+")
+            full_range = params[:credit_score].split("+").first.strip.to_i
+            if (full_range >= first_range && full_range < last_range )
+              fico_key2 = fico_key
+            end
+          else
+            if (@credit_score & (first_range..last_range).to_a).present?
+              fico_key2 = fico_key
+            end
+          end
+        end
+      end
+    end
+    return fico_key2
   end
 
   def find_programs_on_term_based(programs, find_term)
@@ -528,7 +546,6 @@ class DashboardController < ApplicationController
     if total_searched_program.present?
       find_points_of_the_loan total_searched_program
     end
-
   end
 
   def search_programs_with_selected_loan_type
@@ -803,33 +820,12 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key].present?
                       fico_key2 = ''
-                        adj.data[first_key].keys.each do |fico_key|
-                          if (fico_key.include?("Any") || fico_key.include?("All"))
-                            fico_key2 = fico_key
-                            adj_key_hash[key_index] = fico_key
-                          end
-                          if fico_key.include?("-")
-                            fico_key_range =[]
-                            if fico_key.include?("Inf") || fico_key.include?("Infinity")
-                              (fico_key.split("-").first.strip.to_f..fico_key.split("-").first.strip.to_f+60).step(0.01) { |f| fico_key_range << f }
-                              fico_key_range = fico_key_range.uniq
-                              if (fico_key_range & @credit_score).present?
-                                fico_key2 = fico_key
-                                adj_key_hash[key_index] = fico_key
-                              end
-                            else
-                              (fico_key.split("-").first.strip.to_f..fico_key.split("-").last.strip.to_f).step(0.01) { |f| fico_key_range << f }
-                              fico_key_range = fico_key_range.uniq
-                              if (fico_key_range & @credit_score).present?
-                                fico_key2 = fico_key
-                                adj_key_hash[key_index] = fico_key
-                              end
-                            end
-                          end
-                        end
-                        unless fico_key2.present?
-                          break
-                        end
+                      fico_key2 = fico_key_of_adjustment(adj.data[first_key].keys)
+                      if fico_key2.present?
+                        adj_key_hash[key_index] = fico_key2
+                      else
+                        break
+                      end
                     else
                       break
                     end
@@ -890,7 +886,6 @@ class DashboardController < ApplicationController
                     if adj.data[first_key].present?
                       ltv_key2 = ''
                       cltv_key2 = cltv_key_of_adjustment(adj.data[first_key].keys)
-
                       if cltv_key2.present?
                         adj_key_hash[key_index] = cltv_key2
                       else
@@ -1128,33 +1123,12 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-1]].present?
                       fico_key2 = ''
-                        adj.data[first_key][adj_key_hash[key_index-1]].keys.each do |fico_key|
-                          if (fico_key.include?("Any") || fico_key.include?("All"))
-                            fico_key2 = fico_key
-                            adj_key_hash[key_index] = fico_key
-                          end
-                          if fico_key.include?("-")
-                            fico_key_range =[]
-                            if fico_key.include?("Inf") || fico_key.include?("Infinity")
-                              (fico_key.split("-").first.strip.to_f..fico_key.split("-").first.strip.to_f+60).step(0.01) { |f| fico_key_range << f }
-                              fico_key_range = fico_key_range.uniq
-                              if (fico_key_range & @credit_score).present?
-                                fico_key2 = fico_key
-                                adj_key_hash[key_index] = fico_key
-                              end
-                            else
-                              (fico_key.split("-").first.strip.to_f..fico_key.split("-").last.strip.to_f).step(0.01) { |f| fico_key_range << f }
-                              fico_key_range = fico_key_range.uniq
-                              if (fico_key_range & @credit_score).present?
-                                fico_key2 = fico_key
-                                adj_key_hash[key_index] = fico_key
-                              end
-                            end
-                          end
-                        end
-                        unless fico_key2.present?
-                          break
-                        end
+                      fico_key2 = fico_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-1]].keys)
+                      if fico_key2.present?
+                        adj_key_hash[key_index] = fico_key2
+                      else
+                        break
+                      end
                     else
                       break
                     end
@@ -1214,7 +1188,6 @@ class DashboardController < ApplicationController
                     if adj.data[first_key][adj_key_hash[key_index-1]].present?
                       cltv_key2 = ''
                       cltv_key2 = cltv_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-1]].keys)
-
                       if cltv_key2.present?
                         adj_key_hash[key_index] = cltv_key2
                       else
@@ -1452,33 +1425,12 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       fico_key2 = ''
-                        adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |fico_key|
-                          if (fico_key.include?("Any") || fico_key.include?("All"))
-                            fico_key2 = fico_key
-                            adj_key_hash[key_index] = fico_key
-                          end
-                          if fico_key.include?("-")
-                            fico_key_range =[]
-                            if fico_key.include?("Inf") || fico_key.include?("Infinity")
-                              (fico_key.split("-").first.strip.to_f..fico_key.split("-").first.strip.to_f+60).step(0.01) { |f| fico_key_range << f }
-                              fico_key_range = fico_key_range.uniq
-                              if (fico_key_range & @credit_score).present?
-                                fico_key2 = fico_key
-                                adj_key_hash[key_index] = fico_key
-                              end
-                            else
-                              (fico_key.split("-").first.strip.to_f..fico_key.split("-").last.strip.to_f).step(0.01) { |f| fico_key_range << f }
-                              fico_key_range = fico_key_range.uniq
-                              if (fico_key_range & @credit_score).present?
-                                fico_key2 = fico_key
-                                adj_key_hash[key_index] = fico_key
-                              end
-                            end
-                          end
-                        end
-                        unless fico_key2.present?
-                          break
-                        end
+                      fico_key2 = fico_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+                      if fico_key2.present?
+                        adj_key_hash[key_index] = fico_key2
+                      else
+                        break
+                      end
                     else
                       break
                     end
@@ -1537,7 +1489,6 @@ class DashboardController < ApplicationController
                     if adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       cltv_key2 = ''
                       cltv_key2 = cltv_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
-
                       if cltv_key2.present?
                         adj_key_hash[key_index] = cltv_key2
                       else
@@ -1774,33 +1725,12 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       fico_key2 = ''
-                        adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |fico_key|
-                          if (fico_key.include?("Any") || fico_key.include?("All"))
-                            fico_key2 = fico_key
-                            adj_key_hash[key_index] = fico_key
-                          end
-                          if fico_key.include?("-")
-                            fico_key_range =[]
-                            if fico_key.include?("Inf") || fico_key.include?("Infinity")
-                              (fico_key.split("-").first.strip.to_f..fico_key.split("-").first.strip.to_f+60).step(0.01) { |f| fico_key_range << f }
-                              fico_key_range = fico_key_range.uniq
-                              if (fico_key_range & @credit_score).present?
-                                fico_key2 = fico_key
-                                adj_key_hash[key_index] = fico_key
-                              end
-                            else
-                              (fico_key.split("-").first.strip.to_f..fico_key.split("-").last.strip.to_f).step(0.01) { |f| fico_key_range << f }
-                              fico_key_range = fico_key_range.uniq
-                              if (fico_key_range & @credit_score).present?
-                                fico_key2 = fico_key
-                                adj_key_hash[key_index] = fico_key
-                              end
-                            end
-                          end
-                        end
-                        unless fico_key2.present?
-                          break
-                        end
+                      fico_key2 = fico_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+                      if fico_key2.present?
+                        adj_key_hash[key_index] = fico_key2
+                      else
+                        break
+                      end
                     else
                       break
                     end
@@ -1859,7 +1789,6 @@ class DashboardController < ApplicationController
                     if adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       cltv_key2 = ''
                       cltv_key2 = cltv_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
-
                       if cltv_key2.present?
                         adj_key_hash[key_index] = cltv_key2
                       else
@@ -2096,33 +2025,12 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       fico_key2 = ''
-                        adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |fico_key|
-                          if (fico_key.include?("Any") || fico_key.include?("All"))
-                            fico_key2 = fico_key
-                            adj_key_hash[key_index] = fico_key
-                          end
-                          if fico_key.include?("-")
-                            fico_key_range =[]
-                            if fico_key.include?("Inf") || fico_key.include?("Infinity")
-                              (fico_key.split("-").first.strip.to_f..fico_key.split("-").first.strip.to_f+60).step(0.01) { |f| fico_key_range << f }
-                              fico_key_range = fico_key_range.uniq
-                              if (fico_key_range & @credit_score).present?
-                                fico_key2 = fico_key
-                                adj_key_hash[key_index] = fico_key
-                              end
-                            else
-                              (fico_key.split("-").first.strip.to_f..fico_key.split("-").last.strip.to_f).step(0.01) { |f| fico_key_range << f }
-                              fico_key_range = fico_key_range.uniq
-                              if (fico_key_range & @credit_score).present?
-                                fico_key2 = fico_key
-                                adj_key_hash[key_index] = fico_key
-                              end
-                            end
-                          end
-                        end
-                        unless fico_key2.present?
-                          break
-                        end
+                      fico_key2 = fico_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+                      if fico_key2.present?
+                        adj_key_hash[key_index] = fico_key2
+                      else
+                        break
+                      end
                     else
                       break
                     end
@@ -2180,7 +2088,6 @@ class DashboardController < ApplicationController
                     if adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       cltv_key2 = ''
                       cltv_key2 = cltv_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
-
                       if cltv_key2.present?
                         adj_key_hash[key_index] = cltv_key2
                       else
@@ -2418,33 +2325,12 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       fico_key2 = ''
-                        adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |fico_key|
-                          if (fico_key.include?("Any") || fico_key.include?("All"))
-                            fico_key2 = fico_key
-                            adj_key_hash[key_index] = fico_key
-                          end
-                          if fico_key.include?("-")
-                            fico_key_range =[]
-                            if fico_key.include?("Inf") || fico_key.include?("Infinity")
-                              (fico_key.split("-").first.strip.to_f..fico_key.split("-").first.strip.to_f+60).step(0.01) { |f| fico_key_range << f }
-                              fico_key_range = fico_key_range.uniq
-                              if (fico_key_range & @credit_score).present?
-                                fico_key2 = fico_key
-                                adj_key_hash[key_index] = fico_key
-                              end
-                            else
-                              (fico_key.split("-").first.strip.to_f..fico_key.split("-").last.strip.to_f).step(0.01) { |f| fico_key_range << f }
-                              fico_key_range = fico_key_range.uniq
-                              if (fico_key_range & @credit_score).present?
-                                fico_key2 = fico_key
-                                adj_key_hash[key_index] = fico_key
-                              end
-                            end
-                          end
-                        end
-                        unless fico_key2.present?
-                          break
-                        end
+                      fico_key2 = fico_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+                      if fico_key2.present?
+                        adj_key_hash[key_index] = fico_key2
+                      else
+                        break
+                      end
                     else
                       break
                     end
@@ -2503,7 +2389,6 @@ class DashboardController < ApplicationController
                     if adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       cltv_key2 = ''
                       cltv_key2 = cltv_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
-
                       if cltv_key2.present?
                         adj_key_hash[key_index] = cltv_key2
                       else
@@ -2740,33 +2625,12 @@ class DashboardController < ApplicationController
                   begin
                     if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       fico_key2 = ''
-                        adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys.each do |fico_key|
-                          if (fico_key.include?("Any") || fico_key.include?("All"))
-                            fico_key2 = fico_key
-                            adj_key_hash[key_index] = fico_key
-                          end
-                          if fico_key.include?("-")
-                            fico_key_range =[]
-                            if fico_key.include?("Inf") || fico_key.include?("Infinity")
-                              (fico_key.split("-").first.strip.to_f..fico_key.split("-").first.strip.to_f+60).step(0.01) { |f| fico_key_range << f }
-                              fico_key_range = fico_key_range.uniq
-                              if (fico_key_range & @credit_score).present?
-                                fico_key2 = fico_key
-                                adj_key_hash[key_index] = fico_key
-                              end
-                            else
-                              (fico_key.split("-").first.strip.to_f..fico_key.split("-").last.strip.to_f).step(0.01) { |f| fico_key_range << f }
-                              fico_key_range = fico_key_range.uniq
-                              if (fico_key_range & @credit_score).present?
-                                fico_key2 = fico_key
-                                adj_key_hash[key_index] = fico_key
-                              end
-                            end
-                          end
-                        end
-                        unless fico_key2.present?
-                          break
-                        end
+                      fico_key2 = fico_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
+                      if fico_key2.present?
+                        adj_key_hash[key_index] = fico_key2
+                      else
+                        break
+                      end
                     else
                       break
                     end
@@ -2827,7 +2691,6 @@ class DashboardController < ApplicationController
                     if adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].present?
                       cltv_key2 = ''
                       cltv_key2 = cltv_key_of_adjustment(adj.data[first_key][adj_key_hash[key_index-6]][adj_key_hash[key_index-5]][adj_key_hash[key_index-4]][adj_key_hash[key_index-3]][adj_key_hash[key_index-2]][adj_key_hash[key_index-1]].keys)
-
                       if cltv_key2.present?
                         adj_key_hash[key_index] = cltv_key2
                       else

@@ -41,7 +41,7 @@ class Program < ApplicationRecord
 
   PROPERTY_TYPE_VALUES = [["Manufactured Home"],["2nd Home"],["3-4 Unit"],["Non-Owner Occupied"],["Condo"],["2-Unit"], ["2-4 Unit"],["Investment Property"], ["Gov'n Non Owner"], ["NOO"]]
 
-  FINANCING_TYPE_VALUES = [["Subordinate Financing"]]
+  FINANCING_TYPE_VALUES = [["Subordinate Financing"], ["Home Possible"]]
 
   REFINANCE_OPTION_VALUES = [["Cash Out"], ["Rate and Term"], ["IRRRL"]]
 
