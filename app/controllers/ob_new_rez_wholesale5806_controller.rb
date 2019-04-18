@@ -224,6 +224,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @credit_hash["FICO"] = {}
                     @loan_hash["LoanAmount/LoanPurpose"] = {}
                     @bpc_loan_hash["VA/LoanAmount/LoanPurpose"] = {}
+                    @bpc_loan_hash["VA/LoanAmount/LoanPurpose"]["true"] = {}
                     @govt_hash["FHA/RefinanceOption/Streamline/VA"]={}
                     @spe_hash["LoanType"] = {}
                     @second_hash["LoanType/LockDay"]={}
@@ -234,7 +235,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @credit_hash["FICO"][new_key] = new_val
                   end
                   if r >= 123 && r <= 127 && cc == 5
-                    new_key = get_value value
+                    if value.downcase.include?("conforming")
+                      new_key = "300000-Inf"
+                    else
+                      new_key = get_value value
+                    end
                     new_val = sheet_data.cell(r,cc+4)
                     c_val = sheet_data.cell(r,cc+5)
                     @loan_hash["LoanAmount/LoanPurpose"][new_key] = {}
@@ -250,7 +255,6 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     new_key = get_value value
                     new_val = sheet_data.cell(r,cc+4)
                     c_val = sheet_data.cell(r,cc+5)
-                    @bpc_loan_hash["VA/LoanAmount/LoanPurpose"]["true"] = {}
                     @bpc_loan_hash["VA/LoanAmount/LoanPurpose"]["true"][new_key] = {}
                     @bpc_loan_hash["VA/LoanAmount/LoanPurpose"]["true"][new_key]["Purchase"] = new_val
                     @bpc_loan_hash["VA/LoanAmount/LoanPurpose"]["true"][new_key]["Refinance"] = c_val
@@ -326,10 +330,12 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     end
                     if value == "High Balance - 15 Yr Term\n(Adjusting 15 Yr Conforming Pricing - FHA/VA ONLY"
                       new_val = sheet_data.cell(r,cc+6)
-                      @second_hash["FHA/HighBalance/VA/Term"]={}
-                      @second_hash["FHA/HighBalance/VA/Term"]["true"]={}
-                      @second_hash["FHA/HighBalance/VA/Term"]["true"]["true"]={}
-                      @second_hash["FHA/HighBalance/VA/Term"]["true"]["true"]["15"]=new_val
+                      @second_hash["FHA/VA/LoanSize/Term"]={}
+                      @second_hash["FHA/VA/LoanSize/Term"]["true"]={}
+                      @second_hash["FHA/VA/LoanSize/Term"]["true"]["true"]={}
+                      @second_hash["FHA/VA/LoanSize/Term"]["true"]["true"]["High-Balance"]={}
+                      @second_hash["FHA/VA/LoanSize/Term"]["true"]["true"]["High-Balance"]["15"]={}
+                      @second_hash["FHA/VA/LoanSize/Term"]["true"]["true"]["High-Balance"]["15"]=new_val
                     end
                     if value == "Margin on all Government ARMs"
                       new_val = sheet_data.cell(r,cc+6)
@@ -605,9 +611,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                             @block_hash[@title][second_key]["true"][f2_key] = {}
                           else
                             @block_hash[@title][final_key]["true"]["0 - 20"] = {} if value.eql?("≤ 20 Yr Term")
-                            @block_hash[@title][final_key]["true"]["20 - Infinity"] = {} if value.eql?("> 20 Yr Term")
+                            @block_hash[@title][final_key]["true"]["20 - Inf"] = {} if value.eql?("> 20 Yr Term")
                             key = "0 - 20" if value.eql?("≤ 20 Yr Term")
-                            key = "20 - Infinity" if value.eql?("> 20 Yr Term")
+                            key = "20 - Inf" if value.eql?("> 20 Yr Term")
                           end
                         elsif index == 6 && rrr < 154 && value
                           another_key = value.eql?("≤ 85") ? set_range(value) : value
@@ -1053,9 +1059,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                             @block_hash[@title][second_key]["true"][f2_key] = {}
                           else
                             @block_hash[@title][final_key]["true"]["0 - 20"] = {} if value.eql?("≤ 20 Yr Term")
-                            @block_hash[@title][final_key]["true"]["20 - Infinity"] = {} if value.eql?("> 20 Yr Term")
+                            @block_hash[@title][final_key]["true"]["20 - Inf"] = {} if value.eql?("> 20 Yr Term")
                             key = "0 - 20" if value.eql?("≤ 20 Yr Term")
-                            key = "20 - Infinity" if value.eql?("> 20 Yr Term")
+                            key = "20 - Inf" if value.eql?("> 20 Yr Term")
                           end
                         elsif index == 6 && rrr < 154 && value
                           another_key = value.eql?("≤ 85") ? set_range(value) : value
@@ -1488,9 +1494,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                           @block_hash[@title][second_key]["true"][f2_key] = {}
                         else
                           @block_hash[@title][final_key]["true"]["0 - 20"] = {} if value.eql?("≤ 20 Yr Term")
-                          @block_hash[@title][final_key]["true"]["20 - Infinity"] = {} if value.eql?("> 20 Yr Term")
+                          @block_hash[@title][final_key]["true"]["20 - Inf"] = {} if value.eql?("> 20 Yr Term")
                           key = "0 - 20" if value.eql?("≤ 20 Yr Term")
-                          key = "20 - Infinity" if value.eql?("> 20 Yr Term")
+                          key = "20 - Inf" if value.eql?("> 20 Yr Term")
                         end
                       elsif index == 6 && rrr < 106 && value
                         another_key = value.eql?("≤ 85") ? set_range(value) : value
@@ -6999,7 +7005,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
             @block_hash = {}
             begin
               if(@title.eql?("All Fixed Conforming\n(does not apply to terms ≤ 15yrs)"))
-                @title = "LoanSize/LoanType/Term/FICO/LTV"
+                @title = "LoanSize/LoanType/Term/LTV/FICO"
                 @block_hash[@title] = {}
                 @block_hash[@title]["Conforming"] = {}
                 @block_hash[@title]["Conforming"]["Fixed"] = {}
@@ -7042,9 +7048,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         previous_title = @title = sheet_data.cell(rrr,ccc) unless previous_title == @title
                         unless @block_hash.has_key?(@title)
                           @block_hash[@title] = {}
-                          first_key  = "LPMI/RefinanceOption/LTV"
-                          second_key = "LPMI/PropertyType/LTV"
-                          final_key  = "LPMI/Term/FICO/LTV"
+                          first_key  = "LPMI/RefinanceOption/FICO"
+                          second_key = "LPMI/PropertyType/FICO"
+                          final_key  = "LPMI/Term/LTV/FICO"
                           @block_hash[@title][first_key] = {}
                           @block_hash[@title][first_key]["true"] = {}
                           @block_hash[@title][second_key] = {}
@@ -7087,16 +7093,16 @@ class ObNewRezWholesale5806Controller < ApplicationController
                         # for Lender Paid MI Adjustments
                         if index == 5 && value
                           if ["Rate & Term Refi", "Cash Out"].include?(value)
-                            f1_key = "Rate & Term"
+                            f1_key = "Rate and Term"
                             @block_hash[@title][first_key]["true"][f1_key] = {}
                           elsif ["Manufactured Home", "2nd Home", "3-4 Unit", "Non Owner Occupied"].include?(value)
                             f2_key = value
                             @block_hash[@title][second_key]["true"][f2_key] = {}
                           else
-                            @block_hash[@title][final_key]["true"]["0 - 20"] = {} if value.eql?("≤ 20 Yr Term")
-                            @block_hash[@title][final_key]["true"]["20 - Infinity"] = {} if value.eql?("> 20 Yr Term")
-                            key = "0 - 20" if value.eql?("≤ 20 Yr Term")
-                            key = "20 - Infinity" if value.eql?("> 20 Yr Term")
+                            @block_hash[@title][final_key]["true"]["0- 20"] = {} if value.eql?("≤ 20 Yr Term")
+                            @block_hash[@title][final_key]["true"]["20 - Inf"] = {} if value.eql?("> 20 Yr Term")
+                            key = "0-20" if value.eql?("≤ 20 Yr Term")
+                            key = "20-Inf" if value.eql?("> 20 Yr Term")
                           end
                         elsif index == 6 && rrr < 110 && value
                           another_key = value.eql?("≤ 85") ? set_range(value) : value
@@ -7218,10 +7224,10 @@ class ObNewRezWholesale5806Controller < ApplicationController
                               @block_hash["LoanSize/LoanType/LTV"]["High-Balance"]["ARM"] = {}
                               @block_hash["LoanSize/LoanType/LTV"]["High-Balance"]["ARM"]["0-75"] = value
                             elsif "High Balance Loan Adjustment - ARM LTV > 75".include?(first_key)
-                              @block_hash["LoanSize/LoanType/LTV"]["High-Balance"]["ARM"]["75-Infinity"] = value
+                              @block_hash["LoanSize/LoanType/LTV"]["High-Balance"]["ARM"]["75-Inf"] = value
                             end
                           else
-                            @block_hash["PropertyType"][first_key] = value if ["2-4 Units", "Manufactured Home"].include?(first_key)
+                            @block_hash["PropertyType"][first_key] = value.tr('s','') if ["2-4 Units", "Manufactured Home"].include?(first_key)
                           end
                         end
                       end
@@ -7440,7 +7446,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
       elsif value1.include?(">") || value1.include?("+")
         value1 = value1.split(">").last.tr('A-Za-z+ ','')+"-Inf"
       elsif value1.include?("≥")
-        value1 = value1.split("≥").last.tr('A-Za-z ','')+"-Inf"
+        value1 = value1.split("≥").last.tr('A-Za-z$, ','')+"-Inf"
       else
         value1 = value1.tr('$, ','')
       end
