@@ -152,7 +152,7 @@ class DashboardController < ApplicationController
         @filter_not_nil[:term] = nil
       else
         @filter_data[:term] = params[:term].to_i
-        @term = params[:term]
+        @term = params[:term].to_i
         @program_term = params[:term].to_i
       end
     end
