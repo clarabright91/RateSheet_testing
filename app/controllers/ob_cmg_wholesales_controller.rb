@@ -566,17 +566,17 @@ class ObCmgWholesalesController < ApplicationController
 
                 # SUBORDINATE FINANCING
                 if r >= 39 && r <= 43 && cc == 1
-                  if value.include?("%")
-                    secondary_key = value.split('.').first
-                  end
-                  secondary_key = get_value secondary_key
+                  # if value.include?("%")
+                  #   secondary_key = value.split('.').first
+                  # end
+                  secondary_key = get_value value
                   @subordinate_hash[primary_key][primary_key3][secondary_key] = {}
                 end
                 if r >= 39 && r <= 43 && cc == 3
-                  if value.include?("%")
-                    ltv_key = value.split('.').first
-                  end
-                  ltv_key = get_value ltv_key
+                  # if value.include?("%")
+                  #   ltv_key = value.split('.').first
+                  # end
+                  ltv_key = get_value value
                   @subordinate_hash[primary_key][primary_key3][secondary_key][ltv_key] = {}
                 end
                 if r >= 39 && r <= 43 && cc >= 5 && cc <= 7

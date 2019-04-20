@@ -187,8 +187,8 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                     @loan_adj["LoanAmount"] = {}
                     @loan_adj["LoanType/Term"] = {}
                     @loan_adj["LoanType/Term"]["Fixed"] = {}
-                    @loan_adj["LoanType"] = {}
-                    @loan_adj["LoanType"]["ARM"] = {}
+                    @loan_adj["LoanType/ArmBasic"] = {}
+                    @loan_adj["LoanType/ArmBasic"]["ARM"] = {}
                   end
                   if r >= 87 && r <= 95 && cc == 17
                     if value.include?(">")
@@ -208,8 +208,8 @@ class ObAlliedMortgageGroupWholesale8570Controller < ApplicationController
                   end
                   if r == 94 && cc >= 7 && cc <= 9
                     first_key = @term_data[cc-2].tr('A-Za-z ','')
-                    @loan_adj["LoanType"]["ARM"][first_key] = {}
-                    @loan_adj["LoanType"]["ARM"][first_key] = value
+                    @loan_adj["LoanType/ArmBasic"]["ARM"][first_key] = {}
+                    @loan_adj["LoanType/ArmBasic"]["ARM"][first_key] = value
                   end
                 end
               rescue Exception => e
