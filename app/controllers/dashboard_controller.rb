@@ -66,7 +66,7 @@ class DashboardController < ApplicationController
     @base_rate = 0.0
     @filter_data = {}
     @filter_not_nil = {}
-    @interest = "4.500"
+    @interest = "4.000"
     @lock_period ="30"
     @loan_size = "High-Balance"
     @loan_type = "Fixed"
