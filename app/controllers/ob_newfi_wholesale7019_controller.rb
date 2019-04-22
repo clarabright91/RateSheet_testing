@@ -43,7 +43,6 @@ class ObNewfiWholesale7019Controller < ApplicationController
               else
                 cc = 5*max_column + (3+max_column) # 3 / 9 / 15
               end
-
               @title = sheet_data.cell(r,cc)
               if @title.present? && @title != "Rate"
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)

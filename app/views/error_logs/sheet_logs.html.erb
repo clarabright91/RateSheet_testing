@@ -15,7 +15,7 @@
         <% @error_logs.each do |log| %>
           <tr>
             <td><%= log.details.split(":")[1] %></td>
-            <td><%= log.sheet_name %></td>
+            <td><%= log.loan_category %></td>
             <td><%= log.row %></td>
             <td><%= log.column %></td>
             <td><%= log.error_detail %></td>
