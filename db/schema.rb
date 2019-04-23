@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_20_084010) do
+ActiveRecord::Schema.define(version: 2019_04_09_094748) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -92,6 +92,10 @@ ActiveRecord::Schema.define(version: 2019_03_20_084010) do
     t.string "fannie_mae_product"
     t.string "freddie_mac_product"
     t.integer "sub_sheet_id"
+    t.boolean "du", default: false
+    t.boolean "lp", default: false
+    t.string "arm_benchmark"
+    t.float "arm_margin"
   end
 
   create_table "sheets", force: :cascade do |t|
@@ -116,11 +120,11 @@ ActiveRecord::Schema.define(version: 2019_03_20_084010) do
     t.string "fico", default: [], array: true
     t.text "refinance_option", default: [], array: true
     t.text "misc_adjuster", default: [], array: true
-    t.boolean "lpmi"
+    t.boolean "lpmi", default: false
     t.integer "coverage"
     t.integer "loan_amount"
     t.string "cltv"
-    t.boolean "dti"
+    t.boolean "dti", default: false
     t.float "interest_rate"
     t.integer "lock_period"
     t.string "state"

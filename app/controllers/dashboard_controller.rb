@@ -668,6 +668,7 @@ class DashboardController < ApplicationController
           @freddie_mac_product = pro.freddie_mac_product
           @loan_purpose = pro.loan_purpose
           @loan_size = pro.loan_size
+          @term = pro.term
         end
       end
 
