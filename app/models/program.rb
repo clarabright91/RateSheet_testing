@@ -19,7 +19,7 @@ class Program < ApplicationRecord
 
   ARM_BASIC = [["All"], ["1/1"],["2/1"],["3/1"],["5/1"], ["7/1"],["10/1"]]
 
-  ARM_BENCHMARK_LIST = [["LIBOR"]]
+  ARM_BENCHMARK_LIST = [["All"], ["LIBOR"], ["CMT"]]
 
   ARM_MARGIN_LIST = [["All"], ["0.00"], ["2.20"], ["2.25"]]
 
