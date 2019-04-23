@@ -59,7 +59,9 @@ class ObCmgWholesalesController < ApplicationController
               cc = 4*max_column + 1
               begin
                 @title = sheet_data.cell(r,cc)
+                p_name = @title + " " + sheet
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                @program.update_fields p_name
                 program_property sheet
 
                 @programs_ids << @program.id
@@ -295,6 +297,8 @@ class ObCmgWholesalesController < ApplicationController
               @title = sheet_data.cell(r,cc)
               if @title.present? && @title != "2.250% MARGIN - 2/2/6 CAPS - 1 YR LIBOR" && @title != "2.250% MARGIN - 5/2/5 CAPS - 1 YR LIBOR"
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                p_name = @title + " " + sheet
+                @program.update_fields p_name
                 program_property sheet
                 @programs_ids << @program.id
                 # @program.adjustments.destroy_all
@@ -898,6 +902,8 @@ class ObCmgWholesalesController < ApplicationController
               begin
                 @title = sheet_data.cell(r,cc)
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                p_name = @title + " " + sheet
+                @program.update_fields p_name
                 program_property sheet
                 @programs_ids << @program.id
                 # @program.adjustments.destroy_all
@@ -1188,6 +1194,8 @@ class ObCmgWholesalesController < ApplicationController
               begin
                 @title = sheet_data.cell(r,cc)
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                p_name = @title + " " + sheet
+                @program.update_fields p_name
                 program_property sheet
                 @programs_ids << @program.id
                 # @program.adjustments.destroy_all
@@ -1842,6 +1850,8 @@ class ObCmgWholesalesController < ApplicationController
               begin
                 @title = sheet_data.cell(r,cc)
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                p_name = @title + " " + sheet
+                @program.update_fields p_name
                 program_property sheet
                 @programs_ids << @program.id
                 # @program.adjustments.destroy_all
@@ -2057,6 +2067,8 @@ class ObCmgWholesalesController < ApplicationController
               begin
                 @title = sheet_data.cell(r,cc)
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                p_name = @title + " " + sheet
+                @program.update_fields p_name
                 program_property sheet
                 @programs_ids << @program.id
                 # @program.adjustments.destroy_all
@@ -2328,6 +2340,8 @@ class ObCmgWholesalesController < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if cc < 5
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property sheet
                   @programs_ids << @program.id
                   @program.adjustments.destroy_all
@@ -2383,6 +2397,8 @@ class ObCmgWholesalesController < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if cc < 5
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property sheet
                   @programs_ids << @program.id
 
@@ -2783,6 +2799,8 @@ class ObCmgWholesalesController < ApplicationController
               begin
                 @title = sheet_data.cell(r,cc)
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                p_name = @title + " " + sheet
+                @program.update_fields p_name
                 program_property sheet
                 @programs_ids << @program.id
                 # @program.adjustments.destroy_all
@@ -3023,6 +3041,8 @@ class ObCmgWholesalesController < ApplicationController
               begin
                 @title = sheet_data.cell(r,cc)
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                p_name = @title + " " + sheet
+                @program.update_fields p_name
                 program_property sheet
                 @programs_ids << @program.id
                 # @program.adjustments.destroy_all
@@ -3256,6 +3276,8 @@ class ObCmgWholesalesController < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present? && cc < 9
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property sheet
                   @programs_ids << @program.id
                   # @program.adjustments.destroy_all
@@ -3310,6 +3332,8 @@ class ObCmgWholesalesController < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if cc < 5 && @title == "10/1 ARM - 6410"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                  p_name = @title + " " + sheet
+                  @program.update_fields p_name
                   program_property sheet
                   @programs_ids << @program.id
                 end
@@ -3525,6 +3549,8 @@ class ObCmgWholesalesController < ApplicationController
               cc = 4*max_column + 1
               @title = sheet_data.cell(r,cc)
               @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+              p_name = @title + " " + sheet
+              @program.update_fields p_name
               program_property sheet
               @programs_ids << @program.id
               # @program.adjustments.destroy_all
@@ -3676,6 +3702,8 @@ class ObCmgWholesalesController < ApplicationController
 
               @title = sheet_data.cell(r,cc)
               @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+              p_name = @title + " " + sheet
+              @program.update_fields p_name
               program_property sheet
               @programs_ids << @program.id
               if @title.present?
@@ -3724,6 +3752,8 @@ class ObCmgWholesalesController < ApplicationController
 
               @title = sheet_data.cell(r,cc)
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
+                p_name = @title + " " + sheet
+                @program.update_fields p_name
                 program_property sheet
                 @programs_ids << @program.id
               if @title.present?
@@ -4121,18 +4151,8 @@ class ObCmgWholesalesController < ApplicationController
   end
 
   def program_property sheet
-    # term
     term = nil
-    loan_size = nil
-    loan_type = nil
     program_category = nil
-    fha = false
-    va = false
-    usda = false
-    streamline = false
-    jumbo = false
-    high_balance = false
-
     if (@program.program_name.split("Year").count > 1)
       term = @program.program_name.split("Year").first.tr('^0-9><%', '')
     elsif (@program.program_name.split("Yr").count > 1)
@@ -4142,83 +4162,14 @@ class ObCmgWholesalesController < ApplicationController
     if @program.program_name.split("ARM").count > 1
       arm_basic = @program.program_name.split("ARM").first.split("/").first
     end
-      # loan type
-    if @program.program_name.downcase.include?("fixed") || sheet.downcase.include?("fixed")
-      loan_type = "Fixed"
-    elsif @program.program_name.downcase.include?("arm") || sheet.downcase.include?("arm") 
-      loan_type = "ARM"
-      arm_benchmark = "LIBOR"
-      arm_margin = 0
-    elsif @program.program_name.downcase.include?("floating") || sheet.downcase.include?("floating") 
-      loan_type = "Floating"
-    elsif @program.program_name.downcase.include?("variable") || sheet.downcase.include?("variable")
-      loan_type = "Variable"
-    else
-      loan_type = "Fixed"
-    end
-    #Set Bank Name
+    # #Set Bank Name
     bank_name = @sheet_obj.bank.name
-
-    # streamline
-    if @program.program_name.downcase.include?("fha") || sheet.downcase.include?("fha")
-      fha = true
-    end
-    if @program.program_name.downcase.include?("va") || sheet.downcase.include?("va")
-      va = true
-    end
-    if @program.program_name.downcase.include?("usda") || sheet.downcase.include?("usda")
-      usda = true
-    end
-    if @program.program_name.downcase.include?("streamline") || sheet.downcase.include?("streamline")
-      streamline = true
-    end
-    # High-Balance
-    high_balance = false
-    jumbo = false
-    if @program.program_name.downcase.include?("high bal") || @program.program_name.downcase.include?("high balance") || sheet.downcase.include?("high balance") || sheet.downcase.include?("high bal")
-      high_balance = true
-    end
-     # Fannie mae Product
-    if @program.program_name.downcase.include?("homeready") || sheet.downcase.include?("homeready")
-      fannie_mae_product = "HomeReady"
-    end
-    # Freddie mac product
-    if @program.program_name.downcase.include?("home possible") || sheet.downcase.include?("home possible")
-      freddie_mac_product = "Home Possible"
-    end
     # Program Property
     if @program.program_name.split("-").count > 1
       program_category = @program.program_name.split("-").last
       program_category = program_category.squish
     end
-       # Loan Limit Type
-    if @program.program_name.downcase.include?("non-conforming") || @program.program_name.downcase.include?("non conforming") || sheet.downcase.include?("non-conforming") || sheet.downcase.include?("non conforming")
-      loan_size = "Non-Conforming"
-    elsif @program.program_name.downcase.include?("conforming") || sheet.downcase.include?("conforming")
-      loan_size = "Conforming"
-    elsif @program.program_name.downcase.include?("jumbo") || sheet.downcase.include?("jumbo")
-      loan_size = "Jumbo"
-      jumbo = true
-    elsif @program.program_name.downcase.include?("high-Balance") || @program.program_name.downcase.include?("high bal") || sheet.downcase.include?("high-Balance") || sheet.downcase.include?("high bal")
-      loan_size = "High-Balance"
-      high_balance = true
-    else
-      loan_size = "Conforming"
-    end
-    # loan_purpose
-    if @program.program_name.downcase.include?('refinance') || @program.program_name.downcase.include?('refi') || sheet.downcase.include?('refinance') || sheet.downcase.include?('refi')
-      loan_purpose = "Refinance"
-    else
-      loan_purpose = "Purchase"
-    end
-    # lp and du
-    if @program.program_name.downcase.include?('du ') || sheet.downcase.include?('du ')
-      du = true
-    end
-    if @program.program_name.downcase.include?('lp ') || sheet.downcase.include?('lp ')
-      lp = true
-    end
-    @program.update(term: term,loan_type: loan_type,program_category: program_category, streamline: streamline,fha: fha, va: va, usda: usda, arm_basic: arm_basic, loan_category: sheet, fannie_mae_product: fannie_mae_product,freddie_mac_product: freddie_mac_product, loan_size: loan_size, bank_name: bank_name,loan_purpose: loan_purpose, du: du, lp: lp, arm_benchmark: arm_benchmark, arm_margin: arm_margin)
+    @program.update(term: term,program_category: program_category,arm_basic: arm_basic, loan_category: sheet, bank_name: bank_name)
   end
 
   def make_adjust(block_hash, sheet)
