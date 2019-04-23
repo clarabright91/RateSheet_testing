@@ -1423,7 +1423,6 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 p_name = @title + " " + sheet
                 @program.update_fields p_name
                 program_property @title
-
                 if @title.include?("20/25/30 Yr")
                   term = 2030
                 elsif @title.include?("10/15 Yr")
@@ -2389,38 +2388,12 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 p_name = @title + " " + sheet
                 @program.update_fields p_name
-                # term
-                term = nil
-                program_heading = @title.split
-                if @title.include?("10yr") || @title.include?("10 Yr")
-                  term = 10
-                elsif @title.include?("15yr") || @title.include?("15 Yr")
-                  term = 15
-                elsif @title.include?("20yr") || @title.include?("20 Yr")
-                  term = 20
-                elsif @title.include?("25yr") || @title.include?("25 Yr")
-                  term = 25
-                elsif @title.include?("30yr") || @title.include?("30 Yr")
-                  term = 30
-                end
+                program_property @title
                 if @title.include?("20/25/30")
                   term = 2030
+                  @program.update(term: term)
                 end
-                # Arm basic
-                if @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10-1 ARM") || @title.include?("10/1 ARM")
-                  arm_basic = @title.scan(/\d+/)[0].to_i
-                end
-                # Arm Advanced
-                if @title.downcase.include?("arm")
-                  arm_advanced = @title.downcase.split("arm").last.tr('A-Za-z- ','')
-                  if arm_advanced.include?('/')
-                    arm_advanced = arm_advanced.tr('/','-')
-                  else
-                    arm_advanced
-                  end
-                end      
                 @program_ids << @program.id
-                @program.update(term: term, arm_basic: arm_basic,arm_advanced: arm_advanced)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -2692,21 +2665,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @program.update_fields p_name
-                  # term
-                  term = nil
-                  if @title.include?("10yr") || @title.include?("10 Yr")
-                    term = @title.scan(/\d+/)[0]
-                  elsif @title.include?("15yr") || @title.include?("15 Yr")
-                    term = @title.scan(/\d+/)[0]
-                  elsif @title.include?("20yr") || @title.include?("20 Yr")
-                    term = @title.scan(/\d+/)[0]
-                  elsif @title.include?("25yr") || @title.include?("25 Yr")
-                    term = @title.scan(/\d+/)[0]
-                  elsif @title.include?("30yr") || @title.include?("30 Yr")
-                    term = @title.scan(/\d+/)[0]
-                  end               
+                  program_property @title                         
                   @program_ids << @program.id
-                  @program.update(term: term)
                   @program.adjustments.destroy_all
                   @block_hash = {}
                   key = ''
@@ -2870,34 +2830,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 p_name = @title + " " + sheet
                 @program.update_fields p_name
-                # term
-                term = nil
-                if @title.include?("10yr") || @title.include?("10 Yr")
-                  term = 10
-                elsif @title.include?("15yr") || @title.include?("15 Yr")
-                  term = 15
-                elsif @title.include?("20yr") || @title.include?("20 Yr")
-                  term = 20
-                elsif @title.include?("25yr") || @title.include?("25 Yr")
-                  term = 25
-                elsif @title.include?("30yr") || @title.include?("30 Yr")
-                  term = 30
-                end
-                # Arm Basic
-                if @title.include?("3-1 ARM") || @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM")
-                  arm_basic = @title.scan(/\d+/)[0].to_i
-                end
-                # Arm Advanced
-                if @title.downcase.include?("arm")
-                  arm_advanced = @title.downcase.split("arm").last.tr('A-Za-z() ','')
-                  if arm_advanced.include?('/')
-                    arm_advanced = arm_advanced.tr('/','-')
-                  else
-                    arm_advanced
-                  end
-                end          
+                program_property @title    
                 @program_ids << @program.id
-                @program.update(term: term,arm_basic: arm_basic,arm_advanced: arm_advanced)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -3191,31 +3125,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 p_name = @title + " " + sheet
                 @program.update_fields p_name
-                term = nil
-                if @title.include?("10yr") || @title.include?("10 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("15yr") || @title.include?("15 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("20yr") || @title.include?("20 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("25yr") || @title.include?("25 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("30yr") || @title.include?("30 Yr")
-                  term = @title.scan(/\d+/)[0]
-                end
-                # rate arm
-                if @title.include?("3-1 ARM") || @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM")
-                  arm_basic = @title.scan(/\d+/)[0].to_i
-                end                
-                # Arm Advanced
-                if @title.downcase.include?("arm")
-                  arm_advanced = @title.split("ARM").last.tr('A-Za-z ()', '')
-                  if arm_advanced.include?('/')
-                    arm_advanced = arm_advanced.tr('/','-')
-                  else
-                    arm_advanced
-                  end
-                end             
+                program_property @title    
                 @program_ids << @program.id  
                 @program.adjustments.destroy_all
                 @block_hash = {}
@@ -3241,7 +3151,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 if @block_hash.values.first.keys.first.nil?
                   @block_hash.values.first.shift
                 end
-                @program.update(term: term, arm_basic: arm_basic, arm_advanced: arm_advanced ,base_rate: @block_hash)
+                @program.update(base_rate: @block_hash)
                 # @program.update(base_rate: @block_hash,loan_category: @sheet_name)
               rescue Exception => e
                 error_log = ErrorLog.new(details: e.backtrace_locations[0], row: row, column: cc, loan_category: @sheet_name, error_detail: e.message)
@@ -3481,35 +3391,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 p_name = @title + " " + sheet
                 @program.update_fields p_name
-                # term
-                term = nil
-                program_heading = @title.split
-                if @title.include?("10yr") || @title.include?("10 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("15yr") || @title.include?("15 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("20yr") || @title.include?("20 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("25yr") || @title.include?("25 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("30yr") || @title.include?("30 Yr")
-                  term = @title.scan(/\d+/)[0]
-                end          
-                # rate arm
-                if @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM") || @title.include?("10-1 ARM")
-                  arm_basic = @title.scan(/\d+/)[0].to_i
-                end
-                # Arm Advanced
-                if @title.downcase.include?("arm") 
-                  arm_advanced = @title.split("ARM").last.tr('A-Z- () ','')
-                  if arm_advanced.include?('/')
-                    arm_advanced = arm_advanced.tr('/','-')
-                  else
-                    arm_advanced
-                  end
-                end             
+                program_property @title              
                 program_ids << @program.id
-                @program.update(term: term, arm_basic: arm_basic,arm_advanced: arm_advanced)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -3779,34 +3662,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                 @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                 p_name = @title + " " + sheet
                 @program.update_fields p_name
-                 # term
-                term = nil
-                if @title.include?("10yr") || @title.include?("10 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("15yr") || @title.include?("15 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("20yr") || @title.include?("20 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("25yr") || @title.include?("25 Yr")
-                  term = @title.scan(/\d+/)[0]
-                elsif @title.include?("30yr") || @title.include?("30 Yr")
-                  term = @title.scan(/\d+/)[0]
-                end
-                # Arm Basic
-                if @title.include?("5-1 ARM") || @title.include?("7-1 ARM") || @title.include?("10-1 ARM") || @title.include?("10-1 ARM") || @title.include?("5/1 ARM") || @title.include?("7/1 ARM") || @title.include?("10/1 ARM")
-                  arm_basic = @title.scan(/\d+/)[0].to_i
-                end
-                # Arm Advanced
-                if @title.downcase.include?("arm") 
-                  arm_advanced = @title.split("ARM").last.tr('A-Z- () ','')
-                  if arm_advanced.include?('/')
-                    arm_advanced = arm_advanced.tr('/','-')
-                  else
-                    arm_advanced
-                  end
-                end         
+                program_property @title   
                 program_ids << @program.id
-                @program.update(term: term,arm_basic: arm_basic, arm_advanced: arm_advanced)
                 @program.adjustments.destroy_all
                 @block_hash = {}
                 key = ''
@@ -4259,7 +4116,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
   def program_property title
       @arm_advanced = ''
       if title.downcase.exclude?("arm")
-        term = title.downcase.split("fixed").first.tr('A-Za-z/®- ','')
+        term = title.downcase.split("fixed").first.tr('A-Za-z-™/® ','')
         if term.length == 4 && term.last(2).to_i < term.first(2).to_i
           term = term.last(2) + term.first(2)
         else
@@ -4267,14 +4124,16 @@ class ObNewRezWholesale5806Controller < ApplicationController
         end
       end
          # Arm Basic
-      if title.include?("3/1") || title.include?("3 / 1") || title.include?("3-1")
-        arm_basic = 3
-      elsif title.include?("5/1") || title.include?("5 / 1") || title.include?("5-1")
-        arm_basic = 5
-      elsif title.include?("7/1") || title.include?("7 / 1") || title.include?("7-1")
-        arm_basic = 7
-      elsif title.include?("10/1") || title.include?("10 / 1") || title.include?("10 /1") || title.include?("10-1")
-        arm_basic = 10
+      if title.downcase.include?("arm")   
+        if title.include?("3/1") || title.include?("3 / 1") || title.include?("3-1")
+          arm_basic = 3
+        elsif title.include?("5/1") || title.include?("5 / 1") || title.include?("5-1")
+          arm_basic = 5
+        elsif title.include?("7/1") || title.include?("7 / 1") || title.include?("7-1")
+          arm_basic = 7
+        elsif title.include?("10/1") || title.include?("10 / 1") || title.include?("10 /1") || title.include?("10-1")
+          arm_basic = 10
+        end
       end
       # Arm_advanced
       if title.downcase.include?("arm")
