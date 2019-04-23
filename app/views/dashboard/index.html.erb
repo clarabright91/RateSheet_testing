@@ -524,6 +524,9 @@
         if ($('#arm_basic').val()=='' && $("#loan_type").val() != "All" && $("#loan_type").val() != "ARM" ) {
           $('#arm_basic').val('5/1')
         }
+        $('#credit_score').val("700-719")
+        $('#ltv').val("65.01 - 70.00")
+        $('#cltv').val("65.01 - 70.00")
     }
 
     function showTermAndArmSectionOnLoan(){
@@ -770,9 +773,9 @@
         $('#loan_size').val('')
         $('#fannie_mae_product').val('')
         $('#freddie_mac_product').val('')
-        $('#credit_score').val('700-719')
-        $('#ltv').val('65.01-70.00')
-        $('#cltv').val('97 +')
+        $('#credit_score').val("700-719")
+        $('#ltv').val("65.01 - 70.00")
+        $('#cltv').val("65.01 - 70.00")
         $('#state').val('All')
         $('#loan_amount').val('0 - 50000')
         $('#program_category').val('7900')
