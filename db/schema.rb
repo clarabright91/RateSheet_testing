@@ -92,8 +92,8 @@ ActiveRecord::Schema.define(version: 2019_04_09_094748) do
     t.string "fannie_mae_product"
     t.string "freddie_mac_product"
     t.integer "sub_sheet_id"
-    t.boolean "du", default: false
-    t.boolean "lp", default: false
+    t.boolean "du"
+    t.boolean "lp"
     t.string "arm_benchmark"
     t.float "arm_margin"
   end
@@ -120,11 +120,11 @@ ActiveRecord::Schema.define(version: 2019_04_09_094748) do
     t.string "fico", default: [], array: true
     t.text "refinance_option", default: [], array: true
     t.text "misc_adjuster", default: [], array: true
-    t.boolean "lpmi", default: false
+    t.boolean "lpmi"
     t.integer "coverage"
     t.integer "loan_amount"
     t.string "cltv"
-    t.boolean "dti", default: false
+    t.boolean "dti"
     t.float "interest_rate"
     t.integer "lock_period"
     t.string "state"

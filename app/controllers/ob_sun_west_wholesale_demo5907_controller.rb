@@ -94,7 +94,9 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                   last_column = 10
                   first_column = 2
                   ltv_row = 375
-                  ltv_adjustment range1, range2, sheet_data, first_row, end_row,sheet,first_column, last_column, ltv_row, primary_key
+                  range1 = 374
+                  range2 = 494
+                  ltv_adjustment range1, range2, sheet_data, first_row, end_row,@sheet_name,first_column, last_column, ltv_row, primary_key
                 end
                 if value == "CASH OUT REFINANCE "
                   primary_key = "LoanSize/RefinanceOption/FICO/LTV"
@@ -103,7 +105,9 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                   first_column = 2
                   last_column = 6
                   ltv_row = 387
-                  cash_adjustment range1, range2, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row, primary_key
+                  range1 = 374
+                  range2 = 494
+                  cash_adjustment range1, range2, sheet_data, first_row, end_row, @sheet_name, first_column, last_column, ltv_row, primary_key
                 end
                 if value == "ADDITIONAL LPMI ADJUSTMENTS"
                   primary_key = "LPMI/LoanSize/FICO/LTV"
@@ -112,7 +116,9 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                   first_column = 9
                   last_column = 12
                   ltv_row = 388
-                  lpmi_adjustment range1, range2, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row, primary_key
+                  range1 = 374
+                  range2 = 494
+                  lpmi_adjustment range1, range2, sheet_data, first_row, end_row, @sheet_name, first_column, last_column, ltv_row, primary_key
                 end
                 if value == "SUBORDINATE FINANCING"
                   primary_key = "FinancingType/LoanSize/LTV/CLTV/FICO"
@@ -122,7 +128,9 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                   cltv_column = 4
                   last_column = 7
                   ltv_row = 399
-                  sub_adjustment range1, range2, sheet_data, first_row, end_row, sheet, first_column, cltv_column, last_column, ltv_row, primary_key
+                  range1 = 374
+                  range2 = 494
+                  sub_adjustment range1, range2, sheet_data, first_row, end_row, @sheet_name, first_column, cltv_column, last_column, ltv_row, primary_key
                 end
                 if value == "LPMI COVERAGE BASED ADJUSTMENTS"
                   primary_key = "LPMI/RefinanceOption/FICO"
@@ -131,7 +139,9 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                   first_column = 9
                   last_column = 12
                   ltv_row = 397
-                  lpmi_adjustment range1, range2, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row, primary_key
+                  range1 = 374
+                  range2 = 494
+                  lpmi_adjustment range1, range2, sheet_data, first_row, end_row, @sheet_name, first_column, last_column, ltv_row, primary_key
                 end
                 if r == 376 && cc == 15
                   @adj_hash["PropertyType"] = {}
@@ -345,7 +355,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                   ltv_row = 783
                   start_range = 782
                   end_range = 799
-                  ltv_adjustment start_range, end_range, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row, primary_key
+                  ltv_adjustment start_range, end_range, sheet_data, first_row, end_row, @sheet_name, first_column, last_column, ltv_row, primary_key
                 end
                 if value == "SUBORDINATE FINANCING  (Applicable to HomeOne)"
                   primary_key = "FinancingType/LoanSize/LTV/CLTV/FICO"
@@ -357,7 +367,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                   ltv_row = 794
                   range1 = 782
                   range2 = 799
-                  sub_adjustment range1, range2, sheet_data, first_row, end_row, sheet, first_column, cltv_column, last_column, ltv_row, primary_key
+                  sub_adjustment range1, range2, sheet_data, first_row, end_row, @sheet_name, first_column, cltv_column, last_column, ltv_row, primary_key
                 end
                 if r == 783 && cc == 15
                   @property_hash["PropertyType/Term/LTV"] = {}
@@ -2043,6 +2053,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
       end
       adjustment = [@adjustment_hash]
       make_adjust(adjustment,sheet)
+      create_program_association_with_adjustment(sheet)
     end
 
     def cash_adjustment range1, range2, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row, primary_key
@@ -2079,6 +2090,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
       end
       adjustment = [@adjustment_hash]
       make_adjust(adjustment,sheet)
+      create_program_association_with_adjustment(sheet)
     end
 
     def lpmi_adjustment range1, range2, sheet_data, first_row, end_row, sheet, first_column, last_column, ltv_row, primary_key
@@ -2115,6 +2127,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
       end
       adjustment = [@adjustment_hash]
       make_adjust(adjustment,sheet)
+      create_program_association_with_adjustment(sheet)
     end
 
     def sub_adjustment range1, range2, sheet_data, first_row, end_row, sheet, first_column, cltv_column, last_column, ltv_row, primary_key
@@ -2156,6 +2169,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
       end
       adjustment = [@adjustment_hash]
       make_adjust(adjustment,sheet)
+      create_program_association_with_adjustment(sheet)
     end
 
     def make_adjust(block_hash, sheet)

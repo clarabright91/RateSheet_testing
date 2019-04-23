@@ -382,7 +382,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @property_hash["LPMI/Term/LTV/FICO"][true]["0-20"] = {}
                     @property_hash["LPMI/Term/LTV/FICO"][true]["20-Inf"] = {}
                     @property_hash["PropertyType/LTV"] = {}
-                    @property_hash["PropertyType/LTV"]["Non Owner Occupied"] = {}
+                    @property_hash["PropertyType/LTV"]["Non-Owner Occupied"] = {}
                     @sub_hash["FinancingType/LTV/CLTV/FICO"] = {}
                     @sub_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"] = {}
                     @loan_amount["LoanAmount/LoanPurpose"] = {}
@@ -503,10 +503,10 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
                   if r >= 167 && r <= 169 && cc == 7
                     primary_key = get_value value
-                    @property_hash["PropertyType/LTV"]["Non Owner Occupied"][primary_key] = {}
+                    @property_hash["PropertyType/LTV"]["Non-Owner Occupied"][primary_key] = {}
                     cc = cc + 4
                     new_val = sheet_data.cell(r,cc)
-                    @property_hash["PropertyType/LTV"]["Non Owner Occupied"][primary_key] = new_val
+                    @property_hash["PropertyType/LTV"]["Non-Owner Occupied"][primary_key] = new_val
                   end
                   if r >= 156 && r <= 162 && cc == 15
                     if value.downcase.include?("conforming")
@@ -686,7 +686,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @property_hash["LPMI/Term/LTV/FICO"][true]["0-20"] = {}
                     @property_hash["LPMI/Term/LTV/FICO"][true]["20-Inf"] = {}
                     @property_hash["PropertyType/LTV"] = {}
-                    @property_hash["PropertyType/LTV"]["Non Owner Occupied"] = {}
+                    @property_hash["PropertyType/LTV"]["Non-Owner Occupied"] = {}
                     @sub_hash["FinancingType/LTV/CLTV/FICO"] = {}
                     @sub_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"] = {}
                     @loan_amount["LoanAmount/LoanPurpose"] = {}
@@ -794,10 +794,10 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
                   if r >= 167 && r <= 169 && cc == 7
                     primary_key = get_value value
-                    @property_hash["PropertyType/LTV"]["Non Owner Occupied"][primary_key] = {}
+                    @property_hash["PropertyType/LTV"]["Non-Owner Occupied"][primary_key] = {}
                     cc = cc + 4
                     new_val = sheet_data.cell(r,cc)
-                    @property_hash["PropertyType/LTV"]["Non Owner Occupied"][primary_key] = new_val
+                    @property_hash["PropertyType/LTV"]["Non-Owner Occupied"][primary_key] = new_val
                   end
                   if r >= 156 && r <= 162 && cc == 15
                     if value.downcase.include?("conforming")
@@ -2525,19 +2525,19 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"] = {}
                     @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"]["Jumbo"] = {}
                     @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"]["Jumbo"]["Fixed"] = {}
-                    @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"]["Jumbo"]["Fixed"]["Non Owner Occupied"] = {}
-                    @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"]["Jumbo"]["Fixed"]["Non Owner Occupied"]["20"] = {}
-                    @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"]["Jumbo"]["Fixed"]["Non Owner Occupied"]["25"] = {}
-                    @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"]["Jumbo"]["Fixed"]["Non Owner Occupied"]["30"] = {}
+                    @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"]["Jumbo"]["Fixed"]["Non-Owner Occupied"] = {}
+                    @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"]["Jumbo"]["Fixed"]["Non-Owner Occupied"]["20"] = {}
+                    @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"]["Jumbo"]["Fixed"]["Non-Owner Occupied"]["25"] = {}
+                    @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"]["Jumbo"]["Fixed"]["Non-Owner Occupied"]["30"] = {}
                   end
                   if r == 50 && cc >= 4 && cc <= 14
                     ltv_data = get_value @ltv_data[cc-2]
-                    @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"]["Jumbo"]["Fixed"]["Non Owner Occupied"]["20"][ltv_data] = {}
-                    @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"]["Jumbo"]["Fixed"]["Non Owner Occupied"]["25"][ltv_data] = {}
-                    @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"]["Jumbo"]["Fixed"]["Non Owner Occupied"]["30"][ltv_data] = {}
-                    @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"]["Jumbo"]["Fixed"]["Non Owner Occupied"]["20"][ltv_data] = value
-                    @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"]["Jumbo"]["Fixed"]["Non Owner Occupied"]["25"][ltv_data] = value
-                    @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"]["Jumbo"]["Fixed"]["Non Owner Occupied"]["30"][ltv_data] = value
+                    @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"]["Jumbo"]["Fixed"]["Non-Owner Occupied"]["20"][ltv_data] = {}
+                    @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"]["Jumbo"]["Fixed"]["Non-Owner Occupied"]["25"][ltv_data] = {}
+                    @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"]["Jumbo"]["Fixed"]["Non-Owner Occupied"]["30"][ltv_data] = {}
+                    @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"]["Jumbo"]["Fixed"]["Non-Owner Occupied"]["20"][ltv_data] = value
+                    @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"]["Jumbo"]["Fixed"]["Non-Owner Occupied"]["25"][ltv_data] = value
+                    @cash_out["LoanSize/LoanType/PropertyType/Term/LTV"]["Jumbo"]["Fixed"]["Non-Owner Occupied"]["30"][ltv_data] = value
                   end
                   if r >= 55 && r <= 60 && cc == 3
                     primary_key = get_value value
@@ -2888,7 +2888,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @property_hash["LPMI/LTV/FICO"] = {}
                     @property_hash["LPMI/LTV/FICO"][true] = {}
                     @property_hash["PropertyType/LTV"] = {}
-                    @property_hash["PropertyType/LTV"]["Non Owner Occupied"] = {}
+                    @property_hash["PropertyType/LTV"]["Non-Owner Occupied"] = {}
                     @property_hash["PropertyType"] = {}
                     @sub_hash["FinancingType/LTV/CLTV/FICO"] = {}
                     @sub_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"] = {}
@@ -3010,10 +3010,10 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
                   if r >= 94 && r <= 96 && cc == 7
                     primary_key = get_value value
-                    @property_hash["PropertyType/LTV"]["Non Owner Occupied"][primary_key] = {}
+                    @property_hash["PropertyType/LTV"]["Non-Owner Occupied"][primary_key] = {}
                     cc = cc + 4
                     new_val = sheet_data.cell(r,cc)
-                    @property_hash["PropertyType/LTV"]["Non Owner Occupied"][primary_key] = new_val
+                    @property_hash["PropertyType/LTV"]["Non-Owner Occupied"][primary_key] = new_val
                   end
                   if r >= 82 && r <= 88 && cc == 15
                     if value.downcase.include?("conforming")
@@ -3183,7 +3183,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @property_hash["LPMI/LTV/FICO"] = {}
                     @property_hash["LPMI/LTV/FICO"][true] = {}
                     @property_hash["PropertyType/LTV"] = {}
-                    @property_hash["PropertyType/LTV"]["Non Owner Occupied"] = {}
+                    @property_hash["PropertyType/LTV"]["Non-Owner Occupied"] = {}
                     @property_hash["PropertyType"] = {}
                     @sub_hash["FinancingType/LTV/CLTV/FICO"] = {}
                     @sub_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"] = {}
@@ -3264,10 +3264,10 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
                   if r >= 87 && r <= 89 && cc == 6
                     primary_key = get_value value
-                    @property_hash["PropertyType/LTV"]["Non Owner Occupied"][primary_key] = {}
+                    @property_hash["PropertyType/LTV"]["Non-Owner Occupied"][primary_key] = {}
                     cc = cc + 3
                     new_val = sheet_data.cell(r,cc)
-                    @property_hash["PropertyType/LTV"]["Non Owner Occupied"][primary_key] = new_val
+                    @property_hash["PropertyType/LTV"]["Non-Owner Occupied"][primary_key] = new_val
                   end
                   if r >= 91 && r <= 92 && cc == 5
                     primary_key = value.split('s').first
@@ -3455,6 +3455,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @property_hash["LPMI/Term/LTV/FICO"][true]["0-20"] = {}
                     @property_hash["LPMI/Term/LTV/FICO"][true]["20-Inf"] = {}
                     @property_hash["PropertyType/LTV"] = {}
+                    @property_hash["PropertyType/LTV"]["Non-Owner Occupied"] = {}
                     @sub_hash["FinancingType/LTV/CLTV/FICO"] = {}
                     @sub_hash["FinancingType/LTV/CLTV/FICO"]["Subordinate Financing"] = {}
                   end
@@ -3555,10 +3556,10 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
                   if r >= 122 && r <= 124 && cc == 7
                     primary_key = get_value value
-                    @property_hash["PropertyType/LTV"][primary_key] = {}
+                    @property_hash["PropertyType/LTV"]["Non-Owner Occupied"][primary_key] = {}
                     cc = cc + 4
                     new_val = sheet_data.cell(r,cc)
-                    @property_hash["PropertyType/LTV"][primary_key] = new_val
+                    @property_hash["PropertyType/LTV"]["Non-Owner Occupied"][primary_key] = new_val
                   end
                   if r == 126 && cc == 8
                     @property_hash["LoanPurpose/LockDay"] = {}
