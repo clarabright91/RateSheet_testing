@@ -949,7 +949,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
         value1 = value1.split(">").last.tr('^0-9, ', '')+"-Inf"
         value1 = value1.tr('–','-')
       else
-        value1.tr('A-Za-z:$, ','')
+        value1 = value1.tr('A-Za-z:$, ','')
         value1 = value1.tr('–','-')
       end
     end

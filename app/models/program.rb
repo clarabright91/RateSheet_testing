@@ -5,7 +5,7 @@ class Program < ApplicationRecord
   has_many :adjustments, through: :program_adjustments
   belongs_to :sub_sheet, optional: true
   before_save :add_bank_name
-  after_save :add_default_loan_size
+  # after_save :add_default_loan_size
 
   STATE = [["All"], ["AK"], ["AL"], ["AR"], ["AS"], ["AZ"], ["CA"], ["CO"], ["CT"], ["DC"], ["DE"], ["FL"], ["FM"], ["GA"], ["GU"], ["HI"], ["IA"], ["ID"], ["IL"], ["IN"], ["KS"], ["KY"], ["LA"], ["MA"], ["MD"], ["ME"], ["MH"], ["MI"], ["MN"], ["MO"], ["MP"], ["MS"], ["MT"], ["NC"], ["ND"], ["NE"], ["NH"], ["NJ"], ["NM"], ["NV"], ["NY"], ["OH"], ["OK"], ["OR"], ["PA"], ["PR"], ["PW"], ["RI"], ["SC"], ["SD"], ["TN"], ["TX"], ["UT"], ["VA"], ["VI"], ["VT"], ["WA"], ["WI"], ["WV"], ["WY"]]
 
@@ -65,7 +65,7 @@ class Program < ApplicationRecord
   end
 
   def get_non_conforming
-    non_conforming = ["Non-Conforming","non conforming"]
+    non_conforming = ["Non-Conforming","non conforming", "NON CONFORMING"]
     # non_conforming += Acronym.new(non_conforming).to_a
     non_conforming += non_conforming.map(&:downcase)
     return non_conforming
@@ -150,7 +150,7 @@ class Program < ApplicationRecord
     set_usda                        if p_name.downcase.include?("usda")
     set_streamline(p_name)          if ["streamline","SL"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_full_doc                    if p_name.downcase.include?("full doc")
-    # set_libor                       if p_name.downcase.include?("libor")
+    set_libor(p_name)               if p_name.downcase.include?("arm")
     set_arm_margin(p_name)          if p_name.downcase.include?("arm")
     # set_loan_purpose(p_name)        if ["Purchase", "Refinance"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_conforming(p_name)          if ["Conforming","Conf","fcf"].each{ |word| p_name.downcase.include?(word.downcase) }
@@ -222,9 +222,13 @@ class Program < ApplicationRecord
     }
   end
 
-  # def set_libor
-  #   self.arm_benchmark = "LIBOR"
-  # end
+  def set_libor(prog_name)
+    present_word = nil
+    ["LIBOR", "CMT"].each{ |word|
+      present_word = word if prog_name.downcase.include?(word.downcase)
+    }
+    present_word.present? ? self.arm_benchmark = present_word : self.arm_benchmark = "LIBOR"
+  end
 
   def set_arm_margin(prog_name)
     ["2.25","2.00"].each{ |word| 
@@ -257,8 +261,10 @@ class Program < ApplicationRecord
   def set_loan_size p_name
     present_word = nil
     fetch_loan_size_fields.each{ |word|
-      present_word = word if p_name.squish.downcase.include?(word.downcase)
-      break if present_word.present?
+      if p_name.squish.downcase.include?(word.downcase)
+        present_word = word 
+        break
+      end
     }
     loan_size = get_high_balance.include?(present_word) ? "High-Balance" : get_jumbo.include?(present_word) ? "Jumbo" : get_super_conforming.include?(present_word) ? "Super Conforming" : get_non_conforming.include?(present_word) ? "Non-Conforming" : get_conforming.include?(present_word) ? "Conforming" : get_conf.include?(present_word) ? "Conforming and High-Balance" : get_non_conf_hb.include?(present_word) ? "Non-Conforming and Jumbo" : "Conforming"
     self.loan_size = loan_size
@@ -304,14 +310,16 @@ class Program < ApplicationRecord
     self.fannie_mae_product = present_word
   end
 
-  def add_default_loan_size
-    p_name = self.program_name
-    present_word = nil
-    fetch_loan_size_fields.each{ |word|
-      present_word = word if p_name.squish.downcase.include?(word.downcase)
-      break if present_word.present?
-    }
-    loan_size = get_high_balance_extra.include?(present_word) ? "High-Balance Extra" : get_high_balance.include?(present_word) ? "High-Balance" : get_jumbo.include?(present_word) ? "Jumbo" : get_super_conforming.include?(present_word) ? "Super Conforming" : get_non_conforming.include?(present_word) ? "Non-Conforming" : get_conforming.include?(present_word) ? "Conforming" : get_conf.include?(present_word) ? "Conforming and High-Balance" : get_non_conf_hb.include?(present_word) ? "Non-Conforming and Jumbo" : "Conforming"
-    self.update_column(:loan_size, loan_size)
-  end
+  # def add_default_loan_size
+  #   p_name = self.program_name
+  #   present_word = nil
+  #   fetch_loan_size_fields.each{ |word|
+  #     if p_name.squish.downcase.include?(word.downcase)
+  #       present_word = word 
+  #       break
+  #     end
+  #   }
+  #   loan_size = get_high_balance_extra.include?(present_word) ? "High-Balance Extra" : get_high_balance.include?(present_word) ? "High-Balance" : get_jumbo.include?(present_word) ? "Jumbo" : get_super_conforming.include?(present_word) ? "Super Conforming" : get_non_conforming.include?(present_word) ? "Non-Conforming" : get_conforming.include?(present_word) ? "Conforming" : get_conf.include?(present_word) ? "Conforming and High-Balance" : get_non_conf_hb.include?(present_word) ? "Non-Conforming and Jumbo" : "Conforming"
+  #   self.update_column(:loan_size, loan_size)
+  # end
 end
