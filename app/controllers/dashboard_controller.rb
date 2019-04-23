@@ -661,6 +661,13 @@ class DashboardController < ApplicationController
           else
             hash_obj[:base_rate] = 0.0
           end
+          @loan_type = pro.loan_type
+          @arm_basic = pro.arm_basic
+          @arm_advanced = pro.arm_advanced
+          @fannie_mae_product = pro.fannie_mae_product
+          @freddie_mac_product = pro.freddie_mac_product
+          @loan_purpose = pro.loan_purpose
+          @loan_size = pro.loan_size
         end
       end
 
