@@ -500,7 +500,7 @@
     });
 
     function setArmDefaultValues(){
-      $('#arm_benchmark').val('LIBOR')
+      $('#arm_benchmark').val('All')
       $('#arm_margin').val('All')
       $('#arm_advanced').val('All')
       $('#arm_basic').val('5/1')
@@ -508,7 +508,7 @@
 
     function setArmNullValues(){
       $('#term').val('All')
-      $('#arm_benchmark').val('LIBOR')
+      $('#arm_benchmark').val('All')
       $('#arm_margin').val('All')
       $('#arm_advanced').val('All')
       $('#arm_basic').val('All')
@@ -516,7 +516,7 @@
 
     function setArmDefaultValuesOnLoan(){
       if ($('#arm_benchmark').val()=='' && $("#loan_type").val() != "All" && $("#loan_type").val() != "ARM" ) {
-          $('#arm_benchmark').val('')
+          $('#arm_benchmark').val('LIBOR')
         }
         if ($('#arm_margin').val()=='' && $("#loan_type").val() != "All" && $("#loan_type").val() != "ARM" ) {
           $('#arm_margin').val('All')
@@ -756,7 +756,7 @@
         $('input:checkbox').removeAttr('checked');
         $('#loan_type').val('')
         $('#term').val('')
-        $('#arm_benchmark').val('LIBOR')
+        $('#arm_benchmark').val('All')
         $('#arm_margin').val('All')
         $('#arm_advanced').val('All')
         $('#arm_basic').val('5/1')
@@ -766,8 +766,6 @@
         $('#term').val('')
         $('#interest').val('4.000')
         $('#lock_period').val('30')
-        $('#loan_category').val('All')
-        $('#program_name').val('All')
         $('#loan_purpose').val('')
         $('#loan_size').val('')
         $('#fannie_mae_product').val('')
