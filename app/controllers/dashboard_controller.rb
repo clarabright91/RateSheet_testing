@@ -150,6 +150,7 @@ class DashboardController < ApplicationController
     if params[:term].present?
       if (params[:term] == "All")
         @filter_not_nil[:term] = nil
+        @term = params[:term]
       else
         @filter_data[:term] = params[:term].to_i
         @term = params[:term].to_i
@@ -382,24 +383,28 @@ class DashboardController < ApplicationController
 
   def term_key_of_adjustment(term_keys)
     term_key2 = ''
-    term_keys.each do |term_key|
-      if term_key.include?("-")
-        if term_key.include?("Inf") || term_key.include?("Infinite")
-          if (term_key.split("-").first.strip.to_i <= @term)
-            term_key2 = term_key
-          else
-            break
+    if @term == "All"
+      term_key2 = term_keys.first
+    else
+      term_keys.each do |term_key|
+        if term_key.include?("-")
+          if term_key.include?("Inf") || term_key.include?("Infinite")
+            if (term_key.split("-").first.strip.to_i <= @term)
+              term_key2 = term_key
+            else
+              break
+            end
+          elsif term_key.include?("-")
+            if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
+              term_key2 = term_key
+            else
+              break
+            end
           end
-        elsif term_key.include?("-")
-          if (term_key.split("-").first.strip.to_i <= @term && @term <= term_key.split("-").second.strip.to_i)
+        else
+          if (term_key.to_i == @term)
             term_key2 = term_key
-          else
-            break
           end
-        end
-      else
-        if (term_key.to_i == @term)
-          term_key2 = term_key
         end
       end
     end
