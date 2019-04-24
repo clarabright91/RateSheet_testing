@@ -386,7 +386,7 @@
             <td><%= base_rate.split(".").last.length == 1 ? base_rate + "00" : base_rate.split(".").last.length == 2 ? base_rate + "0" : base_rate %></td>
             <td>
               <% if (program[:adj_points] == "Adjustment Not Present") %>
-                <%= program[:adj_points] %>
+                <%#= program[:adj_points] %>
               <% else %>
                 <%if program[:adj_points].present? %>
                 <%= program[:adj_points].map{|a| number_with_precision(a.round(3), :precision => 3)} %>
@@ -397,13 +397,15 @@
               <%
                 if program[:adj_primary_key] == "Adjustment Not Present"
                   %>
-                    <%= program[:adj_primary_key] %>
+                    <%#= program[:adj_primary_key] %>
                   <%
                 else
-                  program[:adj_primary_key].each_with_index do |key, index|
-                    %>
-                      <%= index+1 %>. <%= key %><br/>
-                    <%
+                  if program[:adj_primary_key].present?
+                    program[:adj_primary_key].each_with_index do |key, index|
+                      %>
+                        <%= index+1 %>. <%= key %><br/>
+                      <%
+                    end
                   end
                 end
               %>
