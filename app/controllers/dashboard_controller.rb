@@ -261,7 +261,7 @@ class DashboardController < ApplicationController
           end
           if (loan_amount_key.include?("Inf") || loan_amount_key.include?("Infinity"))
             loan_amount_value = loan_amount_key.split("-").first.strip.to_i
-            if (loan_amount_value.between?(first_range, last_range))
+            if (loan_amount_value <= first_range)
                 loan_amount_key2 = loan_amount_key
             end
           else
