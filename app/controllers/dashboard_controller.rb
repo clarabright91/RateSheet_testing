@@ -817,30 +817,6 @@ class DashboardController < ApplicationController
                     if adj.data[first_key].present?
                       ltv_key2 = ''
                       ltv_key2 = ltv_key_of_adjustment(adj.data[first_key].keys)
-                      # adj.data[first_key].keys.each do |ltv_key|
-                      #   if (ltv_key.include?("Any") || ltv_key.include?("All"))
-                      #     ltv_key2 = ltv_key
-                      #     adj_key_hash[key_index] = ltv_key
-                      #   end
-                      #   if ltv_key.include?("-")
-                      #     ltv_key_range =[]
-                      #     if ltv_key.include?("Inf") || ltv_key.include?("Infinity")
-                      #       (ltv_key.split("-").first.strip.to_f..ltv_key.split("-").first.strip.to_f+60).step(0.01) { |f| ltv_key_range << f }
-                      #       ltv_key_range = ltv_key_range.uniq
-                      #       if (ltv_key_range & @ltv).present?
-                      #         ltv_key2 = ltv_key
-                      #         adj_key_hash[key_index] = ltv_key
-                      #       end
-                      #     else
-                      #       (ltv_key.split("-").first.strip.to_f..ltv_key.split("-").last.strip.to_f).step(0.01) { |f| ltv_key_range << f }
-                      #       ltv_key_range = ltv_key_range.uniq
-                      #       if (ltv_key_range & @ltv).present?
-                      #         ltv_key2 = ltv_key
-                      #         adj_key_hash[key_index] = ltv_key
-                      #       end
-                      #     end
-                      #   end
-                      # end
                       if ltv_key2.present?
                         adj_key_hash[key_index] = ltv_key2
                       else
@@ -2851,17 +2827,21 @@ class DashboardController < ApplicationController
             end
           end
         end
+      else
+        hash_obj[:adj_points] = "Adjustment Not Present"
+        hash_obj[:adj_primary_key] = "Adjustment Not Present"
       end
       if hash_obj[:adj_points].present?
-        hash_obj[:final_rate] << hash_obj[:base_rate].to_f
+        hash_obj[:final_rate] << @interest.to_f
+        hash_obj[:final_rate] << (hash_obj[:base_rate].to_f < 50.0 ? hash_obj[:base_rate].to_f : (100 - hash_obj[:base_rate].to_f))
         @result << hash_obj
       else
         hash_obj[:adj_points] = "Adjustment Not Present"
         hash_obj[:adj_primary_key] = "Adjustment Not Present"
-        hash_obj[:final_rate] << hash_obj[:base_rate].to_f
+        hash_obj[:final_rate] << @interest.to_f
+        hash_obj[:final_rate] << (hash_obj[:base_rate].to_f < 50.0 ? hash_obj[:base_rate].to_f : (100 - hash_obj[:base_rate].to_f))
         @result << hash_obj
       end
-
 
       hash_obj = {
       :bank_name => "",
