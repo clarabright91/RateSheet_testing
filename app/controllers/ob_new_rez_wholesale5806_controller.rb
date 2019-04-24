@@ -585,10 +585,10 @@ class ObNewRezWholesale5806Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@property_hash,@sub_hash,@loan_amount]
         create_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
     # create adjustment for each program
-    create_program_association_with_adjustment(@sheet_name)
     redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
@@ -875,11 +875,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@property_hash,@sub_hash,@loan_amount]
         create_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
 
     # create adjustment for each program
-    create_program_association_with_adjustment(@sheet_name)
     redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
@@ -1152,9 +1152,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@property_hash,@sub_hash,@loan_amount]
         create_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
-    create_program_association_with_adjustment(@sheet)
     redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
@@ -1383,9 +1383,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@property_hash,@state]
         create_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
-    create_program_association_with_adjustment(@sheet_name)
     redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
@@ -1608,9 +1608,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@refinance_hash,@loan_amount,@state,@property_hash]
         create_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
-    create_program_association_with_adjustment(@sheet_name)
     redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
@@ -1757,9 +1757,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@property_hash]
         create_adjust(adjustment,@sheet_name) 
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
-    create_program_association_with_adjustment(@sheet_name)
     redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
@@ -2034,9 +2034,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@property_hash,@state]
         create_adjust(adjustment,@sheet_name)        
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
-    create_program_association_with_adjustment(@sheet_name)
     redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
@@ -3084,9 +3084,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@property_hash,@sub_hash,@loan_amount]
         create_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
-    create_program_association_with_adjustment(@sheet_name)
     redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
@@ -3350,9 +3350,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@property_hash,@sub_hash,@loan_amount]
         create_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
-    create_program_association_with_adjustment(@sheet_name)
     redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
@@ -3621,9 +3621,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@property_hash,@sub_hash,@loan_amount]
         create_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
-    create_program_association_with_adjustment(@sheet_name)
     redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
@@ -3900,9 +3900,9 @@ class ObNewRezWholesale5806Controller < ApplicationController
         end
         adjustment = [@adjustment_hash,@property_hash,@sub_hash,@loan_amount]
         create_adjust(adjustment,@sheet_name)
+        create_program_association_with_adjustment(@sheet_name)
       end
     end
-    create_program_association_with_adjustment(@sheet_name)
     redirect_to programs_ob_new_rez_wholesale5806_path(@sheet_obj)
   end
 
