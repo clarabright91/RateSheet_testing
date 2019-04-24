@@ -1019,7 +1019,9 @@ class ObNewfiWholesale7019Controller < ApplicationController
       if (sheet == "FHA FIXED ARM PRODUCTS")
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
-
+        @adjustment_hash = {}
+        @state = {}
+        primary_key = ''
         #program
         (51..115).each do |r|
           row = sheet_data.row(r)
@@ -1082,6 +1084,79 @@ class ObNewfiWholesale7019Controller < ApplicationController
             end
           end
         end
+        # Adjustments
+        (130..142).each do |r|
+          row = sheet_data.row(r)
+          if row.compact.count >= 1
+            (0..19).each do |cc|
+              value = sheet_data.cell(r,cc)
+              begin
+                if value.present?
+                  if value == " Price Adjustments"
+                    @adjustment_hash["FHA/FICO"] = {}
+                    @adjustment_hash["FHA/FICO"][true] = {}
+                    @state["State"] = {}
+                  end
+                  if r >= 133 && r <= 141 && cc == 3
+                    primary_key = get_value value
+                    @adjustment_hash["FHA/FICO"][true][primary_key] = {}
+                    cc = cc + 4
+                    new_val = sheet_data.cell(r,cc)
+                    @adjustment_hash["FHA/FICO"][true][primary_key] = new_val
+                  end
+                  if r >= 133 && r <= 142 && cc == 15
+                    primary_key = value
+                    @state["State"][primary_key] = {}
+                    cc = cc + 2
+                    new_val = sheet_data.cell(r,cc)
+                    @state["State"][primary_key] = new_val
+                  end
+                  if r == 133 && cc == 13
+                    @adjustment_hash["FHA/DTI"] = {}
+                    @adjustment_hash["FHA/DTI"][true] = {}
+                    @adjustment_hash["FHA/DTI"][true]["55%"] = {}
+                    @adjustment_hash["FHA/DTI"][true]["55%"] = value
+                  end
+                  if r == 134 && cc == 13
+                    @adjustment_hash["FHA/LoanSize/RefinanceOption"] = {}
+                    @adjustment_hash["FHA/LoanSize/RefinanceOption"][true] = {}
+                    @adjustment_hash["FHA/LoanSize/RefinanceOption"][true]["High-Balance"] = {}
+                    @adjustment_hash["FHA/LoanSize/RefinanceOption"][true]["High-Balance"]["Cash Out"] = {}
+                    @adjustment_hash["FHA/LoanSize/RefinanceOption"][true]["High-Balance"]["Cash Out"] = value
+                  end
+                  if r == 135 && cc == 13
+                    @adjustment_hash["FHA/PropertyType/State"] = {}
+                    @adjustment_hash["FHA/PropertyType/State"][true] = {}
+                    @adjustment_hash["FHA/PropertyType/State"][true]["2 Unit"] = {}
+                    @adjustment_hash["FHA/PropertyType/State"][true]["2 Unit"]["NJ"] = {}
+                    @adjustment_hash["FHA/PropertyType/State"][true]["2 Unit"]["NJ"] = value
+                  end
+                  if r == 136 && cc == 13
+                    @adjustment_hash["FHA/PropertyType/State"][true]["3-4 Unit"] = {}
+                    @adjustment_hash["FHA/PropertyType/State"][true]["3-4 Unit"]["NJ"] = {}
+                    @adjustment_hash["FHA/PropertyType/State"][true]["3-4 Unit"]["NJ"] = value
+                  end
+                  if r == 137 && cc == 13
+                    @adjustment_hash["FHA/LoanAmount"] = {}
+                    @adjustment_hash["FHA/LoanAmount"][true] = {}
+                    @adjustment_hash["FHA/LoanAmount"][true]["0-150000"] = {}
+                    @adjustment_hash["FHA/LoanAmount"][true]["0-150000"] = value
+                  end
+                  if r == 138 && cc == 13
+                    @adjustment_hash["FHA/LoanAmount"][true]["300000-Inf"] = {}
+                    @adjustment_hash["FHA/LoanAmount"][true]["300000-Inf"] = value
+                  end
+                end
+              rescue Exception => e
+                error_log = ErrorLog.new(details: e.backtrace_locations[0], row: r, column: cc, loan_category: sheet, error_detail: e.message)
+                error_log.save
+              end
+            end
+          end
+        end
+        adjustment = [@adjustment_hash,@state]
+        make_adjust(adjustment,sheet)
+        create_program_association_with_adjustment(sheet)
       end
     end
     redirect_to programs_ob_newfi_wholesale7019_path(@sheet_obj)
@@ -3066,7 +3141,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
         value1 = value1.split(">").last.tr('A-Za-z%$><=, ', '')+"-Inf"
         value1 = value1.tr('–','-')
       elsif value1.include?("+")
-        value1.split("+")[0] + "-Inf"
+        value1 = value1.split("+")[0] + "-Inf"
         value1 = value1.tr('–','-')
       else
         value1 = value1.tr('% ','')
