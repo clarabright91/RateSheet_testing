@@ -65,7 +65,7 @@ class Program < ApplicationRecord
   end
 
   def get_non_conforming
-    non_conforming = ["Non-Conforming","non conforming", "NON CONFORMING"]
+    non_conforming = ["Non-Conforming","non conforming", "NON CONFORMING", "Non-Conf"]
     # non_conforming += Acronym.new(non_conforming).to_a
     non_conforming += non_conforming.map(&:downcase)
     return non_conforming

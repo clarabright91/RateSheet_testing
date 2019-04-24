@@ -422,11 +422,11 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                   @property_hash["FreddieMacProduct/LoanPurpose/LoanSize/RefinanceOption"] = {}
                   @property_hash["FreddieMacProduct/LoanPurpose/LoanSize/RefinanceOption"]["HomePossible"] = {}
                   @property_hash["FreddieMacProduct/LoanPurpose/LoanSize/RefinanceOption"]["HomePossible"]["Purchase"] = {}
-                  @property_hash["FreddieMacProduct/LoanPurpose/LoanSize/RefinanceOption"]["HomePossible"]["Purchase"]["Conforming"] = {}
-                  @property_hash["FreddieMacProduct/LoanPurpose/LoanSize/RefinanceOption"]["HomePossible"]["Purchase"]["Conforming"]["Cash Out"] = {}
+                  @property_hash["FreddieMacProduct/LoanPurpose/LoanSize/RefinanceOption"]["HomePossible"]["Purchase"]["Super Conforming"] = {}
+                  @property_hash["FreddieMacProduct/LoanPurpose/LoanSize/RefinanceOption"]["HomePossible"]["Purchase"]["Super Conforming"]["Cash Out"] = {}
                   cc = cc + 5
                   new_val = sheet_data.cell(r,cc)
-                  @property_hash["FreddieMacProduct/LoanPurpose/LoanSize/RefinanceOption"]["HomePossible"]["Purchase"]["Conforming"]["Cash Out"] = new_val
+                  @property_hash["FreddieMacProduct/LoanPurpose/LoanSize/RefinanceOption"]["HomePossible"]["Purchase"]["Super Conforming"]["Cash Out"] = new_val
                 end
                 if r == 795 && cc == 2
                   @property_hash["FreddieMacProduct/LTV/FICO"] = {}
