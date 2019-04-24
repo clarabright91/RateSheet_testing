@@ -356,7 +356,7 @@ class DashboardController < ApplicationController
           if params[:cltv].include?("+")
               cltv_key2 = cltv_key
           else
-            if first_range <= @ltv.last
+            if first_range <= @cltv.last
               cltv_key2 = cltv_key
             end
           end
@@ -371,7 +371,7 @@ class DashboardController < ApplicationController
           else
             (first_range..last_range).step(0.01) { |f| cltv_key_range << f }
             cltv_key_range = cltv_key_range.uniq
-            if (cltv_key_range & @ltv).present?
+            if (cltv_key_range & @cltv).present?
               cltv_key2 = cltv_key
             end
           end

@@ -248,7 +248,7 @@
               <div class="form-group">
                 <label>CLTV</label>
                 <div class="input-group">
-                  <%= select_tag 'cltv', options_for_select(Program::CLTV_VALUES, (params[:cltv].present? ? params[:cltv] : "65.01 - 70.00")), :class=> "form-control" %>
+                  <%= select_tag 'cltv', options_for_select(Program::CLTV_VALUES, (params[:cltv].present? ? params[:cltv] : "75.01 - 80.00")), :class=> "form-control" %>
                 </div>
               </div>
             </div>
@@ -357,13 +357,14 @@
   <div class="row col-md-12 custyle">
     <table class="table table-striped custab table-bordered">
       <thead>
-        <h2>Searched Programs</h2>
+        <h2>Search Results</h2>
         <tr>
           <th>No.</th>
           <th>Bank Name</th>
           <th>Loan Category</th>
           <th>Program Category</th>
           <th>Program Name</th>
+          <th>Interest Rate</th>
           <th>Base Rate</th>
           <th>Adjustments</th>
           <th>Adjustment Names</th>
@@ -379,6 +380,7 @@
             <td><%= program[:loan_category] %></td>
             <td><%= program[:program_category] %></td>
             <td><%= program[:program_name] %></td>
+            <td><%= @interest %></td>
             <% 
               base_rate = (program[:base_rate].to_f).round(3).to_s
               final_rate = (program[:final_rate].sum).round(3).to_s
@@ -779,7 +781,7 @@
         $('#freddie_mac_product').val('')
         $('#credit_score').val("700-719")
         $('#ltv').val("65.01 - 70.00")
-        $('#cltv').val("65.01 - 70.00")
+        $('#cltv').val("75.01 - 80.00")
         $('#state').val('All')
         $('#loan_amount').val('0 - 50000')
         $('#program_category').val('7900')
