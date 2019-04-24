@@ -2836,8 +2836,6 @@ class DashboardController < ApplicationController
         hash_obj[:final_rate] << (hash_obj[:base_rate].to_f < 50.0 ? hash_obj[:base_rate].to_f : (100 - hash_obj[:base_rate].to_f))
         @result << hash_obj
       else
-        hash_obj[:adj_points] = "Adjustment Not Present"
-        hash_obj[:adj_primary_key] = "Adjustment Not Present"
         hash_obj[:final_rate] << @interest.to_f
         hash_obj[:final_rate] << (hash_obj[:base_rate].to_f < 50.0 ? hash_obj[:base_rate].to_f : (100 - hash_obj[:base_rate].to_f))
         @result << hash_obj

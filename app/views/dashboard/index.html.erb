@@ -384,12 +384,20 @@
               final_rate = (program[:final_rate].sum).round(3).to_s
             %>
             <td><%= base_rate.split(".").last.length == 1 ? base_rate + "00" : base_rate.split(".").last.length == 2 ? base_rate + "0" : base_rate %></td>
-            <td><%= program[:adj_points].map{|a| number_with_precision(a.round(3), :precision => 3)} unless program[:adj_points] == "Adjustment Not Present" %></td>
+            <td>
+              <% if (program[:adj_points] == "Adjustment Not Present") %>
+                <%= program[:adj_points] %>
+              <% else %>
+                <%if program[:adj_points].present? %>
+                <%= program[:adj_points].map{|a| number_with_precision(a.round(3), :precision => 3)} %>
+                <%end%>
+              <% end %>
+              </td>
             <td>
               <%
                 if program[:adj_primary_key] == "Adjustment Not Present"
                   %>
-                    <%#= program[:adj_primary_key] %>
+                    <%= program[:adj_primary_key] %>
                   <%
                 else
                   program[:adj_primary_key].each_with_index do |key, index|
