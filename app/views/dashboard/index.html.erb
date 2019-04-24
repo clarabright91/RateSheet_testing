@@ -232,7 +232,7 @@
               <div class="form-group">
                 <label>Credit Score</label>
                 <div class="input-group">
-                  <%= select_tag 'credit_score', options_for_select(Program::CREDIT_SCORE_LIST, (params[:credit_score] rescue nil)), :class=> "form-control" %>
+                  <%= select_tag 'credit_score', options_for_select(Program::CREDIT_SCORE_LIST, (params[:credit_score].present? ? params[:credit_score] : "700-719")), :class=> "form-control" %>
                 </div>
               </div>
             </div>
@@ -240,7 +240,7 @@
               <div class="form-group">
                 <label>LTV</label>
                 <div class="input-group">
-                  <%= select_tag 'ltv', options_for_select(Program::LTV_VALUES, (params[:ltv] rescue nil)), :class=> "form-control" %>
+                  <%= select_tag 'ltv', options_for_select(Program::LTV_VALUES, (params[:ltv].present? ? params[:ltv] : "65.01 - 70.00")), :class=> "form-control" %>
                 </div>
               </div>
             </div>
@@ -248,7 +248,7 @@
               <div class="form-group">
                 <label>CLTV</label>
                 <div class="input-group">
-                  <%= select_tag 'cltv', options_for_select(Program::CLTV_VALUES, (params[:cltv] rescue nil)), :class=> "form-control" %>
+                  <%= select_tag 'cltv', options_for_select(Program::CLTV_VALUES, (params[:cltv].present? ? params[:cltv] : "65.01 - 70.00")), :class=> "form-control" %>
                 </div>
               </div>
             </div>
@@ -524,9 +524,6 @@
         if ($('#arm_basic').val()=='' && $("#loan_type").val() != "All" && $("#loan_type").val() != "ARM" ) {
           $('#arm_basic').val('5/1')
         }
-        $('#credit_score').val("700-719")
-        $('#ltv').val("65.01 - 70.00")
-        $('#cltv').val("65.01 - 70.00")
     }
 
     function showTermAndArmSectionOnLoan(){
