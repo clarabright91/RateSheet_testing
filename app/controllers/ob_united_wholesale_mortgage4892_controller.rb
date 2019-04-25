@@ -596,6 +596,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
         primary_key = ''
         secondary_key = ''
         ltv_key = ''
+        program_heading = sheet_data.cell(10,1)
         #program
         (12..38).each do |r|
           row = sheet_data.row(r)
@@ -608,9 +609,10 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  p_name = @title + " " + sheet
+                  p_name = @title + " " + sheet + " " + program_heading
                   @program.update_fields p_name
                   program_property @title
+                  # @program.update(loan_size: "Non-Conforming&Jumbo")
                   @programs_ids << @program.id
                 end
                 @block_hash = {}
@@ -654,7 +656,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  p_name = @title + " " + sheet
+                  p_name = @title + " " + sheet + " " + program_heading
                   @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id
@@ -702,7 +704,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 @title = sheet_data.cell(r,cc)
                 if @title.present?
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
-                  p_name = @title + " " + sheet
+                  p_name = @title + " " + sheet + " " + program_heading
                   @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id

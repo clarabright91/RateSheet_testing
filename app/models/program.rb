@@ -258,16 +258,22 @@ class Program < ApplicationRecord
     self.arm_basic = ProgramUpdate.arm_basic(p_name)
   end
 
+  # def set_loan_size p_name
+  #   present_word = nil
+  #   fetch_loan_size_fields.each{ |word|
+  #     if p_name.squish.downcase.include?(word.downcase)
+  #       present_word = word 
+  #       break
+  #     end
+  #   }
+  #   loan_size = get_high_balance.include?(present_word) ? "High-Balance" : get_jumbo.include?(present_word) ? "Jumbo" : get_super_conforming.include?(present_word) ? "Super Conforming" : get_non_conforming.include?(present_word) ? "Non-Conforming" : get_conforming.include?(present_word) ? "Conforming" : get_conf.include?(present_word) ? "Conforming and High-Balance" : get_non_conf_hb.include?(present_word) ? "Non-Conforming and Jumbo" : "Conforming"
+  #   self.loan_size = loan_size
+  # end
   def set_loan_size p_name
-    present_word = nil
-    fetch_loan_size_fields.each{ |word|
-      if p_name.squish.downcase.include?(word.downcase)
-        present_word = word 
-        break
-      end
-    }
-    loan_size = get_high_balance.include?(present_word) ? "High-Balance" : get_jumbo.include?(present_word) ? "Jumbo" : get_super_conforming.include?(present_word) ? "Super Conforming" : get_non_conforming.include?(present_word) ? "Non-Conforming" : get_conforming.include?(present_word) ? "Conforming" : get_conf.include?(present_word) ? "Conforming and High-Balance" : get_non_conf_hb.include?(present_word) ? "Non-Conforming and Jumbo" : "Conforming"
-    self.loan_size = loan_size
+    present_word = fetch_loan_size_fields.map { |word| p_name.downcase.split.map { |x| word if x == word  }.compact }.reject(&:blank?).flatten.join('&')
+    present_word = present_word.split('&').uniq
+     loan_size = present_word.map { |present_word| loan_size = get_high_balance.include?(present_word) ? "High-Balance" : get_jumbo.include?(present_word) ? "Jumbo" : get_super_conforming.include?(present_word) ? "Super Conforming" : get_non_conforming.include?(present_word) ? "Non-Conforming" : get_conforming.include?(present_word) ? "Conforming" : get_conf.include?(present_word) ? "Conforming and High-Balance" : get_non_conf_hb.include?(present_word) ? "Non-Conforming and Jumbo" : "Conforming"}.join('&')
+     self.loan_size = loan_size
   end
 
   def set_arm_advanced p_name
