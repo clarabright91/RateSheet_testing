@@ -1567,7 +1567,16 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                     third_key = get_value @cltv_data[cc-3]
                     @adjustment_hash[secondary_key][ltv_key][third_key] = (value.class == Float ? value*100 : value)
                   end
-                  if r >= 94 && r <= 95 && cc == 10
+                  if r == 94 && cc == 10
+                    @other_hash["RefinanceOption/LTV"] = {}
+                    @other_hash["RefinanceOption/LTV"]["Cash Out"] = {}
+                  end
+                  if r == 94 && cc >= 11 && cc <= 15
+                    first_key = get_value @ltv_data[cc-3]
+                    @other_hash["RefinanceOption/LTV"]["Cash Out"][first_key] = {}
+                    @other_hash["RefinanceOption/LTV"]["Cash Out"][first_key] = (value.class == Float ? value*100 : value)
+                  end
+                  if r == 95 && cc == 10
                     if value.include?("1")
                       ltv_key = value.split("(1)").first
                     else
@@ -1575,7 +1584,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                     end
                     @other_hash["PropertyType/LTV"][ltv_key] = {}
                   end
-                  if r >= 94 && r <= 95 && cc >= 11 && cc <= 15
+                  if r == 95 && cc >= 11 && cc <= 15
                     first_key = get_value @ltv_data[cc-3]
                     @other_hash["PropertyType/LTV"][ltv_key][first_key] = {}
                     @other_hash["PropertyType/LTV"][ltv_key][first_key] = (value.class == Float ? value*100 : value)
