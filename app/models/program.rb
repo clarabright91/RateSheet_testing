@@ -104,7 +104,7 @@ class Program < ApplicationRecord
   end
 
   def get_high_balance
-    high_balance = ["High-Balance", "HIGH BAL", "High Balance", "HB"]
+    high_balance = ["High-Balance", "HIGH BAL", "High Balance", "HB", "HighBalance"]
     # high_balance += Acronym.new(high_balance).to_a
     high_balance += high_balance.map(&:downcase)
     return high_balance
@@ -129,9 +129,30 @@ class Program < ApplicationRecord
     return rf
   end
 
-  def fetch_loan_size_fields
-    loan_size = get_non_conforming + get_super_conforming + get_conforming + get_high_balance_extra + get_high_balance + get_jumbo + get_conf + get_non_conf_hb 
-    return loan_size
+  def fetch_loan_size_fields p_name
+    @loan_size = []
+    @loan_size = get_non_conforming.map{|a| a if p_name.downcase.include?(a)}.compact
+    unless @loan_size.present?
+      @loan_size = get_super_conforming.map{|a| a if p_name.downcase.include?(a)}.compact
+      unless @loan_size
+        @loan_size = get_conforming
+      end
+    end
+    @check_high_bal = get_high_balance_extra.map{|a| a if p_name.downcase.include?(a)}.compact
+    
+    unless @check_high_bal.nil?
+      @check_high_bal1 = get_high_balance.map{|a| a if p_name.downcase.include?(a)}.compact
+      @loan_size << @check_high_bal1
+    end
+
+    @check_jumbo = get_jumbo.map{|a| a if p_name.downcase.include?(a)}.compact
+    if @check_jumbo.present?
+      @loan_size << @check_jumbo
+    end
+
+    return @loan_size.try(:compact).try(:flatten)
+    # loan_size = get_non_conforming + get_super_conforming + get_conforming + get_high_balance_extra + get_high_balance + get_jumbo + get_conf + get_non_conf_hb 
+    # return loan_size
   end
 
   def fetch_loan_purpose_fields
@@ -140,7 +161,7 @@ class Program < ApplicationRecord
   end
 
   def update_fields p_name
-    set_loan_size(p_name)           if fetch_loan_size_fields.each{ |word| p_name.downcase.include?(word.downcase) }
+    set_loan_size(fetch_loan_size_fields(p_name), p_name)
     set_loan_purpose(p_name)        if fetch_loan_purpose_fields.each{ |word| p_name.downcase.include?(word.downcase) }
     set_load_type(p_name)           if ["Fixed", "ARM", "Hybrid", "Floating", "Variable"].each{ |word| p_name.downcase.include?(word.downcase) }
     set_fha                         if p_name.downcase.include?("fha")
@@ -269,11 +290,18 @@ class Program < ApplicationRecord
   #   loan_size = get_high_balance.include?(present_word) ? "High-Balance" : get_jumbo.include?(present_word) ? "Jumbo" : get_super_conforming.include?(present_word) ? "Super Conforming" : get_non_conforming.include?(present_word) ? "Non-Conforming" : get_conforming.include?(present_word) ? "Conforming" : get_conf.include?(present_word) ? "Conforming and High-Balance" : get_non_conf_hb.include?(present_word) ? "Non-Conforming and Jumbo" : "Conforming"
   #   self.loan_size = loan_size
   # end
-  def set_loan_size p_name
-    present_word = fetch_loan_size_fields.map { |word| p_name.downcase.split.map { |x| word if x == word  }.compact }.reject(&:blank?).flatten.join('&')
-    present_word = present_word.split('&').uniq
-     loan_size = present_word.map { |present_word| loan_size = get_high_balance.include?(present_word) ? "High-Balance" : get_jumbo.include?(present_word) ? "Jumbo" : get_super_conforming.include?(present_word) ? "Super Conforming" : get_non_conforming.include?(present_word) ? "Non-Conforming" : get_conforming.include?(present_word) ? "Conforming" : get_conf.include?(present_word) ? "Conforming and High-Balance" : get_non_conf_hb.include?(present_word) ? "Non-Conforming and Jumbo" : "Conforming"}.join('&')
-     self.loan_size = loan_size
+  def set_loan_size selected_val, p_name
+    loan_size = selected_val.map { |present_word| loan_size = get_high_balance.include?(present_word) ? "High-Balance" : get_jumbo.include?(present_word) ? "Jumbo" : get_super_conforming.include?(present_word) ? "Super Conforming" : get_non_conforming.include?(present_word) ? "Non-Conforming" : get_conforming.include?(present_word) ? "Conforming" : get_conf.include?(present_word) ? "Conforming and High-Balance" : get_non_conf_hb.include?(present_word) ? "Non-Conforming and Jumbo" : "Conforming"}.join('&')
+    loan_size = loan_size.split('&').uniq.join('&')
+    unless loan_size.downcase.include?("non-conforming") || loan_size.downcase.include?("super conforming")
+      conf = get_conforming.map { |word|  p_name.downcase.include?(word) }.any?
+    end
+    if loan_size.present? && conf
+      self.loan_size = loan_size +"&" +"Conforming"
+    else
+      self.loan_size = (loan_size == "" ? "Conforming" : loan_size)
+    end
+    # self.loan_size = (loan_size == "" ? "Conforming" : loan_size)
   end
 
   def set_arm_advanced p_name

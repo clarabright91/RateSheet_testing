@@ -148,7 +148,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @bpc_loan_hash["VA/LoanAmount/LoanPurpose"]["true"] = {}
                     @govt_hash["FHA/RefinanceOption/Streamline/VA"]={}
                     @spe_hash["LoanType"] = {}
-                    @second_hash["LoanType/LockDay"]={}
+                    @second_hash["LoanPurpose/LockDay"]={}
                   end
                   if r >= 112 && r <= 120 && cc == 5
                     new_key = get_value value
@@ -167,10 +167,14 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @loan_hash["LoanAmount/LoanPurpose"][new_key]["Purchase"] = new_val
                     @loan_hash["LoanAmount/LoanPurpose"][new_key]["Refinance"] = c_val
                   end
-                  if r == 128 && cc == 5
-                    new_val = sheet_data.cell(r,cc+4)
-                    @hb_hash["High-Balance"] = {}
-                    @hb_hash["High-Balance"] = new_val
+                  if r == 128 && cc == 9
+                    @hb_hash["LoanSize/LoanPurpose"] = {}
+                    @hb_hash["LoanSize/LoanPurpose"]["High-Balance"] = {}
+                    @hb_hash["LoanSize/LoanPurpose"]["High-Balance"]["Purchase"] = {}
+                    @hb_hash["LoanSize/LoanPurpose"]["High-Balance"]["Purchase"] = value
+                    new_val = sheet_data.cell(r,cc+1)
+                    @hb_hash["LoanSize/LoanPurpose"]["High-Balance"]["Refinance"] = {}
+                    @hb_hash["LoanSize/LoanPurpose"]["High-Balance"]["Refinance"] = new_val
                   end
                   if r >= 129 && r <= 133 && cc == 5
                     new_key = get_value value
@@ -189,10 +193,10 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   if r >= 112 && r <= 125 && cc == 12
                     if value == "30, 45 & 60 Day Lock Purchase Special"
                       new_val = sheet_data.cell(r,cc+6)
-                      @second_hash["LoanType/LockDay"]["Purchase"]={}
-                      @second_hash["LoanType/LockDay"]["Purchase"][30]=new_val
-                      @second_hash["LoanType/LockDay"]["Purchase"][45]=new_val
-                      @second_hash["LoanType/LockDay"]["Purchase"][60]=new_val
+                      @second_hash["LoanPurpose/LockDay"]["Purchase"]={}
+                      @second_hash["LoanPurpose/LockDay"]["Purchase"][30]=new_val
+                      @second_hash["LoanPurpose/LockDay"]["Purchase"][45]=new_val
+                      @second_hash["LoanPurpose/LockDay"]["Purchase"][60]=new_val
                     end
                     if value == "FHA Refinances"
                       new_val = sheet_data.cell(r,cc+6)
@@ -210,18 +214,17 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     end
                     if value == "90 Day Lock (FRM & Purch Only)"
                       new_val = sheet_data.cell(r,cc+6)
-                      @second_hash["RateType/LoanPurpose/LockDay"]={}
-                      @second_hash["RateType/LoanPurpose/LockDay"]["Fixed"]={}
-                      @second_hash["RateType/LoanPurpose/LockDay"]["Fixed"]["Purchase"]={}
-                      @second_hash["RateType/LoanPurpose/LockDay"]["Fixed"]["Purchase"]["90"]=new_val
+                      @second_hash["LoanType/LoanPurpose/LockDay"]={}
+                      @second_hash["LoanType/LoanPurpose/LockDay"]["Fixed"]={}
+                      @second_hash["LoanType/LoanPurpose/LockDay"]["Fixed"]["Purchase"]={}
+                      @second_hash["LoanType/LoanPurpose/LockDay"]["Fixed"]["Purchase"]["90"]=new_val
                     end
                     if value == "VA Cashout >95 LTV"
                       new_val = sheet_data.cell(r,cc+6)
                       @second_hash["RefinanceOption/VA/LTV"]={}
                       @second_hash["RefinanceOption/VA/LTV"]["Cash Out"]={}
                       @second_hash["RefinanceOption/VA/LTV"]["Cash Out"]["true"]={}
-                      @second_hash["RefinanceOption/VA/LTV"]["Cash Out"]["true"]["LTV"]={}
-                      @second_hash["RefinanceOption/VA/LTV"]["Cash Out"]["true"]["LTV"]["0-95"]=new_val
+                      @second_hash["RefinanceOption/VA/LTV"]["Cash Out"]["true"]["0-95"]=new_val
                     end
                     if value == "VA - Refinance Credit Score ≥ 620"
                       new_val = sheet_data.cell(r,cc+6)
@@ -238,10 +241,10 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     end
                     if value == "VA - IRRRL - Investment Property"
                       new_val = sheet_data.cell(r,cc+6)
-                      @second_hash["VA/LoanType/RefinanceOption"]={}
-                      @second_hash["VA/LoanType/RefinanceOption"]["true"]={}
-                      @second_hash["VA/LoanType/RefinanceOption"]["true"]["Refinance"]={}
-                      @second_hash["VA/LoanType/RefinanceOption"]["true"]["Refinance"]["IRRRL"]=new_val
+                      @second_hash["VA/LoanPurpose/RefinanceOption"]={}
+                      @second_hash["VA/LoanPurpose/RefinanceOption"]["true"]={}
+                      @second_hash["VA/LoanPurpose/RefinanceOption"]["true"]["Refinance"]={}
+                      @second_hash["VA/LoanPurpose/RefinanceOption"]["true"]["Refinance"]["IRRRL"]=new_val
                     end
                     if value == "Manufactured Home (FHA Only)"
                       new_val = sheet_data.cell(r,cc+6)
@@ -962,8 +965,6 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     @adjustment_hash["LoanSize/LoanType/Term/LTV/FICO"]["Conforming"] = {}
                     @adjustment_hash["LoanSize/LoanType/Term/LTV/FICO"]["Conforming"]["Fixed"] = {}
                     @adjustment_hash["LoanSize/LoanType/Term/LTV/FICO"]["Conforming"]["Fixed"]["0-15"] = {}
-                    @adjustment_hash["RefinanceOption/LTV/FICO"] = {}
-                    @adjustment_hash["RefinanceOption/LTV/FICO"]["Cash Out"] = {}
                   end
                   if value == "LPMI Adjustments Applied after Cap"
                     @property_hash["LPMI/PropertyType/FICO"] = {}
@@ -1233,7 +1234,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   if value == "FICO/LTV Adjustments - Loan Amount ≤ $1MM"
                     @adjustment_hash["LoanAmount/FICO/LTV"] = {}
                     @adjustment_hash["LoanAmount/FICO/LTV"]["0-1000000"] = {}
-                    @adjustment_hash["LoanAmount/FICO/LTV"]["1000000-#{(Float::INFINITY).to_s.downcase}"] = {}
+                    @adjustment_hash["LoanAmount/FICO/LTV"]["1000000-#{(Float::INFINITY).to_s.capitalize}"] = {}
                   end
                   if value == "Feature Adjustments"
                     @property_hash["PropertyType/LTV"] = {}
@@ -1244,7 +1245,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   # FICO/LTV Adjustments - Loan Amount ≤ $1MM
                   if r >= 45 && r <= 51 && cc == 3
                     if value.include?(">")
-                      primary_key = value.tr('>= ','')+"-#{(Float::INFINITY).to_s.downcase}"
+                      primary_key = value.tr('>= ','')+"-#{(Float::INFINITY).to_s.capitalize}"
                     else
                       primary_key = value
                     end
@@ -1284,11 +1285,11 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   # FICO/LTV Adjustments - Loan Amount > $1MM
                   if r >= 55 && r <= 61 && cc == 3
                     if value.include?(">")
-                      primary_key = value.tr('>= ','')+"-#{(Float::INFINITY).to_s.downcase}"
+                      primary_key = value.tr('>= ','')+"-#{(Float::INFINITY).to_s.capitalize}"
                     else
                       primary_key = value
                     end
-                    @adjustment_hash["LoanAmount/FICO/LTV"]["1000000-#{(Float::INFINITY).to_s.downcase}"][primary_key] = {}
+                    @adjustment_hash["LoanAmount/FICO/LTV"]["1000000-#{(Float::INFINITY).to_s.capitalize}"][primary_key] = {}
                   end
                   if r >= 55 && r <= 61 && cc >= 4 && cc <= 9
                     if @ltv_data[cc-1].include?("<")
@@ -1296,8 +1297,8 @@ class ObNewRezWholesale5806Controller < ApplicationController
                     else
                       ltv_key = @ltv_data[cc-1]
                     end
-                    @adjustment_hash["LoanAmount/FICO/LTV"]["1000000-#{(Float::INFINITY).to_s.downcase}"][primary_key][ltv_key] = {}
-                    @adjustment_hash["LoanAmount/FICO/LTV"]["1000000-#{(Float::INFINITY).to_s.downcase}"][primary_key][ltv_key] = value
+                    @adjustment_hash["LoanAmount/FICO/LTV"]["1000000-#{(Float::INFINITY).to_s.capitalize}"][primary_key][ltv_key] = {}
+                    @adjustment_hash["LoanAmount/FICO/LTV"]["1000000-#{(Float::INFINITY).to_s.capitalize}"][primary_key][ltv_key] = value
                   end
                   # Max Price
                   if r == 64 && cc == 11
@@ -1505,7 +1506,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   # Purchase Transactions Adjustment
                   if r >= 61 && r <= 65 && cc == 3
                     if value.include?("≥")
-                      primary_key = value.tr('≥ ','')+"-#{(Float::INFINITY).to_s.downcase}"
+                      primary_key = value.tr('≥ ','')+"-#{(Float::INFINITY).to_s.capitalize}"
                     else
                       primary_key = get_value value
                     end
@@ -1537,7 +1538,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   # R/T Refinance Transactions Adjustment
                   if r >= 69 && r <= 73 && cc == 3
                     if value.include?("≥")
-                      primary_key = value.tr('≥ ','')+"-#{(Float::INFINITY).to_s.downcase}"
+                      primary_key = value.tr('≥ ','')+"-#{(Float::INFINITY).to_s.capitalize}"
                     else
                       primary_key = get_value value
                     end
@@ -1555,7 +1556,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   # # C/O Refinance Transactions Adjustment
                   if r >= 77 && r <= 81 && cc == 3
                     if value.include?("≥")
-                      primary_key = value.tr('≥ ','')+"-#{(Float::INFINITY).to_s.downcase}"
+                      primary_key = value.tr('≥ ','')+"-#{(Float::INFINITY).to_s.capitalize}"
                     else
                       primary_key = get_value value
                     end
@@ -2169,7 +2170,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   # Purchase Transactions Adjustment
                   if r >= 68 && r <= 74 && cc == 3
                     if value.include?("≥")
-                      primary_key = value.tr('≥ ','')+"-#{(Float::INFINITY).to_s.downcase}"
+                      primary_key = value.tr('≥ ','')+"-#{(Float::INFINITY).to_s.capitalize}"
                     else
                       primary_key = get_value value
                     end
@@ -2219,7 +2220,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   # R/T Refinance Transactions Adjustment
                   if r >= 78 && r <= 84 && cc == 3
                     if value.include?("≥")
-                      primary_key = value.tr('≥ ','')+"-#{(Float::INFINITY).to_s.downcase}"
+                      primary_key = value.tr('≥ ','')+"-#{(Float::INFINITY).to_s.capitalize}"
                     else
                       primary_key = get_value value
                     end
@@ -2237,7 +2238,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   # # C/O Refinance Transactions Adjustment
                   if r >= 88 && r <= 94 && cc == 3
                     if value.include?("≥")
-                      primary_key = value.tr('≥ ','')+"-#{(Float::INFINITY).to_s.downcase}"
+                      primary_key = value.tr('≥ ','')+"-#{(Float::INFINITY).to_s.capitalize}"
                     else
                       primary_key = get_value value
                     end
@@ -2724,7 +2725,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   # All High Balance Extra Loans
                   if r >= 28 && r <= 32 && cc == 2
                     if value.include?(">")
-                      ltv_key = value.tr('>=','')+"-#{(Float::INFINITY).to_s.downcase}"
+                      ltv_key = value.tr('>=','')+"-#{(Float::INFINITY).to_s.capitalize}"
                     else
                       ltv_key = get_value value
                     end
@@ -2742,7 +2743,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   # Cashout Adjustments
                   if r >= 34 && r <= 38 && cc == 2
                     if value.include?(">")
-                      ltv_key = value.tr('>=','')+"-#{(Float::INFINITY).to_s.downcase}"
+                      ltv_key = value.tr('>=','')+"-#{(Float::INFINITY).to_s.capitalize}"
                     else
                       ltv_key = get_value value
                     end
@@ -2773,7 +2774,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
                   end
                   if r >= 42 && r <= 44 && cc > 3 && cc <= 5
                     if @sub_data[cc-2].include?(">")
-                      sub_data = @sub_data[cc-2].tr('>= ','')+"-#{(Float::INFINITY).to_s.downcase}"
+                      sub_data = @sub_data[cc-2].tr('>= ','')+"-#{(Float::INFINITY).to_s.capitalize}"
                     else
                       sub_data = get_value @sub_data[cc-2]
                     end
@@ -4019,7 +4020,7 @@ class ObNewRezWholesale5806Controller < ApplicationController
         value1 = "0-"+value1.split("<=").last.tr('A-Za-z%$><=≤, ','')
         value1 = value1.tr('–','-')
       elsif value1.include?(">") || value1.include?("+")
-        value1 = value1.split(">").last.tr('A-Za-z+ ','')+"-Inf"
+        value1 = value1.split(">").last.tr('A-Za-z+= ','')+"-Inf"
         value1 = value1.tr('–','-')
       elsif value1.include?("≥")
         value1 = value1.split("≥").last.tr('A-Za-z$, ','')+"-Inf"

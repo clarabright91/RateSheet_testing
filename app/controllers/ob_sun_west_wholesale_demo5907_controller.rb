@@ -286,6 +286,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
         sheet_data = @xlsx.sheet(sheet)
         @programs_ids = []
         @property_hash = {}
+        program_heading = sheet_data.cell(706,2)
         # FHLMC HOME POSSIBLE / HOMEONE / SUPER CONFORMING Programs
         (708..760).each do |r|
           row = sheet_data.row(r)
@@ -299,7 +300,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                 if @title.present? && @title != "Rate"
                   @program = @sheet_obj.programs.find_or_create_by(program_name: @title)
                   @sheet_name = @program.sub_sheet.name
-                  p_name = @title + " " + @sheet_name
+                  p_name = @title + " " + @sheet_name + " " + program_heading
                   @program.update_fields p_name
                   program_property @title
                   @programs_ids << @program.id

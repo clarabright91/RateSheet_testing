@@ -199,7 +199,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   end
                 end
 
-                if r >= 137 && r <= 142 && cc >= 5 && cc <= 13
+                if r >= 137 && r <= 142 && cc >= 5 && cc <= 12
                   cltv_key = get_value @cltv_data[cc-3]
                   @highAdjustment["LoanSize/FICO/CLTV"]["High-Balance"][@fico_data[r-137]][cltv_key] = value
                 end
@@ -210,7 +210,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @highAdjustment1["RefinanceOption/CLTV"]["Cash Out"] = {}
                 end
 
-                if r == 146 && cc >= 5 && cc <= 13
+                if r == 146 && cc >= 5 && cc <= 12
                   cltv_key = get_value @ltv_data[cc-3]
                   @highAdjustment1["RefinanceOption/CLTV"]["Cash Out"][cltv_key] = {}
                   @highAdjustment1["RefinanceOption/CLTV"]["Cash Out"][cltv_key] = value
@@ -222,7 +222,7 @@ class ObNewfiWholesale7019Controller < ApplicationController
                   @highAdjustment2["LoanPurpose/CLTV"]["Purchase"] = {}
                 end
 
-                if r == 147 && cc >= 5 && cc <= 13
+                if r == 147 && cc >= 5 && cc <= 12
                   cltv_key = get_value @ltv_data[cc-3]
                   @highAdjustment2["LoanPurpose/CLTV"]["Purchase"][cltv_key] = {}
                   @highAdjustment2["LoanPurpose/CLTV"]["Purchase"][cltv_key] = value
@@ -354,12 +354,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
               end
               if r == 121 && cc == 3
                 @additional_hash["LoanAmount/LTV"] = {}
-                @additional_hash["LoanAmount/LTV"]["1500000"] = {}
+                @additional_hash["LoanAmount/LTV"]["1500000-Inf"] = {}
               end
               if r == 121 && cc >= 5 && cc <= 19
                 ltv_key = get_value @ltv_data[cc-3]
-                @additional_hash["LoanAmount/LTV"]["1500000"][ltv_key] = {}
-                @additional_hash["LoanAmount/LTV"]["1500000"][ltv_key] = value
+                @additional_hash["LoanAmount/LTV"]["1500000-Inf"][ltv_key] = {}
+                @additional_hash["LoanAmount/LTV"]["1500000-Inf"][ltv_key] = value
               end
               if r == 122 && cc == 3
                 @additional_hash["LoanType/LTV"] = {}
@@ -389,14 +389,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @additional_hash["PropertyType/LTV"][primary_key][ltv_key] = value
               end
               if r == 127 && cc == 3
-                @additional_hash["LoanType/Term"] = {}
-                @additional_hash["LoanType/Term"]["Fixed"] = {}
-                @additional_hash["LoanType/Term"]["Fixed"]["40"] = {}
+                @additional_hash["LoanType/Term/LTV"]["Fixed"]["40"] = {}
               end
               if r == 127 && cc >= 5 && cc <= 19
                 ltv_key = get_value @ltv_data[cc-3]
-                @additional_hash["LoanType/Term"]["Fixed"]["40"][ltv_key] = {}
-                @additional_hash["LoanType/Term"]["Fixed"]["40"][ltv_key] = value
+                @additional_hash["LoanType/Term/LTV"]["Fixed"]["40"][ltv_key] = {}
+                @additional_hash["LoanType/Term/LTV"]["Fixed"]["40"][ltv_key] = value
               end
               if r == 128 && cc == 3
                 @additional_hash["FullDoc/LTV"] = {}
@@ -605,12 +603,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
               end
               if r == 125 && cc == 3
                 @additional_hash["LoanAmount/LTV"] = {}
-                @additional_hash["LoanAmount/LTV"]["1500000"] = {}
+                @additional_hash["LoanAmount/LTV"]["1500000-Inf"] = {}
               end
               if r == 125 && cc >= 5 && cc <= 19
                 ltv_key = get_value @ltv_data[cc-3]
-                @additional_hash["LoanAmount/LTV"]["1500000"][ltv_key] = {}
-                @additional_hash["LoanAmount/LTV"]["1500000"][ltv_key] = value
+                @additional_hash["LoanAmount/LTV"]["1500000-Inf"][ltv_key] = {}
+                @additional_hash["LoanAmount/LTV"]["1500000-Inf"][ltv_key] = value
               end
               if r == 126 && cc == 3
                 @additional_hash["LoanType/LTV"] = {}
@@ -640,14 +638,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @additional_hash["PropertyType/LTV"][primary_key][ltv_key] = value
               end
               if r == 131 && cc == 3
-                @additional_hash["LoanType/Term"] = {}
-                @additional_hash["LoanType/Term"]["Fixed"] = {}
-                @additional_hash["LoanType/Term"]["Fixed"]["40"] = {}
+                @additional_hash["LoanType/Term/LTV"]["Fixed"]["40"] = {}
               end
               if r == 131 && cc >= 5 && cc <= 19
                 ltv_key = get_value @ltv_data[cc-3]
-                @additional_hash["LoanType/Term"]["Fixed"]["40"][ltv_key] = {}
-                @additional_hash["LoanType/Term"]["Fixed"]["40"][ltv_key] = value
+                @additional_hash["LoanType/Term/LTV"]["Fixed"]["40"][ltv_key] = {}
+                @additional_hash["LoanType/Term/LTV"]["Fixed"]["40"][ltv_key] = value
               end
               if r == 132 && cc == 3
                 @additional_hash["FullDoc/LTV"] = {}
@@ -851,12 +847,12 @@ class ObNewfiWholesale7019Controller < ApplicationController
 
                   if r == 93 && cc == 5
                     @other_adjustment["ArmBasic/LTV"] = {}
-                    @other_adjustment["ArmBasic/LTV"]["5/1 ARM"] = {}
+                    @other_adjustment["ArmBasic/LTV"]["5"] = {}
                   end
                   if r ==93 && cc >= 7 && cc <= 12
                     secondary_key = @ltv_data[cc-3]*100
-                    @other_adjustment["ArmBasic/LTV"]["5/1 ARM"][secondary_key] = {}
-                    @other_adjustment["ArmBasic/LTV"]["5/1 ARM"][secondary_key] = value
+                    @other_adjustment["ArmBasic/LTV"]["5"][secondary_key] = {}
+                    @other_adjustment["ArmBasic/LTV"]["5"][secondary_key] = value
                   end
 
                   if r >= 94 && r <= 98 && cc == 5
