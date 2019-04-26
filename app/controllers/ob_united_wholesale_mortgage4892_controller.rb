@@ -188,7 +188,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                 end
                 # Loan Size Adjustors
                 if r >= 80 && r <= 82 && cc == 9
-                  secondary_key = value.tr('A-Za-z<:$, ','')
+                  secondary_key = get_value value
                   @adjustment_hash["LoanAmount"][secondary_key] = {}
                 end
                 if r >= 80 && r <= 82 && cc == 16
@@ -835,18 +835,18 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
                   if r == 91 && cc == 3
                     @other_adjustment["LoanSize/ArmBasic/LTV"] = {}
                     @other_adjustment["LoanSize/ArmBasic/LTV"]["Jumbo"] = {}
-                    @other_adjustment["LoanSize/ArmBasic/LTV"]["Jumbo"]["5/1"] = {}
-                    @other_adjustment["LoanSize/ArmBasic/LTV"]["Jumbo"]["7/1"] = {}
-                    @other_adjustment["LoanSize/ArmBasic/LTV"]["Jumbo"]["10/1"] = {}
+                    @other_adjustment["LoanSize/ArmBasic/LTV"]["Jumbo"]["5"] = {}
+                    @other_adjustment["LoanSize/ArmBasic/LTV"]["Jumbo"]["7"] = {}
+                    @other_adjustment["LoanSize/ArmBasic/LTV"]["Jumbo"]["10"] = {}
                   end
                   if r == 91 && cc >= 8 && cc <= 14
                     ltv_key = get_value @ltv_data[cc-1]
-                    @other_adjustment["LoanSize/ArmBasic/LTV"]["Jumbo"]["5/1"][ltv_key] = {}
-                    @other_adjustment["LoanSize/ArmBasic/LTV"]["Jumbo"]["7/1"][ltv_key] = {}
-                    @other_adjustment["LoanSize/ArmBasic/LTV"]["Jumbo"]["10/1"][ltv_key] = {}
-                    @other_adjustment["LoanSize/ArmBasic/LTV"]["Jumbo"]["5/1"][ltv_key] = value
-                    @other_adjustment["LoanSize/ArmBasic/LTV"]["Jumbo"]["7/1"][ltv_key] = value
-                    @other_adjustment["LoanSize/ArmBasic/LTV"]["Jumbo"]["10/1"][ltv_key] = value
+                    @other_adjustment["LoanSize/ArmBasic/LTV"]["Jumbo"]["5"][ltv_key] = {}
+                    @other_adjustment["LoanSize/ArmBasic/LTV"]["Jumbo"]["7"][ltv_key] = {}
+                    @other_adjustment["LoanSize/ArmBasic/LTV"]["Jumbo"]["10"][ltv_key] = {}
+                    @other_adjustment["LoanSize/ArmBasic/LTV"]["Jumbo"]["5"][ltv_key] = value
+                    @other_adjustment["LoanSize/ArmBasic/LTV"]["Jumbo"]["7"][ltv_key] = value
+                    @other_adjustment["LoanSize/ArmBasic/LTV"]["Jumbo"]["10"][ltv_key] = value
                   end
                 end
               rescue Exception => e
@@ -958,7 +958,7 @@ class ObUnitedWholesaleMortgage4892Controller < ApplicationController
         value1 = value1.split(">").last.tr('^0-9, ', '')+"-Inf"
         value1 = value1.tr('–','-')
       else
-        value1 = value1.tr('A-Za-z:$, ','')
+        value1 = value1.tr('A-Za-z:$*, ','')
         value1 = value1.tr('–','-')
       end
     end

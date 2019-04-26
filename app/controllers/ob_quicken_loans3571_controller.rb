@@ -127,8 +127,8 @@ class ObQuickenLoans3571Controller < ApplicationController
                   end
                   if value == "Home Possible & Home Ready Adjustment Caps"
                     @property_hash["FannieMaeProduct/FreddieMacProduct/LTV/FICO"] = {}
-                    @property_hash["FannieMaeProduct/FreddieMacProduct/LTV/FICO"]["Home Ready"] = {}
-                    @property_hash["FannieMaeProduct/FreddieMacProduct/LTV/FICO"]["Home Ready"]["Home Possible"] = {}
+                    @property_hash["FannieMaeProduct/FreddieMacProduct/LTV/FICO"]["HomeReady"] = {}
+                    @property_hash["FannieMaeProduct/FreddieMacProduct/LTV/FICO"]["HomeReady"]["Home Possible"] = {}
                   end
                   if value == "Cash Out"
                     @cashout_hash["RefinanceOption/FICO/LTV"] = {}
@@ -203,11 +203,11 @@ class ObQuickenLoans3571Controller < ApplicationController
                   end
                   # ARM Structure
                   if r >= 49 && r <= 51 && cc == 13
-                    secondary_key = value
+                    secondary_key = value.split('/').first
                     @other_adjustment["LoanType/ArmBasic/ArmAdvanced/Margin"]["ARM"][secondary_key] = {}
                   end
                   if r >= 49 && r <= 51 && cc == 17
-                    ltv_key = value
+                    ltv_key = value.tr('/','-')
                     @other_adjustment["LoanType/ArmBasic/ArmAdvanced/Margin"]["ARM"][secondary_key][ltv_key] = {}
                   end
                   if r >= 49 && r <= 51 && cc == 19
@@ -252,10 +252,10 @@ class ObQuickenLoans3571Controller < ApplicationController
                     @other_adjustment["LoanSize/LoanType/FannieMaeProduct"] = {}
                     @other_adjustment["LoanSize/LoanType/FannieMaeProduct"]["High-Balance"] = {}
                     @other_adjustment["LoanSize/LoanType/FannieMaeProduct"]["High-Balance"]["ARM"] = {}
-                    @other_adjustment["LoanSize/LoanType/FannieMaeProduct"]["High-Balance"]["ARM"]["Home Ready"] = {}
+                    @other_adjustment["LoanSize/LoanType/FannieMaeProduct"]["High-Balance"]["ARM"]["HomeReady"] = {}
                     cc = cc + 8
                     new_value = sheet_data.cell(r,cc)
-                    @other_adjustment["LoanSize/LoanType/FannieMaeProduct"]["High-Balance"]["ARM"]["Home Ready"] = new_value
+                    @other_adjustment["LoanSize/LoanType/FannieMaeProduct"]["High-Balance"]["ARM"]["HomeReady"] = new_value
                   end
                   if r >= 64 && r <= 65 && cc == 13
                     secondary_key = get_value value
@@ -285,7 +285,7 @@ class ObQuickenLoans3571Controller < ApplicationController
                   end
                   # Multiple Unit Property
                   if r == 50 && cc == 3
-                    secondary_key = value.split("Property").first
+                    secondary_key = value.split("Property").first.try(:squish)
                     @property_hash["FannieMae/FreddieMac/PropertyType"] = {}
                     @property_hash["FannieMae/FreddieMac/PropertyType"]["true"] = {}
                     @property_hash["FannieMae/FreddieMac/PropertyType"]["true"]["true"] = {}
@@ -318,7 +318,7 @@ class ObQuickenLoans3571Controller < ApplicationController
                   end
                   if r >= 58 && r <= 59 && cc == 3
                     secondary_key = get_value value
-                    @property_hash["FannieMaeProduct/FreddieMacProduct/LTV/FICO"]["Home Ready"]["Home Possible"][secondary_key] = {}
+                    @property_hash["FannieMaeProduct/FreddieMacProduct/LTV/FICO"]["HomeReady"]["Home Possible"][secondary_key] = {}
                   end
                   if r >= 58 && r <= 59 && cc == 5
                     if value.downcase.include?('all')
@@ -326,17 +326,17 @@ class ObQuickenLoans3571Controller < ApplicationController
                     else
                       ltv_key = get_value value
                     end
-                    @property_hash["FannieMaeProduct/FreddieMacProduct/LTV/FICO"]["Home Ready"]["Home Possible"][secondary_key][ltv_key] = {}
+                    @property_hash["FannieMaeProduct/FreddieMacProduct/LTV/FICO"]["HomeReady"]["Home Possible"][secondary_key][ltv_key] = {}
                     cc = cc + 4
                     new_value = sheet_data.cell(r,cc)
-                    @property_hash["FannieMaeProduct/FreddieMacProduct/LTV/FICO"]["Home Ready"]["Home Possible"][secondary_key][ltv_key] = new_value
+                    @property_hash["FannieMaeProduct/FreddieMacProduct/LTV/FICO"]["HomeReady"]["Home Possible"][secondary_key][ltv_key] = new_value
                   end
                   if r == 60 && cc == 5
                     ltv_key = get_value value
-                    @property_hash["FannieMaeProduct/FreddieMacProduct/LTV/FICO"]["Home Ready"]["Home Possible"][secondary_key][ltv_key] = {}
+                    @property_hash["FannieMaeProduct/FreddieMacProduct/LTV/FICO"]["HomeReady"]["Home Possible"][secondary_key][ltv_key] = {}
                     cc = cc + 4
                     new_value = sheet_data.cell(r,cc)
-                    @property_hash["FannieMaeProduct/FreddieMacProduct/LTV/FICO"]["Home Ready"]["Home Possible"][secondary_key][ltv_key] = new_value
+                    @property_hash["FannieMaeProduct/FreddieMacProduct/LTV/FICO"]["HomeReady"]["Home Possible"][secondary_key][ltv_key] = new_value
                   end
                   if r == 65  && cc == 3
                     @property_hash["FreddieMac/LoanType"] = {}
@@ -579,56 +579,56 @@ class ObQuickenLoans3571Controller < ApplicationController
                     @other_adjustment["FannieMae/LoanType/PropertyType/LTV"]["true"] = {}
                     @other_adjustment["FannieMae/LoanType/PropertyType/LTV"]["true"]["Fixed"] = {}
                     @other_adjustment["FannieMae/LoanType/PropertyType/LTV"]["true"]["Fixed"]["2nd Home"] = {}
-                    @other_adjustment["FannieMae/LoanType/PropertyType/LTV"]["true"]["Fixed"]["Investment"] = {}
+                    @other_adjustment["FannieMae/LoanType/PropertyType/LTV"]["true"]["Fixed"]["Investment Property"] = {}
                     @other_adjustment["FannieMae/LoanType/PropertyType/LTV"]["true"]["Fixed"]["2nd Home"]["80-105"] = {}
-                    @other_adjustment["FannieMae/LoanType/PropertyType/LTV"]["true"]["Fixed"]["Investment"]["80-105"] = {}
+                    @other_adjustment["FannieMae/LoanType/PropertyType/LTV"]["true"]["Fixed"]["Investment Property"]["80-105"] = {}
                     @other_adjustment["FannieMae/LoanType/PropertyType/LTV"]["true"]["ARM"] = {}
                     @other_adjustment["FannieMae/LoanType/PropertyType/LTV"]["true"]["ARM"]["2nd Home"] = {}
-                    @other_adjustment["FannieMae/LoanType/PropertyType/LTV"]["true"]["ARM"]["Investment"] = {}
+                    @other_adjustment["FannieMae/LoanType/PropertyType/LTV"]["true"]["ARM"]["Investment Property"] = {}
                     @other_adjustment["FannieMae/LoanType/PropertyType/LTV"]["true"]["ARM"]["2nd Home"]["80-105"] = {}
-                    @other_adjustment["FannieMae/LoanType/PropertyType/LTV"]["true"]["ARM"]["Investment"]["80-105"] = {}
+                    @other_adjustment["FannieMae/LoanType/PropertyType/LTV"]["true"]["ARM"]["Investment Property"]["80-105"] = {}
                     cc = cc + 7
                     new_value = sheet_data.cell(r,cc)
                     @other_adjustment["FannieMae/LoanType/PropertyType/LTV"]["true"]["Fixed"]["2nd Home"]["80-105"] = new_value
-                    @other_adjustment["FannieMae/LoanType/PropertyType/LTV"]["true"]["Fixed"]["Investment"]["80-105"] = new_value
+                    @other_adjustment["FannieMae/LoanType/PropertyType/LTV"]["true"]["Fixed"]["Investment Property"]["80-105"] = new_value
                     @other_adjustment["FannieMae/LoanType/PropertyType/LTV"]["true"]["ARM"]["2nd Home"]["80-105"] = new_value
-                    @other_adjustment["FannieMae/LoanType/PropertyType/LTV"]["true"]["ARM"]["Investment"]["80-105"] = new_value
+                    @other_adjustment["FannieMae/LoanType/PropertyType/LTV"]["true"]["ARM"]["Investment Property"]["80-105"] = new_value
                   end
                   if r == 54 && cc == 18
                     @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["Fixed"]["2nd Home"] = {}
-                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["Fixed"]["Investment"] = {}
+                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["Fixed"]["Investment Property"] = {}
                     @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["Fixed"]["2nd Home"]["26-Inf"] = {}
-                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["Fixed"]["Investment"]["26-Inf"] = {}
+                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["Fixed"]["Investment Property"]["26-Inf"] = {}
                     @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["Fixed"]["2nd Home"]["26-Inf"]["105-Inf"] = {}
-                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["Fixed"]["Investment"]["26-Inf"]["105-Inf"] = {}
+                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["Fixed"]["Investment Property"]["26-Inf"]["105-Inf"] = {}
                     @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["ARM"]["2nd Home"] = {}
-                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["ARM"]["Investment"] = {}
+                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["ARM"]["Investment Property"] = {}
                     @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["ARM"]["2nd Home"]["26-Inf"] = {}
-                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["ARM"]["Investment"]["26-Inf"] = {}
+                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["ARM"]["Investment Property"]["26-Inf"] = {}
                     @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["ARM"]["2nd Home"]["26-Inf"]["105-Inf"] = {}
-                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["ARM"]["Investment"]["26-Inf"]["105-Inf"] = {}
+                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["ARM"]["Investment Property"]["26-Inf"]["105-Inf"] = {}
                     cc = cc + 7
                     new_value = sheet_data.cell(r,cc)
                     @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["Fixed"]["2nd Home"]["26-Inf"]["105-Inf"] = new_value
-                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["Fixed"]["Investment"]["26-Inf"]["105-Inf"] = new_value
+                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["Fixed"]["Investment Property"]["26-Inf"]["105-Inf"] = new_value
                     @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["ARM"]["2nd Home"]["26-Inf"]["105-Inf"] = new_value
-                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["ARM"]["Investment"]["26-Inf"]["105-Inf"] = new_value
+                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["ARM"]["Investment Property"]["26-Inf"]["105-Inf"] = new_value
                   end
                   if r == 55 && cc == 18
                     @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["Fixed"]["2nd Home"]["0-25"] = {}
-                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["Fixed"]["Investment"]["0-25"] = {}
+                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["Fixed"]["Investment Property"]["0-25"] = {}
                     @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["Fixed"]["2nd Home"]["0-25"]["105-Inf"] = {}
-                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["Fixed"]["Investment"]["0-25"]["105-Inf"] = {}
+                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["Fixed"]["Investment Property"]["0-25"]["105-Inf"] = {}
                     @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["ARM"]["2nd Home"]["0-25"] = {}
-                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["ARM"]["Investment"]["0-25"] = {}
+                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["ARM"]["Investment Property"]["0-25"] = {}
                     @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["ARM"]["2nd Home"]["0-25"]["105-Inf"] = {}
-                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["ARM"]["Investment"]["0-25"]["105-Inf"] = {}
+                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["ARM"]["Investment Property"]["0-25"]["105-Inf"] = {}
                     cc = cc + 7
                     new_value = sheet_data.cell(r,cc)
                     @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["Fixed"]["2nd Home"]["0-25"]["105-Inf"] = new_value
-                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["Fixed"]["Investment"]["0-25"]["105-Inf"] = new_value
+                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["Fixed"]["Investment Property"]["0-25"]["105-Inf"] = new_value
                     @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["ARM"]["2nd Home"]["0-25"]["105-Inf"] = new_value
-                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["ARM"]["Investment"]["0-25"]["105-Inf"] = new_value
+                    @other_adjustment["FannieMae/LoanType/PropertyType/Term/LTV"]["true"]["ARM"]["Investment Property"]["0-25"]["105-Inf"] = new_value
                   end
                   if r == 56 && cc == 18
                     @other_adjustment["FannieMae/LoanSize/LoanType/LTV"] = {}
@@ -647,17 +647,17 @@ class ObQuickenLoans3571Controller < ApplicationController
                     @other_adjustment["FannieMae/LoanSize/LoanType/LTV"]["true"]["High-Balance"]["ARM"]["80-Inf"] = new_value
                   end
                   if r == 58 && cc == 18
-                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"] = {}
-                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"]["true"] = {}
-                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"]["true"]["High-Balance"] = {}
-                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"]["true"]["High-Balance"]["2nd Home"] = {}
-                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"]["true"]["High-Balance"]["Investment"] = {}
-                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"]["true"]["High-Balance"]["2nd Home"]["80-Inf"] = {}
-                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"]["true"]["High-Balance"]["Investment"]["80-Inf"] = {}
+                    @other_adjustment["FannieMae/LoanSize/PropertyType/LTV"] = {}
+                    @other_adjustment["FannieMae/LoanSize/PropertyType/LTV"]["true"] = {}
+                    @other_adjustment["FannieMae/LoanSize/PropertyType/LTV"]["true"]["High-Balance"] = {}
+                    @other_adjustment["FannieMae/LoanSize/PropertyType/LTV"]["true"]["High-Balance"]["2nd Home"] = {}
+                    @other_adjustment["FannieMae/LoanSize/PropertyType/LTV"]["true"]["High-Balance"]["Investment Property"] = {}
+                    @other_adjustment["FannieMae/LoanSize/PropertyType/LTV"]["true"]["High-Balance"]["2nd Home"]["80-Inf"] = {}
+                    @other_adjustment["FannieMae/LoanSize/PropertyType/LTV"]["true"]["High-Balance"]["Investment Property"]["80-Inf"] = {}
                     cc = cc + 7
                     new_value = sheet_data.cell(r,cc)
-                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"]["true"]["High-Balance"]["2nd Home"]["80-Inf"] = new_value
-                    @other_adjustment["FannieMae/LoanSize/LoanType/PropertyType/LTV"]["true"]["High-Balance"]["Investment"]["80-Inf"] = new_value
+                    @other_adjustment["FannieMae/LoanSize/PropertyType/LTV"]["true"]["High-Balance"]["2nd Home"]["80-Inf"] = new_value
+                    @other_adjustment["FannieMae/LoanSize/PropertyType/LTV"]["true"]["High-Balance"]["Investment Property"]["80-Inf"] = new_value
                   end
                   if r >= 61 && r <= 63 && cc == 16
                     secondary_key = get_value value
@@ -780,7 +780,7 @@ class ObQuickenLoans3571Controller < ApplicationController
                   end
                   # Multiple Unit Property
                   if r == 63 && cc == 3
-                    secondary_key = value.split("Property").first
+                    secondary_key = value.split("Property").first.try(:squish)
                     @property_hash["FannieMae/FreddieMac/PropertyType"] = {}
                     @property_hash["FannieMae/FreddieMac/PropertyType"]["true"] = {}
                     @property_hash["FannieMae/FreddieMac/PropertyType"]["true"]["true"] = {}
@@ -790,7 +790,7 @@ class ObQuickenLoans3571Controller < ApplicationController
                     @property_hash["FannieMae/FreddieMac/PropertyType"]["true"]["true"][secondary_key] = new_value
                   end
                   if r == 64 && cc == 3
-                    secondary_key = value.split("Property").first
+                    secondary_key = value.split("Property").first.try(:squish)
                     @property_hash["FannieMae/PropertyType"] = {}
                     @property_hash["FannieMae/PropertyType"]["true"] = {}
                     @property_hash["FannieMae/PropertyType"]["true"][secondary_key] = {}
@@ -846,11 +846,11 @@ class ObQuickenLoans3571Controller < ApplicationController
                   end
                   # ARM Caps
                   if r >= 77 && r <= 79 && cc == 3
-                    secondary_key = value
+                    secondary_key = value.split('/').first
                     @other_adjustment["LoanType/ArmBasic/ArmAdvanced/Margin"]["ARM"][secondary_key] = {}
                   end
                   if r >= 77 && r <= 79 && cc == 5
-                    ltv_key = value
+                    ltv_key = value.tr('/','-')
                     @other_adjustment["LoanType/ArmBasic/ArmAdvanced/Margin"]["ARM"][secondary_key][ltv_key] = {}
                   end
                   if r >= 77 && r <= 79 && cc == 8
@@ -1284,7 +1284,7 @@ class ObQuickenLoans3571Controller < ApplicationController
               value = sheet_data.cell(r,cc)
               if value.present?
                 if r == 70 && cc == 5
-                  secondary_key = value.tr('A-Za-z><= ','')+"-Inf"
+                  secondary_key = value.tr('A-Za-z><=, ','')+"-Inf"
                   @adjustment_hash["LoanAmount"] = {}
                   @adjustment_hash["LoanAmount"][secondary_key] = {}
                   cc = cc + 10
@@ -1353,10 +1353,10 @@ class ObQuickenLoans3571Controller < ApplicationController
                     @adjustment_hash["FreddieMacProduct/LoanType/Term/FICO/LTV"]["Home Possible"]["Fixed"]["30"] = {}
                   end
                   if value == "25-21 Years Fixed"
-                    @additional_adjustment["LoanType/Term"] = {}
-                    @additional_adjustment["LoanType/Term"]["Fixed"] = {}
-                    @additional_adjustment["LoanType/Term"]["Fixed"]["25-21"] = {}
-                    @additional_adjustment["LoanType/Term"]["Fixed"]["20-8"] = {}
+                    @additional_adjustment["LoanType/Term/FICO"] = {}
+                    @additional_adjustment["LoanType/Term/FICO"]["Fixed"] = {}
+                    @additional_adjustment["LoanType/Term/FICO"]["Fixed"]["21-25"] = {}
+                    @additional_adjustment["LoanType/Term/FICO"]["Fixed"]["8-20"] = {}
                     @additional_adjustment["PropertyType/FICO"] = {}
                   end
                   # 30-26 Years Fixed & ARMs
@@ -1385,22 +1385,22 @@ class ObQuickenLoans3571Controller < ApplicationController
                   # 25-21 Years Fixed
                   if r >= 27 && r <= 30 && cc == 3
                     secondary_key = get_value value
-                    @additional_adjustment["LoanType/Term"]["Fixed"]["25-21"][secondary_key] = {}
+                    @additional_adjustment["LoanType/Term/FICO"]["Fixed"]["21-25"][secondary_key] = {}
                   end
                   if r >= 27 && r <= 30 && cc >= 4 && cc <= 13
                     ltv_key = get_value @ltv_data[cc-2]
-                    @additional_adjustment["LoanType/Term"]["Fixed"]["25-21"][secondary_key][ltv_key] = {}
-                    @additional_adjustment["LoanType/Term"]["Fixed"]["25-21"][secondary_key][ltv_key] = value
+                    @additional_adjustment["LoanType/Term/FICO"]["Fixed"]["21-25"][secondary_key][ltv_key] = {}
+                    @additional_adjustment["LoanType/Term/FICO"]["Fixed"]["21-25"][secondary_key][ltv_key] = value
                   end
                   # 20-8 Years Fixed
                   if r >= 36 && r <= 39 && cc == 3
                     secondary_key = get_value value
-                    @additional_adjustment["LoanType/Term"]["Fixed"]["20-8"][secondary_key] = {}
+                    @additional_adjustment["LoanType/Term/FICO"]["Fixed"]["8-20"][secondary_key] = {}
                   end
                   if r >= 36 && r <= 39 && cc >= 4 && cc <= 13
                     ltv_key = get_value @ltv_data[cc-2]
-                    @additional_adjustment["LoanType/Term"]["Fixed"]["20-8"][secondary_key][ltv_key] = {}
-                    @additional_adjustment["LoanType/Term"]["Fixed"]["20-8"][secondary_key][ltv_key] = value
+                    @additional_adjustment["LoanType/Term/FICO"]["Fixed"]["8-20"][secondary_key][ltv_key] = {}
+                    @additional_adjustment["LoanType/Term/FICO"]["Fixed"]["8-20"][secondary_key][ltv_key] = value
                   end
                   # Misc Adjustments
                   if r >= 47 && r <= 49 && cc == 3
@@ -1458,10 +1458,10 @@ class ObQuickenLoans3571Controller < ApplicationController
         	value1 = value1.tr('A-Z<>$%=+, ','')+"-Inf"
           value1 = value1.tr('–','-')
         elsif value1.include?("-")
-          value1 = value1.tr('A-Z<>$%= ','')
+          value1 = value1.tr('A-Za-z()/<>$%=, ','')
           value1 = value1.tr('–','-')
         else
-          value1.tr('A-Za-z/()&%, ','')
+          value1 = value1.tr('A-Za-z/()&%, ','')
           value1 = value1.tr('–','-')
         end
       end

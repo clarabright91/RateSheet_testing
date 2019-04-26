@@ -133,7 +133,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                   sub_adjustment range1, range2, sheet_data, first_row, end_row, @sheet_name, first_column, cltv_column, last_column, ltv_row, primary_key
                 end
                 if value == "LPMI COVERAGE BASED ADJUSTMENTS"
-                  primary_key = "LPMI/RefinanceOption/FICO"
+                  primary_key = "LPMI/LoanSize/FICO/LTV"
                   first_row = 399
                   end_row = 404
                   first_column = 9
@@ -1098,7 +1098,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
             begin
               value = sheet_data.cell(r,cc)
               if value == "ARM INFORMATION"
-                primary_key = "LoanType/Term/LTV/FICO"
+                primary_key = "LoanSize/Term/LTV/FICO"
                 first_row = 2626
                 end_row = 2629
                 first_column = 11
@@ -1108,7 +1108,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
               end
 
               if value == "PROGRAM SPECIFIC PRICE ADJUSTMENTS "
-                primary_key = "LoanType/Term/LTV/FICO"
+                primary_key = "LoanSize/Term/LTV/FICO"
                 first_row = 2638
                 end_row = 2652
                 first_column = 13
@@ -1293,7 +1293,7 @@ class ObSunWestWholesaleDemo5907Controller < ApplicationController
                   @adj_hash["PropertyType/LTV"]["2-4 Unit"][ltv_key] = new_val
                 end
                 if value == "ARM INFORMATION"
-                  primary_key = "LoanType/Term/LTV/FICO"
+                  primary_key = "LoanSize/Term/LTV/FICO"
                   first_row = 2799
                   end_row = 2802
                   first_column = 18

@@ -146,9 +146,6 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                   end
                   if r >= 95 && r <= 101 && cc >= 4 && cc <= 11
                     ltv_key = get_value @cltv_data[cc-1]
-                    if ltv_key.include?('%')
-                      ltv_key = ltv_key.split("%").last
-                    end
                     @mortgage_hash[primary_key][new_key][secondary_key][ltv_key] = {}
                     @mortgage_hash[primary_key][new_key][secondary_key][ltv_key] = (value.class == Float ? value*100 : value)
                   end
@@ -595,11 +592,6 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                   end
                   if r == 69 && cc >= 3 && cc <= 10
                     ltv_key = get_value @cltv_data[cc-1]
-                    if ltv_key.include?("%")
-                      ltv_key = ltv_key.tr('% ','')
-                    else
-                      ltv_key
-                    end
                     @adjustment_hash["PropertyType/Term/LTV"]["Investment Property"]["0-Inf"][ltv_key] = {}
                     @adjustment_hash["PropertyType/Term/LTV"]["Investment Property"]["0-Inf"][ltv_key] = (value.class == Float ? value*100 : value)
                   end
@@ -1081,9 +1073,10 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
                     @property_hash["PropertyType/Term/LTV"] = {}
                     @property_hash["PropertyType/Term/LTV"]["Condo"] = {}
                     @property_hash["PropertyType/Term/LTV"]["Condo"]["15-Inf"] = {}
+                    @property_hash["PropertyType/Term/LTV"]["Condo"]["15-Inf"]["75-Inf"] = {}
                     cc = cc + 3
                     new_value = sheet_data.cell(r,cc)
-                    @property_hash["PropertyType/Term/LTV"]["Condo"]["15-Inf"] = new_value*100
+                    @property_hash["PropertyType/Term/LTV"]["Condo"]["15-Inf"]["75-Inf"] = new_value*100
                   end
                   if r == 61 && cc == 10
                     @property_hash["PropertyType/LTV"] = {}
@@ -1834,7 +1827,7 @@ class ObUnionHomeMortgageWholesale1711Controller < ApplicationController
         value1 = value1.split(">").last.tr('^0-9 ', '')+"-Inf"
         value1 = value1.tr('–','-')
       else
-        value1
+        value1 = value1.tr('A-Za-z% ','')
         value1 = value1.tr('–','-')
       end
     end

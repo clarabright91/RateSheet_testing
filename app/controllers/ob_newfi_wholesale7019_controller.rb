@@ -1789,10 +1789,10 @@ class ObNewfiWholesale7019Controller < ApplicationController
               end
               if r == 167 && cc == 13
                 @other_adjustment["LoanAmount"] = {}
-                @other_adjustment["LoanAmount"]["150000"] = {}
+                @other_adjustment["LoanAmount"]["150000-Inf"] = {}
                 cc = cc + 4
                 new_value = sheet_data.cell(r,cc)
-                @other_adjustment["LoanAmount"]["150000"] = new_value
+                @other_adjustment["LoanAmount"]["150000-Inf"] = new_value
               end
               if r == 168 && cc == 13
                 @other_adjustment["LoanAmount"]["250000-Inf"] = {}
@@ -2385,10 +2385,10 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @other_adjustment["LoanAmount/State"]["275000-Inf"]["CA"] = new_value
               end
               if r == 171 && cc == 12
-                @other_adjustment["LoanAmount/State"]["200000-275000"] = {}
+                @other_adjustment["LoanAmount/State"]["CA"]["200000-275000"] = {}
                 cc = cc + 4
                 new_value = sheet_data.cell(r,cc)
-                @other_adjustment["LoanAmount/State"]["200000-275000"] = new_value
+                @other_adjustment["LoanAmount/State"]["CA"]["200000-275000"] = new_value
               end
 
               # Loans With Secondary Financing
@@ -2556,10 +2556,10 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @property_hash["LoanType/RefinanceOption/LoanAmount"] = {}
                 @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"] = {}
                 @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"] = {}
-                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"]["100000"] = {}
+                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"]["100000-Inf"] = {}
                 cc = cc + 2
                 new_val = sheet_data.cell(r,cc)
-                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"]["100000"] = new_val
+                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"]["100000-Inf"] = new_val
               end
               if r == 169 && cc == 4
                 @property_hash["LoanType/PropertyType"] = {}
@@ -2790,10 +2790,10 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @property_hash["LoanType/RefinanceOption/LoanAmount"] = {}
                 @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"] = {}
                 @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"] = {}
-                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"]["100000"] = {}
+                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"]["100000-Inf"] = {}
                 cc = cc + 2
                 new_val = sheet_data.cell(r,cc)
-                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"]["100000"] = new_val
+                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"]["100000-Inf"] = new_val
               end
               if r == 167 && cc == 4
                 @property_hash["LoanType/PropertyType"] = {}
@@ -3007,10 +3007,10 @@ class ObNewfiWholesale7019Controller < ApplicationController
                 @property_hash["LoanType/RefinanceOption/LoanAmount"] = {}
                 @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"] = {}
                 @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"] = {}
-                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"]["100000"] = {}
+                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"]["100000-Inf"] = {}
                 cc = cc + 2
                 new_val = sheet_data.cell(r,cc)
-                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"]["100000"] = new_val
+                @property_hash["LoanType/RefinanceOption/LoanAmount"]["Fixed"]["Cash Out"]["100000-Inf"] = new_val
               end
               if r == 170 && cc == 4
                 @property_hash["LoanType/PropertyType"] = {}
