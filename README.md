@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # README
 
 This README would normally document whatever steps are necessary to get the
@@ -43,4 +44,3 @@ Things you may want to cover:
         * Download file through url
         * Extract file and call controller method
         * Than upload file on google drive
-* ...
