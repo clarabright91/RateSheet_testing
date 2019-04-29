@@ -73,4 +73,4 @@ gem "select2-rails"
 gem 'csv'
 gem 'jquery-validation-rails'
 
-gem 'search_api', git: "git@github.com:PureLoan/APIRead.git"
+gem 'search_api', :git => 'https://clarabright91:clara-987@github.com/PureLoan/APIHookup.git'
