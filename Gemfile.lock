@@ -1,5 +1,6 @@
-PATH
-  remote: /home/richa-yuva/richa_new/search_api
+GIT
+  remote: git@github.com:PureLoan/APIRead.git
+  revision: f057742f7d0e3b07049c538dffd80171ddf2088b
   specs:
     search_api (0.1.0)
       activesupport
